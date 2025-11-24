@@ -269,6 +269,110 @@
             color: #555;
             line-height: 1.5;
         }
+        
+        /* Leistungen Section (Privat + Firmen Karten) */
+.leistungen-section {
+    padding: 4rem 1rem;
+    background: #f9fafb;
+}
+
+.leistungen-section h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: #1a1a1a;
+}
+
+.leistungen-subtitle {
+    max-width: 700px;
+    margin: 0 auto 2.5rem;
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.98rem;
+}
+
+.leistungen-grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.leistungen-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 1.8rem;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    border: 1px solid #e5e7eb;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+}
+
+.leistungen-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: #020617;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #f9fafb;
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+}
+
+.leistungen-card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #111827;
+}
+
+.leistungen-image {
+    width: 100%;
+    height: 190px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 1.2rem;
+}
+
+.leistungen-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.leistungen-card p {
+    font-size: 0.95rem;
+    color: #4b5563;
+    margin-bottom: 1rem;
+}
+
+.leistungen-list {
+    margin: 0;
+    padding-left: 1.1rem;
+    color: #111827;
+    font-size: 0.95rem;
+}
+
+.leistungen-list li {
+    margin-bottom: 0.3rem;
+}
+
+/* mobil */
+@media (max-width: 768px) {
+    .leistungs-section h2 {
+        font-size: 1.8rem;
+    }
+
+    .leistungen-card {
+        padding: 1.5rem;
+    }
+}
+
 
         /* Services */
         .services {
@@ -701,6 +805,125 @@
                 font-size: 1.6rem;
             }
         }
+        /* 100W JPT Laser-Technologie Section */
+.tech-section {
+    padding: 4rem 1rem;
+    background: #f9fafb;
+}
+
+.tech-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 3rem;
+    align-items: center;
+}
+
+.tech-left h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: #111827;
+    font-weight: 700;
+}
+
+.tech-left p {
+    color: #4b5563;
+    margin-bottom: 1.5rem;
+    line-height: 1.7;
+    font-size: 0.98rem;
+}
+
+.tech-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.7rem;
+}
+
+.tech-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: #111827;
+    font-size: 0.95rem;
+}
+
+.tech-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    background: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    color: #22c55e;
+}
+
+/* Right side card */
+.tech-card {
+    background: #020617;
+    color: #e5e7eb;
+    border-radius: 18px;
+    padding: 2.5rem 2.8rem;
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.7);
+}
+
+.tech-card-main {
+    margin-bottom: 2rem;
+}
+
+.tech-power {
+    font-size: 3rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.4rem;
+}
+
+.tech-label {
+    font-size: 0.95rem;
+    color: #9ca3af;
+}
+
+.tech-card-row {
+    margin-top: 1.6rem;
+}
+
+.tech-card-title {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #9ca3af;
+    margin-bottom: 0.3rem;
+}
+
+.tech-card-value {
+    font-size: 1.7rem;
+    font-weight: 600;
+}
+
+.tech-card-note {
+    font-size: 0.95rem;
+    color: #9ca3af;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .tech-inner {
+        grid-template-columns: 1fr;
+    }
+
+    .tech-card {
+        padding: 2rem 1.8rem;
+    }
+
+    .tech-power {
+        font-size: 2.4rem;
+    }
+}
+
     </style>
 </head>
 <body>
@@ -712,6 +935,7 @@
                 <a href="#privat">Privatkunden</a>
                 <a href="#firmen">Firmen</a>
                 <a href="#services">Beispiele</a>
+                <a href="#laser-tech">Technologie</a>
                 <a href="#faq">FAQ</a>
                 <a href="#contact">Kontakt</a>
             </nav>
@@ -719,75 +943,70 @@
     </header>
 
     <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1>Lasergravur für Firmen & <span>Privatkunden</span></h1>
-            <p>Präzise Beschriftungen für Industrie, Handwerk und individuelle Geschenke im Raum Rosenheim.</p>
-            <div class="cta-group">
-                <a href="#privat" class="cta-button">Für Privatkunden</a>
-                <a href="#firmen" class="cta-button cta-secondary">Für Firmen</a>
-            </div>
-        </div>
-    </section>
+<section class="hero">
+    <div class="hero-content">
+        <h1>Lasergravur für Firmen & <span>Privatkunden</span></h1>
+        <p>Präzise Beschriftungen für Industrie, Handwerk und individuelle Geschenke im Raum Rosenheim.</p>
+    </div>
+</section>
     
 
-    <!-- Privatkunden Section -->
-    <section class="audience-section" id="privat">
-        <h2>Für Privatkunden</h2>
-        <p class="section-intro">
-            Persönliche Geschenke, Hausnummern, Briefkästen oder Einzelstücke – wir gravieren Ihr Wunschmotiv präzise und langlebig.
+    <!-- Unsere Leistungen: Privat + Firmen in 2 Karten -->
+    <section class="leistungen-section" id="privat">
+        <h2>Unsere Leistungen</h2>
+        <p class="leistungen-subtitle">
+            Individuelle Lösungen für Privat- und Geschäftskunden – präzise Lasergravuren für 
+            Geschenke, Werkstücke und Serienprodukte.
         </p>
-        <div class="audience-grid">
-            <div class="audience-card">
-                <span class="audience-badge">Geschenke</span>
-                <h3>Personalisierte Geschenke</h3>
-                <p>Aus einfachen Dingen persönliche Lieblingsstücke machen – mit Ihrer Wunschgravur.</p>
-            </div>
-            <div class="audience-card">
-                <span class="audience-badge">Zuhause</span>
-                <h3>Hausnummern & Briefkästen</h3>
-                <p>Aus einer Adresse ein Blickfang machen – mit Ihrer gravierten Hausnummer oder Ihrem Briefkasten.</p>
-            </div>
-            <div class="audience-card">
-                <span class="audience-badge">Anlässe</span>
-                <h3>Hochzeit & besondere Momente</h3>
-                <p>Hochzeit, Jubiläum und besondere Momente in persönliche Erinnerungen verwandeln – mit Ihrer Wunschgravur.</p>
-            </div>
-            <div class="audience-card">
-                <span class="audience-badge">Einzelstücke</span>
-                <h3>Einzelstücke & Kleinserien</h3>
-                <p>Auch kleine Stückzahlen oder einzelne Unikate sind willkommen – wir nehmen uns Zeit für Ihr Projekt.</p>
-            </div>
-        </div>
-    </section>
 
-    <!-- Firmen Section -->
-    <section class="audience-section alt" id="firmen">
-        <h2>Für Firmen & Handwerk</h2>
-        <p class="section-intro">
-            Dauerhafte Kennzeichnung für Industrie, Handwerk und Dienstleistung – von Seriennummern bis zur Werkzeugkennzeichnung.
-        </p>
-        <div class="audience-grid">
-            <div class="audience-card">
-                <span class="audience-badge">Rückverfolgbarkeit</span>
-                <h3>Seriennummern & Typenschilder</h3>
-                <p>Klare, dauerhafte Beschriftungen für Bauteile und Maschinen – ideal für Qualitäts- und Chargenverfolgung.</p>
-            </div>
-            <div class="audience-card">
-                <span class="audience-badge">Werkstatt</span>
-                <h3>Werkzeugkennzeichnung</h3>
-                <p>Gravuren auf Werkzeugen, Spannmitteln und Betriebsmitteln – damit nichts mehr so leicht verloren geht.</p>
-            </div>
-            <div class="audience-card">
-                <span class="audience-badge">Digital</span>
-                <h3>QR-Codes & DataMatrix</h3>
-                <p>Scannbare Codes direkt auf Metalloberflächen – für digitale Dokumentation, Serviceinformationen oder Lagerlogistik.</p>
-            </div>
-            <div class="audience-card">
-                <span class="audience-badge">Flexibel</span>
-                <h3>Lohngravur & Kleinserien</h3>
-                <p>Flexible Stückzahlen, schnelle Bearbeitung und kurze Wege – ideal für regionale Betriebe im Raum Rosenheim.</p>
-            </div>
+        <div class="leistungen-grid">
+            <!-- Karte 1: Privatkunden -->
+            <article class="leistungen-card">
+                <div class="leistungen-icon">👤</div>
+                <h3>Für Privatkunden</h3>
+
+                <div class="leistungen-image">
+                    <img src="images/privatkunden.jpg" alt="Personalisierte Geschenke mit hochwertiger Lasergravur">
+                </div>
+
+                <p>
+                    Machen Sie aus Alltagsgegenständen besondere Unikate: 
+Mit unserer Faserlaser-Gravur personalisieren wir Geschenke und Erinnerungsstücke 
+mit Namen, Daten, Sprüchen, Logos oder Motiven – ideal für besondere Tage, Hochzeit, Jubiläum 
+oder einfach zwischendurch.
+                </p>
+                <ul class="leistungen-list">
+                    <li>Schmuck, Anhänger und Accessoires</li>
+                    <li>Schlüsselanhänger, Stifte und Feuerzeuge</li>
+                    <li>Trinkflaschen, Thermobecher, Messer und Werkzeug</li>
+                    <li>Erinnerungstafeln, Metallkarten und Plaketten</li>
+                    <li>Individuelle Motive, Logos und Widmungen</li>
+                </ul>
+            </article>
+
+            <!-- Karte 2: Firmenkunden -->
+            <article class="leistungen-card" id="firmen">
+                <div class="leistungen-icon">🏢</div>
+                <h3>Für Unternehmen</h3>
+
+                <div class="leistungen-image">
+                    <img src="images/firmenkunden.jpg" alt="Industrielle Markierungen & dauerhafte Kennzeichnung">
+                </div>
+
+                <p>
+                    Wir unterstützen Unternehmen bei der professionellen Kennzeichnung ihrer Produkte, 
+Bauteile und Werkzeuge. Mit präziser Faserlaser-Gravur erstellen wir gut lesbare, 
+dauerhaft beständige Markierungen – von Seriennummern bis hin zu maschinenlesbaren Codes.
+                </p>
+                <ul class="leistungen-list">
+                    <li>Seriennummern, Chargen- und Datumskennzeichnung</li>
+                    <li>Firmenlogos, CE-Kennzeichnung und Piktogramme</li>
+                    <li>Typenschilder, Frontplatten und Skalen</li>
+                    <li>Werkzeug- und Inventarkennzeichnung</li>
+                    <li>QR-Codes &amp; DataMatrix-Codes für Rückverfolgbarkeit</li>
+                    <li>Auf Wunsch Speicherung Ihrer Layouts für Nachbestellungen</li>
+                </ul>
+            </article>
         </div>
     </section>
     
@@ -809,6 +1028,56 @@
                 <div class="step-number">3</div>
                 <h3>Gravur & Übergabe</h3>
                 <p>Nach Freigabe gravieren wir Ihr Projekt und übergeben es termingerecht.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 100W JPT Laser-Technologie Section -->
+    <section class="tech-section" id="laser-tech">
+        <div class="tech-inner">
+            <div class="tech-left">
+                <h2>100W JPT Laser-Technologie</h2>
+                <p>
+                    Unser hochmoderner 100W JPT Laser ermöglicht präzise Gravuren auf den 
+                    verschiedensten Materialien. Die fortschrittliche Technologie garantiert 
+                    gleichbleibend hohe Qualität und Detailtreue – vom Einzelstück bis zur Serie.
+                </p>
+                <ul class="tech-list">
+                    <li>
+                        <div class="tech-icon">✓</div>
+                        <span>Hochpräzise Gravuren bis ins kleinste Detail</span>
+                    </li>
+                    <li>
+                        <div class="tech-icon">✓</div>
+                        <span>Vielseitig einsetzbar auf Metall, Holz, Kunststoff und mehr</span>
+                    </li>
+                    <li>
+                        <div class="tech-icon">✓</div>
+                        <span>Schnelle Bearbeitungszeiten ohne Qualitätsverlust</span>
+                    </li>
+                    <li>
+                        <div class="tech-icon">✓</div>
+                        <span>Dauerhafte und beständige Ergebnisse</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="tech-card">
+                <div class="tech-card-main">
+                    <div class="tech-power">100W</div>
+                    <div class="tech-label">Laser-Leistung</div>
+                </div>
+
+                <div class="tech-card-row">
+                    <div class="tech-card-title">Präzision</div>
+                    <div class="tech-card-value">±0,01&nbsp;mm</div>
+                </div>
+
+                <div class="tech-card-row" style="margin-top: 1.8rem;">
+                    <div class="tech-card-title">Möglichkeiten</div>
+                    <div class="tech-card-value">∞</div>
+                    <div class="tech-card-note">Von Seriennummern bis personalisierten Geschenken</div>
+                </div>
             </div>
         </div>
     </section>
