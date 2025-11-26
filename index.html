@@ -375,10 +375,100 @@
 
 
         /* Services */
-        .services {
-            padding: 4rem 1rem;
-            background: #f9fafb;
-        }
+/* Vízszintes slider a „Beispiele & Inspiration” részhez */
+.services {
+    position: relative;
+    padding: 4rem 1rem;
+    background: #f9fafb;
+}
+
+.services h2 {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    font-size: 2rem;
+    color: #1a1a1a;
+}
+
+/* Görgethető sáv */
+.services-scroller {
+    max-width: 1100px;
+    margin: 0 auto;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Kártyák egy sorban */
+.services-grid {
+    display: flex;
+    gap: 1.5rem;
+}
+
+/* Minden kártya fix szélességű, szépen „bekattan” */
+.service-card {
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    overflow: hidden;
+    flex: 0 0 260px;        /* kb. 260px széles kártya */
+    scroll-snap-align: start;
+}
+
+/* Scrollbar elrejtése (Chrome/Safari) */
+.services-scroller::-webkit-scrollbar {
+    display: none;
+}
+
+/* Bal/jobb lapozó gombok */
+.slider-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: rgba(15, 23, 42, 0.8);
+    color: #f9fafb;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.slider-btn:hover {
+    background: rgba(0, 212, 255, 0.9);
+    transform: translateY(-50%) scale(1.05);
+}
+
+.slider-btn-prev {
+    left: 10px;
+}
+
+.slider-btn-next {
+    right: 10px;
+}
+
+/* Mobilon a gombok kisebbek legyenek */
+@media (max-width: 768px) {
+    .service-card {
+        flex: 0 0 220px;
+    }
+
+    .slider-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 1.2rem;
+    }
+}
 
         .services h2 {
             text-align: center;
@@ -388,12 +478,9 @@
         }
 
         .services-grid {
-            max-width: 1100px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 1.5rem;
-        }
+    display: flex;
+    gap: 1.5rem;
+}
 
         .service-card {
             background: white;
@@ -1106,74 +1193,82 @@
         </div>
     </section>
 
-  <section class="services" id="services">
+ <section class="services" id="services">
     <h2>Beispiele & Inspiration</h2>
-    <div class="services-grid">
 
-        <div class="service-card">
-            <div class="service-image">
-                <img src="images/seriennummern.jpg">
+    <!-- Bal/jobb lapozó gombok -->
+    <button class="slider-btn slider-btn-prev" type="button" aria-label="Zurück">‹</button>
+    <button class="slider-btn slider-btn-next" type="button" aria-label="Weiter">›</button>
+
+    <!-- Vízszintesen görgethető sáv -->
+    <div class="services-scroller" id="servicesScroller">
+        <div class="services-grid">
+
+            <div class="service-card">
+                <div class="service-image">
+                    <img src="images/seriennummern.jpg" alt="Seriennummern">
+                </div>
+                <h3>Seriennummern</h3>
+                <p>Präzise Nummerierung für Nachverfolgung und Authentifizierung Ihrer Produkte</p>
             </div>
-            <h3>Seriennummern</h3>
-            <p>Präzise Nummerierung für Nachverfolgung und Authentifizierung Ihrer Produkte</p>
-        </div>
 
-        <div class="service-card">
-            <div class="service-image">
-                <img src="images/qrcodes.jpg" >
+            <div class="service-card">
+                <div class="service-image">
+                    <img src="images/qrcodes.jpg" alt="QR-Codes">
+                </div>
+                <h3>QR-Codes</h3>
+                <p>Funktionale QR-Codes für digitale Vernetzung und Produktinformationen</p>
             </div>
-            <h3>QR-Codes</h3>
-            <p>Funktionale QR-Codes für digitale Vernetzung und Produktinformationen</p>
-        </div>
 
-        <div class="service-card">
-            <div class="service-image">
-                <img src="images/Logo.jpg">
+            <div class="service-card">
+                <div class="service-image">
+                    <img src="images/Logo.jpg" alt="Logo-Gravur">
+                </div>
+                <h3>Logo-Gravur</h3>
+                <p>Scharfe, detaillierte Logo-Gravuren für Ihr Corporate Branding</p>
             </div>
-            <h3>Logo-Gravur</h3>
-            <p>Scharfe, detaillierte Logo-Gravuren für Ihr Corporate Branding</p>
-        </div>
 
-        <div class="service-card">
-            <div class="service-image">
-                <img src="images/farbige.jpg">
+            <div class="service-card">
+                <div class="service-image">
+                    <img src="images/farbige.jpg" alt="Farbige Edelstahl-Gravur">
+                </div>
+                <h3>Farbige Edelstahl-Gravur</h3>
+                <p>Hochwertige farbige Gravuren auf Edelstahl für beeindruckende Effekte</p>
             </div>
-            <h3>Farbige Edelstahl-Gravur</h3>
-            <p>Hochwertige farbige Gravuren auf Edelstahl für beeindruckende Effekte</p>
-        </div>
 
-        <div class="service-card">
-            <div class="service-image">
-                <img src="images/schmuck.jpg">
+            <div class="service-card">
+                <div class="service-image">
+                    <img src="images/schmuck.jpg" alt="Schmuck-Gravur">
+                </div>
+                <h3>Schmuck-Gravur</h3>
+                <p>Zarte und elegante Gravuren auf Schmuck und wertvollen Objekten</p>
             </div>
-            <h3>Schmuck-Gravur</h3>
-            <p>Zarte und elegante Gravuren auf Schmuck und wertvollen Objekten</p>
-        </div>
 
-        <div class="service-card">
-            <div class="service-image">
-                <img src="images/werkzeugkennzeichnung.jpg">
+            <div class="service-card">
+                <div class="service-image">
+                    <img src="images/werkzeugkennzeichnung.jpg" alt="Werkzeugkennzeichnung">
+                </div>
+                <h3>Werkzeugkennzeichnung</h3>
+                <p>Dauerhafte Markierung von Werkzeugen und Ausrüstungen</p>
             </div>
-            <h3>Werkzeugkennzeichnung</h3>
-            <p>Dauerhafte Markierung von Werkzeugen und Ausrüstungen</p>
-        </div>
 
-        <div class="service-card">
-            <div class="service-image">
-                <img src="images/geschenk.jpg">
+            <div class="service-card">
+                <div class="service-image">
+                    <img src="images/geschenk.jpg" alt="Geschenk-Gravur">
+                </div>
+                <h3>Geschenk-Gravur</h3>
+                <p>Personalisierte Gravuren für unvergessliche Geschenke</p>
             </div>
-            <h3>Geschenk-Gravur</h3>
-            <p>Personalisierte Gravuren für unvergessliche Geschenke</p>
-        </div>
 
-        <div class="service-card">
-            <div class="service-image">
-                <img src="images/hochzeits.jpg">
+            <div class="service-card">
+                <div class="service-image">
+                    <img src="images/hochzeits.jpg" alt="Hochzeits-Gravuren">
+                </div>
+                <h3>Hochzeits-Gravuren</h3>
+                <p>Elegante und emotionale Gravuren für Ihren besonderen Tag</p>
             </div>
-            <h3>Hochzeits-Gravuren</h3>
-            <p>Elegante und emotionale Gravuren für Ihren besonderen Tag</p>
-        </div>
 
+        </div>
     </div>
 </section>
 
@@ -1407,6 +1502,29 @@
                 submitBtn.textContent = 'Kostenlose Anfrage senden';
             }
         });
+        // Slider gombok a „Beispiele & Inspiration” részhez
+const servicesScroller = document.getElementById('servicesScroller');
+const nextBtn = document.querySelector('.slider-btn-next');
+const prevBtn = document.querySelector('.slider-btn-prev');
+
+if (servicesScroller && nextBtn && prevBtn) {
+    const getStep = () => {
+        const card = servicesScroller.querySelector('.service-card');
+        if (!card) return 300;
+        const cardStyle = window.getComputedStyle(card);
+        const gap = 24; // kb. 1.5rem
+        return card.offsetWidth + gap;
+    };
+
+    nextBtn.addEventListener('click', () => {
+        servicesScroller.scrollBy({ left: getStep(), behavior: 'smooth' });
+    });
+
+    prevBtn.addEventListener('click', () => {
+        servicesScroller.scrollBy({ left: -getStep(), behavior: 'smooth' });
+    });
+}
+
     </script>
 </body>
 </html>
