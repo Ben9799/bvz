@@ -66,21 +66,33 @@
         }
 
         /* Hero Section */
-        .hero {
-            background: radial-gradient(circle at top left, #00d4ff33, transparent 55%),
-                        radial-gradient(circle at top right, #1e40af55, transparent 55%),
-                        #020617;
-            color: white;
-            padding: 4rem 1rem 5rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 500px;
-        }
+      .hero {
+    background: radial-gradient(circle at top left, #00d4ff33, transparent 55%),
+                radial-gradient(circle at top right, #1e40af55, transparent 55%),
+                #020617;
+    color: white;
+    padding: 4rem 1rem 5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 500px;
+}
 
-        .hero-content {
-            max-width: 800px;
-        }
+.hero-content {
+    max-width: 800px;
+    text-align: center; /* minden középre */
+}
+
+/* Hero logo a cím fölött */
+.hero-logo {
+    margin-bottom: 1.5rem;
+}
+
+.hero-logo img {
+    max-width: 180px;      /* igény szerint állíthatod */
+    height: auto;
+    display: inline-block;
+}
 
         .hero h1 {
             font-size: 3.2rem;
@@ -1140,10 +1152,16 @@
     <!-- Hero Section -->
 <section class="hero">
     <div class="hero-content">
+
+        <div class="hero-logo">
+            <img src="images/wolf-lasermark.png" alt="Wolf Lasermark Logo">
+        </div>
+
         <h1>Lasergravur für <span>Firmen</span> & <span>Privatkunden</span></h1>
         <p>Präzise Beschriftungen für Industrie, Handwerk und individuelle Geschenke.</p>
     </div>
 </section>
+
     
 
      
@@ -1638,5 +1656,6 @@ if (servicesScroller && nextBtn && prevBtn) {
 </body>
 </html>
               
+
 
 
