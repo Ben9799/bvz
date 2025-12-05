@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -33,6 +35,30 @@
             z-index: 1000;
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
+
+/* Header brand (logo + felirat) */
+.brand{
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.brand-logo{
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+    display: block;
+}
+
+.brand-text{
+    font-weight: 700;
+    font-size: 1.4rem;
+    letter-spacing: 0.05em;
+}
+
+.brand-text span{
+    color: #00d4ff;
+}
 
         .header-content {
             max-width: 1200px;
@@ -77,6 +103,33 @@
     align-items: center;
     min-height: 500px;
 }
+
+/* Hero watermark a szöveg mögé */
+.hero-content {
+    position: relative;
+}
+
+/* a háttérben lévő vízjel */
+.hero-watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 420px;
+    max-width: 80vw;
+    height: auto;
+    opacity: 0.08;              /* finom, elegáns */
+    pointer-events: none;
+    z-index: 0;
+    filter: drop-shadow(0 0 18px rgba(0, 212, 255, 0.18));
+}
+
+/* minden más elem kerüljön a watermark fölé */
+.hero-content > *:not(.hero-watermark) {
+    position: relative;
+    z-index: 1;
+}
+
 
 .hero-content {
     max-width: 800px;
@@ -1098,10 +1151,15 @@
     <!-- Header -->
 <header>
     <div class="header-content">
-        <div class="logo">Wolf <span>Lasermark</span></div>
+        <div class="brand">
+    <img src="images/wolf-lasermark-icon.png" alt="Wolf Lasermark Logo" class="brand-logo">
+    <div class="brand-text">Wolf <span>Lasermark</span></div>
+</div>
+
         <nav>
             <a href="#privat">Privatkunden</a>
             <a href="#firmen">Firmen</a>
+            <a href="#rabatte">Rabatte</a>
             <a href="#services">Beispiele</a>
             <a href="#laser-tech">Technologie</a>
             <a href="#faq">FAQ</a>
@@ -1150,15 +1208,19 @@
 
     <!-- Hero Section -->
 <section class="hero">
-    <div class="hero-content">
+   <div class="hero-content">
 
+        <!-- háttér-vízjel -->
+        <img class="hero-watermark" src="images/wolf-lasermark.png" alt="" aria-hidden="true">
+
+        <!-- meglévő logo a cím fölött (maradhat) -->
         <div class="hero-logo">
             <img src="images/wolf-lasermark.png" alt="Wolf Lasermark Logo">
         </div>
 
         <h1>Lasergravur für <span>Firmen</span> & <span>Privatkunden</span></h1>
         <p>Präzise Beschriftungen für Industrie, Handwerk und individuelle Geschenke.</p>
-    </div>
+</div>
 </section>
 
     
@@ -1655,6 +1717,4 @@ if (servicesScroller && nextBtn && prevBtn) {
 </body>
 </html>
               
-
-
 
