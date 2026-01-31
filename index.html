@@ -1268,6 +1268,64 @@
     margin-top: 1rem;
 }
 
+        /* Anfrage Box (Firmenkunden) */
+.anfrage-box{
+  margin-top: 1.2rem;
+  padding: 1.1rem 1.1rem;
+  border-radius: 14px;
+  background: #f9fafb;
+  border: 1px solid rgba(0, 212, 255, 0.25);
+}
+
+.anfrage-title{
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.anfrage-text{
+  margin-bottom: 0.75rem;
+  color: #4b5563;
+  font-size: 0.95rem;
+}
+
+.anfrage-email{
+  margin-bottom: 0.9rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.anfrage-email a{
+  color: #00b8d4;
+  text-decoration: none;
+}
+.anfrage-email a:hover{
+  text-decoration: underline;
+}
+
+.anfrage-btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 0.45rem;
+  background: #0b1120;
+  color: #ffffff;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 700;
+  border: 1px solid rgba(0, 212, 255, 0.35);
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.anfrage-btn:hover{
+  transform: translateY(-2px);
+  border-color: #00d4ff;
+  box-shadow: 0 14px 35px rgba(0, 212, 255, 0.14);
+}
+
+
 
 
 
@@ -1396,6 +1454,19 @@
                 <li>QR-Codes &amp; DataMatrix-Codes für Rückverfolgbarkeit</li>
                 <li>Auf Wunsch Speicherung Ihrer Layouts für Nachbestellungen</li>
             </ul>
+            <div class="anfrage-box">
+  <div class="anfrage-title">Anfrage</div>
+  <p class="anfrage-text">
+    Schicken Sie uns Ihre Anforderungen (Material, Stückzahl, Motiv) – wir melden uns schnell mit einem unverbindlichen Angebot.
+  </p>
+  <p class="anfrage-email">
+    <a href="mailto:info@wolf-lasermark.de">info@wolf-lasermark.de</a>
+  </p>
+  <a class="anfrage-btn" href="mailto:info@wolf-lasermark.de?subject=Anfrage%20Lasergravur%20Firmenkunde">
+    📩 Anfrage per E-Mail
+  </a>
+</div>
+
         </article>
     </div>
 </section>
