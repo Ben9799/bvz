@@ -91,6 +91,48 @@
             color: #00d4ff;
         }
 
+        /* Shop kiemelt menüpont (CTA gomb a nav-ban) */
+.nav-shop{
+    background: #00d4ff;
+    color: #020617 !important;
+    padding: 0.55rem 1.05rem;
+    border-radius: 999px;
+    font-weight: 700;
+    border: 2px solid #00d4ff;
+    box-shadow: 0 8px 20px rgba(0, 212, 255, 0.22);
+    margin-left: 1.5rem; /* megtartja a spacinget a többi linkhez */
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.nav-shop:hover{
+    background: #00b8d4;
+    border-color: #00b8d4;
+    color: #020617 !important;
+    transform: translateY(-1px);
+}
+
+/* Opcionális kis "NEU" jelzés */
+.nav-shop::after{
+    content: "NEU";
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    padding: 0.15rem 0.45rem;
+    border-radius: 999px;
+    background: rgba(2, 6, 23, 0.85);
+    color: #e5e7eb;
+}
+
+/* Mobilon ne lógjon szét */
+@media (max-width: 768px){
+    .nav-shop{
+        margin-left: 0;
+        margin-right: 0.8rem;
+    }
+}
+
         /* Hero Section */
       .hero {
     background: radial-gradient(circle at top left, #00d4ff33, transparent 55%),
@@ -427,6 +469,39 @@
         padding: 1.5rem;
     }
 }
+
+        /* Shop CTA a Privatkunden kártyában */
+.shop-cta{
+    margin-top: 1.2rem;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    gap: 0.5rem;
+    background: #0b1120;
+    color: #ffffff;
+    padding: 0.9rem 1rem;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 700;
+    border: 1px solid rgba(0, 212, 255, 0.35);
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.14);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.shop-cta:hover{
+    transform: translateY(-2px);
+    border-color: #00d4ff;
+    box-shadow: 0 14px 35px rgba(0, 212, 255, 0.14);
+}
+
+.shop-note{
+    margin-top: 0.65rem;
+    font-size: 0.9rem;
+    color: #4b5563;
+    text-align: center;
+}
+
 
 
         /* Services */
@@ -1205,7 +1280,7 @@
             <a href="#laser-tech">Technologie</a>
             <a href="#faq">FAQ</a>
             <a href="#contact">Kontakt</a>
-            <a href="shop.html">Shop</a>
+         <a href="shop.html" class="nav-shop">Shop</a>
         </nav>
     </div>
 
@@ -1290,6 +1365,8 @@
                 <li>Erinnerungstafeln, Metallkarten und Plaketten</li>
                 <li>Individuelle Motive, Logos und Widmungen</li>
             </ul>
+            <a class="shop-cta" href="shop.html">🛒 Zum Shop – personalisieren & bestellen</a>
+<p class="shop-note">Ideal für Geschenke, Namen, Daten, Sprüche, Logos & Motive.</p>
         </article>
 
         <!-- Karte 2: Firmenkunden -->
