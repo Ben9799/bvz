@@ -1149,74 +1149,8 @@
         font-size: 2.4rem;
     }
 }
-/* Staffelpreis-Ticker oben */
-.discount-ticker {
-    background: #020617;
-    color: #e5e7eb;
-    border-bottom: 1px solid #111827;
-    overflow: hidden;
-    white-space: nowrap;
-    font-size: 0.85rem;
-}
 
-.discount-ticker-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-    position: relative;
-}
 
-.discount-track {
-    display: inline-block;
-    padding: 0.35rem 0;
-    animation: ticker-move 20s linear infinite;
-}
-
-.discount-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    margin-right: 2.5rem;
-}
-
-.discount-label {
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-size: 0.72rem;
-    color: #9ca3af;
-}
-
-.discount-range {
-    font-weight: 500;
-    color: #e5e7eb;
-}
-
-.discount-value {
-    color: #22c55e;
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-/* kis pont a tételek között */
-.discount-separator {
-    opacity: 0.4;
-}
-
-/* animáció: jobbról balra futó sáv */
-@keyframes ticker-move {
-    0% {
-        transform: translateX(100%);
-    }
-    100% {
-        transform: translateX(-100%);
-    }
-}
-
-/* mobilon legyen kicsit lassabb / jobban olvasható */
-@media (max-width: 768px) {
-    .discount-track {
-        animation-duration: 24s;
-    }
-}
 
         .contact-email-box h3{
     margin-bottom: 0.8rem;
@@ -1351,42 +1285,7 @@
         </nav>
     </div>
 
-    <!-- Staffelpreis-Ticker in der Header-Leiste -->
-    <div class="discount-ticker" id="rabatte">
-        <div class="discount-ticker-inner">
-            <div class="discount-track">
-                <span class="discount-item">
-                    <span class="discount-label">Mengenrabatt</span>
-                    <span class="discount-range">1–4 Stk.</span>
-                    <span class="discount-value">Standardpreis</span>
-                    <span class="discount-separator">•</span>
-                </span>
 
-                <span class="discount-item">
-                    <span class="discount-range">5–9 Stk.</span>
-                    <span class="discount-value">–5&nbsp;%</span>
-                    <span class="discount-separator">•</span>
-                </span>
-
-                <span class="discount-item">
-                    <span class="discount-range">10–24 Stk.</span>
-                    <span class="discount-value">–10&nbsp;%</span>
-                    <span class="discount-separator">•</span>
-                </span>
-
-                <span class="discount-item">
-                    <span class="discount-range">25–49 Stk.</span>
-                    <span class="discount-value">–15&nbsp;%</span>
-                    <span class="discount-separator">•</span>
-                </span>
-
-                <span class="discount-item">
-                    <span class="discount-range">ab 50 Stk.</span>
-                    <span class="discount-value">–20&nbsp;%</span>
-                </span>
-            </div>
-        </div>
-    </div>
 </header>
 
 
