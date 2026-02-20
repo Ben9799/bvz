@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gravur bestellen – Wolf Lasermark</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#020617;--s1:#0b1120;--s2:#111827;--border:rgba(0,212,255,0.12);--accent:#00d4ff;--text:#f1f5f9;--muted:#94a3b8;--green:#22c55e;--orange:#f59e0b;--red:#ef4444;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.bg-glow{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(0,212,255,0.05),transparent),radial-gradient(ellipse 50% 40% at 80% 80%,rgba(30,64,175,0.07),transparent);}
+.page{max-width:920px;margin:0 auto;padding:2.5rem 1rem 6rem;position:relative;z-index:1;}
+
+/* Header */
+.header{text-align:center;margin-bottom:2.5rem;}
+.back-link{display:inline-flex;align-items:center;gap:0.4rem;color:var(--muted);font-size:0.85rem;text-decoration:none;margin-bottom:1.5rem;transition:color 0.2s;}
+.back-link:hover{color:var(--accent);}
+.badge{display:inline-flex;align-items:center;gap:0.5rem;background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.2);border-radius:999px;padding:0.35rem 1rem;font-size:0.82rem;color:var(--accent);font-weight:600;margin-bottom:1rem;}
+.header h1{font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:800;line-height:1.1;margin-bottom:0.75rem;}
+.header h1 span{color:var(--accent);}
+.header p{color:var(--muted);font-size:0.98rem;line-height:1.6;max-width:520px;margin:0 auto 1.5rem;}
+.trust-row{display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;}
+.trust-pill{display:inline-flex;align-items:center;gap:0.4rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:999px;padding:0.3rem 0.8rem;font-size:0.78rem;color:var(--muted);}
+.ic{color:var(--green);}
+
+/* Layout */
+.layout{display:grid;grid-template-columns:1fr 300px;gap:1.5rem;align-items:start;}
+@media(max-width:760px){.layout{grid-template-columns:1fr;}}
+
+/* Cards */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:1.75rem;margin-bottom:1.25rem;}
+
+.sec-head{display:flex;align-items:center;gap:0.75rem;margin-bottom:1.4rem;}
+.sec-num{width:26px;height:26px;border-radius:50%;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.25);display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;color:var(--accent);flex-shrink:0;}
+.sec-title{font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:700;}
+.sec-sub{font-size:0.78rem;color:var(--muted);margin-top:0.1rem;}
+
+/* Grid */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8rem;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;}
+.s2{grid-column:span 2;}
+@media(max-width:520px){.g2,.g3{grid-template-columns:1fr;}.g4{grid-template-columns:repeat(2,1fr);}.s2{grid-column:span 1;}}
+
+/* Fields */
+.field{display:flex;flex-direction:column;gap:0.38rem;}
+.field label{font-size:0.82rem;font-weight:600;color:#cbd5e1;display:flex;align-items:center;gap:0.35rem;flex-wrap:wrap;}
+.req{color:var(--accent);}
+.hint{font-size:0.72rem;color:var(--muted);font-style:italic;font-weight:400;}
+.req-label{font-size:0.7rem;background:rgba(0,212,255,0.1);color:var(--accent);border:1px solid rgba(0,212,255,0.25);border-radius:4px;padding:0.1rem 0.4rem;font-weight:700;font-style:normal;}
+.opt-label{font-size:0.7rem;background:rgba(248,250,252,0.05);color:var(--muted);border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:0.1rem 0.4rem;font-weight:700;}
+.speed-label{font-size:0.7rem;background:rgba(245,158,11,0.1);color:var(--orange);border:1px solid rgba(245,158,11,0.25);border-radius:4px;padding:0.1rem 0.4rem;font-weight:700;}
+
+input,textarea,select{background:var(--s2);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.88rem;padding:0.68rem 0.9rem;width:100%;transition:border-color 0.2s,box-shadow 0.2s;appearance:none;}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,212,255,0.1);}
+input::placeholder,textarea::placeholder{color:#3a4f6e;}
+textarea{resize:vertical;min-height:95px;}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2300d4ff'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 0.9rem center;padding-right:2.5rem;cursor:pointer;}
+select option{background:#111827;}
+input.err,select.err{border-color:var(--red)!important;}
+.emsg{font-size:0.74rem;color:var(--red);display:none;margin-top:0.15rem;}
+.emsg.show{display:block;}
+
+/* Material Grid */
+.mat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;}
+@media(max-width:480px){.mat-grid{grid-template-columns:repeat(2,1fr);}}
+.mat{border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:0.7rem 0.4rem;text-align:center;cursor:pointer;transition:all 0.18s;background:var(--s2);}
+.mat:hover{border-color:rgba(0,212,255,0.3);}
+.mat.on{border-color:var(--accent);background:rgba(0,212,255,0.08);}
+.mat-icon{font-size:1.3rem;margin-bottom:0.25rem;}
+.mat-name{font-size:0.75rem;font-weight:600;}
+.mat-note{font-size:0.65rem;color:var(--muted);margin-top:0.1rem;}
+
+/* Pills */
+.pills{display:flex;flex-wrap:wrap;gap:0.45rem;}
+.pill{display:inline-flex;align-items:center;gap:0.35rem;padding:0.42rem 0.8rem;border:1px solid rgba(255,255,255,0.1);border-radius:999px;background:var(--s2);font-size:0.81rem;font-weight:500;color:var(--muted);cursor:pointer;transition:all 0.18s;user-select:none;}
+.pill:hover{border-color:rgba(0,212,255,0.3);color:var(--text);}
+.pill.on{border-color:var(--accent);background:rgba(0,212,255,0.1);color:var(--text);}
+.pill .pc{display:none;font-size:0.68rem;}
+.pill.on .pc{display:inline;}
+
+/* Urgency */
+.urg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.65rem;}
+@media(max-width:440px){.urg-grid{grid-template-columns:1fr;}}
+.urg{border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:0.9rem;cursor:pointer;transition:all 0.18s;background:var(--s2);}
+.urg:hover{border-color:rgba(0,212,255,0.3);}
+.urg.on{border-color:var(--accent);background:rgba(0,212,255,0.08);}
+.urg-icon{font-size:1.3rem;margin-bottom:0.35rem;}
+.urg-label{font-size:0.85rem;font-weight:700;}
+.urg-days{font-size:0.72rem;color:var(--muted);margin-top:0.1rem;}
+.urg-price{font-size:0.7rem;margin-top:0.2rem;font-weight:600;}
+
+/* Upload */
+.upload{border:2px dashed rgba(0,212,255,0.2);border-radius:12px;padding:1.5rem;text-align:center;cursor:pointer;background:var(--s2);transition:all 0.2s;position:relative;}
+.upload:hover,.upload.drag{border-color:var(--accent);background:rgba(0,212,255,0.04);}
+.upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-icon{font-size:1.6rem;margin-bottom:0.35rem;}
+.upload-text{font-size:0.82rem;color:var(--muted);}
+.upload-text strong{color:var(--accent);}
+.chips{margin-top:0.65rem;display:flex;flex-wrap:wrap;gap:0.35rem;}
+.chip{display:inline-flex;align-items:center;gap:0.35rem;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.2);border-radius:8px;padding:0.25rem 0.6rem;font-size:0.76rem;color:var(--accent);}
+.chip-x{cursor:pointer;color:var(--muted);}
+.chip-x:hover{color:var(--red);}
+
+/* Sidebar */
+.sidebar{position:sticky;top:1.5rem;}
+@media(max-width:760px){.sidebar{position:relative;top:0;}}
+.calc{background:var(--s1);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+.calc-hd{background:linear-gradient(135deg,#0a1928,#0c2040);padding:1.1rem 1.4rem;border-bottom:1px solid var(--border);}
+.calc-hd-title{font-family:'Syne',sans-serif;font-size:0.85rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.08em;}
+.calc-hd-sub{font-size:0.74rem;color:var(--muted);margin-top:0.15rem;}
+.calc-body{padding:1.1rem 1.4rem;}
+.calc-row{display:flex;justify-content:space-between;align-items:flex-start;padding:0.5rem 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:0.82rem;gap:0.5rem;}
+.calc-row:last-child{border-bottom:none;}
+.crl{color:var(--muted);flex-shrink:0;}
+.crv{font-weight:600;text-align:right;}
+.crv.green{color:var(--green);}
+.crv.orange{color:var(--orange);}
+.calc-total{padding:1rem 1.4rem;background:rgba(0,212,255,0.04);border-top:1px solid var(--border);}
+.ct-label{font-size:0.75rem;color:var(--muted);margin-bottom:0.25rem;}
+.ct-price{font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:800;color:var(--accent);line-height:1;}
+.ct-sub{font-size:0.72rem;color:var(--muted);margin-top:0.3rem;}
+.calc-disc{padding:0.75rem 1.4rem;font-size:0.72rem;color:var(--muted);line-height:1.5;border-top:1px solid var(--border);}
+
+.hint-box{background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:12px;padding:0.9rem;margin-top:1rem;font-size:0.8rem;color:#86efac;line-height:1.5;}
+.hint-box strong{color:var(--green);}
+
+/* Submit */
+.submit-area{margin-top:0;}
+.submit-btn{width:100%;background:var(--accent);color:#020617;border:none;border-radius:12px;padding:1rem 1.5rem;font-family:'Syne',sans-serif;font-size:0.98rem;font-weight:700;cursor:pointer;transition:all 0.25s;box-shadow:0 8px 24px rgba(0,212,255,0.25);display:flex;align-items:center;justify-content:center;gap:0.5rem;}
+.submit-btn:hover:not(:disabled){background:#00b8d4;transform:translateY(-2px);box-shadow:0 14px 30px rgba(0,212,255,0.35);}
+.submit-btn:disabled{opacity:0.55;cursor:not-allowed;transform:none;}
+.submit-note{text-align:center;font-size:0.75rem;color:var(--muted);margin-top:0.55rem;}
+
+/* Success */
+.success-wrap{display:none;text-align:center;padding:3rem 2rem;}
+.success-wrap.show{display:block;}
+.success-icon{width:68px;height:68px;border-radius:50%;background:rgba(34,197,94,0.1);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 1.5rem;animation:pop 0.4s ease;}
+@keyframes pop{from{transform:scale(0.5);opacity:0;}to{transform:scale(1);opacity:1;}}
+.success-wrap h2{font-family:'Syne',sans-serif;font-size:1.7rem;font-weight:800;margin-bottom:0.75rem;}
+.success-wrap p{color:var(--muted);line-height:1.6;}
+
+/* Spinner */
+.spin{width:17px;height:17px;border:2px solid rgba(2,6,23,0.3);border-top-color:#020617;border-radius:50%;animation:rot 0.7s linear infinite;}
+@keyframes rot{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+<div class="bg-glow"></div>
+<div class="page">
+
+<div class="header">
+  <a href="index.html" class="back-link">← Zurück zur Startseite</a>
+  <div class="badge">📦 Bestellformular</div>
+  <h1>Jetzt <span>Gravur</span> bestellen</h1>
+  <p>Alle Infos auf einmal – kein WhatsApp-Chaos. Antwort in der Regel <strong style="color:var(--text)">innerhalb von 3 Stunden</strong>.</p>
+  <div class="trust-row">
+    <span class="trust-pill"><span class="ic">✓</span> Kostenlos & unverbindlich</span>
+    <span class="trust-pill"><span class="ic">✓</span> Antwort ≤ 3 Stunden</span>
+    <span class="trust-pill"><span class="ic">✓</span> Keine Mindestmenge</span>
+    <span class="trust-pill"><span class="ic">✓</span> Einzelstücke & Serien</span>
+  </div>
+</div>
+
+<div class="layout" id="mainLayout">
+<div><!-- LEFT COLUMN -->
+
+<!-- 1. Kontakt -->
+<div class="card">
+  <div class="sec-head">
+    <div class="sec-num">1</div>
+    <div><div class="sec-title">Kontaktdaten</div><div class="sec-sub">Damit wir Sie schnell erreichen können</div></div>
+  </div>
+  <div class="g2">
+    <div class="field">
+      <label>Name <span class="req-label">PFLICHT</span></label>
+      <input type="text" id="name" placeholder="Max Mustermann" oninput="calc()">
+      <span class="emsg" id="nameErr">Bitte Namen eingeben</span>
+    </div>
+    <div class="field">
+      <label>E-Mail <span class="req-label">PFLICHT</span></label>
+      <input type="email" id="email" placeholder="max@firma.de" oninput="calc()">
+      <span class="emsg" id="emailErr">Bitte gültige E-Mail eingeben</span>
+    </div>
+    <div class="field">
+      <label>Firma <span class="opt-label">OPTIONAL</span> <span class="hint">für B2B-Preise</span></label>
+      <input type="text" id="firma" placeholder="Mustermann GmbH">
+    </div>
+    <div class="field">
+      <label>Telefon <span class="opt-label">OPTIONAL</span> <span class="hint">für Rückfragen</span></label>
+      <input type="text" id="telefon" placeholder="+49 123 456789">
+    </div>
+  </div>
+</div>
+
+<!-- 2. Material -->
+<div class="card">
+  <div class="sec-head">
+    <div class="sec-num">2</div>
+    <div><div class="sec-title">Material <span style="color:var(--accent)">*</span></div><div class="sec-sub">Welches Material soll graviert werden?</div></div>
+  </div>
+  <div class="mat-grid">
+    <div class="mat" onclick="selMat(this,'Edelstahl',1.2)"><div class="mat-icon">🔩</div><div class="mat-name">Edelstahl</div><div class="mat-note">Standard</div></div>
+    <div class="mat" onclick="selMat(this,'Aluminium',1.0)"><div class="mat-icon">🔲</div><div class="mat-name">Aluminium</div><div class="mat-note">Leicht</div></div>
+    <div class="mat" onclick="selMat(this,'Titan',1.5)"><div class="mat-icon">⚙️</div><div class="mat-name">Titan</div><div class="mat-note">Premium</div></div>
+    <div class="mat" onclick="selMat(this,'Messing',1.2)"><div class="mat-icon">🏅</div><div class="mat-name">Messing</div><div class="mat-note">Standard</div></div>
+    <div class="mat" onclick="selMat(this,'Leder',0.9)"><div class="mat-icon">🟫</div><div class="mat-name">Leder</div><div class="mat-note">Fein</div></div>
+    <div class="mat" onclick="selMat(this,'Kunststoff',0.85)"><div class="mat-icon">🧱</div><div class="mat-name">Kunststoff</div><div class="mat-note">Schnell</div></div>
+    <div class="mat" onclick="selMat(this,'Sonstiges',1.1)"><div class="mat-icon">❓</div><div class="mat-name">Sonstiges</div><div class="mat-note">Anfrage</div></div>
+  </div>
+  <span class="emsg" id="matErr" style="margin-top:0.5rem;">Bitte Material auswählen</span>
+
+  <div style="margin-top:1.1rem;margin-bottom:0.3rem;">
+    <div style="font-size:0.82rem;font-weight:600;color:#cbd5e1;margin-bottom:0.55rem;">Oberfläche <span style="color:var(--accent)">*</span> <span class="hint" style="font-style:italic;font-weight:400;font-size:0.72rem;">– beeinflusst Aufwand und Preis</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;" id="surfGrid">
+      <div class="urg" onclick="selSurf(this,'Ebene Fläche',1.0)" style="padding:0.75rem;">
+        <div class="urg-icon">▭</div>
+        <div class="urg-label">Ebene Fläche</div>
+        <div class="urg-days">Platte, Schild, Blech</div>
+        <div class="urg-price" style="color:var(--green);">Standardpreis</div>
+      </div>
+      <div class="urg" onclick="selSurf(this,'Rotationskörper',1.25)" style="padding:0.75rem;">
+        <div class="urg-icon">🔵</div>
+        <div class="urg-label">Rotationskörper</div>
+        <div class="urg-days">Zylinder, Ring, Welle</div>
+        <div class="urg-price" style="color:var(--orange);">+25% Aufpreis</div>
+      </div>
+    </div>
+    <span class="emsg" id="surfErr" style="margin-top:0.4rem;">Bitte Oberfläche auswählen</span>
+  </div>
+
+  <div class="g3" style="margin-top:1.1rem;">
+    <div class="field">
+      <label>Stückzahl <span class="req-label">PFLICHT</span></label>
+      <input type="number" id="stueckzahl" placeholder="z.B. 100" min="1" oninput="calc()">
+      <div style="margin-top:0.4rem;font-size:0.71rem;color:var(--muted);line-height:1.6;">
+        Mengenrabatt:<br>
+        <span id="discHint" style="color:var(--green);font-weight:600;">10+ Stk: −10% · 50+: −20% · 100+: −30% · 500+: −40%</span>
+      </div>
+      <span class="emsg" id="stkErr">Bitte Stückzahl angeben</span>
+    </div>
+    <div class="field">
+      <label>Gravurbreite (mm) <span class="speed-label">↑ PREIS</span></label>
+      <input type="number" id="breite" placeholder="z.B. 80" oninput="calc()">
+      <div style="margin-top:0.3rem;font-size:0.71rem;color:var(--muted);">Breite des Gravurbereichs</div>
+    </div>
+    <div class="field">
+      <label>Gravurhöhe (mm) <span class="speed-label">↑ PREIS</span></label>
+      <input type="number" id="hoehe" placeholder="z.B. 30" oninput="calc()">
+      <div style="margin-top:0.3rem;font-size:0.71rem;color:var(--muted);">Höhe des Gravurbereichs</div>
+    </div>
+  </div>
+</div>
+
+<!-- 3. Gravur-Art -->
+<div class="card">
+  <div class="sec-head">
+    <div class="sec-num">3</div>
+    <div><div class="sec-title">Gravur-Art <span style="color:var(--accent)">*</span></div><div class="sec-sub">Was soll graviert werden? Mehrfachauswahl möglich.</div></div>
+  </div>
+  <div class="pills" id="gravurPills">
+    <div class="pill" data-val="Seriennummern" data-f="0.8" onclick="togglePill(this)"><span class="pc">✓ </span>Seriennummern</div>
+    <div class="pill" data-val="Text / Schrift" data-f="0.85" onclick="togglePill(this)"><span class="pc">✓ </span>Text / Schrift</div>
+    <div class="pill" data-val="QR-Code / Barcode" data-f="1.0" onclick="togglePill(this)"><span class="pc">✓ </span>QR-Code / Barcode</div>
+    <div class="pill" data-val="DataMatrix-Code" data-f="1.0" onclick="togglePill(this)"><span class="pc">✓ </span>DataMatrix-Code</div>
+    <div class="pill" data-val="Firmenlogo" data-f="1.3" onclick="togglePill(this)"><span class="pc">✓ </span>Firmenlogo</div>
+    <div class="pill" data-val="CE-Kennzeichnung" data-f="0.9" onclick="togglePill(this)"><span class="pc">✓ </span>CE-Kennzeichnung</div>
+    <div class="pill" data-val="Tiefgravur" data-f="1.2" onclick="togglePill(this)"><span class="pc">✓ </span>Tiefgravur</div>
+    <div class="pill" data-val="Schwarze Markierung" data-f="1.0" onclick="togglePill(this)"><span class="pc">✓ </span>Schwarze Markierung</div>
+    <div class="pill" data-val="Farbige Gravur" data-f="1.4" onclick="togglePill(this)"><span class="pc">✓ </span>Farbige Gravur</div>
+    <div class="pill" data-val="Motiv / Bild" data-f="1.3" onclick="togglePill(this)"><span class="pc">✓ </span>Motiv / Bild</div>
+    <div class="pill" data-val="Personalisierung (pro Stück individuell)" data-f="1.5" onclick="togglePill(this)"><span class="pc">✓ </span>Personalisierung / Stück</div>
+  </div>
+  <span class="emsg" id="gravurErr" style="margin-top:0.5rem;">Bitte mindestens eine Gravur-Art wählen</span>
+</div>
+
+<!-- 4. Termin & Details -->
+<div class="card">
+  <div class="sec-head">
+    <div class="sec-num">4</div>
+    <div><div class="sec-title">Termin & Beschreibung</div><div class="sec-sub">Wann brauchen Sie es? Je mehr Details, desto schneller das Angebot.</div></div>
+  </div>
+
+  <div style="margin-bottom:1.1rem;">
+    <div style="font-size:0.82rem;font-weight:600;color:#cbd5e1;margin-bottom:0.55rem;">Dringlichkeit <span style="color:var(--accent)">*</span></div>
+    <div class="urg-grid">
+      <div class="urg" onclick="selUrg(this,'Standard (5–10 Werktage)',0)">
+        <div class="urg-icon">🕐</div><div class="urg-label">Standard</div>
+        <div class="urg-days">5–10 Werktage</div>
+        <div class="urg-price" style="color:var(--green);">Basispreis</div>
+      </div>
+      <div class="urg" onclick="selUrg(this,'Schnell (3–5 Werktage)',0.15)">
+        <div class="urg-icon">⚡</div><div class="urg-label">Schnell</div>
+        <div class="urg-days">3–5 Werktage</div>
+        <div class="urg-price" style="color:var(--orange);">+15% Aufpreis</div>
+      </div>
+      <div class="urg" onclick="selUrg(this,'Express (1–2 Werktage)',0.30)">
+        <div class="urg-icon">🔥</div><div class="urg-label">Express</div>
+        <div class="urg-days">1–2 Werktage</div>
+        <div class="urg-price" style="color:var(--red);">+30% Aufpreis</div>
+      </div>
+    </div>
+    <span class="emsg" id="urgErr" style="margin-top:0.4rem;">Bitte Dringlichkeit auswählen</span>
+  </div>
+
+  <div class="g2" style="margin-bottom:0.8rem;">
+    <div class="field">
+      <label>Wunschtermin <span class="opt-label">OPTIONAL</span></label>
+      <input type="date" id="termin">
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Beschreibung / Gravurtext <span class="speed-label">↑ SCHNELLER</span></label>
+    <textarea id="beschreibung" placeholder="z.B. Gravurrahmen: 40×15 mm, Position: Unterseite rechts&#10;Text: 'SN-2024-001 bis SN-2024-100'&#10;Gravur soll ca. 80% des Rahmens ausfüllen&#10;&#10;💡 Tipp: Gravurrahmen-Größe + Position angeben = schnellstes Angebot!"></textarea>
+  </div>
+</div>
+
+<!-- 5. Datei -->
+<div class="card">
+  <div class="sec-head">
+    <div class="sec-num">5</div>
+    <div>
+      <div class="sec-title">Datei-Upload <span class="speed-label" style="font-size:0.75rem;">↑ BESCHLEUNIGT BEARBEITUNG</span></div>
+      <div class="sec-sub">SVG / DXF / AI = am schnellsten · PNG / JPG / PDF auch möglich</div>
+    </div>
+  </div>
+  <div class="upload" id="dropZone">
+    <input type="file" id="fileInput" multiple accept=".svg,.dxf,.pdf,.png,.jpg,.jpeg,.ai,.eps">
+    <div class="upload-icon">📁</div>
+    <div class="upload-text"><strong>Klicken oder Datei hierher ziehen</strong><br><span style="font-size:0.74rem;">Vektordatei (SVG/DXF) = sofort gravierbar · max. 20MB</span></div>
+    <div class="chips" id="fileChips"></div>
+  </div>
+  <div style="margin-top:0.65rem;font-size:0.76rem;color:var(--muted);line-height:1.5;">
+    💡 <strong style="color:#cbd5e1;">Keine Datei?</strong> Kein Problem – beschreiben Sie das Motiv im Textfeld oder senden Sie es nach der Anfrage per E-Mail zu.
+  </div>
+</div>
+
+<!-- Submit -->
+<div class="submit-area">
+  <button class="submit-btn" id="submitBtn" onclick="submitForm()">
+    <span id="btnText">📩 Anfrage absenden – kostenlos & unverbindlich</span>
+  </button>
+  <p class="submit-note">✓ Kein Spam &nbsp;·&nbsp; ✓ Keine Vorauszahlung &nbsp;·&nbsp; ✓ Antwort ≤ 3 Stunden werktags</p>
+</div>
+
+</div><!-- end left -->
+
+<!-- RIGHT: Kalkulator -->
+<div class="sidebar">
+  <div class="calc">
+    <div class="calc-hd">
+      <div class="calc-hd-title">💰 Preisschätzung</div>
+      <div class="calc-hd-sub">Live-Kalkulator · aktualisiert sich automatisch</div>
+    </div>
+    <div class="calc-body">
+      <div class="calc-row"><span class="crl">Material</span><span class="crv" id="cMat">–</span></div>
+      <div class="calc-row"><span class="crl">Oberfläche</span><span class="crv" id="cSurf">–</span></div>
+      <div class="calc-row"><span class="crl">Stückzahl</span><span class="crv" id="cStk">–</span></div>
+      <div class="calc-row"><span class="crl">Gravur-Art</span><span class="crv" id="cGravur" style="max-width:140px;">–</span></div>
+      <div class="calc-row"><span class="crl">Gravurfläche</span><span class="crv" id="cArea">–</span></div>
+      <div class="calc-row"><span class="crl">Preis / Stück</span><span class="crv" id="cPPS">–</span></div>
+      <div class="calc-row"><span class="crl">Rüstgebühr</span><span class="crv">15,00 €</span></div>
+      <div class="calc-row"><span class="crl">Dringlichkeit</span><span class="crv orange" id="cUrg">–</span></div>
+      <div class="calc-row"><span class="crl">Mengenrabatt</span><span class="crv green" id="cDisc">–</span></div>
+    </div>
+    <div class="calc-total">
+      <div class="ct-label">Geschätzter Gesamtpreis (netto)</div>
+      <div class="ct-price" id="cTotal">–</div>
+      <div class="ct-sub" id="cSub"></div>
+    </div>
+    <div class="calc-disc">* Richtwert. Tatsächlicher Preis im individuellen Angebot. Zzgl. MwSt.</div>
+  </div>
+
+  <div class="hint-box">
+    <strong>Antwort in ≤ 3 Stunden</strong> 🚀<br>
+    Persönliche Prüfung + maßgeschneidertes Angebot. Teststück auf Wunsch möglich.
+  </div>
+</div>
+
+</div><!-- end layout -->
+
+<!-- Success -->
+<div class="card success-wrap" id="successScreen">
+  <div class="success-icon">✓</div>
+  <h2>Anfrage gesendet! 🎉</h2>
+  <p>Danke! Wir melden uns <strong style="color:var(--text)">innerhalb von 3 Stunden</strong> (werktags) mit einem unverbindlichen Angebot.<br><br>
+  <span style="font-size:0.82rem;">Wolf Lasermark · Großkarolinenfeld bei Rosenheim</span></p>
+  <a href="index.html" style="display:inline-block;margin-top:1.5rem;color:var(--accent);font-weight:600;text-decoration:none;">← Zurück zur Startseite</a>
+</div>
+
+</div>
+<script>
+let matName=null,matF=1,urgSurcharge=null,urgName='',files=[],surfName=null,surfF=1;
+
+// Material
+function selMat(el,name,factor){document.querySelectorAll('.mat').forEach(m=>m.classList.remove('on'));el.classList.add('on');matName=name;matF=factor;calc();}
+
+// Surface
+function selSurf(el,name,factor){document.querySelectorAll('#surfGrid .urg').forEach(u=>u.classList.remove('on'));el.classList.add('on');surfName=name;surfF=factor;calc();}
+
+// Pills
+function togglePill(el){el.classList.toggle('on');calc();}
+function activePills(){return[...document.querySelectorAll('#gravurPills .pill.on')];}
+function maxPillF(){const p=activePills();return p.length?Math.max(...p.map(x=>parseFloat(x.dataset.f))):1;}
+
+// Urgency
+function selUrg(el,name,surcharge){document.querySelectorAll('.urg').forEach(u=>u.classList.remove('on'));el.classList.add('on');urgSurcharge=surcharge;urgName=name;calc();}
+
+// File upload
+document.getElementById('fileInput').addEventListener('change',e=>addFiles(e.target.files));
+const dz=document.getElementById('dropZone');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag');});
+dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag');addFiles(e.dataTransfer.files);});
+function addFiles(fl){[...fl].forEach(f=>{if(!files.find(x=>x.name===f.name))files.push(f);});renderChips();}
+function renderChips(){document.getElementById('fileChips').innerHTML=files.map((f,i)=>`<div class="chip">📎 ${f.name}<span class="chip-x" onclick="removeFile(${i})"> ✕</span></div>`).join('');}
+function removeFile(i){files.splice(i,1);renderChips();}
+
+// Calculator
+function fmt(n){return n.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';}
+function calc(){
+  const stk=parseInt(document.getElementById('stueckzahl').value)||0;
+  const breite=parseFloat(document.getElementById('breite').value)||0;
+  const hoehe=parseFloat(document.getElementById('hoehe').value)||0;
+  const gf=maxPillF();
+  const pills=activePills();
+
+  // Flächenfaktor: Basis 4cm² (20×20mm), steigt proportional
+  // Kleine Gravur (≤4cm²): ×1.0 | Mittel (≤25cm²): ×1.2 | Groß (≤100cm²): ×1.6 | Sehr groß: ×2.2
+  const areaCm2=(breite*hoehe)/100;
+  let areaFactor=1.0;
+  if(areaCm2>100) areaFactor=2.2;
+  else if(areaCm2>25) areaFactor=1.6;
+  else if(areaCm2>4) areaFactor=1.2;
+
+  // Discount-Hint Farbe
+  const hint=document.getElementById('discHint');
+  if(stk>=500)hint.style.color='#22c55e';
+  else if(stk>=100)hint.style.color='#86efac';
+  else if(stk>=50)hint.style.color='#a7f3d0';
+  else if(stk>=10)hint.style.color='#d1fae5';
+  else hint.style.color='var(--muted)';
+
+  document.getElementById('cMat').textContent=matName||'–';
+  document.getElementById('cSurf').textContent=surfName||'–';
+  document.getElementById('cStk').textContent=stk>0?stk+' Stk.':'–';
+  document.getElementById('cGravur').textContent=pills.length?pills.map(p=>p.dataset.val).join(', '):'–';
+  document.getElementById('cUrg').textContent=urgName||'–';
+
+  const areaEl=document.getElementById('cArea');
+  if(areaEl) areaEl.textContent=areaCm2>0?areaCm2.toFixed(1)+' cm²':'–';
+
+  if(!matName||stk<1||!pills.length||urgSurcharge===null||!surfName){
+    document.getElementById('cPPS').textContent='–';
+    document.getElementById('cDisc').textContent='–';
+    document.getElementById('cTotal').textContent='–';
+    document.getElementById('cSub').textContent='Alle Pflichtfelder ausfüllen';
+    return;
+  }
+
+  let disc=0;
+  if(stk>=500)disc=0.40;
+  else if(stk>=100)disc=0.30;
+  else if(stk>=50)disc=0.20;
+  else if(stk>=10)disc=0.10;
+
+  const BASE=2.50,RUST=15;
+  const pps=BASE*matF*gf*surfF*areaFactor*(1-disc);
+  const total=Math.max(25,(RUST+pps*stk)*(1+urgSurcharge));
+
+  document.getElementById('cPPS').textContent=fmt(pps);
+  document.getElementById('cDisc').textContent=disc>0?'-'+(disc*100).toFixed(0)+'% aktiv ✓':'Kein Rabatt';
+  document.getElementById('cTotal').textContent=fmt(total);
+  document.getElementById('cSub').textContent=fmt(pps)+' × '+stk+' + '+fmt(RUST)+' Rüst'+(urgSurcharge>0?' +'+Math.round(urgSurcharge*100)+'% Express':'');
+}
+
+// Validation
+function validate(){
+  let ok=true;
+  [{id:'name',eid:'nameErr',fn:v=>v.trim().length>1},
+   {id:'email',eid:'emailErr',fn:v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)},
+   {id:'stueckzahl',eid:'stkErr',fn:v=>parseInt(v)>0}
+  ].forEach(({id,eid,fn})=>{
+    const el=document.getElementById(id),err=document.getElementById(eid);
+    if(!fn(el.value)){el.classList.add('err');err.classList.add('show');ok=false;}
+    else{el.classList.remove('err');err.classList.remove('show');}
+  });
+  const me=document.getElementById('matErr');
+  if(!matName){me.classList.add('show');ok=false;}else me.classList.remove('show');
+  const se=document.getElementById('surfErr');
+  if(!surfName){se.classList.add('show');ok=false;}else se.classList.remove('show');
+  const ge=document.getElementById('gravurErr');
+  if(!activePills().length){ge.classList.add('show');ok=false;}else ge.classList.remove('show');
+  const ue=document.getElementById('urgErr');
+  if(urgSurcharge===null){ue.classList.add('show');ok=false;}else ue.classList.remove('show');
+  return ok;
+}
+
+// Submit
+async function submitForm(){
+  if(!validate()){document.querySelector('.err,.emsg.show')?.scrollIntoView({behavior:'smooth',block:'center'});return;}
+  const btn=document.getElementById('submitBtn'),bt=document.getElementById('btnText');
+  btn.disabled=true;bt.innerHTML='<div class="spin"></div> Wird gesendet…';
+
+  const stk=parseInt(document.getElementById('stueckzahl').value);
+  const breite=parseFloat(document.getElementById('breite').value)||0;
+  const hoehe=parseFloat(document.getElementById('hoehe').value)||0;
+  const areaCm2=(breite*hoehe)/100;
+  let areaFactor=1.0;
+  if(areaCm2>100)areaFactor=2.2;
+  else if(areaCm2>25)areaFactor=1.6;
+  else if(areaCm2>4)areaFactor=1.2;
+  const gf=maxPillF();
+  let disc=0;
+  if(stk>=500)disc=0.40;else if(stk>=100)disc=0.30;else if(stk>=50)disc=0.20;else if(stk>=10)disc=0.10;
+  const pps=2.50*matF*gf*surfF*areaFactor*(1-disc);
+  const total=Math.max(25,(15+pps*stk)*(1+urgSurcharge));
+
+  const payload={
+    name:document.getElementById('name').value,
+    email:document.getElementById('email').value,
+    firma:document.getElementById('firma').value,
+    telefon:document.getElementById('telefon').value,
+    material:matName,
+    oberflaeche:surfName,
+    stueckzahl:stk,
+    breite:document.getElementById('breite').value,
+    hoehe:document.getElementById('hoehe').value,
+    gravurTypen:activePills().map(p=>p.dataset.val).join(', '),
+    beschreibung:document.getElementById('beschreibung').value,
+    dringlichkeit:urgName,
+    wunschtermin:document.getElementById('termin').value,
+    budget:document.getElementById('budget').value,
+    preisschaetzung:fmt(total)+' netto (Richtwert)',
+    _subject:`📦 Neue Gravur-Anfrage: ${matName}, ${stk} Stk. – ${document.getElementById('name').value}`
+  };
+
+  try{
+    const res=await fetch('https://formspree.io/f/xpqjjobb',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload)});
+    if(!res.ok)throw new Error();
+    document.getElementById('mainLayout').style.display='none';
+    document.querySelector('.submit-area').style.display='none';
+    document.getElementById('successScreen').classList.add('show');
+    window.scrollTo({top:0,behavior:'smooth'});
+  }catch{
+    btn.disabled=false;bt.textContent='📩 Anfrage absenden – kostenlos & unverbindlich';
+    alert('Fehler beim Senden. Bitte erneut versuchen.');
+  }
+}
+</script>
+</body>
+</html>
