@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Laser-Auftragsmanager PRO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:       #0d0f14;
+      --surface:  #141720;
+      --surface2: #1a1e2a;
+      --surface3: #20253a;
+      --border:   #2a2f45;
+      --border2:  #363d59;
+      --accent:   #ff6b35;
+      --accent2:  #ff9f1c;
+      --indigo:   #6c7ae0;
+      --text:     #e8eaf0;
+      --text2:    #9299b8;
+      --text3:    #606580;
+      --red:      #f25c54;
+      --yellow:   #f7c59f;
+      --green:    #56cfb2;
+      --blue:     #4fc3f7;
+      --radius-sm: 6px; --radius: 10px; --radius-lg: 16px;
+      font-family: 'IBM Plex Sans', sans-serif; font-size: 14px;
+      color: var(--text); background: var(--bg);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh; background: var(--bg);
+      background-image:
+        radial-gradient(ellipse 80% 50% at 0% 0%, rgba(255,107,53,.07) 0%, transparent 55%),
+        radial-gradient(ellipse 60% 40% at 100% 100%, rgba(108,122,224,.06) 0%, transparent 55%);
+    }
+
+    /* HEADER */
+    .app-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 13px 26px; border-bottom: 1px solid var(--border);
+      background: rgba(20,23,32,.92); backdrop-filter: blur(14px);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .logo { display: flex; align-items: center; gap: 10px; }
+    .logo-icon { width: 33px; height: 33px; background: linear-gradient(135deg,var(--accent),var(--accent2)); border-radius: 8px; display: grid; place-items: center; font-size: 16px; }
+    .logo-text { font-family: 'Syne',sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -.5px; line-height: 1; }
+    .logo-sub  { font-family: 'IBM Plex Mono',monospace; font-size: 9px; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
+    .header-tabs { display: flex; gap: 2px; background: var(--surface2); border-radius: var(--radius); padding: 3px; border: 1px solid var(--border); }
+    .tab-btn { font-family:'IBM Plex Sans',sans-serif; font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 7px; border: none; cursor: pointer; background: transparent; color: var(--text3); transition: all .15s; }
+    .tab-btn.active { background: var(--surface3); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,.3); }
+    .header-right { display: flex; align-items: center; gap: 8px; }
+
+    /* LAYOUT */
+    .app-body { display: grid; grid-template-columns: 355px 1fr; min-height: calc(100vh - 60px); }
+    @media (max-width: 960px) { .app-body { grid-template-columns: 1fr; } }
+    .sidebar { border-right: 1px solid var(--border); padding: 18px 16px; background: var(--surface); overflow-y: auto; }
+    .main-area { display: flex; flex-direction: column; gap: 13px; padding: 18px; overflow-y: auto; }
+
+    /* TABS */
+    .tab-content { display: none; }
+    .tab-content.active { display: flex; flex-direction: column; gap: 13px; }
+
+    /* SECTION TITLE */
+    .section-title { font-family:'Syne',sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text3); margin-bottom: 13px; display: flex; align-items: center; gap: 8px; }
+    .section-title::after { content:''; flex:1; height:1px; background: var(--border); }
+
+    /* FIELDS */
+    .field { margin-bottom: 11px; }
+    label { display: block; font-size: 10px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 4px; }
+    input, textarea, select { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: var(--radius-sm); padding: 7px 10px; font-size: 12.5px; font-family:'IBM Plex Sans',sans-serif; outline: none; transition: border-color .15s,box-shadow .15s,background .15s; }
+    input::placeholder, textarea::placeholder { color: var(--text3); }
+    input:focus, textarea:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(255,107,53,.18); background: var(--surface3); }
+    textarea { resize: vertical; min-height: 62px; line-height: 1.5; }
+    select option { background: var(--surface2); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
+    .live-calc { background: rgba(108,122,224,.1); border: 1px solid rgba(108,122,224,.2); border-radius: var(--radius-sm); padding: 7px 11px; margin: -3px 0 11px; font-family:'IBM Plex Mono',monospace; font-size: 11px; color: var(--indigo); }
+
+    /* BUTTONS */
+    button { font-family:'IBM Plex Sans',sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; border: none; border-radius: var(--radius-sm); padding: 7px 14px; display: inline-flex; align-items: center; gap: 6px; transition: all .15s; white-space: nowrap; letter-spacing: .3px; }
+    .btn-primary { background: linear-gradient(135deg,var(--accent),var(--accent2)); color: white; box-shadow: 0 2px 12px rgba(255,107,53,.3); }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 18px rgba(255,107,53,.45); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-secondary { background: var(--surface3); color: var(--text2); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--border); color: var(--text); }
+    .btn-danger { background: rgba(242,92,84,.1); color: var(--red); border: 1px solid rgba(242,92,84,.2); padding: 4px 9px; font-size: 11px; }
+    .btn-danger:hover { background: rgba(242,92,84,.2); }
+    .btn-full { width: 100%; justify-content: center; padding: 10px; }
+
+    /* KPI CARDS */
+    .kpi-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; }
+    @media (max-width: 1400px) { .kpi-grid { grid-template-columns: repeat(3,1fr); } }
+    @media (max-width: 1000px) { .kpi-grid { grid-template-columns: repeat(2,1fr); } }
+    .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; position: relative; overflow: hidden; transition: border-color .2s; }
+    .kpi::before { content:''; position: absolute; top:0; left:0; right:0; height:2px; background: var(--kpi-color,var(--accent)); }
+    .kpi:hover { border-color: var(--border2); }
+    .kpi-icon { position: absolute; right:12px; top:10px; font-size:17px; opacity:.18; }
+    .kpi-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text3); margin-bottom: 5px; }
+    .kpi-value { font-family:'Syne',sans-serif; font-size: 19px; font-weight: 700; line-height: 1; }
+    .kpi-sub { font-size: 10px; color: var(--text3); margin-top: 3px; line-height: 1.3; }
+
+    /* DASHBOARD */
+    .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
+    @media (max-width: 1100px) { .dash-grid { grid-template-columns: 1fr; } }
+    .dash-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px; }
+    .dash-title { font-family:'Syne',sans-serif; font-size: 12px; font-weight: 700; color: var(--text2); margin-bottom: 13px; display: flex; align-items: center; gap: 6px; }
+
+    .month-bars { display: flex; flex-direction: column; gap: 7px; }
+    .month-row { display: grid; grid-template-columns: 56px 1fr 86px; align-items: center; gap: 10px; }
+    .month-name { font-family:'IBM Plex Mono',monospace; font-size: 10px; color: var(--text3); }
+    .month-bars-wrap { display: flex; flex-direction: column; gap: 2px; }
+    .month-bar-track { height: 6px; background: var(--surface2); border-radius: 999px; overflow: hidden; }
+    .month-bar-fill { height: 100%; border-radius: 999px; transition: width .7s ease; background: linear-gradient(90deg,var(--accent),var(--accent2)); }
+    .month-bar-fill.paid { background: linear-gradient(90deg,var(--green),#34d399); }
+    .month-vals { text-align: right; }
+    .month-val { font-family:'IBM Plex Mono',monospace; font-size: 10px; color: var(--text2); }
+    .month-val.sm { font-size: 9px; color: var(--green); }
+
+    .customer-list { display: flex; flex-direction: column; gap: 5px; }
+    .customer-row { display: flex; align-items: center; gap: 9px; background: var(--surface2); border-radius: var(--radius-sm); padding: 7px 10px; }
+    .customer-avatar { width: 26px; height: 26px; border-radius: 50%; background: linear-gradient(135deg,var(--accent),var(--indigo)); display: grid; place-items: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+    .customer-info { flex:1; min-width:0; }
+    .customer-name-t { font-size: 11.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .customer-meta { font-size: 10px; color: var(--text3); }
+    .customer-amt { font-family:'IBM Plex Mono',monospace; font-size: 11px; color: var(--green); white-space: nowrap; }
+
+    .rate-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+    .rate-item { background: var(--surface2); border-radius: var(--radius-sm); padding: 11px; text-align: center; }
+    .rate-label { font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 4px; }
+    .rate-val { font-family:'IBM Plex Mono',monospace; font-size: 15px; font-weight: 500; }
+    .rate-val.good { color: var(--green); } .rate-val.warn { color: var(--yellow); } .rate-val.bad { color: var(--red); }
+
+    .pay-track { height: 10px; background: var(--surface2); border-radius: 999px; overflow: hidden; margin: 8px 0; display: flex; }
+    .pay-fill-paid { background: var(--green); transition: width .5s; }
+    .pay-fill-open { background: rgba(242,92,84,.45); transition: width .5s; }
+    .pay-legend { display: flex; gap: 16px; font-size: 10px; color: var(--text3); flex-wrap: wrap; }
+    .pay-legend span { display: flex; align-items: center; gap: 4px; }
+    .pay-legend span::before { content:''; width:8px; height:8px; border-radius:2px; background: var(--lc,var(--green)); }
+
+    .overdue-alert { background: rgba(242,92,84,.07); border: 1px solid rgba(242,92,84,.22); border-radius: var(--radius); padding: 10px 14px; }
+    .overdue-item { display: flex; align-items: center; gap: 8px; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,.04); font-size: 11px; }
+    .overdue-item:last-child { border-bottom: none; }
+
+    /* FILTER */
+    .filter-bar { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+    .filter-lbl { font-size: 10px; color: var(--text3); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .filter-btn { background: transparent; border: 1px solid var(--border); color: var(--text2); border-radius: 999px; padding: 3px 11px; font-size: 11px; cursor: pointer; transition: all .15s; }
+    .filter-btn:hover { border-color: var(--border2); color: var(--text); }
+    .filter-btn.active { background: var(--accent); border-color: var(--accent); color: white; box-shadow: 0 2px 8px rgba(255,107,53,.3); }
+    .filter-spacer { flex:1; }
+    .search-wrap { position: relative; }
+    .search-wrap input { width: 175px; padding-left: 27px; font-size: 12px; height: 29px; }
+    .search-icon { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 11px; pointer-events: none; }
+
+    /* TABLE */
+    .table-outer { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    thead tr { background: var(--surface2); border-bottom: 1px solid var(--border); }
+    th { padding: 9px 11px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text3); text-align: left; white-space: nowrap; }
+    td { padding: 8px 11px; border-bottom: 1px solid rgba(42,47,69,.5); vertical-align: middle; }
+    tbody tr { transition: background .1s; }
+    tbody tr:hover td { background: rgba(255,255,255,.018); }
+    tbody tr:last-child td { border-bottom: none; }
+
+    .row-urgent td { background: rgba(242,92,84,.05); }
+    .row-urgent td:first-child { border-left: 2px solid var(--red); padding-left: 9px; }
+    .row-soon td { background: rgba(247,197,159,.04); }
+    .row-soon td:first-child { border-left: 2px solid var(--yellow); padding-left: 9px; }
+    .row-later td { background: rgba(86,207,178,.03); }
+    .row-later td:first-child { border-left: 2px solid var(--green); padding-left: 9px; }
+    .row-neutral td:first-child { border-left: 2px solid transparent; padding-left: 9px; }
+
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 999px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; white-space: nowrap; }
+    .badge::before { content:''; width:4px; height:4px; border-radius:50%; background:currentColor; }
+    .badge-offen     { background: rgba(242,92,84,.15); color: var(--red); }
+    .badge-arbeit    { background: rgba(247,197,159,.15); color: var(--yellow); }
+    .badge-fertig    { background: rgba(86,207,178,.15); color: var(--green); }
+    .badge-abgegeben { background: rgba(79,195,247,.15); color: var(--blue); }
+
+    .cname { font-weight: 600; font-size: 12px; }
+    .ccontact { font-size: 10px; color: var(--text3); margin-top: 1px; }
+    .jdesc { max-width: 190px; font-size: 11px; color: var(--text2); line-height: 1.4; }
+    .jnotes { font-size: 10px; color: var(--text3); margin-top: 2px; font-style: italic; }
+    .due-t { font-family:'IBM Plex Mono',monospace; font-size: 11px; }
+    .due-tag { font-size: 10px; margin-top: 1px; }
+    .due-tag.overdue { color:var(--red); } .due-tag.today { color:var(--yellow); } .due-tag.soon { color:var(--yellow); } .due-tag.ok { color:var(--green); }
+    .p-total { font-family:'IBM Plex Mono',monospace; font-size: 12px; font-weight: 600; }
+    .p-paid  { font-size: 10px; color: var(--text3); }
+    .p-open  { font-family:'IBM Plex Mono',monospace; font-size: 10px; color: var(--red); }
+    .p-full  { font-size: 10px; color: var(--green); }
+    .time-pill { font-family:'IBM Plex Mono',monospace; font-size: 10px; padding: 2px 7px; border-radius:999px; background:rgba(108,122,224,.13); color:var(--indigo); display:inline-block; }
+    .eph { font-family:'IBM Plex Mono',monospace; font-size: 11px; }
+    .eph.good { color:var(--green); } .eph.warn { color:var(--yellow); } .eph.bad { color:var(--red); }
+    .status-select { background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:4px; padding:3px 5px; font-size:10px; width:100%; margin-top:4px; cursor:pointer; }
+    .cell-input { background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:4px; padding:3px 5px; font-size:10px; font-family:'IBM Plex Mono',monospace; width:60px; outline:none; }
+    .cell-input:focus { border-color:var(--accent); }
+    .cell-row { display:flex; align-items:center; gap:4px; margin-bottom:2px; font-size:10px; color:var(--text3); }
+
+    .summary-row { display:flex; align-items:center; gap:10px; font-size:11px; color:var(--text3); flex-wrap:wrap; }
+    .summary-row strong { color:var(--text2); }
+
+    .empty-state { text-align:center; padding:55px 20px; }
+    .empty-icon { font-size:40px; margin-bottom:10px; opacity:.3; }
+    .empty-text { color:var(--text3); font-size:12px; line-height:1.6; }
+
+    #toast { position:fixed; bottom:20px; right:20px; background:var(--surface3); border:1px solid var(--border2); color:var(--text); padding:9px 15px; border-radius:var(--radius); font-size:12px; font-weight:500; opacity:0; transform:translateY(8px); transition:all .22s; z-index:999; pointer-events:none; display:flex; align-items:center; gap:8px; box-shadow:0 6px 24px rgba(0,0,0,.5); }
+    #toast.show { opacity:1; transform:translateY(0); }
+    #toast.success { border-color:var(--green); } #toast.error { border-color:var(--red); }
+
+    @media print {
+      body { background:white; color:black; }
+      .no-print { display:none!important; }
+      .app-body { display:block; }
+      .sidebar { display:none; }
+      td,th { color:black; background:white!important; border-color:#ddd; }
+      .badge { border:1px solid currentColor; }
+    }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+    .kpi { animation:fadeUp .4s both; }
+    .kpi:nth-child(2) { animation-delay:.04s; } .kpi:nth-child(3) { animation-delay:.08s; }
+    .kpi:nth-child(4) { animation-delay:.12s; } .kpi:nth-child(5) { animation-delay:.16s; }
+    tbody tr { animation:fadeUp .25s both; }
+  </style>
+</head>
+<body>
+
+<header class="app-header no-print">
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div>
+      <div class="logo-text">Auftragsmanager</div>
+      <div class="logo-sub">Laser Gravur · PRO</div>
+    </div>
+  </div>
+  <div class="header-tabs">
+    <button class="tab-btn active" data-tab="auftraege">📋 Aufträge</button>
+    <button class="tab-btn" data-tab="dashboard">📊 Dashboard</button>
+  </div>
+  <div class="header-right">
+    <button class="btn-secondary" id="exportBtn">↓ Export</button>
+    <button class="btn-secondary" id="importBtn">↑ Import</button>
+    <input type="file" id="importFile" accept=".json" style="display:none;" />
+    <button class="btn-secondary" id="printBtn">🖨 Drucken</button>
+    <button class="btn-secondary" id="cloudToggleBtn" title="Firebase Cloud Sync (optional)">☁ Cloud Sync</button>
+  </div>
+</header>
+
+<div class="app-body">
+  <aside class="sidebar no-print">
+    <div class="section-title">Neuer Auftrag</div>
+    <div class="field">
+      <label>Kunde / Firma</label>
+      <input id="customerName" type="text" placeholder="Max Mustermann / Muster GmbH" />
+    </div>
+    <div class="grid-2">
+      <div class="field"><label>Kontakt</label><input id="customerContact" type="text" placeholder="+49... / E-Mail" /></div>
+      <div class="field"><label>Fällig am</label><input id="dueDate" type="date" /></div>
+    </div>
+    <div class="field">
+      <label>Auftragsbeschreibung</label>
+      <textarea id="jobDescription" placeholder="z.B. 10x Edelstahl-Schlüsselanhänger mit Logo..."></textarea>
+    </div>
+    <div class="grid-3">
+      <div class="field"><label>Preis gesamt (€)</label><input id="priceTotal" type="number" min="0" step="0.01" placeholder="120.00" /></div>
+      <div class="field"><label>Bezahlt (€)</label><input id="pricePaid" type="number" min="0" step="0.01" placeholder="0.00" /></div>
+      <div class="field"><label>Status</label>
+        <select id="status">
+          <option value="offen">Offen</option>
+          <option value="in_arbeit">In Arbeit</option>
+          <option value="fertig">Fertig</option>
+          <option value="abgegeben">Abgegeben</option>
+        </select>
+      </div>
+    </div>
+    <div class="section-title" style="margin-top:4px;">Zeitkalkulation</div>
+    <div class="grid-3">
+      <div class="field"><label>Menge (Stk)</label><input id="qty" type="number" min="0" step="1" placeholder="10" /></div>
+      <div class="field"><label>Min/Stück</label><input id="timePerPart" type="number" min="0" step="0.1" placeholder="2.5" /></div>
+      <div class="field"><label>Rüstzeit (Min)</label><input id="setupTime" type="number" min="0" step="0.1" placeholder="15" /></div>
+    </div>
+    <div class="live-calc" id="liveCalc">⏱ Gesamtzeit: — &nbsp;|&nbsp; €/h: —</div>
+    <div class="field"><label>Interne Notizen</label><textarea id="notes" placeholder="Dateiname, Material, Besonderheiten..."></textarea></div>
+    <button class="btn-primary btn-full" id="addJobBtn">＋ Auftrag speichern</button>
+    <div style="margin-top:6px;"><button class="btn-secondary btn-full" id="resetFormBtn">✕ Formular leeren</button></div>
+  </aside>
+
+  <main class="main-area">
+    <!-- AUFTRÄGE TAB -->
+    <div class="tab-content active" id="tab-auftraege">
+      <div class="kpi-grid no-print">
+        <div class="kpi" style="--kpi-color:var(--green);">
+          <div class="kpi-icon">💰</div>
+          <div class="kpi-label">Einnahmen (kassiert)</div>
+          <div class="kpi-value" id="kpiRevenue">0 €</div>
+          <div class="kpi-sub" id="kpiRevenueSub">tatsächlich bezahlt</div>
+        </div>
+        <div class="kpi" style="--kpi-color:var(--red);">
+          <div class="kpi-icon">⏳</div>
+          <div class="kpi-label">Ausstehend</div>
+          <div class="kpi-value" id="kpiOpen">0 €</div>
+          <div class="kpi-sub" id="kpiOpenSub">noch offen</div>
+        </div>
+        <div class="kpi" style="--kpi-color:var(--accent);">
+          <div class="kpi-icon">🎯</div>
+          <div class="kpi-label">Ø €/Stunde</div>
+          <div class="kpi-value" id="kpiRate">—</div>
+          <div class="kpi-sub">eff. Stundensatz</div>
+        </div>
+        <div class="kpi" style="--kpi-color:var(--yellow);">
+          <div class="kpi-icon">📦</div>
+          <div class="kpi-label">Aktive Aufträge</div>
+          <div class="kpi-value" id="kpiActive">0</div>
+          <div class="kpi-sub" id="kpiActiveSub">offen + in Arbeit</div>
+        </div>
+        <div class="kpi" style="--kpi-color:var(--indigo);">
+          <div class="kpi-icon">⏱</div>
+          <div class="kpi-label">Offene Arbeitszeit</div>
+          <div class="kpi-value" id="kpiTime">0 h</div>
+          <div class="kpi-sub">aktive Aufträge</div>
+        </div>
+      </div>
+
+      <div class="filter-bar no-print">
+        <span class="filter-lbl">Filter</span>
+        <button class="filter-btn active" data-filter="alle">Alle</button>
+        <button class="filter-btn" data-filter="offen">Offen</button>
+        <button class="filter-btn" data-filter="in_arbeit">In Arbeit</button>
+        <button class="filter-btn" data-filter="fertig">Fertig</button>
+        <button class="filter-btn" data-filter="abgegeben">Abgegeben</button>
+        <div class="filter-spacer"></div>
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Suchen..." />
+        </div>
+      </div>
+
+      <div class="table-outer">
+        <table>
+          <thead>
+            <tr>
+              <th>Kunde</th><th>Auftrag</th><th>Fällig</th><th>Status</th>
+              <th>Preis / Zahlung</th><th class="no-print">Zeit-Params</th>
+              <th>Zeit</th><th class="no-print">€/h</th><th class="no-print">Aktion</th>
+            </tr>
+          </thead>
+          <tbody id="jobsBody"></tbody>
+        </table>
+      </div>
+      <div class="summary-row no-print" id="summaryRow"></div>
+    </div>
+
+    <!-- DASHBOARD TAB -->
+    <div class="tab-content" id="tab-dashboard">
+      <div class="dash-grid">
+        <div class="dash-card">
+          <div class="dash-title"><span>📅</span> Monatlicher Umsatz (letzte 6 Monate)</div>
+          <div id="monthlyBars" class="month-bars"></div>
+          <div id="monthLegend" style="margin-top:8px;"></div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-title"><span>🏆</span> Top Kunden (nach Einnahmen)</div>
+          <div id="topCustomers" class="customer-list"></div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-title"><span>🎯</span> Stundensatz-Analyse</div>
+          <div class="rate-grid" id="rateGrid"></div>
+          <div style="font-size:11px;color:var(--text3);line-height:1.6;" id="rateHint"></div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-title"><span>💳</span> Zahlungsstatus gesamt</div>
+          <div id="payTotal" style="font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:700;color:var(--text);margin-bottom:7px;"></div>
+          <div class="pay-track"><div class="pay-fill-paid" id="payBarPaid" style="width:0%"></div><div class="pay-fill-open" id="payBarOpen" style="width:0%"></div></div>
+          <div class="pay-legend">
+            <span style="--lc:var(--green);">Kassiert: <strong id="payPaidAmt" style="color:var(--green);">0 €</strong></span>
+            <span style="--lc:rgba(242,92,84,.5);">Ausstehend: <strong id="payOpenAmt" style="color:var(--red);">0 €</strong></span>
+          </div>
+          <div style="margin-top:13px;">
+            <div class="dash-title" style="margin-bottom:9px;"><span>⚠️</span> Überfällige Aufträge</div>
+            <div id="overdueList"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-card">
+        <div class="dash-title"><span>📈</span> Gesamtstatistik</div>
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:9px;" id="totalStats"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast">✓ Gespeichert</div>
+
+<!-- =========================
+     Firebase (Cloud Sync) – config block
+     =========================
+     1) Firebase Console -> Project settings -> Your apps -> Web app -> Config
+     2) Paste the values into FIREBASE_CONFIG below
+     NOTE: This block alone does NOT change app behavior.
+           It only adds the Firebase config + SDK scripts into the file.
+-->
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
+<script>
+  // Paste your Firebase Web App config here:
+  const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyBLSp0en7wDD_71PF1n3qYXPF0YNTEWmIc",
+    authDomain: "auftrage-edc6d.firebaseapp.com",
+    projectId: "auftrage-edc6d",
+    storageBucket: "auftrage-edc6d.firebasestorage.app",
+    messagingSenderId: "675308449934",
+    appId: "1:675308449934:web:b4c1fc2e190647ace419df"
+  };
+</script>
+
+
+<script>
+  // =========================
+  // Firebase Cloud Sync (optional)
+  // =========================
+  // Uses Anonymous Auth (no Google login).
+  // Data path: users/{uid}/jobs/{jobId}
+  let cloudEnabled = false;
+  let cloud = { enabled:false, user:null, db:null, unsub:null, ready:false };
+
+  function firebaseConfigured() {
+    return typeof FIREBASE_CONFIG === 'object' && FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.projectId;
+  }
+
+  async function cloudInit() {
+    if (!firebaseConfigured()) return false;
+    try {
+      if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+      cloud.db = firebase.firestore();
+      const auth = firebase.auth();
+
+      // Use cached user if already logged in
+      if (auth.currentUser) {
+        cloud.user = auth.currentUser;
+        cloud.enabled = true;
+        cloud.ready = true;
+        return true;
+      }
+
+      // Wait for auth state
+      return await new Promise((resolve) => {
+        const unsub = auth.onAuthStateChanged(async (user) => {
+          unsub();
+          if (user) {
+            cloud.user = user;
+            cloud.enabled = true;
+            cloud.ready = true;
+            resolve(true);
+          } else {
+            // Sign in with Google
+            try {
+              const provider = new firebase.auth.GoogleAuthProvider();
+              const result = await auth.signInWithPopup(provider);
+              cloud.user = result.user;
+              cloud.enabled = true;
+              cloud.ready = true;
+              resolve(true);
+            } catch(e) {
+              console.error('Google login failed:', e);
+              cloud.enabled = false;
+              cloud.ready = false;
+              resolve(false);
+            }
+          }
+        });
+      });
+    } catch (e) {
+      console.error('Cloud init failed:', e);
+      cloud.enabled = false;
+      cloud.ready = false;
+      return false;
+    }
+  }
+
+  function cloudCol() {
+    return cloud.db.collection('users').doc(cloud.user.uid).collection('jobs');
+  }
+
+  async function cloudUpsertJob(job) {
+    if (!cloud.enabled) return;
+    const payload = Object.assign({}, job, { updatedAt: new Date().toISOString() });
+    await cloudCol().doc(job.id).set(payload, { merge: true });
+  }
+
+  async function cloudDeleteJob(jobId) {
+    if (!cloud.enabled) return;
+    await cloudCol().doc(jobId).delete();
+  }
+
+  function cloudStartListener(onData) {
+    if (!cloud.enabled) return;
+    if (cloud.unsub) { try { cloud.unsub(); } catch(e) {} }
+    cloud.unsub = cloudCol().orderBy('createdAt', 'asc').onSnapshot(
+      (snap) => onData(snap.docs.map(d => d.data())),
+      (err) => console.error('Cloud listener error:', err)
+    );
+  }
+</script>
+
+
+<script>
+const STORAGE_KEY = 'bvz_laser_jobs_v2_offline';
+const CLOUD_MIRROR_KEY = 'bvz_laser_cloud_enabled_v1';
+let jobs = [], currentFilter = 'alle', searchQuery = '', activeTab = 'auftraege';
+
+function loadJobs() { try { const d=JSON.parse(localStorage.getItem(STORAGE_KEY)); return Array.isArray(d)?d:[]; } catch{return[];} }
+function saveJobs() { localStorage.setItem(STORAGE_KEY, JSON.stringify(jobs)); }
+function createId() { return 'J'+Date.now()+'-'+Math.floor(Math.random()*9999); }
+
+function toN(v) { const n=parseFloat(String(v??'').replace(',','.')); return Number.isFinite(n)?n:0; }
+function fmtEur(n) { return toN(n).toLocaleString('de-DE',{style:'currency',currency:'EUR'}); }
+function fmtDate(iso) { if(!iso)return''; try{const d=new Date(iso+'T00:00:00');return isNaN(d)?iso:d.toLocaleDateString('de-DE');}catch{return iso;} }
+function daysUntil(iso) { if(!iso)return null; const t=new Date();t.setHours(0,0,0,0);const d=new Date(iso+'T00:00:00');return isNaN(d)?null:Math.ceil((d-t)/86400000); }
+function urgClass(iso) { const d=daysUntil(iso);if(d===null)return'row-neutral';if(d<=1)return'row-urgent';if(d<=3)return'row-soon';if(d>7)return'row-later';return'row-neutral'; }
+function calcMin(j) { return Math.max(0,toN(j.setupTime))+Math.max(0,Math.floor(toN(j.qty)))*Math.max(0,toN(j.timePerPart)); }
+function fmtDur(m) { const mm=Math.round(toN(m));const h=Math.floor(mm/60);const r=mm%60;return h<=0?`${r} min`:`${h} h ${r} min`; }
+function calcEph(j) { const m=calcMin(j),p=toN(j.priceTotal);if(m<=0||p<=0)return null;return p/(m/60); }
+function statusLabel(s) { return{offen:'Offen',in_arbeit:'In Arbeit',fertig:'Fertig',abgegeben:'Abgegeben'}[s]||s; }
+function statusBadge(s) { return'badge '+({offen:'badge-offen',in_arbeit:'badge-arbeit',fertig:'badge-fertig',abgegeben:'badge-abgegeben'}[s]||''); }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+let toastT;
+function toast(msg,type='success') {
+  const el=document.getElementById('toast');
+  el.textContent=(type==='success'?'✓ ':'✕ ')+msg;
+  el.className='show '+type; clearTimeout(toastT);
+  toastT=setTimeout(()=>el.className='',2600);
+}
+
+function updateLiveCalc() {
+  const qty=Math.max(0,Math.floor(toN(document.getElementById('qty').value||0)));
+  const tpp=Math.max(0,toN(document.getElementById('timePerPart').value||0));
+  const setup=Math.max(0,toN(document.getElementById('setupTime').value||0));
+  const price=toN(document.getElementById('priceTotal').value||0);
+  const mins=setup+qty*tpp;
+  const el=document.getElementById('liveCalc');
+  const ts=mins>0?fmtDur(mins):'—';
+  let rs='—';
+  if(mins>0&&price>0){const r=price/(mins/60);const c=r>=40?'color:var(--green)':r>=20?'color:var(--yellow)':'color:var(--red)';rs=`<span style="${c};font-weight:600;">${r.toFixed(2)} €/h</span>`;}
+  el.innerHTML=`⏱ Gesamtzeit: <strong>${ts}</strong> &nbsp;|&nbsp; Stundensatz: ${rs}`;
+}
+
+function resetForm() {
+  ['customerName','customerContact','jobDescription','priceTotal','pricePaid','qty','timePerPart','setupTime','notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('status').value='offen';
+  document.getElementById('dueDate').value=new Date().toISOString().substring(0,10);
+  updateLiveCalc();
+}
+
+function addJob() {
+  const cn=document.getElementById('customerName').value.trim();
+  const jd=document.getElementById('jobDescription').value.trim();
+  if(!cn&&!jd){toast('Bitte Kunde oder Beschreibung eingeben.','error');return;}
+  const job={
+    id:createId(), customerName:cn,
+    customerContact:document.getElementById('customerContact').value.trim(),
+    dueDate:document.getElementById('dueDate').value,
+    jobDescription:jd,
+    priceTotal:toN(document.getElementById('priceTotal').value||0),
+    pricePaid:toN(document.getElementById('pricePaid').value||0),
+    status:document.getElementById('status').value,
+    qty:Math.max(0,Math.floor(toN(document.getElementById('qty').value||0))),
+    timePerPart:Math.max(0,toN(document.getElementById('timePerPart').value||0)),
+    setupTime:Math.max(0,toN(document.getElementById('setupTime').value||0)),
+    notes:document.getElementById('notes').value.trim(),
+    createdAt:new Date().toISOString()
+  };
+  jobs.push(job); saveJobs();
+  if (cloudEnabled && cloud && cloud.enabled) { cloudUpsertJob(job).catch(console.error); }
+  resetForm(); renderAll(); toast('Auftrag gespeichert!');}
+
+function upsertJob(j){const i=jobs.findIndex(x=>x.id===j.id);if(i>=0)jobs[i]=j;else jobs.push(j);saveJobs();
+  if (cloudEnabled && cloud && cloud.enabled) { cloudUpsertJob(j).catch(console.error); }
+}
+function deleteJob(id){jobs=jobs.filter(j=>j.id!==id);saveJobs();
+  if (cloudEnabled && cloud && cloud.enabled) { cloudDeleteJob(id).catch(console.error); }
+}
+
+function setFilter(f) {
+  currentFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===f));
+  renderAll();
+}
+
+function getFiltered() {
+  let list=jobs.slice();
+  if(currentFilter!=='alle') list=list.filter(j=>j.status===currentFilter);
+  if(searchQuery){const q=searchQuery.toLowerCase();list=list.filter(j=>(j.customerName||'').toLowerCase().includes(q)||(j.jobDescription||'').toLowerCase().includes(q)||(j.customerContact||'').toLowerCase().includes(q)||(j.notes||'').toLowerCase().includes(q));}
+  list.sort((a,b)=>(a.dueDate||'z').localeCompare(b.dueDate||'z'));
+  return list;
+}
+
+/* ── RENDER KPIs ── */
+function renderKPIs() {
+  const totalPaid    = jobs.reduce((s,j)=>s+toN(j.pricePaid),0);
+  const totalRevenue = jobs.reduce((s,j)=>s+toN(j.priceTotal),0);
+  const totalOpen    = Math.max(0,totalRevenue-totalPaid);
+  const active       = jobs.filter(j=>j.status==='offen'||j.status==='in_arbeit');
+  const activeMin    = active.reduce((s,j)=>s+calcMin(j),0);
+  const doneT        = jobs.filter(j=>j.status==='abgegeben'&&calcMin(j)>0&&toN(j.priceTotal)>0);
+  let effRate=null;
+  if(doneT.length>0){const tp=doneT.reduce((s,j)=>s+toN(j.priceTotal),0),tm=doneT.reduce((s,j)=>s+calcMin(j),0);effRate=tm>0?tp/(tm/60):null;}
+  document.getElementById('kpiRevenue').textContent=fmtEur(totalPaid);
+  document.getElementById('kpiRevenueSub').textContent=`von ${fmtEur(totalRevenue)} Gesamtwert`;
+  document.getElementById('kpiOpen').textContent=fmtEur(totalOpen);
+  document.getElementById('kpiOpenSub').textContent=`${jobs.filter(j=>Math.max(0,toN(j.priceTotal)-toN(j.pricePaid))>0).length} Aufträge offen`;
+  document.getElementById('kpiRate').textContent=effRate?effRate.toFixed(2)+' €/h':'—';
+  document.getElementById('kpiActive').textContent=active.length;
+  document.getElementById('kpiActiveSub').textContent=`${jobs.filter(j=>j.status==='offen').length} offen, ${jobs.filter(j=>j.status==='in_arbeit').length} in Arbeit`;
+  document.getElementById('kpiTime').textContent=fmtDur(activeMin);
+}
+
+/* ── RENDER TABLE ── */
+function renderTable() {
+  const tbody=document.getElementById('jobsBody');
+  tbody.innerHTML='';
+  const filtered=getFiltered();
+  const sumEl=document.getElementById('summaryRow');
+  if(filtered.length>0){
+    const ts=filtered.reduce((s,j)=>s+toN(j.priceTotal),0);
+    const tp=filtered.reduce((s,j)=>s+toN(j.pricePaid),0);
+    const to=Math.max(0,ts-tp);
+    const tm=filtered.reduce((s,j)=>s+calcMin(j),0);
+    sumEl.innerHTML=`<span>${filtered.length} Aufträge</span><span>·</span><span>Summe: <strong>${fmtEur(ts)}</strong></span><span>·</span><span>Kassiert: <strong style="color:var(--green);">${fmtEur(tp)}</strong></span><span>·</span><span>Offen: <strong style="color:var(--red);">${fmtEur(to)}</strong></span><span>·</span><span>Zeit: <strong style="color:var(--indigo);">${fmtDur(tm)}</strong></span>`;
+  } else { sumEl.innerHTML=''; }
+
+  if(filtered.length===0){
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td colspan="9"><div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">Keine Aufträge gefunden.<br>Lege links einen neuen Auftrag an.</div></div></td>`;
+    tbody.appendChild(tr); return;
+  }
+
+  filtered.forEach((job,idx)=>{
+    const tr=document.createElement('tr');
+    tr.className=urgClass(job.dueDate);
+    tr.style.animationDelay=(idx*0.025)+'s';
+    const sum=toN(job.priceTotal),paid=toN(job.pricePaid),open=Math.max(0,sum-paid);
+    const mins=calcMin(job),qty=Math.max(0,Math.floor(toN(job.qty))),tpp=Math.max(0,toN(job.timePerPart)),setup=Math.max(0,toN(job.setupTime));
+    const eph=calcEph(job);
+    let ephHtml='—';
+    if(eph!==null){const cls=eph>=40?'good':eph>=20?'warn':'bad';ephHtml=`<span class="eph ${cls}">${eph.toFixed(2)} €/h</span>`;}
+    const d=daysUntil(job.dueDate);
+    let dueSub='',dueC='';
+    if(d!==null){if(d<0){dueSub=`${Math.abs(d)}T überfällig`;dueC='overdue';}else if(d===0){dueSub='heute';dueC='today';}else if(d===1){dueSub='morgen';dueC='soon';}else{dueSub=`in ${d}T`;dueC='ok';}}
+    const paidFull=paid>=sum&&sum>0;
+    tr.innerHTML=`
+      <td><div class="cname">${esc(job.customerName||'—')}</div>${job.customerContact?`<div class="ccontact">${esc(job.customerContact)}</div>`:''}</td>
+      <td><div class="jdesc">${esc(job.jobDescription||'').replace(/\n/g,'<br>')}</div>${job.notes?`<div class="jnotes">📌 ${esc(job.notes)}</div>`:''}</td>
+      <td><div class="due-t">${job.dueDate?fmtDate(job.dueDate):'—'}</div>${dueSub?`<div class="due-tag ${dueC}">${dueSub}</div>`:''}</td>
+      <td>
+        <div class="${statusBadge(job.status)}">${statusLabel(job.status)}</div>
+        <select class="status-select no-print">
+          <option value="offen"${job.status==='offen'?' selected':''}>Offen</option>
+          <option value="in_arbeit"${job.status==='in_arbeit'?' selected':''}>In Arbeit</option>
+          <option value="fertig"${job.status==='fertig'?' selected':''}>Fertig</option>
+          <option value="abgegeben"${job.status==='abgegeben'?' selected':''}>Abgegeben</option>
+        </select>
+      </td>
+      <td>
+        <div class="p-total">${fmtEur(sum)}</div>
+        ${paidFull?`<div class="p-full">✓ Voll bezahlt</div>`:`<div class="p-paid">Bezahlt: ${fmtEur(paid)}</div>${open>0?`<div class="p-open">▲ ${fmtEur(open)}</div>`:''}`}
+        <div style="display:flex;gap:3px;margin-top:4px;" class="no-print">
+          <input class="cell-input" type="number" min="0" step="0.01" value="${sum}" data-field="priceTotal" title="Preis" />
+          <input class="cell-input" type="number" min="0" step="0.01" value="${paid}" data-field="pricePaid" title="Bezahlt" />
+        </div>
+      </td>
+      <td class="no-print">
+        <div class="cell-row">Menge: <input class="cell-input" type="number" min="0" step="1" value="${qty}" data-field="qty" /></div>
+        <div class="cell-row">Min/Stk: <input class="cell-input" type="number" min="0" step="0.1" value="${tpp}" data-field="timePerPart" /></div>
+        <div class="cell-row">Rüst: <input class="cell-input" type="number" min="0" step="0.1" value="${setup}" data-field="setupTime" /></div>
+      </td>
+      <td><span class="time-pill">${fmtDur(mins)}</span></td>
+      <td class="no-print">${ephHtml}</td>
+      <td class="no-print" style="display:flex;flex-direction:column;gap:4px;align-items:flex-start;">
+        <button class="btn-danger del-btn">Löschen</button>
+        <button class="btn-secondary rechnung-btn" style="font-size:10px;padding:4px 9px;color:var(--green);border-color:rgba(86,207,178,.3);background:rgba(86,207,178,.07);" title="Daten in Rechnung übernehmen">🧾 Rechnung</button>
+      </td>
+    `;
+    tr.querySelector('.status-select').addEventListener('change',e=>{job.status=e.target.value;upsertJob(job);renderAll();});
+    tr.querySelectorAll('input[data-field]').forEach(inp=>inp.addEventListener('change',()=>{const f=inp.dataset.field;if(f==='qty')job.qty=Math.max(0,Math.floor(toN(inp.value)));else job[f]=toN(inp.value);upsertJob(job);renderAll();}));
+    tr.querySelector('.del-btn').addEventListener('click',()=>{if(confirm('Diesen Auftrag wirklich löschen?')){deleteJob(job.id);renderAll();toast('Auftrag gelöscht.','error');}});
+    tr.querySelector('.rechnung-btn').addEventListener('click',()=>{
+      const qty=Math.max(1,Math.floor(toN(job.qty)||1));
+      const priceTotal=toN(job.priceTotal);
+      const einzelpreis=qty>0?priceTotal/qty:priceTotal;
+      const rechnungData={
+        customerName: job.customerName||'',
+        customerContact: job.customerContact||'',
+        jobNotes: job.jobDescription||'',
+        qty: qty,
+        einzelpreis: einzelpreis,
+        priceTotal: priceTotal
+      };
+      localStorage.setItem('auftrag_to_rechnung', JSON.stringify(rechnungData));
+      toast('Daten in Rechnung übertragen! Öffne rechnung.html');
+      // Try to open the rechnung file in a new tab
+      window.open('rechnung_simple_firebase_v3.html','_blank');
+    });
+    tbody.appendChild(tr);
+  });
+}
+
+/* ── RENDER DASHBOARD ── */
+function renderDashboard() {
+  const now=new Date();
+  // Monthly
+  const months=[];
+  for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push({year:d.getFullYear(),month:d.getMonth(),label:d.toLocaleDateString('de-DE',{month:'short',year:'2-digit'}),total:0,paid:0});}
+  jobs.forEach(j=>{
+    const ref=j.dueDate?new Date(j.dueDate+'T00:00:00'):(j.createdAt?new Date(j.createdAt):null);
+    if(!ref||isNaN(ref))return;
+    const m=months.find(m=>m.year===ref.getFullYear()&&m.month===ref.getMonth());
+    if(m){m.total+=toN(j.priceTotal);m.paid+=toN(j.pricePaid);}
+  });
+  const maxT=Math.max(...months.map(m=>m.total),1);
+  document.getElementById('monthlyBars').innerHTML=months.map(m=>`
+    <div class="month-row">
+      <span class="month-name">${m.label}</span>
+      <div class="month-bars-wrap">
+        <div class="month-bar-track"><div class="month-bar-fill" style="width:${(m.total/maxT*100).toFixed(1)}%"></div></div>
+        <div class="month-bar-track"><div class="month-bar-fill paid" style="width:${(m.paid/maxT*100).toFixed(1)}%"></div></div>
+      </div>
+      <div class="month-vals"><div class="month-val">${fmtEur(m.total)}</div><div class="month-val sm">${fmtEur(m.paid)}</div></div>
+    </div>
+  `).join('');
+  document.getElementById('monthLegend').innerHTML=`<div style="display:flex;gap:14px;font-size:10px;color:var(--text3);">
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:4px;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));display:inline-block;"></span>Gesamtwert</span>
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:4px;border-radius:2px;background:var(--green);display:inline-block;"></span>Kassiert</span>
+  </div>`;
+
+  // Top customers
+  const cm={};
+  jobs.forEach(j=>{const k=(j.customerName||'Unbekannt').trim();if(!cm[k])cm[k]={name:k,total:0,paid:0,count:0};cm[k].total+=toN(j.priceTotal);cm[k].paid+=toN(j.pricePaid);cm[k].count++;});
+  const top=Object.values(cm).sort((a,b)=>b.paid-a.paid).slice(0,6);
+  document.getElementById('topCustomers').innerHTML=top.length===0
+    ?'<div style="color:var(--text3);font-size:12px;padding:20px 0;text-align:center;">Noch keine Aufträge</div>'
+    :top.map(c=>`<div class="customer-row"><div class="customer-avatar">${c.name.charAt(0).toUpperCase()}</div><div class="customer-info"><div class="customer-name-t">${esc(c.name)}</div><div class="customer-meta">${c.count} Auftrag${c.count!==1?'e':''} · Gesamt: ${fmtEur(c.total)}</div></div><div class="customer-amt">${fmtEur(c.paid)}</div></div>`).join('');
+
+  // Rates
+  const awt=jobs.filter(j=>calcMin(j)>0&&toN(j.priceTotal)>0);
+  const done=jobs.filter(j=>j.status==='abgegeben'&&calcMin(j)>0&&toN(j.priceTotal)>0);
+  let avgR=null,minR=null,maxR=null,effR=null;
+  if(awt.length>0){const rs=awt.map(j=>calcEph(j)).filter(r=>r!==null);if(rs.length>0){avgR=rs.reduce((s,r)=>s+r,0)/rs.length;minR=Math.min(...rs);maxR=Math.max(...rs);}}
+  if(done.length>0){const tp=done.reduce((s,j)=>s+toN(j.priceTotal),0),tm=done.reduce((s,j)=>s+calcMin(j),0);effR=tm>0?tp/(tm/60):null;}
+  const rc=(r)=>r===null?'':r>=40?'good':r>=20?'warn':'bad';
+  document.getElementById('rateGrid').innerHTML=`
+    <div class="rate-item"><div class="rate-label">Ø Stundensatz</div><div class="rate-val ${rc(avgR)}">${avgR?avgR.toFixed(2)+' €':'—'}</div></div>
+    <div class="rate-item"><div class="rate-label">Min – Max</div><div class="rate-val" style="font-size:11px;color:var(--text2);">${minR?minR.toFixed(0)+'€':'—'} – ${maxR?maxR.toFixed(0)+'€':'—'}</div></div>
+    <div class="rate-item"><div class="rate-label">Eff. (Abgegeben)</div><div class="rate-val ${rc(effR)}">${effR?effR.toFixed(2)+' €':'—'}</div></div>
+  `;
+  document.getElementById('rateHint').innerHTML=avgR!==null?(avgR>=40?'✅ Sehr guter Stundensatz! Über dem empfohlenen Richtwert von 40 €/h.':avgR>=20?`⚠️ Ø ${avgR.toFixed(0)} €/h – Potenzial nach oben. Ziel: 40 €/h+`:'🔴 Unter 20 €/h – Preisgestaltung oder Zeitkalkulation prüfen.'):'Kalkulation verfügbar sobald Aufträge mit Menge + Zeit angelegt sind.';
+
+  // Payment
+  const totR=jobs.reduce((s,j)=>s+toN(j.priceTotal),0);
+  const totP=jobs.reduce((s,j)=>s+toN(j.pricePaid),0);
+  const totO=Math.max(0,totR-totP);
+  document.getElementById('payTotal').textContent=fmtEur(totR)+' Gesamtwert';
+  const pp=totR>0?(totP/totR*100):0, op=totR>0?(totO/totR*100):0;
+  document.getElementById('payBarPaid').style.width=pp.toFixed(1)+'%';
+  document.getElementById('payBarOpen').style.width=op.toFixed(1)+'%';
+  document.getElementById('payPaidAmt').textContent=fmtEur(totP)+` (${pp.toFixed(0)}%)`;
+  document.getElementById('payOpenAmt').textContent=fmtEur(totO)+` (${op.toFixed(0)}%)`;
+
+  // Overdue
+  const od=jobs.filter(j=>{const d=daysUntil(j.dueDate);return d!==null&&d<0&&j.status!=='abgegeben';}).sort((a,b)=>daysUntil(a.dueDate)-daysUntil(b.dueDate));
+  const odEl=document.getElementById('overdueList');
+  if(od.length===0){odEl.innerHTML='<div style="color:var(--green);font-size:12px;">✓ Keine überfälligen Aufträge</div>';}
+  else{odEl.innerHTML=`<div class="overdue-alert">${od.slice(0,5).map(j=>`<div class="overdue-item"><span style="font-weight:600;">${esc(j.customerName||'—')}</span><span style="color:var(--text3);">${fmtDate(j.dueDate)}</span><span style="color:var(--red);">${Math.abs(daysUntil(j.dueDate))}T überfällig</span><span style="color:var(--text3);margin-left:auto;">${fmtEur(Math.max(0,toN(j.priceTotal)-toN(j.pricePaid)))}</span></div>`).join('')}${od.length>5?`<div style="color:var(--text3);font-size:10px;margin-top:5px;">+ ${od.length-5} weitere</div>`:''}</div>`;}
+
+  // Total stats
+  const totJ=jobs.length,totH=jobs.reduce((s,j)=>s+calcMin(j),0)/60,avgV=totJ>0?jobs.reduce((s,j)=>s+toN(j.priceTotal),0)/totJ:0;
+  const collR=totR>0?(totP/totR*100):0,abgC=jobs.filter(j=>j.status==='abgegeben').length;
+  document.getElementById('totalStats').innerHTML=[
+    {l:'Alle Aufträge',v:totJ,s:'gesamt'},
+    {l:'Abgeschlossen',v:abgC,s:`${totJ>0?(abgC/totJ*100).toFixed(0):0}% aller Aufträge`},
+    {l:'Kassiert',v:fmtEur(totP),s:'tatsächlich erhalten'},
+    {l:'Inkasso-Rate',v:collR.toFixed(0)+'%',s:'Bezahlt / Gesamtwert'},
+    {l:'Ø Auftragswert',v:fmtEur(avgV),s:'pro Auftrag'},
+    {l:'Geleistete Zeit',v:totH.toFixed(1)+' h',s:'alle Aufträge'},
+  ].map(s=>`<div style="background:var(--surface2);border-radius:var(--radius-sm);padding:11px;text-align:center;"><div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:4px;">${s.l}</div><div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:var(--text);">${s.v}</div><div style="font-size:10px;color:var(--text3);margin-top:2px;">${s.s}</div></div>`).join('');
+}
+
+function renderAll() { renderKPIs(); renderTable(); if(activeTab==='dashboard')renderDashboard(); }
+
+function switchTab(tab) {
+  activeTab=tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.toggle('active',c.id==='tab-'+tab));
+  if(tab==='dashboard')renderDashboard();
+}
+
+document.getElementById('exportBtn').addEventListener('click',()=>{
+  const blob=new Blob([JSON.stringify(jobs,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='auftraege_export.json';a.click();toast('Export erfolgreich!');
+});
+document.getElementById('importBtn').addEventListener('click',()=>document.getElementById('importFile').click());
+document.getElementById('importFile').addEventListener('change',e=>{
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();r.onload=ev=>{try{const data=JSON.parse(ev.target.result);if(!Array.isArray(data))throw new Error();
+  if(confirm(`${data.length} Aufträge importieren? Duplikate werden übersprungen.`)){const ids=new Set(jobs.map(j=>j.id));let added=0;data.forEach(j=>{if(!ids.has(j.id)){jobs.push(j);added++;}});saveJobs();renderAll();toast(`${added} Aufträge importiert.`);}}catch{toast('Import fehlgeschlagen.','error');}e.target.value='';};r.readAsText(file);
+});
+
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('addJobBtn').addEventListener('click',addJob);
+  document.getElementById('resetFormBtn').addEventListener('click',resetForm);
+  document.getElementById('printBtn').addEventListener('click',()=>window.print());
+
+  // Cloud Sync preference
+  try { cloudEnabled = localStorage.getItem(CLOUD_MIRROR_KEY) === '1'; } catch(e) { cloudEnabled = false; }
+
+  const cloudBtn = document.getElementById('cloudToggleBtn');
+  if (cloudBtn) {
+    cloudBtn.addEventListener('click', async () => {
+      cloudEnabled = !cloudEnabled;
+      localStorage.setItem(CLOUD_MIRROR_KEY, cloudEnabled ? '1' : '0');
+
+      if (!cloudEnabled) {
+        if (cloud && cloud.unsub) { try { cloud.unsub(); } catch(e) {} }
+        toast('Cloud Sync AUS (Offline aktiv).');
+        return;
+      }
+
+      const ok = await cloudInit();
+      if (!ok) {
+        cloudEnabled = false;
+        localStorage.setItem(CLOUD_MIRROR_KEY, '0');
+        toast('Cloud Sync fehlgeschlagen (Config/Auth/Rules).', 'error');
+        return;
+      }
+
+      cloudStartListener((arr) => {
+        jobs = Array.isArray(arr) ? arr : [];
+        saveJobs();
+        renderAll();
+      });
+
+      // Push local -> cloud (initial sync)
+      try { for (const j of jobs) await cloudUpsertJob(j); } catch(e) { console.error(e); }
+
+      toast('Cloud Sync EIN (Firebase).');
+    });
+
+    // Auto-start if enabled
+    (async ()=>{
+      if(!cloudEnabled) return;
+      const ok = await cloudInit();
+      if(!ok){ cloudEnabled=false; localStorage.setItem(CLOUD_MIRROR_KEY,'0'); return; }
+      cloudStartListener((arr)=>{ jobs = Array.isArray(arr)?arr:[]; saveJobs(); renderAll(); });
+    })();
+  }
+
+  document.querySelectorAll('.filter-btn').forEach(b=>b.addEventListener('click',()=>setFilter(b.dataset.filter)));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
+  document.getElementById('searchInput').addEventListener('input',e=>{searchQuery=e.target.value.trim();renderAll();});
+  ['qty','timePerPart','setupTime','priceTotal'].forEach(id=>document.getElementById(id).addEventListener('input',updateLiveCalc));
+  document.getElementById('dueDate').value=new Date().toISOString().substring(0,10);
+  jobs=loadJobs(); renderAll();
+});
+</script>
+</body>
+</html>
