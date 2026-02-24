@@ -1,0 +1,2717 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Wolf Lasermark – Professionelle Lasergravur für Firmen und Privatkunden im Raum Rosenheim. Präzise Beschriftungen, Seriennummern, QR-Codes und personalisierte Geschenke.">
+    <meta name="keywords" content="Lasergravur, Rosenheim, Seriennummern, QR-Codes, Gravur, Edelstahl">
+    <meta property="og:title" content="Wolf Lasermark - Professionelle Lasergravur">
+    <meta property="og:description" content="Präzise Lasergravur für Industrie, Handwerk und Privatpersonen.">
+    <meta property="og:type" content="business.business">
+    <title>Wolf Lasermark - Professionelle Lasergravur | Rosenheim</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            background: #f5f7fb;
+            line-height: 1.6;
+        }
+
+        /* Headerke */
+        header {
+            background: #0b1120;
+            color: white;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+/* Header brand (logo + felirat) */
+.brand{
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.brand-logo{
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+    display: block;
+}
+
+.brand-text{
+    font-weight: 700;
+    font-size: 1.4rem;
+    letter-spacing: 0.05em;
+}
+
+.brand-text span{
+    color: #00d4ff;
+}
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.4rem;
+            letter-spacing: 0.05em;
+        }
+
+        .logo span {
+            color: #00d4ff;
+        }
+
+        nav a {
+            color: #e5e7eb;
+            text-decoration: none;
+            margin-left: 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        nav a:hover {
+            color: #00d4ff;
+        }
+
+       /* Shop kiemelt menüpont (CTA gomb a nav-ban) */
+.nav-shop{
+    background: #00d4ff;
+    color: #020617 !important;
+    padding: 0.55rem 1.05rem;
+    border-radius: 999px;
+    font-weight: 700;
+
+    /* elegáns, vékony keret */
+    border: 1px solid rgba(0, 212, 255, 0.55);
+
+    /* picit finomabb árnyék */
+    box-shadow: 0 6px 16px rgba(0, 212, 255, 0.18);
+
+    margin-left: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.nav-shop:hover{
+    background: #00b8d4;
+    border-color: rgba(0, 184, 212, 0.65);
+    color: #020617 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(0, 184, 212, 0.18);
+}
+
+/* Opcionális kis "NEU" jelzés */
+.nav-shop::after{
+    content: "NEU";
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    padding: 0.15rem 0.45rem;
+    border-radius: 999px;
+    background: rgba(2, 6, 23, 0.85);
+    color: #e5e7eb;
+}
+
+
+/* Mobilon ne lógjon szét */
+@media (max-width: 768px){
+    .nav-shop{
+        margin-left: 0;
+        margin-right: 0.8rem;
+    }
+}
+
+        /* Hero Section */
+      .hero {
+    background: radial-gradient(circle at top left, #00d4ff33, transparent 55%),
+                radial-gradient(circle at top right, #1e40af55, transparent 55%),
+                #020617;
+    color: white;
+    padding: 4rem 1rem 5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 500px;
+}
+
+/* Hero watermark a szöveg mögé */
+.hero-content {
+    position: relative;
+}
+
+/* a háttérben lévő vízjel */
+.hero-watermark {
+    position: absolute;
+    top: 5%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 460px;
+    max-width: 80vw;
+    height: auto;
+    opacity: 0.8;              /* finom, elegáns */
+    pointer-events: none;
+    z-index: 0;
+    filter: drop-shadow(0 0 18px rgba(0, 212, 255, 0.18));
+}
+
+/* minden más elem kerüljön a watermark fölé */
+.hero-content > *:not(.hero-watermark) {
+    position: relative;
+    z-index: 1;
+}
+
+
+.hero-content {
+    max-width: 800px;
+    text-align: center; /* minden középre */
+}
+
+
+        .hero h1 {
+            font-size: 3.2rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .hero h1 span {
+            color: #00d4ff;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: #e5e7eb;
+            line-height: 1.5;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: #00d4ff;
+            color: #1a1a1a;
+            padding: 0.9rem 2.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 8px 20px rgba(0, 212, 255, 0.3);
+            transition: all 0.3s ease;
+            border: 2px solid #00d4ff;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(0, 212, 255, 0.4);
+            background: #00b8d4;
+        }
+
+        .cta-secondary {
+            background: transparent;
+            color: #00d4ff;
+        }
+
+        .cta-secondary:hover {
+            background: #00d4ff;
+            color: #1a1a1a;
+        }
+
+        .cta-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        /* Process Section */
+        .process-section {
+            padding: 4rem 1rem;
+            background: #0f172a;
+            color: #e5e7eb;
+        }
+
+        .process-section h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+        }
+
+        .process-grid {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .process-step {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 8px;
+            padding: 2rem;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            transition: all 0.3s;
+        }
+
+        .process-step:hover {
+            border-color: #00d4ff;
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #00d4ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: #00d4ff;
+        }
+
+        .process-step h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.7rem;
+            color: #e5e7eb;
+            font-weight: 600;
+        }
+
+        .process-step p {
+            font-size: 0.95rem;
+            color: #cbd5f5;
+            line-height: 1.5;
+        }
+
+        /* Audience Section */
+        .audience-section {
+            padding: 4rem 1rem;
+            background: #f9fafb;
+        }
+
+        .audience-section.alt {
+            background: #ffffff;
+        }
+
+        .audience-section h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: #1a1a1a;
+        }
+
+        .section-intro {
+            max-width: 750px;
+            margin: 0 auto 2.5rem;
+            text-align: center;
+            color: #555;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .audience-grid {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .audience-card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 1.8rem;
+            border: 1px solid #eee;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+
+        .audience-card:hover {
+            box-shadow: 0 8px 20px rgba(0, 212, 255, 0.1);
+            transform: translateY(-3px);
+            border-color: #00d4ff;
+        }
+
+        .audience-badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #00d4ff;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+        }
+
+        .audience-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.7rem;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .audience-card p {
+            font-size: 0.95rem;
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        /* Leistungen Section (Privat + Firmen Karten) */
+.leistungen-section {
+    padding: 4rem 1rem;
+    background: #f9fafb;
+}
+
+.leistungen-section h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: #1a1a1a;
+}
+
+.leistungen-subtitle {
+    max-width: 700px;
+    margin: 0 auto 2.5rem;
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.98rem;
+}
+
+.leistungen-grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.leistungen-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 1.8rem;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    border: 1px solid #e5e7eb;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+}
+
+.leistungen-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: #020617;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #f9fafb;
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+}
+
+.leistungen-card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #111827;
+}
+
+.leistungen-image {
+    width: 100%;
+    height: 190px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 1.2rem;
+}
+
+.leistungen-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.leistungen-card p {
+    font-size: 0.95rem;
+    color: #4b5563;
+    margin-bottom: 1rem;
+}
+
+.leistungen-list {
+    margin: 0;
+    padding-left: 1.1rem;
+    color: #111827;
+    font-size: 0.95rem;
+}
+
+.leistungen-list li {
+    margin-bottom: 0.3rem;
+}
+
+/* mobil */
+@media (max-width: 768px) {
+    .leistungs-section h2 {
+        font-size: 1.8rem;
+    }
+
+    .leistungen-card {
+        padding: 1.5rem;
+    }
+}
+
+        /* Shop CTA a Privatkunden kártyában */
+.shop-cta{
+    margin-top: 1.2rem;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    gap: 0.5rem;
+    background: #0b1120;
+    color: #ffffff;
+    padding: 0.9rem 1rem;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 700;
+    border: 1px solid rgba(0, 212, 255, 0.35);
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.14);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.shop-cta:hover{
+    transform: translateY(-2px);
+    border-color: #00d4ff;
+    box-shadow: 0 14px 35px rgba(0, 212, 255, 0.14);
+}
+
+.shop-note{
+    margin-top: 0.65rem;
+    font-size: 0.9rem;
+    color: #4b5563;
+    text-align: center;
+}
+
+
+
+        /* Services */
+/* Vízszintes slider a „Beispiele & Inspiration" részhez */
+.services {
+    position: relative;
+    padding: 4rem 1rem;
+    background: #f9fafb;
+}
+
+.services h2 {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    font-size: 2rem;
+    color: #1a1a1a;
+}
+
+/* Görgethető sáv */
+.services-scroller {
+    max-width: 1100px;
+    margin: 0 auto;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Kártyák egy sorban */
+.services-grid {
+    display: flex;
+    gap: 1.5rem;
+}
+
+/* Minden kártya fix szélességű, szépen „bekattan" */
+.service-card {
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    overflow: hidden;
+    flex: 0 0 260px;        /* kb. 260px széles kártya */
+    scroll-snap-align: start;
+}
+
+/* Scrollbar elrejtése (Chrome/Safari) */
+.services-scroller::-webkit-scrollbar {
+    display: none;
+}
+
+/* Bal/jobb lapozó gombok */
+.slider-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: rgba(15, 23, 42, 0.8);
+    color: #f9fafb;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.slider-btn:hover {
+    background: rgba(0, 212, 255, 0.9);
+    transform: translateY(-50%) scale(1.05);
+}
+
+.slider-btn-prev {
+    left: 10px;
+}
+
+.slider-btn-next {
+    right: 10px;
+}
+
+/* Mobilon a gombok kisebbek legyenek */
+@media (max-width: 768px) {
+    .service-card {
+        flex: 0 0 220px;
+    }
+
+    .slider-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 1.2rem;
+    }
+}
+
+        .services h2 {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            font-size: 2rem;
+            color: #1a1a1a;
+        }
+
+        .services-grid {
+    display: flex;
+    gap: 1.5rem;
+}
+
+        .service-card {
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .service-card:hover {
+            border-color: #00d4ff;
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.15);
+            transform: translateY(-5px);
+        }
+
+    .service-image {
+    margin-bottom: 1rem;
+    width: 100%;
+    height: 150px;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.service-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+
+        .service-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.7rem;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .service-card p {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* About Section */
+        .about-section {
+            padding: 4rem 1rem;
+            background: #f9fafb;
+        }
+
+        .about-inner {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .about-text h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: #1a1a1a;
+            font-weight: 700;
+        }
+
+        .about-text p {
+            margin-bottom: 1rem;
+            color: #555;
+            font-size: 0.98rem;
+            line-height: 1.7;
+        }
+
+        .trust-badges {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .trust-badge {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #00d4ff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .trust-badge strong {
+            color: #00d4ff;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        .trust-badge p {
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            padding: 4rem 1rem;
+            background: white;
+        }
+
+        .faq-section h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: #1a1a1a;
+        }
+
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            margin-bottom: 1rem;
+            background: #f9fafb;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #eee;
+        }
+
+        .faq-question {
+            padding: 1.2rem;
+            background: #f9fafb;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+            user-select: none;
+        }
+
+        .faq-question:hover {
+            background: #f0f4f8;
+            color: #00d4ff;
+        }
+
+        .faq-toggle {
+            color: #00d4ff;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: transform 0.3s;
+        }
+
+        .faq-item.active .faq-toggle {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            display: none;
+            padding: 0 1.2rem 1.2rem;
+            color: #555;
+            background: white;
+            line-height: 1.6;
+        }
+
+        .faq-item.active .faq-answer {
+            display: block;
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: 4rem 1rem;
+            background: white;
+        }
+
+        .contact-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .contact h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+            color: #1a1a1a;
+        }
+
+        .contact-content {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.3fr);
+            gap: 2.5rem;
+        }
+
+        .contact-info h3 {
+            margin-bottom: 1rem;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .contact-info p {
+            margin-bottom: 0.8rem;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .contact-info strong {
+            color: #00d4ff;
+        }
+
+        .contact-form {
+            background: #f9fafb;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.09);
+            border: 1px solid #e5e7eb;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #1a1a1a;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .kundentyp-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .kundentyp-options label {
+            font-size: 0.95rem;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .submit-btn {
+            background: #00d4ff;
+            color: #1a1a1a;
+            padding: 0.95rem 2rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 18px rgba(0, 212, 255, 0.35);
+            width: 100%;
+            font-size: 0.98rem;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(0, 212, 255, 0.45);
+            background: #00b8d4;
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .form-message {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: none;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .form-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .form-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        /* WhatsApp Button */
+        .whatsapp-btn {
+            display: inline-block;
+            background: #25d366;
+            color: white;
+            padding: 0.8rem 1.8rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+        }
+
+        .whatsapp-btn:hover {
+            background: #1fa857;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(37, 211, 102, 0.3);
+        }
+
+        /* Floating WhatsApp */
+        .floating-whatsapp {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: #25d366;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .floating-whatsapp:hover {
+            background: #1fa857;
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        }
+
+        /* Footer */
+        footer {
+            background: #1a1a1a;
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.9rem;
+            border-top: 1px solid #333;
+        }
+
+        footer p {
+            margin: 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.4rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.8rem;
+            }
+
+            nav {
+                width: 100%;
+                display: flex;
+                flex-wrap: wrap;
+            }
+
+            nav a {
+                margin-left: 0;
+                margin-right: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .cta-group {
+                flex-direction: column;
+            }
+
+            .contact-content {
+                grid-template-columns: 1fr;
+            }
+
+            .about-text h2 {
+                text-align: center;
+            }
+
+            .floating-whatsapp {
+                bottom: 20px;
+                right: 20px;
+                width: 56px;
+                height: 56px;
+                font-size: 1.6rem;
+            }
+        }
+        /* 100W JPT Laser-Technologie Section */
+.tech-section {
+    padding: 4rem 1rem;
+    background: #f9fafb;
+}
+
+.tech-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 3rem;
+    align-items: center;
+}
+
+.tech-left h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: #111827;
+    font-weight: 700;
+}
+
+.tech-left p {
+    color: #4b5563;
+    margin-bottom: 1.5rem;
+    line-height: 1.7;
+    font-size: 0.98rem;
+}
+
+.tech-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.7rem;
+}
+
+.tech-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: #111827;
+    font-size: 0.95rem;
+}
+
+.tech-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    background: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    color: #22c55e;
+}
+
+/* Right side card */
+.tech-card {
+    background: #020617;
+    color: #e5e7eb;
+    border-radius: 18px;
+    padding: 2.5rem 2.8rem;
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.7);
+}
+
+.tech-card-main {
+    margin-bottom: 2rem;
+}
+
+.tech-power {
+    font-size: 3rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.4rem;
+}
+
+.tech-label {
+    font-size: 0.95rem;
+    color: #9ca3af;
+}
+
+.tech-card-row {
+    margin-top: 1.6rem;
+}
+
+.tech-card-title {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #9ca3af;
+    margin-bottom: 0.3rem;
+}
+
+.tech-card-value {
+    font-size: 1.7rem;
+    font-weight: 600;
+}
+
+.tech-card-note {
+    font-size: 0.95rem;
+    color: #9ca3af;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .tech-inner {
+        grid-template-columns: 1fr;
+    }
+
+    .tech-card {
+        padding: 2rem 1.8rem;
+    }
+
+    .tech-power {
+        font-size: 2.4rem;
+    }
+}
+
+
+
+        .contact-email-box h3{
+    margin-bottom: 0.8rem;
+    color: #1a1a1a;
+    font-weight: 600;
+}
+
+.contact-email{
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.contact-email a{
+    color: #00d4ff;
+    text-decoration: none;
+}
+
+.contact-email a:hover{
+    text-decoration: underline;
+}
+
+.contact-cta-row{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-top: 1rem;
+}
+
+.email-btn{
+    display: inline-block;
+    background: #0b1120;
+    color: #ffffff;
+    padding: 0.8rem 1.4rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.email-btn:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(2, 6, 23, 0.25);
+    opacity: 0.95;
+}
+
+.contact-note{
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin-top: 1rem;
+}
+
+        /* Anfrage Box (Firmenkunden) */
+.anfrage-box{
+  margin-top: 1.2rem;
+  padding: 1.1rem 1.1rem;
+  border-radius: 14px;
+  background: #f9fafb;
+  border: 1px solid rgba(0, 212, 255, 0.25);
+}
+
+.anfrage-title{
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.anfrage-text{
+  margin-bottom: 0.75rem;
+  color: #4b5563;
+  font-size: 0.95rem;
+}
+
+.anfrage-email{
+  margin-bottom: 0.9rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.anfrage-email a{
+  color: #00b8d4;
+  text-decoration: none;
+}
+.anfrage-email a:hover{
+  text-decoration: underline;
+}
+
+.anfrage-btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 0.45rem;
+  background: #0b1120;
+  color: #ffffff;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 700;
+  border: 1px solid rgba(0, 212, 255, 0.35);
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.anfrage-btn:hover{
+  transform: translateY(-2px);
+  border-color: #00d4ff;
+  box-shadow: 0 14px 35px rgba(0, 212, 255, 0.14);
+}
+
+/* Angebot-Kalkulator Button (Firmenkunden) */
+.kalkulator-btn{
+  margin-top: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 0.45rem;
+  background: #0b1120;
+  color: #ffffff;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 700;
+  border: 1px solid rgba(0, 212, 255, 0.35);
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.kalkulator-btn:hover{
+  transform: translateY(-2px);
+  border-color: #00d4ff;
+  box-shadow: 0 14px 35px rgba(0, 212, 255, 0.14);
+}
+.kalkulator-note{
+  margin-top: 0.55rem;
+  font-size: 0.9rem;
+  color: #6b7280;
+  text-align: center;
+}
+
+/* =============================================
+   ÜBER MICH / INHABER SECTION
+   ============================================= */
+.ueber-mich-section {
+    padding: 5rem 1rem;
+    background: #0f172a;
+    color: #e5e7eb;
+}
+
+.ueber-mich-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    .ueber-mich-inner {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        text-align: center;
+    }
+}
+
+.ueber-mich-photo-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.ueber-mich-photo {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(0, 212, 255, 0.4);
+    box-shadow: 0 0 0 8px rgba(0, 212, 255, 0.07);
+    display: block;
+}
+
+.ueber-mich-photo-placeholder {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: rgba(0, 212, 255, 0.08);
+    border: 3px dashed rgba(0, 212, 255, 0.35);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    font-size: 0.85rem;
+    text-align: center;
+    gap: 0.5rem;
+}
+
+.ueber-mich-photo-placeholder span {
+    font-size: 2.5rem;
+}
+
+.ueber-mich-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #e5e7eb;
+    text-align: center;
+}
+
+.ueber-mich-role {
+    font-size: 0.85rem;
+    color: #00d4ff;
+    text-align: center;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+}
+
+.ueber-mich-text h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 1.2rem;
+    line-height: 1.3;
+}
+
+.ueber-mich-text h2 span {
+    color: #00d4ff;
+}
+
+.ueber-mich-text p {
+    color: #9ca3af;
+    line-height: 1.8;
+    margin-bottom: 1rem;
+    font-size: 0.98rem;
+}
+
+.ueber-mich-facts {
+    display: flex;
+    gap: 2rem;
+    margin-top: 1.8rem;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+    .ueber-mich-facts {
+        justify-content: center;
+    }
+}
+
+.ueber-fact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.ueber-fact-num {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #00d4ff;
+    line-height: 1;
+}
+
+.ueber-fact-label {
+    font-size: 0.8rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.referenz-logos {
+    margin-top: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    .referenz-logos {
+        justify-content: center;
+    }
+}
+
+.referenz-label {
+    font-size: 0.78rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    width: 100%;
+    margin-bottom: 0.2rem;
+}
+
+.referenz-tag {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    border-radius: 999px;
+    padding: 0.35rem 0.9rem;
+    font-size: 0.85rem;
+    color: #e5e7eb;
+    font-weight: 500;
+}
+
+/* =============================================
+   BEWERTUNGEN / REVIEWS
+   ============================================= */
+.reviews-section {
+    padding: 5rem 1rem;
+    background: #f9fafb;
+}
+
+.reviews-section h2 {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+}
+
+.reviews-subtitle {
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.95rem;
+    margin-bottom: 3rem;
+}
+
+.reviews-grid {
+    max-width: 1050px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.review-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.8rem;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.07);
+    border: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: transform 0.25s, box-shadow 0.25s;
+}
+
+.review-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(0, 212, 255, 0.1);
+    border-color: rgba(0, 212, 255, 0.3);
+}
+
+.review-stars {
+    color: #f59e0b;
+    font-size: 1.1rem;
+    letter-spacing: 0.05em;
+}
+
+.review-text {
+    color: #374151;
+    font-size: 0.97rem;
+    line-height: 1.7;
+    font-style: italic;
+    flex: 1;
+}
+
+.review-text::before {
+    content: '"';
+    font-size: 2.5rem;
+    color: #00d4ff;
+    line-height: 0;
+    vertical-align: -0.6rem;
+    margin-right: 0.2rem;
+    font-style: normal;
+}
+
+.review-author {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    border-top: 1px solid #f3f4f6;
+    padding-top: 1rem;
+}
+
+.review-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #0b1120;
+    color: #00d4ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.review-author-info strong {
+    display: block;
+    font-size: 0.92rem;
+    color: #111827;
+    font-weight: 600;
+}
+
+.review-author-info span {
+    font-size: 0.82rem;
+    color: #9ca3af;
+}
+
+.review-google-badge {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.review-google-badge a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6b7280;
+    font-size: 0.88rem;
+    text-decoration: none;
+    border: 1px solid #e5e7eb;
+    padding: 0.5rem 1.2rem;
+    border-radius: 999px;
+    background: white;
+    transition: all 0.2s;
+}
+
+.review-google-badge a:hover {
+    border-color: #00d4ff;
+    color: #00d4ff;
+}
+
+/* =============================================
+   PREISE / ÁRAZÁS (Privat-only)
+   ============================================= */
+.preise-section {
+    padding: 5rem 1rem;
+    background: white;
+}
+
+.preise-section h2 {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 0.4rem;
+}
+
+.preise-subtitle {
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.95rem;
+    margin-bottom: 3rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.preise-grid {
+    max-width: 950px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.2rem;
+}
+
+.preis-card {
+    border-radius: 16px;
+    padding: 1.8rem 1.5rem;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    text-align: center;
+    transition: all 0.25s;
+    position: relative;
+}
+
+.preis-card:hover {
+    border-color: #00d4ff;
+    box-shadow: 0 10px 30px rgba(0, 212, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.preis-card.featured {
+    background: #0b1120;
+    border-color: rgba(0, 212, 255, 0.4);
+    color: white;
+}
+
+.preis-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #00d4ff;
+    color: #020617;
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 0.25rem 0.8rem;
+    border-radius: 999px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.preis-icon {
+    font-size: 2rem;
+    margin-bottom: 0.7rem;
+    display: block;
+}
+
+.preis-titel {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.5rem;
+}
+
+.preis-card.featured .preis-titel {
+    color: #e5e7eb;
+}
+
+.preis-von {
+    font-size: 0.8rem;
+    color: #9ca3af;
+    margin-bottom: 0.2rem;
+}
+
+.preis-betrag {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #00d4ff;
+    line-height: 1.1;
+    margin-bottom: 0.2rem;
+}
+
+.preis-ab {
+    font-size: 0.78rem;
+    color: #9ca3af;
+    margin-bottom: 1rem;
+}
+
+.preis-beispiel {
+    font-size: 0.85rem;
+    color: #6b7280;
+    line-height: 1.5;
+}
+
+.preis-card.featured .preis-beispiel {
+    color: #9ca3af;
+}
+
+.preise-hinweis {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 0.88rem;
+    color: #9ca3af;
+}
+
+.preise-hinweis a {
+    color: #00d4ff;
+    text-decoration: none;
+}
+
+/* =============================================
+   IMPROVED PROCESS – privat vs firmen
+   ============================================= */
+.process-privat-steps {
+    max-width: 900px;
+    margin: 2rem auto 0;
+    display: flex;
+    gap: 0;
+    position: relative;
+}
+
+.process-privat-steps::before {
+    content: '';
+    position: absolute;
+    top: 28px;
+    left: calc(10% + 28px);
+    right: calc(10% + 28px);
+    height: 2px;
+    background: linear-gradient(90deg, #00d4ff, #1e40af);
+    z-index: 0;
+}
+
+@media (max-width: 700px) {
+    .process-privat-steps {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    .process-privat-steps::before {
+        display: none;
+    }
+}
+
+.privat-step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0 0.8rem;
+    position: relative;
+    z-index: 1;
+}
+
+.privat-step-circle {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #0b1120;
+    border: 2px solid #00d4ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 0.9rem;
+    box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.1);
+}
+
+.privat-step h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #e5e7eb;
+    margin-bottom: 0.4rem;
+}
+
+.privat-step p {
+    font-size: 0.85rem;
+    color: #9ca3af;
+    line-height: 1.5;
+}
+
+.privat-step-cta {
+    margin-top: 2.5rem;
+    text-align: center;
+}
+
+.privat-step-cta a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #00d4ff;
+    color: #020617;
+    padding: 0.85rem 2rem;
+    border-radius: 999px;
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: all 0.25s;
+    box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
+}
+
+.privat-step-cta a:hover {
+    background: #00b8d4;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px rgba(0, 212, 255, 0.4);
+}
+
+/* =============================================
+   KUNDEN-WAHL OVERLAY
+   ============================================= */
+#kunden-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at top left, #00d4ff22, transparent 50%),
+                radial-gradient(circle at bottom right, #1e40af44, transparent 50%),
+                #020617;
+    padding: 1rem;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+
+#kunden-overlay.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.overlay-inner {
+    text-align: center;
+    max-width: 700px;
+    width: 100%;
+}
+
+.overlay-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-bottom: 2.5rem;
+}
+
+.overlay-logo img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+.overlay-logo-text {
+    font-weight: 700;
+    font-size: 1.6rem;
+    color: white;
+    letter-spacing: 0.05em;
+}
+
+.overlay-logo-text span {
+    color: #00d4ff;
+}
+
+.overlay-inner h1 {
+    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+    line-height: 1.3;
+}
+
+.overlay-inner p {
+    color: #9ca3af;
+    font-size: 1rem;
+    margin-bottom: 3rem;
+}
+
+.kunden-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+@media (max-width: 560px) {
+    .kunden-cards {
+        grid-template-columns: 1fr;
+    }
+    .overlay-inner h1 {
+        font-size: 1.5rem;
+    }
+}
+
+.kunden-card-btn {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(0, 212, 255, 0.25);
+    border-radius: 20px;
+    padding: 2.5rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    color: white;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.kunden-card-btn:hover {
+    background: rgba(0, 212, 255, 0.08);
+    border-color: #00d4ff;
+    transform: translateY(-4px);
+    box-shadow: 0 20px 50px rgba(0, 212, 255, 0.15);
+}
+
+.kunden-card-btn .kunden-icon {
+    font-size: 3rem;
+    line-height: 1;
+    display: block;
+}
+
+.kunden-card-btn .kunden-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: white;
+}
+
+.kunden-card-btn .kunden-desc {
+    font-size: 0.9rem;
+    color: #9ca3af;
+    line-height: 1.5;
+}
+
+.kunden-card-btn .kunden-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(0, 212, 255, 0.15);
+    color: #00d4ff;
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.kunden-card-btn:hover .kunden-arrow {
+    background: #00d4ff;
+    color: #020617;
+    transform: translateX(3px);
+}
+
+/* Main content hidden until choice made */
+#main-content {
+    display: none;
+}
+
+/* Privat- und Firmenmodus */
+body.mode-privat .firmen-only { display: none !important; }
+body.mode-firmen .privat-only { display: none !important; }
+
+/* Mode-Switch Banner */
+.mode-switch-bar {
+    background: #0b1120;
+    color: #9ca3af;
+    text-align: center;
+    padding: 0.5rem 1rem;
+    font-size: 0.88rem;
+    border-bottom: 1px solid rgba(0,212,255,0.15);
+}
+
+.mode-switch-bar button {
+    background: none;
+    border: none;
+    color: #00d4ff;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.88rem;
+    padding: 0 0.3rem;
+    text-decoration: underline;
+    font-family: inherit;
+}
+
+.mode-switch-bar button:hover {
+    color: #00b8d4;
+}
+
+</style>
+</head>
+<body>
+    <!-- KUNDEN-WAHL OVERLAY -->
+    <div id="kunden-overlay">
+        <div class="overlay-inner">
+            <div class="overlay-logo">
+                <img src="images/wolf-lasermark-icon.png" alt="Wolf Lasermark Logo">
+                <div class="overlay-logo-text">Wolf <span>Lasermark</span></div>
+            </div>
+            <h1>Willkommen bei Wolf Lasermark</h1>
+            <p>Wählen Sie, wie wir Ihnen helfen können:</p>
+            <div class="kunden-cards">
+                <button class="kunden-card-btn" onclick="chooseMode('privat')">
+                    <span class="kunden-icon">👤</span>
+                    <span class="kunden-title">Privatkunden</span>
+                    <span class="kunden-desc">Personalisierte Geschenke, Schmuck, Erinnerungsstücke & mehr</span>
+                    <span class="kunden-arrow">→</span>
+                </button>
+                <button class="kunden-card-btn" onclick="chooseMode('firmen')">
+                    <span class="kunden-icon">🏢</span>
+                    <span class="kunden-title">Firmenkunden</span>
+                    <span class="kunden-desc">Seriennummern, QR-Codes, Werkzeugkennzeichnung & Industrielösungen</span>
+                    <span class="kunden-arrow">→</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main-content">
+    <!-- Mode Switch Bar -->
+    <div class="mode-switch-bar">
+        <span id="mode-label-text"></span>
+        &nbsp;|&nbsp;
+        <button onclick="resetMode()">Ansicht wechseln</button>
+    </div>
+<header>
+    <div class="header-content">
+        <div class="brand">
+    <img src="images/wolf-lasermark-icon.png" alt="Wolf Lasermark Logo" class="brand-logo">
+    <div class="brand-text">Wolf <span>Lasermark</span></div>
+</div>
+
+        <nav>
+            <a href="#privat" class="privat-only">Privatkunden</a>
+            <a href="#firmen" class="firmen-only">Firmenkunden</a>
+            <a href="#services">Beispiele</a>
+            <a href="#about">Über mich</a>
+            <a href="#bewertungen">Bewertungen</a>
+            <a href="#faq">FAQ</a>
+            <a href="#contact">Kontakt</a>
+         <a href="shop.html" class="nav-shop privat-only">Shop</a>
+        </nav>
+    </div>
+
+
+</header>
+
+
+    <!-- Hero Section -->
+<section class="hero">
+   <div class="hero-content">
+
+        <!-- háttér-vízjel -->
+        <img class="hero-watermark" src="images/wolf-lasermark.png" alt="" aria-hidden="true">
+
+        <h1>Lasergravur für <span>Firmen</span> & <span>Privatkunden</span></h1>
+        <p>Präzise Beschriftungen für Industrie, Handwerk und individuelle Geschenke.</p>
+</div>
+</section>
+
+    
+
+     
+    <!-- Unsere Leistungen: Privat + Firmen in 2 Karten -->
+    <section class="leistungen-section" id="privat">
+    <h2 id="leistungen-title">Unsere Leistungen</h2>
+    <p class="leistungen-subtitle" id="leistungen-subtitle">
+        Individuelle Lösungen für Privat- und Geschäftskunden – präzise Lasergravuren für 
+        Geschenke, Werkstücke und Serienprodukte.
+    </p>
+
+    <div class="leistungen-grid">
+        <!-- Karte 1: Privatkunden -->
+        <article class="leistungen-card privat-only">
+            <div class="leistungen-icon">👤</div>
+            <h3>Für Privatkunden</h3>
+
+            <p>
+                Machen Sie aus Alltagsgegenständen besondere Unikate: 
+                Mit unserer Faserlaser-Gravur personalisieren wir Geschenke und Erinnerungsstücke 
+                mit Namen, Daten, Sprüchen, Logos oder Motiven – ideal für besondere Tage, Hochzeit, Jubiläum 
+                oder einfach zwischendurch.
+            </p>
+            <ul class="leistungen-list">
+                <li>Schmuck, Anhänger und Accessoires</li>
+                <li>Schlüsselanhänger, Stifte und Feuerzeuge</li>
+                <li>Trinkflaschen, Thermobecher, Messer und Werkzeug</li>
+                <li>Erinnerungstafeln, Metallkarten und Plaketten</li>
+                <li>Individuelle Motive, Logos und Widmungen</li>
+            </ul>
+            <a class="shop-cta" href="shop.html">🛒 Zum Shop – personalisieren & bestellen</a>
+<p class="shop-note">Ideal für Geschenke, Namen, Daten, Sprüche, Logos & Motive.</p>
+        </article>
+
+        <!-- Karte 2: Firmenkunden -->
+        <article class="leistungen-card firmen-only" id="firmen">
+            <div class="leistungen-icon">🏢</div>
+            <h3>Für Unternehmen</h3>
+
+            <p>
+                Wir unterstützen Unternehmen bei der professionellen Kennzeichnung ihrer Produkte, 
+                Bauteile und Werkzeuge. Mit präziser Faserlaser-Gravur erstellen wir gut lesbare, 
+                dauerhaft beständige Markierungen – von Seriennummern bis hin zu maschinenlesbaren Codes.
+            </p>
+            <ul class="leistungen-list">
+                <li>Seriennummern, Chargen- und Datumskennzeichnung</li>
+                <li>Firmenlogos, CE-Kennzeichnung und Piktogramme</li>
+                <li>Typenschilder, Frontplatten und Skalen</li>
+                <li>Werkzeug- und Inventarkennzeichnung</li>
+                <li>QR-Codes &amp; DataMatrix-Codes für Rückverfolgbarkeit</li>
+                <li>Auf Wunsch Speicherung Ihrer Layouts für Nachbestellungen</li>
+            </ul>
+            <div class="anfrage-box">
+  <div class="anfrage-title">Anfrage &amp; Auftrag</div>
+  <p class="anfrage-text">
+    Stellen Sie direkt eine Anfrage oder verfolgen Sie Ihren laufenden Auftrag – alles an einem Ort.
+  </p>
+  <a class="anfrage-btn" href="auftrag-status.html">
+  🔍 Auftrag verfolgen
+</a>
+  <p class="anfrage-text" style="margin-top:0.8rem;font-size:0.85rem;">
+    Oder direkt per E-Mail: <a href="mailto:info@wolf-lasermark.de" style="color:#00d4ff;font-weight:600;">info@wolf-lasermark.de</a>
+  </p>
+  <a class="kalkulator-btn" href="bestellung.html">
+    🧮 Angebot-Kalkulator (nur Schätzung) / Anfrage stellen
+  </a>
+  <p class="kalkulator-note">Schnelle Preis-Indikation – das finale Angebot erhalten Sie per E-Mail.</p>
+</div>
+
+        </article>
+    </div>
+</section>
+
+    
+        <!-- Process Section -->
+    <section class="process-section">
+        <h2 id="process-title">So einfach funktioniert's</h2>
+
+        <!-- Privatkunden: visueller Step-by-Step -->
+        <div class="process-privat-steps privat-only">
+            <div class="privat-step">
+                <div class="privat-step-circle">🛒</div>
+                <h4>Shop besuchen</h4>
+                <p>Produkt auswählen, Text oder Motiv eingeben – fertig. Oder per WhatsApp schreiben.</p>
+            </div>
+            <div class="privat-step">
+                <div class="privat-step-circle">💬</div>
+                <h4>Kurze Abstimmung</h4>
+                <p>Wir bestätigen Ihr Motiv und melden uns innerhalb von 8 Stunden persönlich.</p>
+            </div>
+            <div class="privat-step">
+                <div class="privat-step-circle">⚡</div>
+                <h4>Gravur in 3–5 Tagen</h4>
+                <p>Präzise Lasergravur, Qualitätskontrolle, dann Abholung oder Versand.</p>
+            </div>
+            <div class="privat-step">
+                <div class="privat-step-circle">🎁</div>
+                <h4>Freude erleben</h4>
+                <p>Ihr Unikat kommt an – perfekt verpackt, bereit zum Verschenken.</p>
+            </div>
+        </div>
+        <div class="privat-step-cta privat-only">
+            <a href="shop.html">🛒 Jetzt im Shop stöbern</a>
+        </div>
+
+        <!-- Firmenkunden: klassische 3-Schritte -->
+        <div class="process-grid firmen-only">
+            <div class="process-step">
+                <div class="step-number">1</div>
+                <h3>Angebot-Kalkulator / Anfrage stellen</h3>
+                <p>Nutzen Sie unseren <a href="bestellung.html" style="color:#00d4ff;font-weight:600;">Angebot-Kalkulator</a> für eine schnelle Preis-Indikation oder stellen Sie direkt eine Anfrage – per E-Mail oder WhatsApp. Wir melden uns schnell.</p>
+            </div>
+            <div class="process-step">
+                <div class="step-number">2</div>
+                <h3>Angebot & Freigabe</h3>
+                <p>Transparente Kalkulation, Mustervoransicht auf Wunsch – erst nach Ihrer Freigabe.</p>
+            </div>
+            <div class="process-step">
+                <div class="step-number">3</div>
+                <h3>Gravur & Lieferung</h3>
+                <p>Termingerechte Bearbeitung, Speicherung Ihrer Layouts für Nachbestellungen. Nach der Auftragsbestätigung erhalten Sie eine E-Mail mit einem Code, mit dem Sie den aktuellen Status Ihres Auftrags jederzeit über den Button „Auftrag verfolgen" nachverfolgen können.</p>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- 100W JPT Laser-Technologie Section -->
+    <section class="tech-section" id="laser-tech">
+        <div class="tech-inner">
+            <div class="tech-left">
+                <h2>100W JPT Laser-Technologie</h2>
+                <p>
+                    Unser hochmoderner 100W JPT Laser ermöglicht präzise Gravuren auf den 
+                    verschiedensten Materialien. Die fortschrittliche Technologie garantiert 
+                    gleichbleibend hohe Qualität und Detailtreue – vom Einzelstück bis zur Serie.
+                </p>
+                <ul class="tech-list">
+                    <li>
+                        <div class="tech-icon">✓</div>
+                        <span>Hochpräzise Gravuren bis ins kleinste Detail</span>
+                    </li>
+                    <li>
+                        <div class="tech-icon">✓</div>
+                        <span>Vielseitig einsetzbar auf Metall, Holz, Kunststoff, Leder und mehr</span>
+                    </li>
+                    <li>
+                        <div class="tech-icon">✓</div>
+                        <span>Schnelle Bearbeitungszeiten ohne Qualitätsverlust</span>
+                    </li>
+                    <li>
+                        <div class="tech-icon">✓</div>
+                        <span>Dauerhafte und beständige Ergebnisse</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="tech-card">
+                <div class="tech-card-main">
+                     <div class="tech-label">Laser-Leistung</div>
+                    <div class="tech-power">100W</div>
+                </div>
+
+                <div class="tech-card-row">
+                    <div class="tech-card-title">Präzision</div>
+                    <div class="tech-card-value">±0,01&nbsp;mm</div>
+                </div>
+
+                <div class="tech-card-row" style="margin-top: 1.8rem;">
+                    <div class="tech-card-title">Möglichkeiten</div>
+                    <div class="tech-card-value">∞</div>
+                    <div class="tech-card-note">Von Seriennummern bis personalisierten Geschenken</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Über mich Section -->
+    <section class="ueber-mich-section" id="about">
+        <div class="ueber-mich-inner">
+
+            <div class="ueber-mich-photo-wrap">
+                <!-- ⬇ Tausche "images/inhaber.jpg" gegen dein echtes Foto aus -->
+                <div class="ueber-mich-photo-placeholder">
+                    <span>📷</span>
+                    <p>Foto hier<br>einfügen</p>
+                </div>
+                <!-- Wenn du ein Foto hast, lösche das div oben und nimm stattdessen:
+                <img src="images/inhaber.jpg" alt="Inhaber Wolf Lasermark" class="ueber-mich-photo"> -->
+                <div class="ueber-mich-name">Bence(Inhaber) & Veda</div>
+                <div class="ueber-mich-role"> · Wolf Lasermark ·</div>
+            </div>
+
+            <div class="ueber-mich-text">
+                <h2>Hinter jeder Gravur<br>steckt <span>ein Mensch</span></h2>
+                <p>
+                    Wolf Lasermark sind wir zwei – meine Frau und ich. Die Website, das Design, 
+                    die Ideen, die Gravuren: alles gemeinsam. Was wir machen, machen wir mit 
+                    Überzeugung – egal ob ein Liebesring oder tausend Seriennummern.
+                </p>
+
+                <div class="ueber-mich-facts">
+                    <div class="ueber-fact">
+                        <span class="ueber-fact-num">3+</span>
+                        <span class="ueber-fact-label">Jahre Erfahrung</span>
+                    </div>
+                    <div class="ueber-fact">
+                        <span class="ueber-fact-num">100W</span>
+                        <span class="ueber-fact-label">JPT Faserlaser</span>
+                    </div>
+                    <div class="ueber-fact">
+                        <span class="ueber-fact-num">8h</span>
+                        <span class="ueber-fact-label">Antwortzeit</span>
+                    </div>
+                    <div class="ueber-fact">
+                        <span class="ueber-fact-num">±0,01</span>
+                        <span class="ueber-fact-label">mm Präzision</span>
+                    </div>
+                </div>
+
+                <div class="referenz-logos">
+                    <div class="referenz-label">Vertrauen von</div>
+                    <!-- ⬇ Hier deine Referenz-Kunden/Firmen eintragen -->
+                    <span class="referenz-tag">Firma A</span>
+                    <span class="referenz-tag">Firma B</span>
+                    <span class="referenz-tag">Handwerksbetrieb C</span>
+                    <span class="referenz-tag">+ weitere</span>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Bewertungen Section -->
+    <section class="reviews-section" id="bewertungen">
+        <h2>Was Kunden sagen</h2>
+        <p class="reviews-subtitle">Echte Erfahrungen – von echten Menschen</p>
+
+        <div class="reviews-grid">
+
+            <!-- Review 1 – Privatkunde -->
+            <div class="review-card">
+                <div class="review-stars">★★★★★</div>
+                <p class="review-text">
+                    <!-- ⬇ Hier echte Kundenmeinung eintragen -->
+                    Ich hatte ein personalisiertes Geschenk für meinen Mann bestellt – die Gravur war 
+                    haargenau so wie ich mir das vorgestellt hatte. Schnelle Kommunikation, top Qualität. 
+                    Komme definitiv wieder!
+                </p>
+                <div class="review-author">
+                    <div class="review-avatar">M</div>
+                    <div class="review-author-info">
+                        <strong>Maria S.</strong>
+                        <span>Privatkunde · Rosenheim</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Review 2 – Firmenkunde -->
+            <div class="review-card">
+                <div class="review-stars">★★★★★</div>
+                <p class="review-text">
+                    Wir haben 200 Werkzeuge beschriften lassen – alles pünktlich, sauber graviert und 
+                    zu einem fairen Preis. Direkter Kontakt mit dem Inhaber macht die Zusammenarbeit 
+                    sehr angenehm.
+                </p>
+                <div class="review-author">
+                    <div class="review-avatar">T</div>
+                    <div class="review-author-info">
+                        <strong>Thomas K.</strong>
+                        <span>Geschäftskunde · Prien am Chiemsee</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Review 3 -->
+            <div class="review-card">
+                <div class="review-stars">★★★★★</div>
+                <p class="review-text">
+                    Hochzeitsringe gravieren lassen – das Ergebnis war wunderschön und der Preis 
+                    absolut fair. Ich kann Wolf Lasermark nur weiterempfehlen. Sehr professionell 
+                    und herzlich.
+                </p>
+                <div class="review-author">
+                    <div class="review-avatar">L</div>
+                    <div class="review-author-info">
+                        <strong>Laura & Florian</strong>
+                        <span>Privatkunden · Bad Aibling</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="review-google-badge">
+            <a href="https://g.page/r/DEIN-GOOGLE-LINK/review" target="_blank" rel="noopener">
+                ⭐ Alle Google-Bewertungen ansehen &rarr;
+            </a>
+        </div>
+    </section>
+
+    <!-- Preise Section (nur Privatkunden) -->
+    <section class="preise-section privat-only" id="preise">
+        <h2>Was kostet eine Gravur?</h2>
+        <p class="preise-subtitle">
+            Transparent & fair – hier ein Überblick. Das genaue Angebot erhalten Sie immer individuell nach Anfrage.
+        </p>
+        <div class="preise-grid">
+
+            <div class="preis-card">
+                <span class="preis-icon">💍</span>
+                <div class="preis-titel">Schmuck & Ringe</div>
+                <div class="preis-von">ab</div>
+                <div class="preis-betrag">15€</div>
+                <div class="preis-ab">pro Stück</div>
+                <p class="preis-beispiel">Namen, Datum, kurzer Spruch auf Ring, Armband, Anhänger</p>
+            </div>
+
+            <div class="preis-card featured">
+                <div class="preis-badge">Beliebt</div>
+                <span class="preis-icon">🎁</span>
+                <div class="preis-titel">Geschenke & Accessoires</div>
+                <div class="preis-von">ab</div>
+                <div class="preis-betrag">20€</div>
+                <div class="preis-ab">pro Stück</div>
+                <p class="preis-beispiel">Thermobecher, Messer, Feuerzeug, Schlüsselanhänger mit individuellem Motiv</p>
+            </div>
+
+            <div class="preis-card">
+                <span class="preis-icon">🪧</span>
+                <div class="preis-titel">Schilder & Plaketten</div>
+                <div class="preis-von">ab</div>
+                <div class="preis-betrag">25€</div>
+                <div class="preis-ab">pro Stück</div>
+                <p class="preis-beispiel">Erinnerungstafeln, Metallkarten, personalisierte Namensschilder</p>
+            </div>
+
+            <div class="preis-card">
+                <span class="preis-icon">💒</span>
+                <div class="preis-titel">Hochzeit & Jubiläum</div>
+                <div class="preis-von">ab</div>
+                <div class="preis-betrag">30€</div>
+                <div class="preis-ab">pro Set</div>
+                <p class="preis-beispiel">Ringe, Gastgeschenke, Dankeskarten aus Metall – individuell abgestimmt</p>
+            </div>
+
+        </div>
+        <p class="preise-hinweis">
+            Alle Preise sind Richtwerte inkl. MwSt. – das finale Angebot nach Ihrer Anfrage ist immer 
+            <a href="shop.html">unverbindlich & kostenlos</a>.
+        </p>
+    </section>
+
+ <section class="services" id="services">
+    <h2>Beispiele & Inspiration</h2>
+
+    <!-- Bal/jobb lapozó gombok -->
+    <button class="slider-btn slider-btn-prev" type="button" aria-label="Zurück">‹</button>
+    <button class="slider-btn slider-btn-next" type="button" aria-label="Weiter">›</button>
+
+    <!-- Vízszintesen görgethető sáv -->
+    <div class="services-scroller" id="servicesScroller">
+        <div class="services-grid">
+
+            <div class="service-card">
+                <div class="service-image">
+                    <img src="images/seriennummern.jpg" alt="Seriennummern">
+                </div>
+                <h3>Seriennummern</h3>
+                <p>Präzise Nummerierung für Nachverfolgung und Authentifizierung Ihrer Produkte</p>
+            </div>
+
+            <div class="service-card">
+                <div class="service-image">
+                    <img src="images/qrcodes.jpg" alt="QR-Codes">
+                </div>
+                <h3>QR-Codes</h3>
+                <p>Funktionale QR-Codes für digitale Vernetzung und Produktinformationen</p>
+            </div>
+
+            <div class="service-card">
+                <div class="service-image">
+                    <img src="images/Logo.jpg" alt="Logo-Gravur">
+                </div>
+                <h3>Logo-Gravur</h3>
+                <p>Scharfe, detaillierte Logo-Gravuren für Ihr Corporate Branding</p>
+            </div>
+
+            <div class="service-card">
+                <div class="service-image">
+                    <img src="images/farbige.jpg" alt="Farbige Edelstahl-Gravur">
+                </div>
+                <h3>Farbige Edelstahl-Gravur</h3>
+                <p>Hochwertige farbige Gravuren auf Edelstahl für beeindruckende Effekte</p>
+            </div>
+
+            <div class="service-card">
+                <div class="service-image">
+                    <img src="images/schmuck.jpg" alt="Schmuck-Gravur">
+                </div>
+                <h3>Schmuck-Gravur</h3>
+                <p>Zarte und elegante Gravuren auf Schmuck und wertvollen Objekten</p>
+            </div>
+
+            <div class="service-card">
+                <div class="service-image">
+                    <img src="images/werkzeugkennzeichnung.jpg" alt="Werkzeugkennzeichnung">
+                </div>
+                <h3>Werkzeugkennzeichnung</h3>
+                <p>Dauerhafte Markierung von Werkzeugen und Ausrüstungen</p>
+            </div>
+
+            <div class="service-card">
+                <div class="service-image">
+                    <img src="images/geschenk.jpg" alt="Geschenk-Gravur">
+                </div>
+                <h3>Geschenk-Gravur</h3>
+                <p>Personalisierte Gravuren für unvergessliche Geschenke</p>
+            </div>
+
+            <div class="service-card">
+                <div class="service-image">
+                    <img src="images/hochzeits.jpg" alt="Hochzeits-Gravuren">
+                </div>
+                <h3>Hochzeits-Gravuren</h3>
+                <p>Elegante und emotionale Gravuren für Ihren besonderen Tag</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+
+    <!-- FAQ Section -->
+    <section class="faq-section" id="faq">
+        <h2>Häufig gestellte Fragen</h2>
+        <div class="faq-container">
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Welche Materialien können graviert werden?</span>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    Wir gravieren Edelstahl, Aluminium, Titan, Kunststoffe, Holz, Leder und viele weitere Materialien. Bei Fragen zu Ihrem spezifischen Material kontaktieren Sie uns gerne direkt.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Wie lange dauert die Bearbeitung?</span>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    Je nach Projekt und Auftragslage: Kleine Privataufträge meist 3–5 Tage, Unternehmensaufträge 5–10 Tage. Auf Wunsch erkundigen wir uns nach Express-Möglichkeiten.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Sind auch kleine Stückzahlen möglich?</span>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    Ja, absolut! Einzelstücke und Kleinserien sind für uns kein Problem. Wir sind stolz, auch bei kleinen Aufträgen den gleichen Standard zu halten.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Wie wird der Preis berechnet?</span>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    Der Preis hängt von Material, Größe, Komplexität und Stückzahl ab. Wir erstellen ein unverbindliches Angebot nach Ihrer Anfrage – mit transparenter Kalkulation.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Können Sie auch DataMatrix oder QR-Codes gravieren?</span>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    Ja, wir spezialisieren uns darauf. Beide Codes lassen sich direkt auf Metall gravieren und sind sofort einsatzbereit – ideal für Logistik und Rückverfolgung.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Wie verläuft die Bestellung?</span>
+                    <span class="faq-toggle">+</span>
+                </div>
+                <div class="faq-answer">
+                    Einfach: Anfrage per Email oder WhatsApp → Wir klären Details und erstellen ein Angebot → Nach Freigabe gravieren wir → Übergabe oder Versand. Unkompliziert und transparent!
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <div class="contact-wrapper">
+            <h2>Kontaktieren Sie uns</h2>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h3>Warum Wolf Lasermark?</h3>
+                    <p>
+                        <strong>Professionelle Qualität:</strong> Wir bieten höchste Präzision und Qualität für jedes Projekt.
+                    </p>
+                    <p>
+                        <strong>Flexible Lösungen:</strong> Ob Unternehmen oder Privatperson – wir finden die richtige Lösung für Sie.
+                    </p>
+                    <p>
+                        <strong>Schnelle Bearbeitung:</strong> Effiziente Verarbeitung ohne Qualitätseinbußen.
+                    </p>
+                    <p>
+                        <strong>Vielfältige Materialien:</strong> Edelstahl, Schmuck, Werkzeuge und vieles mehr.
+                    </p>
+                   
+                </div>
+
+               <div class="contact-form contact-email-box">
+    <h3>Schreiben Sie uns eine E-Mail</h3>
+    <p style="margin-bottom: 0.8rem;">
+        Für ein schnelles Angebot oder bei Fragen erreichen Sie uns direkt:
+    </p>
+
+    <p class="contact-email">
+        <a href="mailto:info@wolf-lasermark.de">info@wolf-lasermark.de</a>
+    </p>
+
+    <div class="contact-cta-row">
+        <a href="mailto:info@wolf-lasermark.de"
+           class="email-btn"
+           aria-label="E-Mail senden">
+            ✉️ E-Mail schreiben
+        </a>
+
+        <a href="https://wa.me/15730897682"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="whatsapp-btn"
+           aria-label="WhatsApp Nachricht senden">
+            💬 WhatsApp Nachricht
+        </a>
+    </div>
+    <p class="contact-note">
+        Antwortzeit in der Regel in 8 Stunden an Werktagen.
+    </p>
+</div>
+
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/15730897682" 
+       class="floating-whatsapp" 
+       target="_blank" 
+       rel="noopener noreferrer"
+       title="WhatsApp Kontakt"
+       aria-label="Kontaktieren Sie uns auf WhatsApp">
+        💬
+    </a>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Wolf Lasermark – Professionelle Lasergravur im Raum Rosenheim. Alle Rechte vorbehalten.</p>
+    </footer>
+
+        </div><!-- end #main-content -->
+
+    <script>
+        // ====== KUNDEN WAHL ======
+        function chooseMode(mode) {
+            localStorage.setItem('kundenMode', mode);
+            applyMode(mode);
+            const overlay = document.getElementById('kunden-overlay');
+            overlay.classList.add('fade-out');
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+            }, 500);
+        }
+
+        function resetMode() {
+            localStorage.removeItem('kundenMode');
+            document.getElementById('main-content').style.display = 'none';
+            const overlay = document.getElementById('kunden-overlay');
+            overlay.style.display = 'flex';
+            overlay.classList.remove('fade-out');
+            document.body.classList.remove('mode-privat', 'mode-firmen');
+        }
+
+        function applyMode(mode) {
+            document.body.classList.remove('mode-privat', 'mode-firmen');
+            document.body.classList.add('mode-' + mode);
+            const label = document.getElementById('mode-label-text');
+            if (mode === 'privat') {
+                label.textContent = 'Ansicht: Privatkunden';
+                document.getElementById('leistungen-title').textContent = 'Für Privatkunden';
+                document.getElementById('leistungen-subtitle').textContent = 
+                    'Personalisierte Geschenke, Schmuck, Erinnerungsstücke und mehr – mit unserer Faserlaser-Gravur.';
+            } else {
+                label.textContent = 'Ansicht: Firmenkunden';
+                document.getElementById('leistungen-title').textContent = 'Für Unternehmen';
+                document.getElementById('leistungen-subtitle').textContent = 
+                    'Professionelle Kennzeichnung für Industrie und Handwerk – Seriennummern, QR-Codes, Logos und mehr.';
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('kundenMode');
+            if (saved) {
+                applyMode(saved);
+                document.getElementById('kunden-overlay').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+            }
+        });
+
+        // Smooth Scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // FAQ Toggle
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', function() {
+                this.parentElement.classList.toggle('active');
+            });
+        });
+
+        // Slider
+        const servicesScroller = document.getElementById('servicesScroller');
+        const nextBtn = document.querySelector('.slider-btn-next');
+        const prevBtn = document.querySelector('.slider-btn-prev');
+        if (servicesScroller && nextBtn && prevBtn) {
+            const getStep = () => {
+                const card = servicesScroller.querySelector('.service-card');
+                return card ? card.offsetWidth + 24 : 280;
+            };
+            nextBtn.addEventListener('click', () => servicesScroller.scrollBy({ left: getStep(), behavior: 'smooth' }));
+            prevBtn.addEventListener('click', () => servicesScroller.scrollBy({ left: -getStep(), behavior: 'smooth' }));
+        }
+    </script>
+</body>
+</html>
