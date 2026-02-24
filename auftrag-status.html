@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auftragsstatus — Wolf Lasermark</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #09090b;
+  --surface:  #111113;
+  --surface2: #18181b;
+  --surface3: #1c1c1f;
+  --border:   #27272a;
+  --border2:  #3f3f46;
+  --accent:   #00d4ff;
+  --accent2:  #00b8d4;
+  --ok:       #4ade80;
+  --warn:     #fb923c;
+  --danger:   #f87171;
+  --text:     #fafafa;
+  --text2:    #a1a1aa;
+  --text3:    #52525b;
+  --font:     'Space Grotesk', sans-serif;
+  --mono:     'JetBrains Mono', monospace;
+  --radius:   10px;
+  --radius-lg:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;min-height:100vh;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(0,212,255,.07),transparent 60%)}
+
+/* WRAPPER */
+.page-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:32px 16px 48px}
+
+/* PORTAL CARD */
+.portal-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;overflow:hidden;
+  box-shadow:0 2px 4px rgba(0,0,0,.5),0 20px 60px rgba(0,0,0,.4);width:100%;max-width:680px}
+
+/* HEADER */
+.portal-header{position:relative;overflow:hidden;padding:28px 32px 22px;
+  background:linear-gradient(160deg,#0e0e10 0%,#111113 60%,#0d0d10 100%)}
+.portal-header::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 50% at 80% -5%,rgba(0,212,255,.07) 0%,transparent 60%);pointer-events:none}
+.laser-line{position:absolute;top:0;left:-100%;width:200%;height:2px;
+  background:linear-gradient(90deg,transparent 0%,rgba(0,212,255,.6) 40%,rgba(0,212,255,1) 50%,rgba(0,212,255,.6) 60%,transparent 100%);
+  animation:laserSweep 4s ease-in-out infinite;pointer-events:none}
+@keyframes laserSweep{0%{transform:translateX(-60%) scaleX(.6);opacity:0}20%{opacity:1}50%{transform:translateX(0) scaleX(1)}80%{opacity:1}100%{transform:translateX(60%) scaleX(.6);opacity:0}}
+
+.header-logo{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+.header-icon{width:44px;height:44px;background:linear-gradient(135deg,#00d4ff,#0ea5e9);border-radius:12px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  box-shadow:0 0 0 1px rgba(0,212,255,.3),0 0 20px rgba(0,212,255,.15)}
+.header-icon img{width:28px;height:28px;object-fit:contain}
+.brand{font-size:20px;font-weight:800;letter-spacing:-.4px;line-height:1.1}
+.brand em{color:var(--accent);font-style:normal}
+.brand-sub{font-size:12px;color:var(--text3);margin-top:3px;font-weight:400}
+
+.trust-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+.trust-badge{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);
+  font-size:11px;color:var(--text2);font-weight:500}
+.trust-badge strong{color:var(--text)}
+
+/* SEARCH */
+.search-wrap{padding:22px 32px;border-bottom:1px solid var(--border)}
+.search-row{display:flex;gap:10px}
+.search-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:9px;
+  color:var(--text);font-family:var(--mono);font-size:13px;letter-spacing:1px;
+  padding:10px 14px;outline:none;transition:border-color .15s}
+.search-input:focus{border-color:rgba(0,212,255,.5);box-shadow:0 0 0 3px rgba(0,212,255,.06)}
+.search-input::placeholder{color:var(--text3);letter-spacing:0}
+.btn-search{background:var(--accent);color:#020617;border:none;border-radius:9px;
+  font-family:var(--font);font-size:13px;font-weight:700;padding:10px 22px;
+  cursor:pointer;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.btn-search:hover{background:#00b8d4;transform:translateY(-1px)}
+.btn-search:disabled{background:var(--surface3);color:var(--text3);cursor:not-allowed;transform:none}
+.search-hint{font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5}
+
+/* RESULT */
+.result-wrap{padding:24px 32px 32px}
+
+/* Status hero */
+.status-hero{text-align:center;padding:4px 0 0}
+.status-hero-id{font-family:var(--mono);font-size:11px;color:var(--text3);margin-bottom:8px;letter-spacing:3px;text-transform:uppercase}
+.status-hero-name{font-size:22px;font-weight:800;letter-spacing:-.5px;margin-bottom:6px;line-height:1.2}
+.status-hero-meta{font-size:13px;color:var(--text2);display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
+.status-hero-meta span{display:flex;align-items:center;gap:4px}
+
+/* Live dot */
+.live-dot{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;
+  letter-spacing:.5px;text-transform:uppercase;color:var(--ok);
+  background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.18);
+  padding:3px 9px;border-radius:20px;margin-bottom:14px}
+.live-dot::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--ok);animation:livePulse 2s ease infinite}
+@keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+
+/* Progress ring */
+.progress-ring-wrap{display:flex;justify-content:center;margin:4px 0 18px}
+.progress-ring-bg{fill:none;stroke:var(--border);stroke-width:8}
+.progress-ring-fill{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)}
+.progress-ring-label{text-anchor:middle;dominant-baseline:middle;font-family:'Space Grotesk',sans-serif;font-weight:800}
+
+/* Status mini cards */
+.status-cards-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0}
+.sc-card{background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center}
+.sc-val{font-family:var(--mono);font-size:24px;font-weight:800;letter-spacing:-1px;line-height:1}
+.sc-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-top:5px}
+
+/* ETA */
+.eta-box{background:linear-gradient(135deg,rgba(0,212,255,.04),rgba(0,212,255,.02));
+  border:1px solid rgba(0,212,255,.15);border-radius:14px;padding:16px 18px;margin:14px 0;
+  display:flex;align-items:center;gap:14px}
+.eta-icon{font-size:28px;flex-shrink:0}
+.eta-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent2);margin-bottom:3px}
+.eta-val{font-size:16px;font-weight:700;letter-spacing:-.2px}
+.eta-sub{font-size:12px;color:var(--text2);margin-top:2px;line-height:1.5}
+
+/* Timeline */
+.status-timeline{margin-top:18px}
+.stl-item{display:flex;gap:14px;padding:10px 0;position:relative}
+.stl-item:not(:last-child)::after{content:'';position:absolute;left:15px;top:40px;bottom:-4px;width:2px;background:linear-gradient(var(--border),transparent)}
+.stl-dot{width:32px;height:32px;border-radius:50%;border:2px solid var(--border);background:var(--surface);
+  display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;z-index:1;position:relative;transition:all .3s}
+.stl-dot.active{border-color:var(--accent);background:rgba(0,212,255,.1);box-shadow:0 0 0 4px rgba(0,212,255,.08),0 0 16px rgba(0,212,255,.12)}
+.stl-dot.done{border-color:var(--ok);background:rgba(74,222,128,.1)}
+.stl-content{flex:1;padding-top:5px}
+.stl-title{font-size:14px;font-weight:700;letter-spacing:-.2px}
+.stl-sub{font-size:12px;color:var(--text3);margin-top:3px;line-height:1.5}
+.stl-item.active .stl-title{color:var(--text)}
+.stl-item.done .stl-title{color:var(--ok)}
+.stl-item:not(.active):not(.done) .stl-title{color:var(--text3)}
+
+/* Not found */
+.not-found{color:var(--danger);text-align:center;padding:24px;
+  border:1px solid rgba(248,113,113,.2);border-radius:14px;background:rgba(248,113,113,.04)}
+.not-found-icon{font-size:28px;margin-bottom:10px}
+
+/* Back button */
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border);
+  border-radius:8px;font-family:var(--font);font-size:12px;font-weight:600;
+  padding:7px 14px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+.btn-secondary:hover{background:var(--surface3);border-color:var(--border2)}
+
+/* Footer */
+.page-footer{margin-top:24px;text-align:center;font-size:11px;color:var(--text3)}
+.page-footer a{color:var(--text3);text-decoration:none}
+.page-footer a:hover{color:var(--text2)}
+
+@media(max-width:540px){
+  .portal-header,.search-wrap,.result-wrap{padding-left:20px;padding-right:20px}
+  .status-cards-row{grid-template-columns:repeat(3,1fr)}
+  .search-row{flex-direction:column}
+  .btn-search{justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+  <div class="portal-card">
+
+    <!-- HEADER -->
+    <div class="portal-header">
+      <div class="laser-line"></div>
+      <div class="header-logo">
+        <div class="header-icon">
+          <img src="images/wolf-lasermark-icon.png" alt="Wolf Lasermark" onerror="this.parentElement.textContent='⚡'">
+        </div>
+        <div>
+          <div class="brand">Wolf <em>Lasermark</em></div>
+          <div class="brand-sub">Auftrags-Status · Live-Verfolgung</div>
+        </div>
+      </div>
+      <div class="trust-row">
+        <div class="trust-badge"><span>⚡</span> Antwort in <strong>24h</strong></div>
+        <div class="trust-badge"><span>🔒</span> SSL-verschlüsselt</div>
+        <div class="trust-badge"><span>🇩🇪</span> Made in Germany</div>
+      </div>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="search-wrap">
+      <div class="search-row">
+        <input type="text" id="status-id-input" class="search-input"
+          placeholder="Auftragsnummer… z.B. SF-202601-AB12"
+          onkeydown="if(event.key==='Enter')lookupStatus()"
+          oninput="this.value=this.value.toUpperCase()">
+        <button class="btn-search" id="btn-search" onclick="lookupStatus()">
+          🔍 Prüfen
+        </button>
+      </div>
+      <div class="search-hint">
+        Die Auftragsnummer finden Sie in Ihrer Bestätigungs-E-Mail von Wolf Lasermark.
+      </div>
+    </div>
+
+    <!-- RESULT -->
+    <div class="result-wrap" id="status-result" style="display:none"></div>
+
+  </div>
+
+  <div class="page-footer">
+    <a href="index.html">← Zurück zur Website</a>
+    &nbsp;·&nbsp;
+    <a href="mailto:info@wolf-lasermark.de">info@wolf-lasermark.de</a>
+  </div>
+</div>
+
+<!-- Firebase -->
+<script type="module">
+import{initializeApp,getApps}from'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import{getFirestore,doc,getDoc,collection,getDocs}from'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+const firebaseConfig={
+  apiKey:"AIzaSyBLSp0en7wDD_71PF1n3qYXPF0YNTEWmIc",
+  authDomain:"auftrage-edc6d.firebaseapp.com",
+  projectId:"auftrage-edc6d",
+  storageBucket:"auftrage-edc6d.firebasestorage.app",
+  messagingSenderId:"675308449934",
+  appId:"1:675308449934:web:b4c1fc2e190647ace419df"
+};
+
+try{
+  const app=getApps().length?getApps()[0]:initializeApp(firebaseConfig);
+  window.db=getFirestore(app);
+  window._fsDoc=doc;
+  window._fsGetDoc=getDoc;
+  window._fsCollection=collection;
+  window._fsGetDocs=getDocs;
+}catch(e){
+  console.error('Firebase init failed:',e);
+}
+
+// Auto-load from URL param
+const params=new URLSearchParams(window.location.search);
+const statusId=params.get('status')||params.get('id');
+if(statusId){
+  document.addEventListener('DOMContentLoaded',()=>{
+    setTimeout(()=>{
+      const inp=document.getElementById('status-id-input');
+      if(inp){inp.value=statusId.toUpperCase();lookupStatus();}
+    },300);
+  });
+}
+</script>
+
+<script>
+function escHtml(s){
+  if(s==null)return'';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+async function lookupStatus(){
+  const R=54, C=2*Math.PI*R;
+  const id=document.getElementById('status-id-input').value.trim().toUpperCase();
+  const res=document.getElementById('status-result');
+  const btn=document.getElementById('btn-search');
+
+  res.style.display='block';
+
+  if(!id){
+    res.innerHTML='<div style="color:var(--text3);text-align:center;padding:20px">Bitte Auftragsnummer eingeben.</div>';
+    return;
+  }
+
+  // Loading state
+  btn.disabled=true;
+  res.innerHTML='<div style="text-align:center;padding:36px;color:var(--text2)"><div style="font-size:32px;margin-bottom:12px">⏳</div>Auftrag wird geladen…</div>';
+
+  let order=null;
+
+  // Load from Firestore — no login required (public read via Firestore Rules)
+  if(window.db && window._fsGetDoc){
+    try{
+      const snap=await window._fsGetDoc(window._fsDoc(window.db,'orders',id));
+      if(snap.exists()){
+        order=snap.data();
+        // Load serials subcollection for progress stats
+        const serialSnap=await window._fsGetDocs(window._fsCollection(window.db,'orders',id,'serials'));
+        order._serials=serialSnap.docs.map(d=>d.data());
+      }
+    }catch(e){
+      console.error('Firestore error:',e);
+      res.innerHTML=`<div class="not-found">
+        <div class="not-found-icon">⚠️</div>
+        <div style="font-weight:700;margin-bottom:4px">Verbindungsfehler</div>
+        <div style="font-size:12px;color:var(--text3)">${escHtml(e.message||'Bitte Seite neu laden.')}</div>
+      </div>`;
+      btn.disabled=false;
+      return;
+    }
+  } else {
+    res.innerHTML='<div class="not-found"><div class="not-found-icon">⚠️</div><div style="font-weight:700">Firebase nicht verfügbar</div><div style="font-size:12px;color:var(--text3)">Bitte Seite neu laden.</div></div>';
+    btn.disabled=false;
+    return;
+  }
+
+  btn.disabled=false;
+
+  if(!order){
+    res.innerHTML=`<div class="not-found">
+      <div class="not-found-icon">🔍</div>
+      <div style="font-weight:700;margin-bottom:6px">Auftrag nicht gefunden</div>
+      <div style="font-size:12px;color:var(--text3)">Keine Auftrags-Nr. „${escHtml(id)}" im System.<br>Bitte Schreibweise prüfen (Groß-/Kleinschreibung).</div>
+    </div>`;
+    return;
+  }
+
+  // Render result
+  const dn=order._serials?order._serials.filter(s=>s.state==='done').length:0;
+  const rw=order._serials?order._serials.filter(s=>s.state==='rework').length:0;
+  const sc=order._serials?order._serials.filter(s=>s.state==='scrap').length:0;
+  const pct=order.qty?Math.round(dn/order.qty*100):0;
+
+  const createdDate=order.createdAt?new Date(order.createdAt):null;
+
+  // ETA box
+  let etaHtml='';
+  if(order.status==='done'){
+    etaHtml=`<div class="eta-box"><div class="eta-icon">✅</div><div>
+      <div class="eta-label">Abgeschlossen</div>
+      <div class="eta-val">Ihr Auftrag ist fertig!</div>
+      <div class="eta-sub">Alle ${dn} Teile beschriftet und freigegeben.</div>
+    </div></div>`;
+  } else if(order.status==='in_progress'){
+    const rem=order.qty-dn;
+    etaHtml=`<div class="eta-box"><div class="eta-icon">⚙️</div><div>
+      <div class="eta-label">In Bearbeitung</div>
+      <div class="eta-val">Noch ${rem} von ${order.qty} Teilen offen</div>
+      <div class="eta-sub">Wir arbeiten an Ihrem Auftrag. Bei Fragen: <a href="mailto:info@wolf-lasermark.de" style="color:var(--accent2)">info@wolf-lasermark.de</a></div>
+    </div></div>`;
+  } else {
+    etaHtml=`<div class="eta-box"><div class="eta-icon">📥</div><div>
+      <div class="eta-label">Auftrag eingegangen</div>
+      <div class="eta-val">In Warteschlange</div>
+      <div class="eta-sub">Ihr Auftrag wird bald bearbeitet. Eingang: ${createdDate?createdDate.toLocaleDateString('de',{day:'2-digit',month:'long',year:'numeric'}):''}</div>
+    </div></div>`;
+  }
+
+  // Timeline
+  const steps=[
+    {label:'Auftrag eingegangen',icon:'📥',sub:'Wir haben Ihren Auftrag erhalten und geprüft.'},
+    {label:'In Bearbeitung',icon:'⚡',sub:`Laserbeschriftung läuft. ${pct}% abgeschlossen.`},
+    {label:'Fertig & freigegeben',icon:'✅',sub:'Alle Seriennummern beschriftet und qualitätskontrolliert.'}
+  ];
+  const statusOrder=['received','in_progress','done'];
+  const ci=statusOrder.indexOf(order.status);
+  const timelineHtml=steps.map((s,i)=>{
+    const cls=i<ci?'done':i===ci?'active':'';
+    return`<div class="stl-item ${cls}">
+      <div class="stl-dot ${cls}">${s.icon}</div>
+      <div class="stl-content">
+        <div class="stl-title">${s.label}</div>
+        <div class="stl-sub">${i===1&&order.status==='in_progress'?s.sub:(i<ci?'Abgeschlossen':i===ci?s.sub:'Ausstehend')}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Progress ring (only when in_progress or done)
+  const ringColor=pct===100?'var(--ok)':pct>50?'var(--accent2)':'var(--accent)';
+  const ringHtml=order.status!=='received'?`
+    <div class="progress-ring-wrap">
+      <svg width="130" height="130" viewBox="0 0 130 130">
+        <circle class="progress-ring-bg" cx="65" cy="65" r="${R}" transform="rotate(-90 65 65)"/>
+        <circle class="progress-ring-fill" cx="65" cy="65" r="${R}"
+          stroke="${ringColor}" stroke-dasharray="${C}" stroke-dashoffset="${C}"
+          id="ring-fill-circle" transform="rotate(-90 65 65)"/>
+        <text class="progress-ring-label" x="65" y="60" font-size="24" fill="var(--text)">${pct}%</text>
+        <text class="progress-ring-label" x="65" y="78" font-size="10" fill="var(--text3)">Fortschritt</text>
+      </svg>
+    </div>`:'';
+
+  res.innerHTML=`
+    <div class="status-hero">
+      <div style="display:flex;justify-content:center;margin-bottom:10px">
+        <div class="live-dot">Live-Status</div>
+      </div>
+      <div class="status-hero-id">${escHtml(order.id)}</div>
+      <div class="status-hero-name">${escHtml(order.projectName)}</div>
+      <div class="status-hero-meta">
+        <span>🏭 ${escHtml(order.companyName)}</span>
+        <span>🔩 ${escHtml(order.material)}</span>
+        <span>📦 ${order.qty} Stück</span>
+      </div>
+    </div>
+    ${ringHtml}
+    ${order.status!=='received'?`<div class="status-cards-row">
+      <div class="sc-card"><div class="sc-val" style="color:var(--ok)">${dn}</div><div class="sc-label">✓ Fertig</div></div>
+      <div class="sc-card"><div class="sc-val" style="color:var(--warn)">${rw}</div><div class="sc-label">⚠ Rework</div></div>
+      <div class="sc-card"><div class="sc-val" style="color:var(--danger)">${sc}</div><div class="sc-label">✕ Ausschuss</div></div>
+    </div>`:''}
+    ${etaHtml}
+    <div style="border-top:1px solid var(--border);margin-top:4px;padding-top:16px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:12px">Auftragsverlauf</div>
+      <div class="status-timeline">${timelineHtml}</div>
+    </div>
+    ${order.notes?`<div style="margin-top:14px;padding:12px 14px;background:var(--surface2);border-radius:10px;font-size:12px;color:var(--text2);border:1px solid var(--border)">
+      <strong style="color:var(--text);display:block;margin-bottom:4px">📝 Ihre Notiz</strong>${escHtml(order.notes)}
+    </div>`:''}
+    <div style="margin-top:16px">
+      <button class="btn-secondary" onclick="document.getElementById('status-result').style.display='none';document.getElementById('status-id-input').value=''">← Neue Suche</button>
+    </div>`;
+
+  // Animate progress ring
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const circle=document.getElementById('ring-fill-circle');
+    if(circle) circle.style.strokeDashoffset=C*(1-pct/100);
+  }));
+}
+</script>
+
+</body>
+</html>
