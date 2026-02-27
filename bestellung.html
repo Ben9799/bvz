@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gravur bestellen – Wolf Lasermark</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #020617;
+  --s1: #0b1120;
+  --s2: #111827;
+  --s3: #1e293b;
+  --border: rgba(0,212,255,0.12);
+  --accent: #00d4ff;
+  --accent2: #0099bb;
+  --text: #f1f5f9;
+  --muted: #64748b;
+  --muted2: #94a3b8;
+  --green: #22c55e;
+  --orange: #f59e0b;
+  --red: #ef4444;
+  --step-inactive: rgba(255,255,255,0.06);
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+/* BACKGROUND */
+.bg-mesh {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 50% at 15% 5%, rgba(0,212,255,0.06), transparent),
+    radial-gradient(ellipse 60% 60% at 85% 90%, rgba(30,64,175,0.08), transparent),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(0,40,60,0.3), transparent);
+}
+.bg-grid {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.025;
+  background-image: linear-gradient(rgba(0,212,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,1) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* LAYOUT */
+.page { max-width: 1060px; margin: 0 auto; padding: 2rem 1rem 6rem; position: relative; z-index: 1; }
+
+/* HEADER */
+.header { text-align: center; margin-bottom: 2.5rem; }
+.back-link { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--muted2); font-size: 0.82rem; text-decoration: none; margin-bottom: 1.2rem; transition: color 0.2s; }
+.back-link:hover { color: var(--accent); }
+.logo-badge { display: inline-flex; align-items: center; gap: 0.6rem; background: rgba(0,212,255,0.07); border: 1px solid rgba(0,212,255,0.2); border-radius: 999px; padding: 0.4rem 1.1rem; font-size: 0.82rem; color: var(--accent); font-weight: 700; margin-bottom: 1rem; letter-spacing: 0.04em; }
+.header h1 { font-family: 'Syne', sans-serif; font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; line-height: 1.1; margin-bottom: 0.6rem; }
+.header h1 span { color: var(--accent); }
+.header p { color: var(--muted2); font-size: 0.95rem; line-height: 1.6; }
+.trust-pills { display: flex; flex-wrap: wrap; gap: 0.45rem; justify-content: center; margin-top: 1.2rem; }
+.trust-pill { display: inline-flex; align-items: center; gap: 0.35rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 999px; padding: 0.28rem 0.75rem; font-size: 0.75rem; color: var(--muted2); }
+.trust-pill .ic { color: var(--green); font-size: 0.7rem; }
+
+/* PROGRESS BAR */
+.progress-wrap { margin-bottom: 2rem; }
+.progress-steps { display: flex; align-items: center; gap: 0; position: relative; }
+.progress-step { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.4rem; position: relative; cursor: pointer; }
+.progress-step::before {
+  content: ''; position: absolute; top: 17px; left: -50%; right: 50%; height: 2px;
+  background: rgba(255,255,255,0.08); z-index: 0; transition: background 0.4s;
+}
+.progress-step:first-child::before { display: none; }
+.progress-step.done::before { background: var(--accent); }
+.progress-step.active::before { background: linear-gradient(90deg, var(--accent), rgba(0,212,255,0.4)); }
+
+.step-dot {
+  width: 36px; height: 36px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.1);
+  background: var(--s2); display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; font-weight: 700; color: var(--muted); position: relative; z-index: 1;
+  transition: all 0.3s; flex-shrink: 0;
+}
+.progress-step.done .step-dot { background: var(--accent); border-color: var(--accent); color: #020617; }
+.progress-step.active .step-dot { background: rgba(0,212,255,0.15); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 0 4px rgba(0,212,255,0.1); }
+.step-label { font-size: 0.7rem; font-weight: 600; color: var(--muted); text-align: center; transition: color 0.3s; white-space: nowrap; }
+.progress-step.active .step-label { color: var(--accent); }
+.progress-step.done .step-label { color: var(--muted2); }
+
+.progress-bar-line { height: 2px; background: rgba(255,255,255,0.06); border-radius: 1px; margin-bottom: 0.5rem; overflow: hidden; display: none; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #0099bb); border-radius: 1px; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); }
+
+/* MAIN LAYOUT */
+.main-layout { display: grid; grid-template-columns: 1fr 290px; gap: 1.5rem; align-items: start; }
+@media (max-width: 780px) { .main-layout { grid-template-columns: 1fr; } }
+
+/* STEP PANELS */
+.step-panel { display: none; animation: fadeIn 0.35s ease; }
+.step-panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-8px); } }
+
+/* CARD */
+.card {
+  background: var(--s1); border: 1px solid var(--border); border-radius: 18px;
+  padding: 1.75rem; margin-bottom: 1.2rem; position: relative; overflow: hidden;
+}
+.card::before { content: ''; position: absolute; inset: 0; border-radius: 18px; background: linear-gradient(135deg, rgba(0,212,255,0.02), transparent); pointer-events: none; }
+
+.sec-head { display: flex; align-items: flex-start; gap: 0.85rem; margin-bottom: 1.5rem; }
+.sec-icon { width: 40px; height: 40px; border-radius: 12px; background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.18); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+.sec-title { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700; line-height: 1.2; }
+.sec-sub { font-size: 0.78rem; color: var(--muted2); margin-top: 0.2rem; }
+
+/* FORM FIELDS */
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.85rem; }
+.s2 { grid-column: span 2; }
+@media (max-width: 520px) { .g2, .g3 { grid-template-columns: 1fr; } .s2 { grid-column: span 1; } }
+
+.field { display: flex; flex-direction: column; gap: 0.4rem; }
+.field label { font-size: 0.82rem; font-weight: 600; color: #cbd5e1; display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+.req-badge { font-size: 0.65rem; background: rgba(0,212,255,0.12); color: var(--accent); border: 1px solid rgba(0,212,255,0.25); border-radius: 4px; padding: 0.1rem 0.4rem; font-weight: 700; }
+.opt-badge { font-size: 0.65rem; background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 0.1rem 0.4rem; font-weight: 700; }
+.hint-badge { font-size: 0.65rem; background: rgba(245,158,11,0.1); color: var(--orange); border: 1px solid rgba(245,158,11,0.2); border-radius: 4px; padding: 0.1rem 0.4rem; font-weight: 700; }
+
+input, textarea, select {
+  background: var(--s2); border: 1.5px solid rgba(255,255,255,0.07);
+  border-radius: 10px; color: var(--text); font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem; padding: 0.72rem 0.95rem; width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s; appearance: none;
+}
+input:focus, textarea:focus, select:focus {
+  outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,212,255,0.1);
+  background: rgba(0,212,255,0.03);
+}
+input::placeholder, textarea::placeholder { color: #2d4060; }
+textarea { resize: vertical; min-height: 100px; }
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2300d4ff'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 0.9rem center; padding-right: 2.5rem; cursor: pointer;
+}
+select option { background: #111827; }
+input.err, select.err { border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(239,68,68,0.1) !important; }
+.emsg { font-size: 0.74rem; color: var(--red); display: none; margin-top: 0.2rem; }
+.emsg.show { display: flex; align-items: center; gap: 0.3rem; }
+.emsg.show::before { content: '⚠'; font-size: 0.8rem; }
+input.valid { border-color: rgba(34,197,94,0.4); }
+
+/* MATERIAL GRID */
+.mat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.65rem; }
+@media (max-width: 500px) { .mat-grid { grid-template-columns: repeat(2, 1fr); } }
+.mat-card {
+  border: 1.5px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 1rem 0.6rem;
+  text-align: center; cursor: pointer; transition: all 0.2s; background: var(--s2); position: relative;
+}
+.mat-card:hover { border-color: rgba(0,212,255,0.35); transform: translateY(-2px); background: rgba(0,212,255,0.03); }
+.mat-card.on { border-color: var(--accent); background: rgba(0,212,255,0.08); }
+.mat-card.on::after { content: '✓'; position: absolute; top: 6px; right: 8px; font-size: 0.65rem; color: var(--accent); font-weight: 700; }
+.mat-icon { font-size: 1.5rem; margin-bottom: 0.4rem; display: block; }
+.mat-name { font-size: 0.78rem; font-weight: 700; }
+.mat-note { font-size: 0.65rem; color: var(--muted2); margin-top: 0.15rem; }
+.mat-factor { font-size: 0.62rem; color: var(--accent); margin-top: 0.2rem; font-weight: 600; opacity: 0.7; }
+
+/* SURFACE CARDS */
+.surf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.surf-card {
+  border: 1.5px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 1.1rem;
+  cursor: pointer; transition: all 0.2s; background: var(--s2); position: relative;
+}
+.surf-card:hover { border-color: rgba(0,212,255,0.3); transform: translateY(-2px); }
+.surf-card.on { border-color: var(--accent); background: rgba(0,212,255,0.07); }
+.surf-card.on::after { content: '✓'; position: absolute; top: 8px; right: 10px; font-size: 0.65rem; color: var(--accent); font-weight: 700; }
+.surf-icon { font-size: 1.4rem; margin-bottom: 0.4rem; }
+.surf-name { font-size: 0.88rem; font-weight: 700; }
+.surf-desc { font-size: 0.72rem; color: var(--muted2); margin-top: 0.2rem; }
+.surf-badge { font-size: 0.65rem; color: var(--accent); background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2); border-radius: 4px; padding: 0.1rem 0.4rem; margin-top: 0.4rem; display: inline-block; font-weight: 600; }
+
+/* SKALA EXTRA */
+.skala-toggle-btn {
+  display: flex; align-items: center; gap: 0.6rem; padding: 0.75rem 1rem;
+  border: 1.5px dashed rgba(0,212,255,0.2); border-radius: 10px; cursor: pointer;
+  font-size: 0.83rem; color: var(--muted2); transition: all 0.2s; background: rgba(0,212,255,0.02); margin-top: 0.75rem;
+}
+.skala-toggle-btn:hover { border-color: rgba(0,212,255,0.4); color: var(--text); }
+.skala-toggle-btn.on { border-color: var(--accent); border-style: solid; color: var(--accent); background: rgba(0,212,255,0.06); }
+.skala-toggle-icon { font-size: 1rem; }
+.skala-extra { margin-top: 0.85rem; padding: 1rem; background: rgba(0,212,255,0.03); border: 1px solid rgba(0,212,255,0.12); border-radius: 12px; display: none; }
+.skala-extra.show { display: block; animation: fadeIn 0.25s ease; }
+.skala-umfang-display { font-size: 0.8rem; color: var(--accent); font-weight: 600; margin-top: 0.5rem; background: rgba(0,212,255,0.06); border-radius: 8px; padding: 0.5rem 0.75rem; display: none; }
+.skala-umfang-display.show { display: block; }
+
+/* PILLS (content type) */
+.pill-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.pill {
+  display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.9rem;
+  border: 1.5px solid rgba(255,255,255,0.09); border-radius: 999px; background: var(--s2);
+  font-size: 0.82rem; font-weight: 500; color: var(--muted2); cursor: pointer;
+  transition: all 0.18s; user-select: none;
+}
+.pill:hover { border-color: rgba(0,212,255,0.3); color: var(--text); transform: translateY(-1px); }
+.pill.on { border-color: var(--accent); background: rgba(0,212,255,0.1); color: var(--text); }
+.pill .check { display: none; color: var(--accent); font-size: 0.7rem; }
+.pill.on .check { display: inline; }
+
+/* MARKING CARDS */
+.mark-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.65rem; }
+@media (max-width: 400px) { .mark-grid { grid-template-columns: 1fr; } }
+.mark-card {
+  border: 1.5px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 0.9rem;
+  cursor: pointer; transition: all 0.2s; background: var(--s2); position: relative;
+}
+.mark-card:hover { border-color: rgba(0,212,255,0.3); transform: translateY(-1px); }
+.mark-card.on { border-color: var(--accent); background: rgba(0,212,255,0.07); }
+.mark-card.on::after { content: '✓'; position: absolute; top: 7px; right: 9px; font-size: 0.65rem; color: var(--accent); font-weight: 700; }
+.mark-icon { font-size: 1.2rem; margin-bottom: 0.3rem; }
+.mark-name { font-size: 0.83rem; font-weight: 700; }
+.mark-desc { font-size: 0.7rem; color: var(--muted2); margin-top: 0.15rem; }
+
+/* URGENCY CARDS */
+.urg-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.65rem; }
+@media (max-width: 440px) { .urg-grid { grid-template-columns: 1fr; } }
+.urg-card {
+  border: 1.5px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 1rem 0.75rem;
+  cursor: pointer; transition: all 0.2s; background: var(--s2); text-align: center; position: relative;
+}
+.urg-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.15); }
+.urg-card.on { border-color: var(--accent); background: rgba(0,212,255,0.07); }
+.urg-card.on::after { content: '✓'; position: absolute; top: 6px; right: 8px; font-size: 0.65rem; color: var(--accent); font-weight: 700; }
+.urg-icon { font-size: 1.4rem; margin-bottom: 0.3rem; }
+.urg-name { font-size: 0.84rem; font-weight: 700; }
+.urg-days { font-size: 0.7rem; color: var(--muted2); margin-top: 0.15rem; }
+.urg-price { font-size: 0.72rem; margin-top: 0.3rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 6px; display: inline-block; }
+.urg-price.free { color: var(--green); background: rgba(34,197,94,0.08); }
+.urg-price.warn { color: var(--orange); background: rgba(245,158,11,0.08); }
+.urg-price.hot { color: var(--red); background: rgba(239,68,68,0.08); }
+
+/* UPLOAD */
+.upload-zone {
+  border: 2px dashed rgba(0,212,255,0.2); border-radius: 14px; padding: 1.5rem;
+  text-align: center; cursor: pointer; background: rgba(0,212,255,0.02); transition: all 0.2s; position: relative;
+}
+.upload-zone:hover, .upload-zone.drag { border-color: var(--accent); background: rgba(0,212,255,0.05); }
+.upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.upload-icon { font-size: 1.8rem; margin-bottom: 0.4rem; }
+.upload-text { font-size: 0.82rem; color: var(--muted2); line-height: 1.5; }
+.upload-text strong { color: var(--accent); }
+.file-chips { margin-top: 0.6rem; display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.file-chip { display: inline-flex; align-items: center; gap: 0.35rem; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.2); border-radius: 8px; padding: 0.25rem 0.6rem; font-size: 0.76rem; color: var(--accent); }
+.chip-x { cursor: pointer; color: var(--muted); transition: color 0.15s; margin-left: 0.1rem; }
+.chip-x:hover { color: var(--red); }
+
+/* STEP BUTTONS */
+.step-nav { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
+.btn-next {
+  flex: 1; background: var(--accent); color: #020617; border: none; border-radius: 12px;
+  padding: 0.95rem 1.5rem; font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700;
+  cursor: pointer; transition: all 0.25s; box-shadow: 0 6px 20px rgba(0,212,255,0.2);
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+}
+.btn-next:hover { background: #00c4ee; transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,212,255,0.3); }
+.btn-back {
+  background: var(--s2); color: var(--muted2); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 0.95rem 1.4rem; font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+}
+.btn-back:hover { background: var(--s3); color: var(--text); }
+.btn-submit {
+  flex: 1; background: linear-gradient(135deg, #00d4ff, #0099bb); color: #020617; border: none;
+  border-radius: 12px; padding: 1rem 1.5rem; font-family: 'Syne', sans-serif; font-size: 1rem;
+  font-weight: 700; cursor: pointer; transition: all 0.25s; box-shadow: 0 8px 24px rgba(0,212,255,0.25);
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+}
+.btn-submit:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(0,212,255,0.35); }
+.btn-submit:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+/* SUMMARY */
+.summary-section { margin-bottom: 1rem; }
+.summary-label { font-size: 0.72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+.summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.summary-item { background: var(--s2); border-radius: 10px; padding: 0.65rem 0.85rem; }
+.summary-item-label { font-size: 0.7rem; color: var(--muted2); margin-bottom: 0.15rem; }
+.summary-item-val { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+.summary-item-val.accent { color: var(--accent); }
+.summary-edit-btn { font-size: 0.72rem; color: var(--accent); background: none; border: none; cursor: pointer; padding: 0; text-decoration: underline; float: right; margin-top: -1.5rem; }
+
+/* SIDEBAR PRICE CALC */
+.sidebar { position: sticky; top: 1.5rem; }
+@media (max-width: 780px) { .sidebar { position: relative; top: 0; } }
+.calc-card { background: var(--s1); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
+.calc-header { background: linear-gradient(135deg, #0a1928, #0d2244); padding: 1.1rem 1.4rem; border-bottom: 1px solid var(--border); }
+.calc-title { font-family: 'Syne', sans-serif; font-size: 0.82rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; }
+.calc-subtitle { font-size: 0.72rem; color: var(--muted); margin-top: 0.1rem; }
+.calc-rows { padding: 1rem 1.4rem; }
+.calc-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 0.45rem 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.8rem; gap: 0.5rem; }
+.calc-row:last-child { border-bottom: none; }
+.calc-row-label { color: var(--muted); flex-shrink: 0; }
+.calc-row-val { font-weight: 600; text-align: right; max-width: 150px; font-size: 0.8rem; }
+.calc-row-val.green { color: var(--green); }
+.calc-row-val.orange { color: var(--orange); }
+.calc-total-section { padding: 1rem 1.4rem; background: rgba(0,212,255,0.04); border-top: 1px solid var(--border); }
+.calc-total-label { font-size: 0.7rem; color: var(--muted); margin-bottom: 0.2rem; }
+.calc-total-val { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--accent); line-height: 1; }
+.calc-total-sub { font-size: 0.7rem; color: var(--muted); margin-top: 0.3rem; line-height: 1.4; }
+.calc-disclaimer { padding: 0.65rem 1.4rem; font-size: 0.7rem; color: var(--muted); line-height: 1.5; border-top: 1px solid var(--border); }
+
+/* STEP INDICATOR IN SIDEBAR */
+.step-indicator-mini { background: var(--s1); border: 1px solid var(--border); border-radius: 14px; padding: 1rem 1.2rem; margin-bottom: 1rem; }
+.sim-title { font-size: 0.7rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.65rem; }
+.sim-steps { display: flex; flex-direction: column; gap: 0.4rem; }
+.sim-step { display: flex; align-items: center; gap: 0.6rem; font-size: 0.78rem; color: var(--muted); transition: color 0.2s; }
+.sim-step.done { color: var(--muted2); }
+.sim-step.active { color: var(--text); font-weight: 600; }
+.sim-step-dot { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.1); background: var(--s2); display: flex; align-items: center; justify-content: center; font-size: 0.55rem; flex-shrink: 0; transition: all 0.3s; }
+.sim-step.done .sim-step-dot { background: var(--green); border-color: var(--green); color: #020617; font-size: 0.6rem; }
+.sim-step.active .sim-step-dot { background: rgba(0,212,255,0.15); border-color: var(--accent); color: var(--accent); font-size: 0.6rem; }
+
+/* HINT BOX */
+.hint-box { background: rgba(34,197,94,0.05); border: 1px solid rgba(34,197,94,0.18); border-radius: 12px; padding: 0.85rem 1rem; margin-top: 1rem; font-size: 0.78rem; color: #86efac; line-height: 1.6; }
+.hint-box strong { color: var(--green); }
+
+/* SUCCESS */
+.success-wrap { display: none; text-align: center; padding: 3rem 2rem; }
+.success-wrap.show { display: block; animation: fadeIn 0.5s ease; }
+.success-icon { width: 76px; height: 76px; border-radius: 50%; background: rgba(34,197,94,0.1); border: 2px solid var(--green); display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 1.5rem; animation: pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes pop { from { transform: scale(0.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.success-wrap h2 { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; margin-bottom: 0.75rem; }
+.success-sub { color: var(--muted2); line-height: 1.7; font-size: 0.95rem; }
+.success-back { display: inline-block; margin-top: 1.5rem; color: var(--accent); font-weight: 600; text-decoration: none; border: 1px solid rgba(0,212,255,0.3); border-radius: 10px; padding: 0.6rem 1.4rem; transition: all 0.2s; }
+.success-back:hover { background: rgba(0,212,255,0.07); }
+
+/* SPINNER */
+.spin { width: 18px; height: 18px; border: 2px solid rgba(2,6,23,0.3); border-top-color: #020617; border-radius: 50%; animation: rot 0.7s linear infinite; }
+@keyframes rot { to { transform: rotate(360deg); } }
+
+/* DISCOUNT INFO */
+.discount-info { background: rgba(34,197,94,0.05); border: 1px solid rgba(34,197,94,0.15); border-radius: 10px; padding: 0.65rem 0.85rem; font-size: 0.75rem; color: #86efac; margin-top: 0.5rem; }
+.discount-info span { color: var(--green); font-weight: 700; }
+
+/* TOOLTIP */
+.tooltip-wrap { position: relative; display: inline-flex; align-items: center; }
+.tooltip-icon { width: 15px; height: 15px; border-radius: 50%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; font-size: 0.6rem; color: var(--muted); cursor: help; }
+.tooltip-box { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: var(--s3); border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem 0.7rem; font-size: 0.72rem; color: var(--muted2); white-space: nowrap; z-index: 100; display: none; pointer-events: none; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+.tooltip-wrap:hover .tooltip-box { display: block; }
+
+/* QUANTITY INPUT SPECIAL */
+.qty-wrap { position: relative; }
+.qty-display { position: absolute; right: 0.9rem; top: 50%; transform: translateY(-50%); font-size: 0.7rem; color: var(--accent); font-weight: 700; pointer-events: none; }
+
+/* MOBILE ADJUSTMENTS */
+@media (max-width: 560px) {
+  .mat-grid { grid-template-columns: repeat(3, 1fr); }
+  .urg-grid { grid-template-columns: 1fr; }
+  .surf-grid { grid-template-columns: 1fr; }
+  .mark-grid { grid-template-columns: 1fr; }
+}
+
+/* SECTION DIVIDER */
+.divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(0,212,255,0.15), transparent); margin: 1.25rem 0; }
+
+/* COMPLETION PROGRESS inside form */
+.completion-bar { height: 3px; background: rgba(255,255,255,0.06); border-radius: 2px; margin-bottom: 1.5rem; overflow: hidden; }
+.completion-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #22c55e); border-radius: 2px; transition: width 0.4s ease; }
+</style>
+</head>
+<body>
+<div class="bg-mesh"></div>
+<div class="bg-grid"></div>
+
+<div class="page">
+
+<!-- HEADER -->
+<div class="header">
+  <a href="index.html" class="back-link">← Zurück zur Startseite</a>
+  <div class="logo-badge">⚡ Wolf Lasermark · Bruckmühl</div>
+  <h1>Gravur <span>bestellen</span></h1>
+  <p>4 Schritte – fertig. Antwort in der Regel <strong style="color:var(--text)">innerhalb von 3 Stunden</strong>.</p>
+  <div class="trust-pills">
+    <span class="trust-pill"><span class="ic">✓</span> Kostenlos & unverbindlich</span>
+    <span class="trust-pill"><span class="ic">✓</span> Antwort ≤ 3h</span>
+    <span class="trust-pill"><span class="ic">✓</span> Keine Mindestmenge</span>
+    <span class="trust-pill"><span class="ic">✓</span> Einzelstücke & Serien</span>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-wrap">
+  <div class="progress-steps" id="progressSteps">
+    <div class="progress-step active" data-step="1" onclick="jumpStep(1)">
+      <div class="step-dot">1</div>
+      <div class="step-label">Kontakt</div>
+    </div>
+    <div class="progress-step" data-step="2" onclick="jumpStep(2)">
+      <div class="step-dot">2</div>
+      <div class="step-label">Material</div>
+    </div>
+    <div class="progress-step" data-step="3" onclick="jumpStep(3)">
+      <div class="step-dot">3</div>
+      <div class="step-label">Gravur</div>
+    </div>
+    <div class="progress-step" data-step="4" onclick="jumpStep(4)">
+      <div class="step-dot">4</div>
+      <div class="step-label">Details</div>
+    </div>
+    <div class="progress-step" data-step="5" onclick="jumpStep(5)">
+      <div class="step-dot">5</div>
+      <div class="step-label">Abschicken</div>
+    </div>
+  </div>
+</div>
+
+<div class="main-layout" id="mainLayout">
+
+<!-- LEFT COLUMN: STEPS -->
+<div>
+
+<!-- ===================== STEP 1: KONTAKT ===================== -->
+<div class="step-panel active" id="step1">
+  <div class="card">
+    <div class="sec-head">
+      <div class="sec-icon">👤</div>
+      <div>
+        <div class="sec-title">Kontaktdaten</div>
+        <div class="sec-sub">Damit wir Sie schnell und direkt erreichen können</div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label>Name <span class="req-badge">PFLICHT</span></label>
+        <input type="text" id="name" placeholder="Max Mustermann" oninput="onFieldInput(this,'nameErr',v=>v.trim().length>1);calc()">
+        <span class="emsg" id="nameErr">Bitte Namen eingeben</span>
+      </div>
+      <div class="field">
+        <label>E-Mail <span class="req-badge">PFLICHT</span></label>
+        <input type="email" id="email" placeholder="max@firma.de" oninput="onFieldInput(this,'emailErr',v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v));calc()">
+        <span class="emsg" id="emailErr">Bitte gültige E-Mail eingeben</span>
+      </div>
+      <div class="field">
+        <label>Firma <span class="opt-badge">OPTIONAL</span> <span style="font-size:0.7rem;color:var(--muted);font-weight:400;">→ B2B-Preise</span></label>
+        <input type="text" id="firma" placeholder="Mustermann GmbH">
+      </div>
+      <div class="field">
+        <label>Telefon <span class="opt-badge">OPTIONAL</span></label>
+        <input type="text" id="telefon" placeholder="+49 123 456789">
+      </div>
+    </div>
+  </div>
+
+  <div class="step-nav">
+    <button class="btn-next" onclick="nextStep(1)">Weiter: Material auswählen →</button>
+  </div>
+</div>
+
+<!-- ===================== STEP 2: MATERIAL & OBERFLÄCHE ===================== -->
+<div class="step-panel" id="step2">
+  <div class="card">
+    <div class="sec-head">
+      <div class="sec-icon">🔩</div>
+      <div>
+        <div class="sec-title">Material <span style="color:var(--accent)">*</span></div>
+        <div class="sec-sub">Welches Material soll graviert werden?</div>
+      </div>
+    </div>
+    <div class="mat-grid">
+      <div class="mat-card" onclick="selMat(this,'Edelstahl',1.15)">
+        <span class="mat-icon">🔩</span>
+        <div class="mat-name">Edelstahl</div>
+        <div class="mat-note">Rostfrei, robust</div>
+        <div class="mat-factor">Standard</div>
+      </div>
+      <div class="mat-card" onclick="selMat(this,'Aluminium',1.0)">
+        <span class="mat-icon">🔲</span>
+        <div class="mat-name">Aluminium</div>
+        <div class="mat-note">Leicht, schnell</div>
+        <div class="mat-factor">Günstig</div>
+      </div>
+      <div class="mat-card" onclick="selMat(this,'Titan',1.35)">
+        <span class="mat-icon">⚙️</span>
+        <div class="mat-name">Titan</div>
+        <div class="mat-note">Extrem hart</div>
+        <div class="mat-factor">Premium</div>
+      </div>
+      <div class="mat-card" onclick="selMat(this,'Messing',1.15)">
+        <span class="mat-icon">🏅</span>
+        <div class="mat-name">Messing</div>
+        <div class="mat-note">Edel, klassisch</div>
+        <div class="mat-factor">Standard</div>
+      </div>
+      <div class="mat-card" onclick="selMat(this,'Leder',1.0)">
+        <span class="mat-icon">🟫</span>
+        <div class="mat-name">Leder</div>
+        <div class="mat-note">Weich, fein</div>
+        <div class="mat-factor">Günstig</div>
+      </div>
+      <div class="mat-card" onclick="selMat(this,'Kunststoff',1.0)">
+        <span class="mat-icon">🧱</span>
+        <div class="mat-name">Kunststoff</div>
+        <div class="mat-note">Vielseitig</div>
+        <div class="mat-factor">Günstig</div>
+      </div>
+      <div class="mat-card" onclick="selMat(this,'Sonstiges',1.1)">
+        <span class="mat-icon">❓</span>
+        <div class="mat-name">Sonstiges</div>
+        <div class="mat-note">Auf Anfrage</div>
+        <div class="mat-factor">Individuell</div>
+      </div>
+    </div>
+    <span class="emsg" id="matErr" style="margin-top:0.6rem;">Bitte Material auswählen</span>
+  </div>
+
+  <div class="card">
+    <div class="sec-head">
+      <div class="sec-icon">📐</div>
+      <div>
+        <div class="sec-title">Oberfläche <span style="color:var(--accent)">*</span></div>
+        <div class="sec-sub">Wie ist das Werkstück geformt?</div>
+      </div>
+    </div>
+    <div class="surf-grid">
+      <div class="surf-card" onclick="selSurf(this,'Ebene Fläche',1.0)">
+        <div class="surf-icon">▭</div>
+        <div class="surf-name">Ebene Fläche</div>
+        <div class="surf-desc">Platte, Schild, Blech, flache Oberflächen</div>
+        <div class="surf-badge">Standardpreis</div>
+      </div>
+      <div class="surf-card" onclick="selSurf(this,'Rotationskörper',1.25)">
+        <div class="surf-icon">🔵</div>
+        <div class="surf-name">Rotationskörper</div>
+        <div class="surf-desc">Zylinder, Ring, Welle, Rohr</div>
+        <div class="surf-badge">+25% für Drehachse</div>
+      </div>
+    </div>
+    <span class="emsg" id="surfErr" style="margin-top:0.5rem;">Bitte Oberfläche auswählen</span>
+
+    <!-- Skala Toggle (only visible when Rotationskörper selected) -->
+    <div id="skalaToggleWrap" style="display:none;">
+      <div class="divider"></div>
+      <div class="skala-toggle-btn" id="skalaToggleBtn" onclick="toggleSkala()">
+        <span class="skala-toggle-icon">📏</span>
+        <div>
+          <div style="font-weight:600;font-size:0.84rem;">Skalengravur hinzufügen?</div>
+          <div style="font-size:0.7rem;color:var(--muted);margin-top:0.1rem;">Teilstriche + Beschriftung auf dem Zylinder</div>
+        </div>
+        <div style="margin-left:auto;font-size:0.72rem;color:var(--accent);" id="skalaToggleStatus">Nein</div>
+      </div>
+      <div class="skala-extra" id="skalaExtra">
+        <div class="g2" style="gap:0.75rem;">
+          <div class="field">
+            <label>Durchmesser (mm) <span class="req-badge">PFLICHT</span></label>
+            <input type="number" id="durchmesser" placeholder="z.B. 50" min="1" oninput="calcSkala();calc();">
+          </div>
+          <div class="field">
+            <label>Skalenlänge (mm) <span class="opt-badge">OPTIONAL</span></label>
+            <input type="number" id="skalaLaenge" placeholder="z.B. 120" min="1" oninput="calc();">
+            <div style="font-size:0.67rem;color:var(--muted);margin-top:0.2rem;">Länge des zu gravierenden Bereichs</div>
+          </div>
+        </div>
+        <div class="skala-umfang-display" id="skalaUmfangDisplay"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sec-head">
+      <div class="sec-icon">📦</div>
+      <div>
+        <div class="sec-title">Menge & Abmessungen</div>
+        <div class="sec-sub">Stückzahl und Gravurbereich angeben</div>
+      </div>
+    </div>
+    <div class="g3">
+      <div class="field">
+        <label>Stückzahl <span class="req-badge">PFLICHT</span></label>
+        <div class="qty-wrap">
+          <input type="number" id="stueckzahl" placeholder="z.B. 50" min="1" oninput="onFieldInput(this,'stkErr',v=>parseInt(v)>0);calc();updateDiscountInfo();">
+          <span class="qty-display" id="qtyDiscount"></span>
+        </div>
+        <span class="emsg" id="stkErr">Bitte Stückzahl eingeben</span>
+      </div>
+      <div class="field">
+        <label>Gravurbreite (mm)
+          <div class="tooltip-wrap"><div class="tooltip-icon">?</div><div class="tooltip-box">Breite des Gravurbereichs auf dem Werkstück</div></div>
+        </label>
+        <input type="number" id="breite" placeholder="z.B. 80" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Gravurhöhe (mm)
+          <div class="tooltip-wrap"><div class="tooltip-icon">?</div><div class="tooltip-box">Höhe des Gravurbereichs auf dem Werkstück</div></div>
+        </label>
+        <input type="number" id="hoehe" placeholder="z.B. 30" oninput="calc()">
+      </div>
+    </div>
+    <div class="discount-info" id="discountInfo">
+      Mengenrabatt: <span>10+ Stk: −5%</span> · <span>50+: −10%</span> · <span>100+: −15%</span> · <span>250+: −20%</span> · <span>500+: −25%</span>
+    </div>
+  </div>
+
+  <div class="step-nav">
+    <button class="btn-back" onclick="goStep(1)">← Zurück</button>
+    <button class="btn-next" onclick="nextStep(2)">Weiter: Gravurinhalt →</button>
+  </div>
+</div>
+
+<!-- ===================== STEP 3: GRAVUR-INHALT & MARKIERUNG ===================== -->
+<div class="step-panel" id="step3">
+  <div class="card">
+    <div class="sec-head">
+      <div class="sec-icon">✏️</div>
+      <div>
+        <div class="sec-title">Gravur-Inhalt <span style="color:var(--accent)">*</span></div>
+        <div class="sec-sub">Was soll graviert werden? Mehrfachauswahl möglich</div>
+      </div>
+    </div>
+    <div class="pill-group" id="contentPills">
+      <div class="pill" data-val="Seriennummern" data-f="1.0" onclick="togglePill(this)"><span class="check">✓ </span>🔢 Seriennummern</div>
+      <div class="pill" data-val="Text / Schrift" data-f="1.0" onclick="togglePill(this)"><span class="check">✓ </span>📝 Text / Schrift</div>
+      <div class="pill" data-val="QR-Code / Barcode" data-f="1.1" onclick="togglePill(this)"><span class="check">✓ </span>📱 QR-Code / Barcode</div>
+      <div class="pill" data-val="DataMatrix-Code" data-f="1.1" onclick="togglePill(this)"><span class="check">✓ </span>⬛ DataMatrix-Code</div>
+      <div class="pill" data-val="CE-Kennzeichnung" data-f="1.05" onclick="togglePill(this)"><span class="check">✓ </span>🏷️ CE-Kennzeichnung</div>
+      <div class="pill" data-val="Firmenlogo" data-f="1.3" onclick="togglePill(this)"><span class="check">✓ </span>🏢 Firmenlogo</div>
+      <div class="pill" data-val="Motiv / Bild" data-f="1.3" onclick="togglePill(this)"><span class="check">✓ </span>🖼️ Motiv / Bild</div>
+      <div class="pill" data-val="Personalisierung (pro Stück individuell)" data-f="1.5" onclick="togglePill(this)"><span class="check">✓ </span>🎯 Individuell / Stück</div>
+    </div>
+    <span class="emsg" id="contentErr" style="margin-top:0.6rem;">Bitte mindestens einen Inhalt wählen</span>
+  </div>
+
+  <div class="card">
+    <div class="sec-head">
+      <div class="sec-icon">🎨</div>
+      <div>
+        <div class="sec-title">Markierungsart <span style="color:var(--accent)">*</span></div>
+        <div class="sec-sub">Wie soll die Gravur aussehen?</div>
+      </div>
+    </div>
+    <div class="mark-grid">
+      <div class="mark-card" onclick="selMark(this,'Standard',1.0)">
+        <div class="mark-icon">⬜</div>
+        <div class="mark-name">Standard</div>
+        <div class="mark-desc">Helle, saubere Liniengravur</div>
+      </div>
+      <div class="mark-card" onclick="selMark(this,'Schwarze Markierung',1.1)">
+        <div class="mark-icon">⬛</div>
+        <div class="mark-name">Schwarze Markierung</div>
+        <div class="mark-desc">Kontrastreiche dunkle Gravur</div>
+      </div>
+      <div class="mark-card" onclick="selMark(this,'Tiefgravur',1.2)">
+        <div class="mark-icon">🔲</div>
+        <div class="mark-name">Tiefgravur</div>
+        <div class="mark-desc">Tastbar, tiefer eingearbeitet</div>
+      </div>
+      <div class="mark-card" onclick="selMark(this,'Farbige Gravur',1.4)">
+        <div class="mark-icon">🌈</div>
+        <div class="mark-name">Farbige Gravur</div>
+        <div class="mark-desc">Mit Farbfüllung nach Wunsch</div>
+      </div>
+    </div>
+    <span class="emsg" id="markErr" style="margin-top:0.5rem;">Bitte eine Markierungsart wählen</span>
+  </div>
+
+  <div class="step-nav">
+    <button class="btn-back" onclick="goStep(2)">← Zurück</button>
+    <button class="btn-next" onclick="nextStep(3)">Weiter: Termin & Details →</button>
+  </div>
+</div>
+
+<!-- ===================== STEP 4: DETAILS & TERMIN ===================== -->
+<div class="step-panel" id="step4">
+  <div class="card">
+    <div class="sec-head">
+      <div class="sec-icon">⚡</div>
+      <div>
+        <div class="sec-title">Dringlichkeit <span style="color:var(--accent)">*</span></div>
+        <div class="sec-sub">Wann brauchen Sie die Gravur?</div>
+      </div>
+    </div>
+    <div class="urg-grid">
+      <div class="urg-card" onclick="selUrg(this,'Standard (5–10 Werktage)',0)">
+        <div class="urg-icon">🕐</div>
+        <div class="urg-name">Standard</div>
+        <div class="urg-days">5–10 Werktage</div>
+        <div class="urg-price free">Basispreis</div>
+      </div>
+      <div class="urg-card" onclick="selUrg(this,'Schnell (3–5 Werktage)',0.15)">
+        <div class="urg-icon">⚡</div>
+        <div class="urg-name">Schnell</div>
+        <div class="urg-days">3–5 Werktage</div>
+        <div class="urg-price warn">+15% Aufpreis</div>
+      </div>
+      <div class="urg-card" onclick="selUrg(this,'Express (1–2 Werktage)',0.30)">
+        <div class="urg-icon">🔥</div>
+        <div class="urg-name">Express</div>
+        <div class="urg-days">1–2 Werktage</div>
+        <div class="urg-price hot">+30% Aufpreis</div>
+      </div>
+    </div>
+    <span class="emsg" id="urgErr" style="margin-top:0.5rem;">Bitte Dringlichkeit auswählen</span>
+  </div>
+
+  <div class="card">
+    <div class="sec-head">
+      <div class="sec-icon">📋</div>
+      <div>
+        <div class="sec-title">Beschreibung & Dateien</div>
+        <div class="sec-sub">Mehr Details = schnelleres Angebot</div>
+      </div>
+    </div>
+
+    <div class="g2" style="margin-bottom:0.85rem;">
+      <div class="field">
+        <label>Wunschtermin <span class="opt-badge">OPTIONAL</span></label>
+        <input type="date" id="termin">
+      </div>
+    </div>
+
+    <div class="field" style="margin-bottom:0.85rem;">
+      <label>Beschreibung / Gravurtext <span class="hint-badge">↑ SCHNELLER</span></label>
+      <textarea id="beschreibung" placeholder="z.B. Gravurrahmen: 40×15 mm, Position: Unterseite rechts&#10;Text: 'SN-2024-001 bis SN-2024-100'&#10;Gravur soll ca. 80% des Rahmens ausfüllen&#10;&#10;💡 Tipp: Gravurrahmen-Größe + Position = schnellstes Angebot!"></textarea>
+    </div>
+
+
+  </div>
+
+  <div class="step-nav">
+    <button class="btn-back" onclick="goStep(3)">← Zurück</button>
+    <button class="btn-next" onclick="nextStep(4)">Weiter: Zusammenfassung →</button>
+  </div>
+</div>
+
+<!-- ===================== STEP 5: SUMMARY & SUBMIT ===================== -->
+<div class="step-panel" id="step5">
+  <div class="card">
+    <div class="sec-head">
+      <div class="sec-icon">✅</div>
+      <div>
+        <div class="sec-title">Zusammenfassung</div>
+        <div class="sec-sub">Bitte prüfen Sie Ihre Angaben</div>
+      </div>
+    </div>
+
+    <div class="summary-section">
+      <div class="summary-label">👤 Kontakt <button class="summary-edit-btn" onclick="goStep(1)">✏️ bearbeiten</button></div>
+      <div class="summary-grid">
+        <div class="summary-item"><div class="summary-item-label">Name</div><div class="summary-item-val" id="sumName">–</div></div>
+        <div class="summary-item"><div class="summary-item-label">E-Mail</div><div class="summary-item-val" id="sumEmail">–</div></div>
+        <div class="summary-item"><div class="summary-item-label">Firma</div><div class="summary-item-val" id="sumFirma">–</div></div>
+        <div class="summary-item"><div class="summary-item-label">Telefon</div><div class="summary-item-val" id="sumTel">–</div></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="summary-section">
+      <div class="summary-label">🔩 Material & Auftrag <button class="summary-edit-btn" onclick="goStep(2)">✏️ bearbeiten</button></div>
+      <div class="summary-grid">
+        <div class="summary-item"><div class="summary-item-label">Material</div><div class="summary-item-val accent" id="sumMat">–</div></div>
+        <div class="summary-item"><div class="summary-item-label">Oberfläche</div><div class="summary-item-val" id="sumSurf">–</div></div>
+        <div class="summary-item"><div class="summary-item-label">Stückzahl</div><div class="summary-item-val accent" id="sumStk">–</div></div>
+        <div class="summary-item"><div class="summary-item-label">Gravurfläche</div><div class="summary-item-val" id="sumArea">–</div></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="summary-section">
+      <div class="summary-label">✏️ Gravur <button class="summary-edit-btn" onclick="goStep(3)">✏️ bearbeiten</button></div>
+      <div class="summary-grid">
+        <div class="summary-item"><div class="summary-item-label">Inhalt</div><div class="summary-item-val" id="sumContent">–</div></div>
+        <div class="summary-item"><div class="summary-item-label">Markierungsart</div><div class="summary-item-val" id="sumMark">–</div></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="summary-section">
+      <div class="summary-label">⏱ Termin <button class="summary-edit-btn" onclick="goStep(4)">✏️ bearbeiten</button></div>
+      <div class="summary-grid">
+        <div class="summary-item"><div class="summary-item-label">Dringlichkeit</div><div class="summary-item-val accent" id="sumUrg">–</div></div>
+        <div class="summary-item"><div class="summary-item-label">Wunschtermin</div><div class="summary-item-val" id="sumTermin">nicht angegeben</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-nav">
+    <button class="btn-back" onclick="goStep(4)">← Zurück</button>
+    <button class="btn-submit" id="submitBtn" onclick="submitForm()">
+      <span id="btnText">📩 Kostenlos & unverbindlich absenden</span>
+    </button>
+  </div>
+  <p style="text-align:center;font-size:0.75rem;color:var(--muted);margin-top:0.6rem;">✓ Kein Spam &nbsp;·&nbsp; ✓ Keine Vorauszahlung &nbsp;·&nbsp; ✓ Antwort ≤ 3h werktags</p>
+</div>
+
+</div><!-- end steps column -->
+
+<!-- ===================== RIGHT SIDEBAR ===================== -->
+<div class="sidebar">
+
+  <!-- Mini step overview -->
+  <div class="step-indicator-mini" id="sidebarStepIndicator">
+    <div class="sim-title">Fortschritt</div>
+    <div class="sim-steps">
+      <div class="sim-step active" id="sim1"><div class="sim-step-dot">1</div>Kontakt</div>
+      <div class="sim-step" id="sim2"><div class="sim-step-dot">2</div>Material & Menge</div>
+      <div class="sim-step" id="sim3"><div class="sim-step-dot">3</div>Gravur-Inhalt</div>
+      <div class="sim-step" id="sim4"><div class="sim-step-dot">4</div>Details & Termin</div>
+      <div class="sim-step" id="sim5"><div class="sim-step-dot">5</div>Zusammenfassung</div>
+    </div>
+  </div>
+
+  <!-- Price Calculator -->
+  <div class="calc-card">
+    <div class="calc-header">
+      <div class="calc-title">💰 Preisschätzung</div>
+      <div class="calc-subtitle">Live · aktualisiert sich automatisch</div>
+    </div>
+    <div class="calc-rows">
+      <div class="calc-row"><span class="calc-row-label">Material</span><span class="calc-row-val" id="cMat">–</span></div>
+      <div class="calc-row"><span class="calc-row-label">Oberfläche</span><span class="calc-row-val" id="cSurf">–</span></div>
+      <div class="calc-row" id="cDiamRow" style="display:none;"><span class="calc-row-label">Durchmesser</span><span class="calc-row-val" id="cDiam">–</span></div>
+      <div class="calc-row" id="cUmfangRow" style="display:none;"><span class="calc-row-label">Umfang</span><span class="calc-row-val" id="cUmfang" style="color:var(--accent);">–</span></div>
+      <div class="calc-row"><span class="calc-row-label">Stückzahl</span><span class="calc-row-val" id="cStk">–</span></div>
+      <div class="calc-row"><span class="calc-row-label">Inhalt</span><span class="calc-row-val" id="cContent" style="max-width:140px;word-break:break-word;font-size:0.72rem;">–</span></div>
+      <div class="calc-row"><span class="calc-row-label">Markierung</span><span class="calc-row-val" id="cMark">–</span></div>
+      <div class="calc-row"><span class="calc-row-label">Gravurfläche</span><span class="calc-row-val" id="cArea">–</span></div>
+      <div class="calc-row"><span class="calc-row-label">Preis / Stück</span><span class="calc-row-val" id="cPPS">–</span></div>
+      <div class="calc-row"><span class="calc-row-label">Rüstgebühr</span><span class="calc-row-val">15,00 €</span></div>
+      <div class="calc-row"><span class="calc-row-label">Dringlichkeit</span><span class="calc-row-val orange" id="cUrg">–</span></div>
+      <div class="calc-row"><span class="calc-row-label">Mengenrabatt</span><span class="calc-row-val green" id="cDisc">–</span></div>
+    </div>
+    <div class="calc-total-section">
+      <div class="calc-total-label">Geschätzter Gesamtpreis (netto)</div>
+      <div class="calc-total-val" id="cTotal">–</div>
+      <div class="calc-total-sub" id="cSub">Alle Pflichtfelder ausfüllen für Schätzung</div>
+    </div>
+    <div class="calc-disclaimer">* Richtwert. Tatsächlicher Preis im individuellen Angebot.</div>
+  </div>
+
+  <div class="hint-box">
+    <strong>Antwort in ≤ 3 Stunden</strong> 🚀<br>
+    Persönliche Prüfung + maßgeschneidertes Angebot.<br>Teststück auf Wunsch möglich.
+  </div>
+</div>
+
+</div><!-- end main-layout -->
+
+<!-- SUCCESS SCREEN -->
+<div class="card success-wrap" id="successScreen">
+  <div class="success-icon">✓</div>
+  <h2>Anfrage gesendet! 🎉</h2>
+  <p class="success-sub">
+    Danke, <strong id="successName" style="color:var(--text)"></strong>!<br>
+    Wir melden uns <strong style="color:var(--text)">innerhalb von 3 Stunden</strong> (werktags) mit einem unverbindlichen Angebot.<br><br>
+    <span style="font-size:0.82rem;color:var(--muted);">Wolf Lasermark · Bruckmühl bei Rosenheim</span>
+  </p>
+  <a href="index.html" class="success-back">← Zurück zur Startseite</a>
+</div>
+
+</div><!-- end page -->
+
+<script>
+// ===== STATE =====
+let currentStep = 1;
+let matName = null, matF = 1;
+let surfName = null, surfF = 1;
+let urgSurcharge = null, urgName = '';
+let isSkala = false;
+const uploadedFiles = [];
+
+// ===== NAVIGATION =====
+function goStep(n) {
+  document.getElementById('step' + currentStep).classList.remove('active');
+  currentStep = n;
+  document.getElementById('step' + n).classList.add('active');
+  updateProgress();
+  if (n === 5) fillSummary();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function nextStep(fromStep) {
+  if (!validateStep(fromStep)) return;
+  goStep(fromStep + 1);
+}
+
+function jumpStep(n) {
+  if (n < currentStep) goStep(n);
+}
+
+function updateProgress() {
+  const steps = document.querySelectorAll('.progress-step');
+  steps.forEach((el, i) => {
+    const s = i + 1;
+    el.classList.remove('active', 'done');
+    if (s < currentStep) el.classList.add('done');
+    if (s === currentStep) el.classList.add('active');
+    // Update dot content
+    const dot = el.querySelector('.step-dot');
+    dot.textContent = s < currentStep ? '✓' : s;
+  });
+
+  // Update sidebar mini steps
+  for (let i = 1; i <= 5; i++) {
+    const el = document.getElementById('sim' + i);
+    el.classList.remove('active', 'done');
+    const dot = el.querySelector('.sim-step-dot');
+    if (i < currentStep) { el.classList.add('done'); dot.textContent = '✓'; }
+    else if (i === currentStep) { el.classList.add('active'); dot.textContent = i; }
+    else { dot.textContent = i; }
+  }
+}
+
+// ===== VALIDATION PER STEP =====
+function validateStep(step) {
+  let ok = true;
+
+  if (step === 1) {
+    const checks = [
+      { id: 'name', eid: 'nameErr', fn: v => v.trim().length > 1 },
+      { id: 'email', eid: 'emailErr', fn: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) },
+    ];
+    checks.forEach(({ id, eid, fn }) => {
+      const el = document.getElementById(id);
+      const err = document.getElementById(eid);
+      if (!fn(el.value)) { el.classList.add('err'); err.classList.add('show'); ok = false; }
+      else { el.classList.remove('err'); err.classList.remove('show'); }
+    });
+  }
+
+  if (step === 2) {
+    if (!matName) { document.getElementById('matErr').classList.add('show'); ok = false; }
+    else document.getElementById('matErr').classList.remove('show');
+
+    if (!surfName) { document.getElementById('surfErr').classList.add('show'); ok = false; }
+    else document.getElementById('surfErr').classList.remove('show');
+
+    const stkEl = document.getElementById('stueckzahl');
+    const stkErr = document.getElementById('stkErr');
+    if (!parseInt(stkEl.value) > 0 || !stkEl.value) { stkEl.classList.add('err'); stkErr.classList.add('show'); ok = false; }
+    else { stkEl.classList.remove('err'); stkErr.classList.remove('show'); }
+  }
+
+  if (step === 3) {
+    if (!activeContentPills().length) { document.getElementById('contentErr').classList.add('show'); ok = false; }
+    else document.getElementById('contentErr').classList.remove('show');
+
+    if (!activeMarkPill()) { document.getElementById('markErr').classList.add('show'); ok = false; }
+    else document.getElementById('markErr').classList.remove('show');
+  }
+
+  if (step === 4) {
+    if (urgSurcharge === null) { document.getElementById('urgErr').classList.add('show'); ok = false; }
+    else document.getElementById('urgErr').classList.remove('show');
+  }
+
+  if (!ok) {
+    const firstErr = document.querySelector('.err, .emsg.show');
+    if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  return ok;
+}
+
+// ===== FIELD INPUT HELPER =====
+function onFieldInput(el, errId, fn) {
+  const err = document.getElementById(errId);
+  if (fn(el.value)) { el.classList.remove('err'); el.classList.add('valid'); err.classList.remove('show'); }
+  else { el.classList.remove('valid'); }
+}
+
+// ===== MATERIAL =====
+function selMat(el, name, factor) {
+  document.querySelectorAll('.mat-card').forEach(m => m.classList.remove('on'));
+  el.classList.add('on');
+  matName = name; matF = factor;
+  document.getElementById('matErr').classList.remove('show');
+  calc();
+}
+
+// ===== SURFACE =====
+function selSurf(el, name, factor) {
+  document.querySelectorAll('.surf-card').forEach(u => u.classList.remove('on'));
+  el.classList.add('on');
+  surfName = name; surfF = factor;
+  document.getElementById('surfErr').classList.remove('show');
+
+  const wrap = document.getElementById('skalaToggleWrap');
+  if (name === 'Rotationskörper') {
+    wrap.style.display = 'block';
+    setTimeout(() => wrap.style.opacity = '1', 10);
+  } else {
+    wrap.style.display = 'none';
+    resetSkala();
+  }
+  calc();
+}
+
+function resetSkala() {
+  isSkala = false;
+  const btn = document.getElementById('skalaToggleBtn');
+  const extra = document.getElementById('skalaExtra');
+  btn.classList.remove('on');
+  document.getElementById('skalaToggleStatus').textContent = 'Nein';
+  extra.classList.remove('show');
+  document.getElementById('cDiamRow').style.display = 'none';
+  document.getElementById('cUmfangRow').style.display = 'none';
+}
+
+function toggleSkala() {
+  const btn = document.getElementById('skalaToggleBtn');
+  const extra = document.getElementById('skalaExtra');
+  isSkala = !btn.classList.contains('on');
+  btn.classList.toggle('on', isSkala);
+  document.getElementById('skalaToggleStatus').textContent = isSkala ? 'Ja ✓' : 'Nein';
+  extra.classList.toggle('show', isSkala);
+
+  if (isSkala) { surfName = 'Skalengravur (Zylinder)'; surfF = 1.6; }
+  else { surfName = 'Rotationskörper'; surfF = 1.25; }
+
+  document.getElementById('cDiamRow').style.display = isSkala ? 'flex' : 'none';
+  document.getElementById('cUmfangRow').style.display = isSkala ? 'flex' : 'none';
+  calc();
+}
+
+function calcSkala() {
+  const d = parseFloat(document.getElementById('durchmesser').value) || 0;
+  const el = document.getElementById('skalaUmfangDisplay');
+  const cUmfang = document.getElementById('cUmfang');
+  if (d > 0) {
+    const u = (Math.PI * d).toFixed(1);
+    el.textContent = '→ Umfang: ' + u + ' mm  (π × ' + d + ' mm)';
+    el.classList.add('show');
+    cUmfang.textContent = u + ' mm';
+  } else {
+    el.classList.remove('show');
+    cUmfang.textContent = '–';
+  }
+}
+
+// ===== CONTENT PILLS (Multi) =====
+function togglePill(el) {
+  el.classList.toggle('on');
+  if (activeContentPills().length) document.getElementById('contentErr').classList.remove('show');
+  calc();
+}
+function activeContentPills() { return [...document.querySelectorAll('#contentPills .pill.on')]; }
+function maxContentF() { const p = activeContentPills(); return p.length ? Math.max(...p.map(x => parseFloat(x.dataset.f))) : 1; }
+
+// ===== MARKING (Single) =====
+function selMark(el, name, factor) {
+  document.querySelectorAll('.mark-card').forEach(m => m.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('markErr').classList.remove('show');
+  calc();
+}
+function activeMarkPill() { return document.querySelector('.mark-card.on'); }
+function markF() { const p = activeMarkPill(); return p ? parseFloat(p.dataset.f || 1) : 1; }
+
+// Manually assign data-f values
+document.addEventListener('DOMContentLoaded', () => {
+  const markFs = [1.0, 1.1, 1.2, 1.4];
+  document.querySelectorAll('.mark-card').forEach((el, i) => el.dataset.f = markFs[i]);
+});
+
+// ===== URGENCY =====
+function selUrg(el, name, surcharge) {
+  document.querySelectorAll('.urg-card').forEach(u => u.classList.remove('on'));
+  el.classList.add('on');
+  urgSurcharge = surcharge; urgName = name;
+  document.getElementById('urgErr').classList.remove('show');
+  calc();
+}
+
+// ===== FILE UPLOAD =====
+function handleFiles(files) {
+  const chips = document.getElementById('fileChips');
+  for (const f of files) {
+    if (uploadedFiles.find(x => x.name === f.name)) continue;
+    uploadedFiles.push(f);
+    const chip = document.createElement('div');
+    chip.className = 'file-chip';
+    chip.innerHTML = `📎 ${f.name} <span class="chip-x" onclick="removeFile('${f.name}',this)">✕</span>`;
+    chips.appendChild(chip);
+  }
+}
+function removeFile(name, el) {
+  const idx = uploadedFiles.findIndex(f => f.name === name);
+  if (idx > -1) uploadedFiles.splice(idx, 1);
+  el.parentElement.remove();
+}
+
+// ===== DISCOUNT INFO =====
+function updateDiscountInfo() {
+  const stk = parseInt(document.getElementById('stueckzahl').value) || 0;
+  const el = document.getElementById('qtyDiscount');
+  if (stk >= 500) el.textContent = '−25%';
+  else if (stk >= 250) el.textContent = '−20%';
+  else if (stk >= 100) el.textContent = '−15%';
+  else if (stk >= 50) el.textContent = '−10%';
+  else if (stk >= 10) el.textContent = '−5%';
+  else el.textContent = '';
+}
+
+// ===== PRICE CALC =====
+function fmt(n) { return n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'; }
+
+function baseByArea(cm2) {
+  if (cm2 <= 0) return 1.30;
+  if (cm2 <= 4) return 0.90;
+  if (cm2 <= 15) return 1.30;
+  if (cm2 <= 50) return 1.90;
+  if (cm2 <= 150) return 2.80;
+  return 4.00;
+}
+
+function skalaBasePrice() {
+  const d = parseFloat(document.getElementById('durchmesser').value) || 0;
+  const sLen = parseFloat(document.getElementById('skalaLaenge').value) || 0;
+  if (d <= 0) return 1.30;
+  const umfang = Math.PI * d;
+  let base = umfang * 0.035;
+  if (sLen > 0) { let lf = sLen / 50; if (lf < 0.6) lf = 0.6; if (lf > 4) lf = 4; base *= lf; }
+  return Math.max(1.50, base);
+}
+
+function calc() {
+  const stk = parseInt(document.getElementById('stueckzahl').value) || 0;
+  const breite = parseFloat(document.getElementById('breite').value) || 0;
+  const hoehe = parseFloat(document.getElementById('hoehe').value) || 0;
+  const areaCm2 = (breite * hoehe) / 100;
+  const gf = maxContentF();
+  const mf = markF();
+  const pills = activeContentPills();
+  const mark = activeMarkPill();
+  const d = parseFloat(document.getElementById('durchmesser').value) || 0;
+  const umfangMm = Math.PI * d;
+
+  document.getElementById('cMat').textContent = matName || '–';
+  document.getElementById('cSurf').textContent = surfName || '–';
+  document.getElementById('cStk').textContent = stk > 0 ? stk + ' Stk.' : '–';
+  document.getElementById('cContent').textContent = pills.length ? pills.map(p => p.dataset.val).join(', ') : '–';
+  document.getElementById('cMark').textContent = mark ? mark.querySelector('.mark-name').textContent : '–';
+  document.getElementById('cUrg').textContent = urgName || '–';
+
+  if (isSkala && d > 0) {
+    document.getElementById('cDiam').textContent = d + ' mm';
+    document.getElementById('cUmfang').textContent = umfangMm.toFixed(1) + ' mm';
+  }
+
+  const areaEl = document.getElementById('cArea');
+  if (isSkala && d > 0) {
+    const sLen = parseFloat(document.getElementById('skalaLaenge').value) || 0;
+    if (sLen > 0) { areaEl.textContent = ((umfangMm * sLen) / 100).toFixed(1) + ' cm²'; }
+    else { areaEl.textContent = umfangMm.toFixed(1) + ' mm Umfang'; }
+  } else {
+    areaEl.textContent = areaCm2 > 0 ? areaCm2.toFixed(1) + ' cm²' : 'nicht angegeben';
+  }
+
+  if (!matName || stk < 1 || !pills.length || !mark || urgSurcharge === null || !surfName) {
+    document.getElementById('cPPS').textContent = '–';
+    document.getElementById('cDisc').textContent = '–';
+    document.getElementById('cTotal').textContent = '–';
+    document.getElementById('cSub').textContent = 'Pflichtfelder noch ausfüllen';
+    return;
+  }
+
+  let disc = 0;
+  if (stk >= 500) disc = 0.25;
+  else if (stk >= 250) disc = 0.20;
+  else if (stk >= 100) disc = 0.15;
+  else if (stk >= 50) disc = 0.10;
+  else if (stk >= 10) disc = 0.05;
+
+  const RUST = 15;
+  let pps, total;
+
+  if (isSkala) {
+    const BASE = skalaBasePrice();
+    pps = BASE * matF * gf * mf * (1 - disc);
+  } else {
+    const BASE = baseByArea(areaCm2);
+    pps = BASE * matF * gf * mf * surfF * (1 - disc);
+  }
+  total = Math.max(20, (RUST + pps * stk) * (1 + urgSurcharge));
+
+  document.getElementById('cPPS').textContent = fmt(pps);
+  document.getElementById('cDisc').textContent = disc > 0 ? '-' + (disc * 100).toFixed(0) + '% ✓' : 'Kein Rabatt';
+  document.getElementById('cTotal').textContent = fmt(total);
+  document.getElementById('cSub').textContent = fmt(pps) + ' × ' + stk + ' + 15,00 € Rüst' + (urgSurcharge > 0 ? ' +' + Math.round(urgSurcharge * 100) + '% Express' : '');
+}
+
+// ===== FILL SUMMARY =====
+function fillSummary() {
+  const stk = parseInt(document.getElementById('stueckzahl').value) || 0;
+  const breite = parseFloat(document.getElementById('breite').value) || 0;
+  const hoehe = parseFloat(document.getElementById('hoehe').value) || 0;
+  document.getElementById('sumName').textContent = document.getElementById('name').value || '–';
+  document.getElementById('sumEmail').textContent = document.getElementById('email').value || '–';
+  document.getElementById('sumFirma').textContent = document.getElementById('firma').value || '–';
+  document.getElementById('sumTel').textContent = document.getElementById('telefon').value || '–';
+  document.getElementById('sumMat').textContent = matName || '–';
+  document.getElementById('sumSurf').textContent = surfName || '–';
+  document.getElementById('sumStk').textContent = stk ? stk + ' Stk.' : '–';
+  document.getElementById('sumArea').textContent = (breite && hoehe) ? ((breite * hoehe) / 100).toFixed(1) + ' cm²' : '–';
+  document.getElementById('sumContent').textContent = activeContentPills().map(p => p.dataset.val).join(', ') || '–';
+  const mark = activeMarkPill();
+  document.getElementById('sumMark').textContent = mark ? mark.querySelector('.mark-name').textContent : '–';
+  document.getElementById('sumUrg').textContent = urgName || '–';
+  document.getElementById('sumTermin').textContent = document.getElementById('termin').value || 'nicht angegeben';
+}
+
+// ===== SUBMIT =====
+async function submitForm() {
+  const btn = document.getElementById('submitBtn');
+  const bt = document.getElementById('btnText');
+  btn.disabled = true;
+  bt.innerHTML = '<div class="spin"></div> Wird gesendet…';
+
+  const stk = parseInt(document.getElementById('stueckzahl').value);
+  const breite = parseFloat(document.getElementById('breite').value) || 0;
+  const hoehe = parseFloat(document.getElementById('hoehe').value) || 0;
+  const areaCm2 = (breite * hoehe) / 100;
+  const gf = maxContentF();
+  const mf = markF();
+  let disc = 0;
+  if (stk >= 500) disc = 0.25;
+  else if (stk >= 250) disc = 0.20;
+  else if (stk >= 100) disc = 0.15;
+  else if (stk >= 50) disc = 0.10;
+  else if (stk >= 10) disc = 0.05;
+
+  let pps;
+  if (isSkala) { pps = skalaBasePrice() * matF * gf * mf * (1 - disc); }
+  else { pps = baseByArea(areaCm2) * matF * gf * mf * surfF * (1 - disc); }
+  const total = Math.max(20, (15 + pps * stk) * (1 + urgSurcharge));
+
+  const payload = {
+    standort: 'Bruckmühl',
+    name: document.getElementById('name').value,
+    email: document.getElementById('email').value,
+    firma: document.getElementById('firma').value || '–',
+    telefon: document.getElementById('telefon').value || '–',
+    material: matName,
+    oberflaeche: surfName,
+    durchmesser: isSkala ? (document.getElementById('durchmesser').value || '–') : '–',
+    skalaLaenge: isSkala ? (document.getElementById('skalaLaenge').value || '–') : '–',
+    stueckzahl: stk,
+    breite: document.getElementById('breite').value || '–',
+    hoehe: document.getElementById('hoehe').value || '–',
+    gravurInhalt: activeContentPills().map(p => p.dataset.val).join(', '),
+    markierungsart: activeMarkPill() ? activeMarkPill().querySelector('.mark-name').textContent : '–',
+    beschreibung: document.getElementById('beschreibung').value || '–',
+    dringlichkeit: urgName,
+    wunschtermin: document.getElementById('termin').value || '–',
+    preisschaetzung: fmt(total) + ' netto (Richtwert)',
+    _subject: `📦 Neue Gravur-Anfrage: ${matName}, ${stk} Stk. – ${document.getElementById('name').value}`
+  };
+
+  try {
+    const res = await fetch('https://formspree.io/f/xpqjjobb', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error();
+    document.getElementById('successName').textContent = document.getElementById('name').value;
+    document.getElementById('mainLayout').style.display = 'none';
+    document.querySelector('.progress-wrap').style.display = 'none';
+    document.getElementById('successScreen').classList.add('show');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch {
+    btn.disabled = false;
+    bt.textContent = '📩 Kostenlos & unverbindlich absenden';
+    alert('Fehler beim Senden. Bitte erneut versuchen.');
+  }
+}
+
+// Init
+updateProgress();
+</script>
+</body>
+</html>
