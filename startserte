@@ -892,9 +892,6 @@ footer a:hover { color: var(--accent); }
     </button>
     <nav id="nav">
       <a href="index.html">Startseite</a>
-      <a href="index.html#leistungen">Leistungen</a>
-      <a href="laser-marking-guide.html" class="active">Kennzeichnung</a>
-      <a href="index.html#kontakt">Kontakt</a>
     </nav>
   </div>
 </header>
