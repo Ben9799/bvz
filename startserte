@@ -951,11 +951,11 @@ footer a:hover { color: var(--accent); }
     <p>In diesem Leitfaden zeigen wir, worauf es bei der industriellen Laserkennzeichnung ankommt, welche Unterschiede es zwischen Lasergravur und Laserbeschriftung gibt – und welche Lösung sich für Edelstahl, Aluminium und andere Werkstoffe eignet.</p>
     <div class="stat-row">
       <div class="stat-item">
-        <div class="stat-num">±0,02<span style="font-size:1.2rem">mm</span></div>
+        <div class="stat-num">±0,01<span style="font-size:1.2rem">mm</span></div>
         <div class="stat-label">Positionsgenauigkeit</div>
       </div>
       <div class="stat-item">
-        <div class="stat-num">50<span style="font-size:1.2rem">W</span></div>
+        <div class="stat-num">100<span style="font-size:1.2rem">W</span></div>
         <div class="stat-label">Faserlaser-Leistung</div>
       </div>
       <div class="stat-item">
