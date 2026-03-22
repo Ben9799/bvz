@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Datenschutzerklärung | Wolf Lasermark</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a1018;
+      --bg2: #0f1724;
+      --panel: rgba(14, 22, 35, 0.88);
+      --panel-2: rgba(17, 27, 42, 0.92);
+      --border: rgba(102, 185, 255, 0.18);
+      --text: #e9f3ff;
+      --muted: #9cb0c8;
+      --accent: #52c7ff;
+      --accent-2: #18a7ff;
+      --glow: rgba(82, 199, 255, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Outfit', Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(24, 167, 255, 0.10), transparent 34%),
+        radial-gradient(circle at top right, rgba(82, 199, 255, 0.08), transparent 28%),
+        linear-gradient(180deg, var(--bg) 0%, #0c1320 45%, #0a1018 100%);
+      color: var(--text);
+      line-height: 1.78;
+    }
+
+    .page {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 42px 20px 72px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, rgba(14,22,35,0.96), rgba(11,18,28,0.92));
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 34px 30px 28px;
+      box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.35),
+        0 0 0 1px rgba(255,255,255,0.02) inset,
+        0 0 40px var(--glow);
+      margin-bottom: 24px;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -80px;
+      top: -80px;
+      width: 240px;
+      height: 240px;
+      background: radial-gradient(circle, rgba(82,199,255,0.18), transparent 68%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 14px;
+      padding: 6px 10px;
+      border: 1px solid rgba(82,199,255,0.26);
+      border-radius: 999px;
+      color: var(--accent);
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: rgba(82, 199, 255, 0.08);
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(2.1rem, 4vw, 3.9rem);
+      line-height: 1.04;
+      letter-spacing: -0.03em;
+      color: #ecf7ff;
+    }
+
+    .hero p {
+      max-width: 760px;
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .legal-shell {
+      background: linear-gradient(180deg, var(--panel), var(--panel-2));
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.32),
+        0 0 0 1px rgba(255,255,255,0.02) inset;
+      backdrop-filter: blur(8px);
+    }
+
+    .legal {
+      max-width: 920px;
+      margin: 0 auto;
+    }
+
+    .legal h1:first-child {
+      display: none;
+    }
+
+    .legal h2 {
+      margin: 2.2rem 0 1rem;
+      padding-top: 0.2rem;
+      font-size: clamp(1.15rem, 2vw, 1.45rem);
+      line-height: 1.3;
+      color: #f3f9ff;
+      position: relative;
+    }
+
+    .legal h2::before {
+      content: "";
+      display: block;
+      width: 54px;
+      height: 3px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+      margin-bottom: 14px;
+    }
+
+    .legal p,
+    .legal li {
+      color: #d8e6f7;
+      font-size: 1rem;
+    }
+
+    .legal p {
+      margin: 0 0 1rem;
+    }
+
+    .legal ul {
+      margin: 0.4rem 0 1.2rem 0;
+      padding-left: 1.2rem;
+    }
+
+    .legal li {
+      margin-bottom: 0.42rem;
+    }
+
+    .legal a {
+      color: var(--accent);
+      text-decoration: none;
+      word-break: break-word;
+    }
+
+    .legal a:hover {
+      color: #8adbff;
+      text-decoration: underline;
+    }
+
+    .legal b {
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .legal blockquote {
+      margin: 1rem 0;
+      padding: 1rem 1.1rem;
+      border-left: 3px solid var(--accent);
+      background: rgba(82, 199, 255, 0.07);
+      border-radius: 14px;
+    }
+
+    .footer-note {
+      margin-top: 22px;
+      text-align: center;
+      color: #89a0ba;
+      font-size: 0.88rem;
+    }
+
+    @media (max-width: 720px) {
+      .page {
+        padding: 24px 14px 48px;
+      }
+
+      .hero,
+      .legal-shell {
+        border-radius: 22px;
+        padding: 20px 16px;
+      }
+
+      .legal {
+        max-width: 100%;
+      }
+
+      .legal p,
+      .legal li {
+        font-size: 0.97rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="eyebrow">Wolf Lasermark · Rechtliches</div>
+      <h1>Datenschutzerklärung</h1>
+      <p>Rechtliche Informationen zum Datenschutz auf wolf-lasermark.de. Der Inhalt wurde beibehalten, das Layout wurde nur optisch an den Wolf-Lasermark-Stil angepasst.</p>
+    </section>
+
+    <section class="legal-shell">
+      <div class="legal">
+        <div><h1>Datenschutzerkl&auml;rung</h1>
+
+<h2>1) Einleitung und Kontaktdaten des Verantwortlichen</h2>
+
+<p><b>1.1</b>&nbsp;Wir freuen uns, dass Sie unsere Website besuchen, und bedanken uns f&uuml;r Ihr Interesse. Im Folgenden informieren wir Sie &uuml;ber den Umgang mit Ihren personenbezogenen Daten bei der Nutzung unserer Website. Personenbezogene Daten sind hierbei alle Daten, mit denen Sie pers&ouml;nlich identifiziert werden k&ouml;nnen.</p>
+
+<p><b>1.2</b>&nbsp;Verantwortlicher f&uuml;r die Datenverarbeitung auf dieser Website im Sinne der Datenschutz-Grundverordnung (DSGVO) ist Bence Farkas, Wolf Lasermark, M&uuml;nchener Str. 3, 83052 Bruckm&uuml;hl, Deutschland, Tel.: +49 157 30897682, E-Mail: info@wolf-lasermark.de. Der f&uuml;r die Verarbeitung von personenbezogenen Daten Verantwortliche ist diejenige nat&uuml;rliche oder juristische Person, die allein oder gemeinsam mit anderen &uuml;ber die Zwecke und Mittel der Verarbeitung von personenbezogenen Daten entscheidet.</p>
+
+<h2>2) Datenerfassung beim Besuch unserer Website</h2>
+
+<p><b>2.1</b>&nbsp;Bei der blo&szlig; informatorischen Nutzung unserer Website, also wenn Sie sich nicht registrieren oder uns anderweitig Informationen &uuml;bermitteln, erheben wir nur solche Daten, die Ihr Browser an den Seitenserver &uuml;bermittelt (sog. &bdquo;Server-Logfiles&#8220;). Wenn Sie unsere Website aufrufen, erheben wir die folgenden Daten, die f&uuml;r uns technisch erforderlich sind, um Ihnen die Website anzuzeigen:</p>
+
+<ul>
+<li>Unsere besuchte Website</li>
+<li>Datum und Uhrzeit zum Zeitpunkt des Zugriffes</li>
+<li>Menge der gesendeten Daten in Byte</li>
+<li>Quelle/Verweis, von welchem Sie auf die Seite gelangten</li>
+<li>Verwendeter Browser</li>
+<li>Verwendetes Betriebssystem</li>
+<li>Verwendete IP-Adresse (ggf.: in anonymisierter Form)</li>
+</ul>
+
+<p>Die Verarbeitung erfolgt gem&auml;&szlig; Art. 6 Abs. 1 lit. f DSGVO auf Basis unseres berechtigten Interesses an der Verbesserung der Stabilit&auml;t und Funktionalit&auml;t unserer Website. Eine Weitergabe oder anderweitige Verwendung der Daten findet nicht statt. Wir behalten uns allerdings vor, die Server-Logfiles nachtr&auml;glich zu &uuml;berpr&uuml;fen, sollten konkrete Anhaltspunkte auf eine rechtswidrige Nutzung hinweisen.</p>
+
+<p><b>2.2</b>&nbsp;Diese Website nutzt aus Sicherheitsgr&uuml;nden und zum Schutz der &Uuml;bertragung personenbezogener Daten und anderer vertraulicher Inhalte (z.B. Bestellungen oder Anfragen an den Verantwortlichen) eine SSL-bzw. TLS-Verschl&uuml;sselung. Sie k&ouml;nnen eine verschl&uuml;sselte Verbindung an der Zeichenfolge &bdquo;https://&#8220; und dem Schloss-Symbol in Ihrer Browserzeile erkennen.</p>
+
+<h2>3) Hosting &amp; Content-Delivery-Network</h2>
+
+<p><b>3.1</b>&nbsp;Amazon Web Services</p>
+
+<p>F&uuml;r das Hosting unserer Website und die &nbsp;Darstellung der Seiteninhalte nutzen wir das System des folgenden Anbieters: Amazon Web Services, Inc., 410 Terry Avenue North, Seattle, WA 98109, USA</p>
+
+<p>S&auml;mtliche auf unserer Website erhobenen Daten werden auf den Servern des Anbieters verarbeitet.<br />
+Wir haben mit dem Anbieter einen Auftragsverarbeitungsvertrag geschlossen, der den Schutz der Daten unserer Seitenbesucher sicherstellt und eine unberechtigte Weitergabe an Dritte untersagt.&nbsp;</p>
+
+<p>F&uuml;r Daten&uuml;bermittlungen in die USA hat sich der Anbieter dem EU-US-Datenschutzrahmen (EU-US Data Privacy Framework) angeschlossen, das auf Basis eines Angemessenheitsbeschlusses der Europ&auml;ischen Kommission die Einhaltung des europ&auml;ischen Datenschutzniveaus&nbsp;sicherstellt.</p>
+
+<p><b>3.2</b>&nbsp;Ecwid</p>
+
+<p>F&uuml;r das Hosting unserer Website und die Darstellung der Seiteninhalte nutzen wir das System des folgenden Anbieters: Ecwid, Inc., 144 West D Street, Suite 103, Encinitas, CA 92024, USA</p>
+
+<p>S&auml;mtliche auf unserer Website erhobenen Daten werden auf den Servern des Anbieters verarbeitet.<br />
+Wir haben mit dem Anbieter einen Auftragsverarbeitungsvertrag geschlossen, der den Schutz der Daten unserer Seitenbesucher sicherstellt und eine unberechtigte Weitergabe an Dritte untersagt.&nbsp;</p>
+
+<p>F&uuml;r Daten&uuml;bermittlungen in die USA hat sich der Anbieter dem EU-US-Datenschutzrahmen (EU-US Data Privacy Framework) angeschlossen, das auf Basis eines Angemessenheitsbeschlusses der Europ&auml;ischen Kommission die Einhaltung des europ&auml;ischen Datenschutzniveaus&nbsp;sicherstellt.</p>
+
+<p><b>3.3</b>&nbsp;GitHub</p>
+
+<p>F&uuml;r das Hosting unserer Website und die Darstellung der Seiteninhalte nutzen wir das System des folgenden Anbieters: GitHub Inc., 88 Colin P Kelly Jr Street, San Francisco, CA 94107, USA</p>
+
+<p>S&auml;mtliche auf unserer Website erhobenen Daten werden auf den Servern des Anbieters verarbeitet, sofern nicht im Nachstehenden f&uuml;r spezifische Datenverarbeitungen abweichende Datenempf&auml;nger genannt sind.</p>
+
+<p>Wir haben mit dem Anbieter einen Auftragsverarbeitungsvertrag geschlossen, der den Schutz der Daten unserer Seitenbesucher sicherstellt und eine unberechtigte Weitergabe an Dritte untersagt.</p>
+
+<p>F&uuml;r Daten&uuml;bermittlungen in die USA hat sich der Anbieter dem EU-US-Datenschutzrahmen (EU-US Data Privacy Framework) angeschlossen, das auf Basis eines Angemessenheitsbeschlusses der Europ&auml;ischen Kommission die Einhaltung des europ&auml;ischen Datenschutzniveaus sicherstellt.</p>
+
+<p><b>3.4</b>&nbsp;AWS-CloudFront</p>
+
+<p>Wir nutzen ein Content Delivery Network des folgenden Anbieters: Amazon Web Services, Inc., 410 Terry Avenue North, Seattle, WA 98109, USA</p>
+
+<p>Dieser Dienst erm&ouml;glicht uns, gro&szlig;e Mediendateien wie Grafiken, Seiteninhalte oder Skripte &uuml;ber ein Netz regional verteilter Server schneller auszuliefern. Die Verarbeitung erfolgt zur Wahrung unseres berechtigten Interesses an der Verbesserung der Stabilit&auml;t und Funktionalit&auml;t unserer Website gem. Art. 6 Abs. 1 lit. f DSGVO. Wir haben mit dem Anbieter einen Auftragsverarbeitungsvertrag geschlossen, der den Schutz der Daten unserer Seitenbesucher sicherstellt und eine unberechtigte Weitergabe an Dritte untersagt.</p>
+
+<p>F&uuml;r Daten&uuml;bermittlungen in die USA hat sich der Anbieter dem EU-US-Datenschutzrahmen (EU-US Data Privacy Framework) angeschlossen, das auf Basis eines Angemessenheitsbeschlusses der Europ&auml;ischen Kommission die Einhaltung des europ&auml;ischen Datenschutzniveaus&nbsp;sicherstellt.</p>
+
+<p><b>3.5</b>&nbsp;Cloudflare</p>
+
+<p>Wir nutzen ein Content Delivery Network des folgenden Anbieters: Cloudflare Inc., 101 Townsend St. San Francisco, CA 94107, USA</p>
+
+<p>Dieser Dienst erm&ouml;glicht uns, gro&szlig;e Mediendateien wie Grafiken, Seiteninhalte oder Skripte &uuml;ber ein Netz regional verteilter Server schneller auszuliefern. Die Verarbeitung erfolgt zur Wahrung unseres berechtigten Interesses an der Verbesserung der Stabilit&auml;t und Funktionalit&auml;t unserer Website gem. Art. 6 Abs. 1 lit. f DSGVO. Wir haben mit dem Anbieter einen Auftragsverarbeitungsvertrag geschlossen, der den Schutz der Daten unserer Seitenbesucher sicherstellt und eine unberechtigte Weitergabe an Dritte untersagt.</p>
+
+<p>F&uuml;r Daten&uuml;bermittlungen in die USA hat sich der Anbieter dem EU-US-Datenschutzrahmen (EU-US Data Privacy Framework) angeschlossen, das auf Basis eines Angemessenheitsbeschlusses der Europ&auml;ischen Kommission die Einhaltung des europ&auml;ischen Datenschutzniveaus sicherstellt.</p>
+
+<p><b>3.6</b>&nbsp;Fastly</p>
+
+<p>Wir nutzen ein Content Delivery Network des folgenden Anbieters: Fastly Inc., 475 Brannan St. #300, San Francisco, CA 94107, USA</p>
+
+<p>Dieser Dienst erm&ouml;glicht uns, gro&szlig;e Mediendateien wie Grafiken, Seiteninhalte oder Skripte &uuml;ber ein Netz regional verteilter Server schneller auszuliefern. Die Verarbeitung erfolgt zur Wahrung unseres berechtigten Interesses an der Verbesserung der Stabilit&auml;t und Funktionalit&auml;t unserer Website gem. Art. 6 Abs. 1 lit. f DSGVO. Wir haben mit dem Anbieter einen Auftragsverarbeitungsvertrag geschlossen, der den Schutz der Daten unserer Seitenbesucher sicherstellt und eine unberechtigte Weitergabe an Dritte untersagt.</p>
+
+<p>F&uuml;r Daten&uuml;bermittlungen in die USA hat sich der Anbieter dem EU-US-Datenschutzrahmen (EU-US Data Privacy Framework) angeschlossen, das auf Basis eines Angemessenheitsbeschlusses der Europ&auml;ischen Kommission die Einhaltung des europ&auml;ischen Datenschutzniveaus&nbsp;sicherstellt.</p>
+
+<h2>4) Cookies</h2>
+
+<p>Um den Besuch unserer Website attraktiv zu gestalten und die Nutzung bestimmter Funktionen zu erm&ouml;glichen, verwenden wir Cookies, also kleine Textdateien, die auf Ihrem Endger&auml;t abgelegt werden. Teilweise werden diese Cookies nach Schlie&szlig;en des Browsers automatisch wieder gel&ouml;scht (sog. &bdquo;Session-Cookies&#8220;), teilweise verbleiben diese Cookies l&auml;nger auf Ihrem Endger&auml;t und erm&ouml;glichen das Speichern von Seiteneinstellungen (sog. &bdquo;persistente Cookies&#8220;). Im letzteren Fall k&ouml;nnen Sie die Speicherdauer der &Uuml;bersicht zu den Cookie-Einstellungen Ihres Webbrowsers entnehmen.</p>
+
+<p>Sofern durch einzelne von uns eingesetzte Cookies auch personenbezogene Daten verarbeitet werden, erfolgt die Verarbeitung gem&auml;&szlig; Art. 6 Abs. 1 lit. b DSGVO entweder zur Durchf&uuml;hrung des Vertrages, gem&auml;&szlig; Art. 6 Abs. 1 lit. a DSGVO im Falle einer erteilten Einwilligung oder gem&auml;&szlig; Art. 6 Abs. 1 lit. f DSGVO zur Wahrung unserer berechtigten Interessen an der bestm&ouml;glichen Funktionalit&auml;t der Website sowie einer kundenfreundlichen und effektiven Ausgestaltung des Seitenbesuchs.</p>
+
+<p>Sie k&ouml;nnen Ihren Browser so einstellen, dass Sie &uuml;ber das Setzen von Cookies informiert werden und einzeln &uuml;ber deren Annahme entscheiden oder die Annahme von Cookies f&uuml;r bestimmte F&auml;lle oder generell ausschlie&szlig;en k&ouml;nnen.</p>
+
+<p>Bitte beachten Sie, dass bei Nichtannahme von Cookies die Funktionalit&auml;t unserer Website eingeschr&auml;nkt sein kann.</p>
+
+<h2>5) Kontaktaufnahme</h2>
+
+<p><b>5.1</b>&nbsp;WhatsApp-Business</p>
+
+<p>Sie haben die M&ouml;glichkeit, mit uns &uuml;ber den Nachrichtendienst WhatsApp der WhatsApp Ireland Limited, 4 Grand Canal Square, Grand Canal Harbour, Dublin 2, Irland, in Kontakt zu treten. Hierf&uuml;r verwenden wir die sog. &bdquo;Business-Version&#8220; von WhatsApp.</p>
+
+<p>Sofern Sie uns anl&auml;sslich eines konkreten Gesch&auml;fts (beispielsweise einer get&auml;tigten Bestellung) per WhatsApp kontaktieren, speichern und verwenden wir die von Ihnen bei WhatsApp genutzte Mobilfunknummer sowie &ndash; falls bereitgestellt &ndash; Ihren Vor- und Nachnamen gem&auml;&szlig; Art. 6 Abs. 1 lit. b. DSGVO zur Bearbeitung und Beantwortung Ihres Anliegens. Auf Basis derselben Rechtsgrundlage werden wir Sie per WhatsApp gegebenenfalls um die Bereitstellung weiterer Daten (Bestellnummer, Kundennummer, Anschrift oder E-Mailadresse) bitten, um Ihre Anfrage einem bestimmten Vorgang zuordnen zu k&ouml;nnen.</p>
+
+<p>Nutzen Sie unseren WhatsApp-Kontakt f&uuml;r allgemeine Anfragen (etwa zum Leistungsspektrum, zu Verf&uuml;gbarkeiten oder zu unserem Internetauftritt) speichern und verwenden wir die von Ihnen bei WhatsApp genutzte Mobilfunknummer sowie &ndash; falls bereitgestellt &ndash; Ihren Vor- und Nachnamen gem&auml;&szlig; Art. 6 Abs. 1 lit. f DSGVO auf Basis unseres berechtigten Interesses an der effizienten und zeitnahen Bereitstellung der gew&uuml;nschten Informationen.</p>
+
+<p>Ihre Daten werden stets nur zur Beantwortung Ihres Anliegens per WhatsApp verwendet. Eine Weitergabe an Dritte findet nicht statt.</p>
+
+<p>Bitte beachten Sie, dass WhatsApp Business Zugriff auf das Adressbuch des von uns hierf&uuml;r verwendeten mobilen Endger&auml;ts erh&auml;lt und im Adressbuch gespeicherte Telefonnummern automatisch an einen Server des Mutterkonzerns Meta Platforms Inc. in den USA &uuml;bertr&auml;gt. F&uuml;r den Betrieb unseres WhatsApp-Business-Kontos verwenden wir ein mobiles Endger&auml;t, in dessen Adressbuch ausschlie&szlig;lich die WhatsApp-Kontaktdaten solcher Nutzer gespeichert werden, die mit uns per WhatsApp auch in Kontakt getreten sind.</p>
+
+<p>Hierdurch wird sichergestellt, dass jede Person, deren WhatsApp- Kontaktdaten in unserem Adressbuch gespeichert sind, bereits bei erstmaliger Nutzung der App auf seinem Ger&auml;t durch Akzeptanz der WhatsApp-Nutzungsbedingungen in die &Uuml;bermittlung seiner WhatsApp-Telefonnummer aus den Adressb&uuml;chern seiner Chat-Kontakte gem&auml;&szlig; Art. 6 Abs. 1 lit. a DSGVO eingewilligt hat. Eine &Uuml;bermittlung von Daten solcher Nutzer, die WhatsApp nicht verwenden und/oder uns nicht &uuml;ber WhatsApp kontaktiert haben, wird insofern ausgeschlossen.</p>
+
+<p>Zweck und Umfang der Datenerhebung und die weitere Verarbeitung und Nutzung der Daten durch WhatsApp sowie Ihre diesbez&uuml;glichen Rechte und Einstellungsm&ouml;glichkeiten zum Schutz Ihrer Privatsph&auml;re entnehmen Sie bitte den Datenschutzhinweisen von WhatsApp: <a href="https://www.whatsapp.com/legal/?eea=1#privacy-policy" target="_blank">https://www.whatsapp.com<wbr>/legal<wbr>/?eea=1#privacy-policy</a></p>
+
+<p>Wir haben mit dem Anbieter einen Auftragsverarbeitungsvertrag geschlossen, der die Daten unserer Seitenbesucher sch&uuml;tzt und eine Weitergabe an Dritte untersagt.</p>
+
+<p>Im Rahmen der oben genannten Verarbeitungen kann es zu Daten&uuml;bertragungen an Server von Meta Platforms Inc. in den USA kommen.</p>
+
+<p>F&uuml;r Daten&uuml;bermittlungen in die USA hat sich der Anbieter dem EU-US-Datenschutzrahmen (EU-US Data Privacy Framework) angeschlossen, das auf Basis eines Angemessenheitsbeschlusses der Europ&auml;ischen Kommission die Einhaltung des europ&auml;ischen Datenschutzniveaus sicherstellt.</p>
+
+<p><b>5.2</b>&nbsp;- Funktion f&uuml;r Preisvorschl&auml;ge</p>
+
+<p>Auf unserer Website bieten wir Kunden bei ausgew&auml;hlten Artikeln die M&ouml;glichkeit, uns &uuml;ber ein elektronisches Formular einen Preisvorschlag zu unterbreiten, zu dem sie den Artikel erwerben w&uuml;rden.</p>
+
+<p>Gem&auml;&szlig; Art. 6 Abs. 1 lit. b DSGVO erheben und speichern wir im Zuge der elektronischen &Uuml;bermittlung des Formulars gewisse personenbezogene Daten des Anfragenden (etwa Name und Mailadresse) f&uuml;r die Bearbeitung des Preisvorschlags und verwenden diese, um den Anfragenden im Anschluss &uuml;ber eine Ablehnung oder Annahme des Vorschlags zu informieren oder ihm einen Gegenvorschlag zu unterbreiten. Die &uuml;ber das Formular bereitgestellten Daten werden streng zweckgebunden zur Erhebung und Zuordnung des Preisvorschlags sowie f&uuml;r eine Entscheidung &uuml;ber dessen Annahme zur etwaigen Vorbereitung eines Vertragsschlusses verwendet. Nach abschlie&szlig;ender Bearbeitung einer Preisvorschlagsanfrage werden die personenbezogenen Daten gel&ouml;scht, sofern keine gesetzlichen Aufbewahrungsfristen entgegenstehen.</p>
+
+<p><b>5.3</b>&nbsp;Im Rahmen der Kontaktaufnahme mit uns (z.B. per Kontaktformular oder E-Mail) werden &ndash; ausschlie&szlig;lich zum Zweck der Bearbeitung und Beantwortung Ihres Anliegens und nur im daf&uuml;r erforderlichen Umfang &ndash; personenbezogene Daten verarbeitet.</p>
+
+<p>Rechtsgrundlage f&uuml;r die Verarbeitung dieser Daten ist unser berechtigtes Interesse an der Beantwortung Ihres Anliegens gem&auml;&szlig; Art. 6 Abs. 1 lit. f DSGVO. Zielt Ihre Kontaktierung auf einen Vertrag ab, so ist zus&auml;tzliche Rechtsgrundlage f&uuml;r die Verarbeitung Art. 6 Abs. 1 lit. b DSGVO. Ihre Daten werden gel&ouml;scht, wenn sich aus den Umst&auml;nden entnehmen l&auml;sst, dass der betroffene Sachverhalt abschlie&szlig;end gekl&auml;rt ist und sofern keine gesetzlichen Aufbewahrungspflichten entgegenstehen.</p>
+
+<h2>6) Datenverarbeitung zur Bestellabwicklung</h2>
+
+<p><b>6.1</b>&nbsp;&Uuml;bermittlung von Bilddateien zur Bestellabwicklung per E-Mail</p>
+
+<p>Auf unserer Website bieten wir Kunden die M&ouml;glichkeit, durch die &Uuml;bermittlung von Bilddateien per E-Mail die Personalisierung von Produkten zu beauftragen. Dabei wird das eingereichte Bildmotiv als Vorlage f&uuml;r die Personalisierung des gew&auml;hlten Produktes verwendet.</p>
+
+<p>&Uuml;ber die auf der Website mitgeteilte Mailadresse kann der Kunde eine oder mehrere Bilddateien aus dem Speicher des verwendeten Endger&auml;tes an uns &uuml;bermitteln. Wir erfassen, speichern und verwenden die so &uuml;bermittelten Dateien daraufhin ausschlie&szlig;lich zur Anfertigung des personalisierten Produktes im Sinne der jeweiligen Leistungsbeschreibung auf unserer Website. Sofern die &uuml;bermittelten Bilddateien zur Anfertigung und Abwicklung der Bestellung an spezielle Dienstleister weitergegeben werden, werden Sie hier&uuml;ber in den folgenden Abs&auml;tzen explizit informiert. Eine dar&uuml;berhinausgehende Weitergabe erfolgt nicht. Sofern die &uuml;bermittelten Dateien bzw. die digitalen Motive personenbezogene Daten (insbesondere Abbildungen von identifizierbaren Personen) enthalten, erfolgen s&auml;mtliche soeben benannten Verarbeitungsvorg&auml;nge ausschlie&szlig;lich zum Zwecke der Abwicklung Ihrer Online-Bestellung gem&auml;&szlig; Art. 6 Abs. 1 lit. b DSGVO.</p>
+
+<p>Nach abschlie&szlig;ender Abwicklung der Bestellung werden die &uuml;bermittelten Bilddateien automatisch und vollst&auml;ndig gel&ouml;scht.</p>
+
+<p><b>6.2</b>&nbsp;Soweit f&uuml;r die Vertragsabwicklung zu Liefer- und Zahlungszwecken erforderlich, werden die von uns erhobenen personenbezogenen Daten gem&auml;&szlig; Art. 6 Abs. 1 lit. b DSGVO an das beauftragte Transportunternehmen und das beauftragte Kreditinstitut weitergegeben.</p>
+
+<p>Sofern wir Ihnen auf Grundlage eines entsprechenden Vertrages Aktualisierungen f&uuml;r Waren mit digitalen Elementen oder f&uuml;r digitale Produkte schulden, verarbeiten wir die von Ihnen bei der Bestellung &uuml;bermittelten Kontaktdaten, um Sie im Rahmen unserer gesetzlichen Informationspflichten gem&auml;&szlig; Art. 6 Abs. 1 lit. c DSGVO pers&ouml;nlich zu informieren. Ihre Kontaktdaten werden hierbei streng zweckgebunden f&uuml;r Mitteilungen &uuml;ber von uns geschuldete Aktualisierungen verwendet und zu diesem Zweck durch uns nur insoweit verarbeitet, wie dies f&uuml;r die jeweilige Information erforderlich ist.</p>
+
+<p>Zur Abwicklung Ihrer Bestellung arbeiten wir ferner mit dem / den nachstehenden Dienstleister(n) zusammen, die uns ganz oder teilweise bei der Durchf&uuml;hrung geschlossener Vertr&auml;ge unterst&uuml;tzen. An diese Dienstleister werden nach Ma&szlig;gabe der folgenden Informationen gewisse personenbezogene Daten &uuml;bermittelt.</p>
+
+<p><b>6.3</b>&nbsp;Weitergabe personenbezogener Daten an Versanddienstleister</p>
+
+<p>- DHL</p>
+
+<p>Als Transportdienstleister nutzen wir den nachstehenden Anbieter: DHL Paket GmbH, Str&auml;&szlig;chensweg 10, 53113 Bonn, Deutschland</p>
+
+<p>Wir geben Ihre E-Mail-Adresse und/oder Telefonnummer gem&auml;&szlig; Art. 6 Abs. 1 lit. a DSGVO vor der Zustellung der Ware zum Zweck der Abstimmung eines Liefertermins bzw. zur Lieferank&uuml;ndigung an den Anbieter weiter, sofern Sie hierf&uuml;r im Bestellprozess Ihre ausdr&uuml;ckliche Einwilligung erteilt haben. Anderenfalls geben wir zum Zwecke der Zustellung gem&auml;&szlig; Art. 6 Abs. 1 lit. b DSGVO nur den Namen des Empf&auml;ngers und die Lieferadresse an den Anbieter weiter. Die Weitergabe erfolgt nur, soweit dies f&uuml;r die Warenlieferung erforderlich ist. In diesem Fall ist eine vorherige Abstimmung des Liefertermins mit dem Anbieter bzw. die Lieferank&uuml;ndigung nicht m&ouml;glich.</p>
+
+<p>Die Einwilligung kann jederzeit mit Wirkung f&uuml;r die Zukunft gegen&uuml;ber dem oben bezeichneten Verantwortlichen oder gegen&uuml;ber dem Anbieter widerrufen werden.<br />
+- DHL Express</p>
+
+<p>Als Transportdienstleister nutzen wir den nachstehenden Anbieter: DHL Express Germany GmbH, Heinrich-Br&uuml;ning-Str. 5, 53113 Bonn, Deutschland</p>
+
+<p>Wir geben Ihre E-Mail-Adresse und/oder Telefonnummer gem&auml;&szlig; Art. 6 Abs. 1 lit. a DSGVO vor der Zustellung der Ware zum Zweck der Abstimmung eines Liefertermins bzw. zur Lieferank&uuml;ndigung an den Anbieter weiter, sofern Sie hierf&uuml;r im Bestellprozess Ihre ausdr&uuml;ckliche Einwilligung erteilt haben. Anderenfalls geben wir zum Zwecke der Zustellung gem&auml;&szlig; Art. 6 Abs. 1 lit. b DSGVO nur den Namen des Empf&auml;ngers und die Lieferadresse an den Anbieter weiter. Die Weitergabe erfolgt nur, soweit dies f&uuml;r die Warenlieferung erforderlich ist. In diesem Fall ist eine vorherige Abstimmung des Liefertermins mit dem Anbieter bzw. die Lieferank&uuml;ndigung nicht m&ouml;glich.</p>
+
+<p>Die Einwilligung kann jederzeit mit Wirkung f&uuml;r die Zukunft gegen&uuml;ber dem oben bezeichneten Verantwortlichen oder gegen&uuml;ber dem Anbieter widerrufen werden.<br />
+- DPD</p>
+
+<p>Als Transportdienstleister nutzen wir den nachstehenden Anbieter: DPD Deutschland GmbH, Wailandtstra&szlig;e 1, 63741 Aschaffenburg, Deutschland</p>
+
+<p>Wir geben Ihre E-Mail-Adresse und/oder Telefonnummer gem&auml;&szlig; Art. 6 Abs. 1 lit. a DSGVO vor der Zustellung der Ware zum Zweck der Abstimmung eines Liefertermins bzw. zur Lieferank&uuml;ndigung an den Anbieter weiter, sofern Sie hierf&uuml;r im Bestellprozess Ihre ausdr&uuml;ckliche Einwilligung erteilt haben. Anderenfalls geben wir zum Zwecke der Zustellung gem&auml;&szlig; Art. 6 Abs. 1 lit. b DSGVO nur den Namen des Empf&auml;ngers und die Lieferadresse an den Anbieter weiter. Die Weitergabe erfolgt nur, soweit dies f&uuml;r die Warenlieferung erforderlich ist. In diesem Fall ist eine vorherige Abstimmung des Liefertermins mit dem Anbieter bzw. die Lieferank&uuml;ndigung nicht m&ouml;glich.</p>
+
+<p>Die Einwilligung kann jederzeit mit Wirkung f&uuml;r die Zukunft gegen&uuml;ber dem oben bezeichneten Verantwortlichen oder gegen&uuml;ber dem Anbieter widerrufen werden.<br />
+- FedEx</p>
+
+<p>Als Transportdienstleister nutzen wir den nachstehenden Anbieter: FedEx Express Germany GmbH, Langer Kornweg 34 k,65451 Kelsterbach, Deutschland</p>
+
+<p>Wir geben Ihre E-Mail-Adresse und/oder Telefonnummer gem&auml;&szlig; Art. 6 Abs. 1 lit. a DSGVO vor der Zustellung der Ware zum Zweck der Abstimmung eines Liefertermins bzw. zur Lieferank&uuml;ndigung an den Anbieter weiter, sofern Sie hierf&uuml;r im Bestellprozess Ihre ausdr&uuml;ckliche Einwilligung erteilt haben. Anderenfalls geben wir zum Zwecke der Zustellung gem&auml;&szlig; Art. 6 Abs. 1 lit. b DSGVO nur den Namen des Empf&auml;ngers und die Lieferadresse an den Anbieter weiter. Die Weitergabe erfolgt nur, soweit dies f&uuml;r die Warenlieferung erforderlich ist. In diesem Fall ist eine vorherige Abstimmung des Liefertermins mit dem Anbieter bzw. die Lieferank&uuml;ndigung nicht m&ouml;glich.</p>
+
+<p>Die Einwilligung kann jederzeit mit Wirkung f&uuml;r die Zukunft gegen&uuml;ber dem oben bezeichneten Verantwortlichen oder gegen&uuml;ber dem Anbieter widerrufen werden.<br />
+- GLS</p>
+
+<p>Als Transportdienstleister nutzen wir den nachstehenden Anbieter: General Logistics Systems Germany GmbH &amp; Co. OHG, GLS Germany-Stra&szlig;e 1 &ndash; 7, 36286 Neuenstein, Deutschland</p>
+
+<p>Wir geben Ihre E-Mail-Adresse und/oder Telefonnummer gem&auml;&szlig; Art. 6 Abs. 1 lit. a DSGVO vor der Zustellung der Ware zum Zweck der Abstimmung eines Liefertermins bzw. zur Lieferank&uuml;ndigung an den Anbieter weiter, sofern Sie hierf&uuml;r im Bestellprozess Ihre ausdr&uuml;ckliche Einwilligung erteilt haben. Anderenfalls geben wir zum Zwecke der Zustellung gem&auml;&szlig; Art. 6 Abs. 1 lit. b DSGVO nur den Namen des Empf&auml;ngers und die Lieferadresse an den Anbieter weiter. Die Weitergabe erfolgt nur, soweit dies f&uuml;r die Warenlieferung erforderlich ist. In diesem Fall ist eine vorherige Abstimmung des Liefertermins mit dem Anbieter bzw. die Lieferank&uuml;ndigung nicht m&ouml;glich.</p>
+
+<p>Die Einwilligung kann jederzeit mit Wirkung f&uuml;r die Zukunft gegen&uuml;ber dem oben bezeichneten Verantwortlichen oder gegen&uuml;ber dem Anbieter widerrufen werden.<br />
+- Hermes</p>
+
+<p>Als Transportdienstleister nutzen wir den nachstehenden Anbieter: Hermes Logistik Gruppe Deutschland GmbH, Essener Stra&szlig;e 89, 22419 Hamburg, Deutschland</p>
+
+<p>Wir geben Ihre E-Mail-Adresse und/oder Telefonnummer gem&auml;&szlig; Art. 6 Abs. 1 lit. a DSGVO vor der Zustellung der Ware zum Zweck der Abstimmung eines Liefertermins bzw. zur Lieferank&uuml;ndigung an den Anbieter weiter, sofern Sie hierf&uuml;r im Bestellprozess Ihre ausdr&uuml;ckliche Einwilligung erteilt haben. Anderenfalls geben wir zum Zwecke der Zustellung gem&auml;&szlig; Art. 6 Abs. 1 lit. b DSGVO nur den Namen des Empf&auml;ngers und die Lieferadresse an den Anbieter weiter. Die Weitergabe erfolgt nur, soweit dies f&uuml;r die Warenlieferung erforderlich ist. In diesem Fall ist eine vorherige Abstimmung des Liefertermins mit dem Anbieter bzw. die Lieferank&uuml;ndigung nicht m&ouml;glich.</p>
+
+<p>Die Einwilligung kann jederzeit mit Wirkung f&uuml;r die Zukunft gegen&uuml;ber dem oben bezeichneten Verantwortlichen oder gegen&uuml;ber dem Anbieter widerrufen werden.</p>
+
+<p><b>6.4</b>&nbsp;Verwendung von Paymentdienstleistern (Zahlungsdiensten)</p>
+
+<p>- Google Pay</p>
+
+<p>Wenn Sie sich f&uuml;r die Zahlungsart &bdquo;Google Pay&#8220; der Google Ireland Limited, Gordon House, 4 Barrow St, Dublin, D04 E5W5, Irland (&bdquo;Google&#8220;) entscheiden, erfolgt die Zahlungsabwicklung &uuml;ber die &bdquo;Google Pay&#8220;-Applikation Ihres mit mindestens Android 4.4 (&bdquo;KitKat&#8220;) betriebenen und &uuml;ber eine NFC-Funktion verf&uuml;genden mobilen Endger&auml;ts durch die Belastung einer bei Google Pay hinterlegten Zahlungskarte oder einem dort verifizierten Bezahlsystem (z.B. PayPal). F&uuml;r die Freigabe einer Zahlung &uuml;ber Google Pay in H&ouml;he von mehr als 25,- &euro; ist das vorherige Entsperren Ihres mobilen Endger&auml;tes durch die jeweils eingerichtete Verifikationsma&szlig;nahme (etwa Gesichtserkennung, Passwort, Fingerabdruck oder Muster) erforderlich.</p>
+
+<p>Zum Zwecke der Zahlungsabwicklung werden Ihre im Rahmen des Bestellvorgangs mitgeteilten Informationen nebst den Informationen &uuml;ber Ihre Bestellung an Google weitergegeben. Google &uuml;bermittelt sodann Ihre in Google Pay hinterlegten Zahlungsinformationen in Form einer einmalig vergebenen Transaktionsnummer an die Ausgangswebsite, mit der eine erfolgte Zahlung verifiziert wird. Diese Transaktionsnummer enth&auml;lt keinerlei Informationen zu den realen Zahldaten Ihrer bei Google Pay hinterlegten Zahlungsmittel, sondern wird als einmalig g&uuml;ltiger numerischer Token erstellt und &uuml;bermittelt. Bei s&auml;mtlichen Transaktionen &uuml;ber Google Pay tritt Google lediglich als Vermittler zur Abwicklung des Bezahlvorgangs auf. Die Durchf&uuml;hrung der Transaktion erfolgt ausschlie&szlig;lich im Verh&auml;ltnis zwischen dem Nutzer und der Ausgangswebsite durch Belastung des bei Google Pay hinterlegten Zahlungsmittels.</p>
+
+<p>Sofern bei den beschriebenen &Uuml;bermittlungen personenbezogene Daten verarbeitet werden, erfolgt die Verarbeitung ausschlie&szlig;lich zum Zwecke der Zahlungsabwicklung gem&auml;&szlig; Art. 6 Abs. 1 lit. b DSGVO.</p>
+
+<p>Google beh&auml;lt sich vor, bei jeder &uuml;ber Google Pay get&auml;tigten Transaktion bestimmte vorgangsspezifische Informationen zu erheben, zu speichern und auszuwerten. Hierzu geh&ouml;ren Datum, Uhrzeit und Betrag der Transaktion, H&auml;ndlerstandort und -beschreibung, eine vom H&auml;ndler bereitgestellte Beschreibung der gekauften Waren oder Dienste, Fotos, die Sie der Transaktion beigef&uuml;gt haben, der Name und die E-Mail-Adresse des Verk&auml;ufers und K&auml;ufers bzw. des Absenders und Empf&auml;ngers, die verwendete Zahlungsmethode, Ihre Beschreibung f&uuml;r den Grund der Transaktion sowie gegebenenfalls das mit der Transaktion verbundene Angebot.</p>
+
+<p>Laut Google erfolgt diese Verarbeitung ausschlie&szlig;lich gem&auml;&szlig; Art. 6 Abs.1 lit. f DSGVO auf Basis des berechtigten Interesses an der ordnungsgem&auml;&szlig;en Rechnungslegung, der Verifizierung von Vorgangsdaten und der Optimierung und Funktionserhaltung des Google Pay-Dienstes.</p>
+
+<p>Google beh&auml;lt sich au&szlig;erdem vor, die verarbeiteten Vorgangsdaten mit weiteren Informationen zusammenzuf&uuml;hren, die bei der Nutzung weiterer Google-Dienste durch Google erhoben und gespeichert werden.</p>
+
+<p>Die Nutzungsbedingungen von Google Pay finden sich hier:</p>
+
+<p><a href="https://payments.google.com/payments/apis-secure/u/0/get_legal_document?ldo=0&amp;ldt=googlepaytos&amp;ldl=de" target="_blank">https://payments.google.com<wbr>/payments<wbr>/apis-secure<wbr>/u<wbr>/0<wbr>/get_legal_document<wbr>?ldo=0<wbr>&amp;ldt=googlepaytos<wbr>&amp;ldl=de</a><br />
+Weitere Hinweise zum Datenschutz bei Google Pay finden Sie unter der nachstehenden Internetadresse:<br />
+<a href="https://payments.google.com/payments/apis-secure/get_legal_document?ldo=0&amp;ldt=privacynotice&amp;ldl=de" target="_blank">https://payments.google.com<wbr>/payments<wbr>/apis-secure<wbr>/get_legal_document<wbr>?ldo=0<wbr>&amp;ldt=privacynotice<wbr>&amp;ldl=de</a><br />
+- Klarna</p>
+
+<p>Auf dieser Website stehen eine oder mehrere Online-Zahlungsarten des folgenden Anbieters zur Verf&uuml;gung: Klarna Bank AB, Sveav&auml;gen 46, 111 34 Stockholm, Schweden</p>
+
+<p>Bei Auswahl einer Zahlungsart des Anbieters, bei der Sie in Vorleistung gehen (etwa Kreditkartenzahlung), werden an diesen Ihre im Rahmen des Bestellvorgangs mitgeteilten Zahlungsdaten (darunter Name, Anschrift, Bank- und Zahlkarteninformationen, W&auml;hrung und Transaktionsnummer) sowie Informationen &uuml;ber den Inhalt Ihrer Bestellung gem&auml;&szlig; Art. 6 Abs. 1 lit. b DSGVO weitergegeben. Die Weitergabe Ihrer Daten erfolgt in diesem Falle ausschlie&szlig;lich zum Zweck der Zahlungsabwicklung mit dem Anbieter und nur insoweit, als sie hierf&uuml;r erforderlich ist.</p>
+
+<p>Bei Auswahl einer Zahlungsart, bei der der Anbieter in Vorleistung geht (etwa Rechnungs- oder Ratenkauf bzw. Lastschrift), werden Sie im Bestellablauf auch aufgefordert, bestimmte pers&ouml;nliche Daten (Vor- und Nachname, Stra&szlig;e, Hausnummer, Postleitzahl, Ort, Geburtsdatum, E-Mail-Adresse, Telefonnummer, ggf. Daten zu einem alternativen Zahlungsmittel) anzugeben.</p>
+
+<p>Um unser berechtigtes Interesse an der Feststellung der Zahlungsf&auml;higkeit unserer Kunden zu wahren, werden diese Daten von uns gem&auml;&szlig; Art. 6 Abs. 1 lit. f DSGVO zum Zweck einer Bonit&auml;tspr&uuml;fung an den Anbieter weitergeleitet. Der Anbieter pr&uuml;ft auf Basis der von Ihnen angegebenen pers&ouml;nlichen Daten sowie weiterer Daten (wie etwa Warenkorb, Rechnungsbetrag, Bestellhistorie, Zahlungserfahrungen), ob die von Ihnen ausgew&auml;hlte Zahlungsm&ouml;glichkeit im Hinblick auf Zahlungs- und/oder Forderungsausfallrisiken gew&auml;hrt werden kann.</p>
+
+<p>Zur Entscheidung im Rahmen der Antragspr&uuml;fung k&ouml;nnen neben anbieterinternen Kriterien gem&auml;&szlig; Art. 6 Abs. 1 lit. f DSGVO auch Identit&auml;ts- und Bonit&auml;tsinformationen von folgenden Auskunfteien einbezogen werden:</p>
+
+<p><a href="https://cdn.klarna.com/1.0/shared/content/legal/terms/0/de_de/credit_rating_agencies" target="_blank">https://cdn.klarna.com<wbr>/1.0<wbr>/shared<wbr>/content<wbr>/legal<wbr>/terms<wbr>/0<wbr>/de_de<wbr>/credit_rating_agencies</a></p>
+
+<p>Die Bonit&auml;tsauskunft kann Wahrscheinlichkeitswerte enthalten (sog. Score-Werte). Soweit Score-Werte in das Ergebnis der Bonit&auml;tsauskunft einflie&szlig;en, haben sie ihre Grundlage in einem wissenschaftlich anerkannten mathematisch-statistischen Verfahren. In die Berechnung der Score-Werte flie&szlig;en unter anderem, aber nicht ausschlie&szlig;lich, Anschriftendaten ein.</p>
+
+<p>Sie k&ouml;nnen dieser Verarbeitung Ihrer Daten jederzeit durch eine Nachricht an uns oder gegen&uuml;ber dem Anbieter widersprechen. Jedoch bleibt der Anbieter ggf. weiterhin berechtigt, Ihre personenbezogenen Daten zu verarbeiten, sofern dies zur vertragsgem&auml;&szlig;en Zahlungsabwicklung erforderlich ist.<br />
+- Paypal</p>
+
+<p>Auf dieser Website stehen eine oder mehrere Online-Zahlungsarten des folgenden Anbieters zur Verf&uuml;gung: PayPal (Europe) S.a.r.l. et Cie, S.C.A., 22-24 Boulevard Royal, L-2449 Luxemburg</p>
+
+<p>Bei Auswahl einer Zahlungsart des Anbieters, bei der Sie in Vorleistung gehen, werden an diesen Ihre im Rahmen des Bestellvorgangs mitgeteilten Zahlungsdaten (darunter Name, Anschrift, Bank- und Zahlkarteninformationen, W&auml;hrung und Transaktionsnummer) sowie Informationen &uuml;ber den Inhalt Ihrer Bestellung gem&auml;&szlig; Art. 6 Abs. 1 lit. b DSGVO weitergegeben. Die Weitergabe Ihrer Daten erfolgt in diesem Falle ausschlie&szlig;lich zum Zweck der Zahlungsabwicklung mit dem Anbieter und nur insoweit, als sie hierf&uuml;r erforderlich ist.</p>
+
+<p>Bei Auswahl einer Zahlungsart, bei der wir in Vorleistung gehen, werden Sie im Bestellablauf auch aufgefordert, bestimmte pers&ouml;nliche Daten (Vor- und Nachname, Stra&szlig;e, Hausnummer, Postleitzahl, Ort, Geburtsdatum, E-Mail-Adresse, Telefonnummer, ggf. Daten zu einem alternativen Zahlungsmittel) anzugeben.</p>
+
+<p>Um in solchen F&auml;llen unser berechtigtes Interesse an der Feststellung Ihrer Zahlungsf&auml;higkeit zu wahren, werden diese Daten von uns gem&auml;&szlig; Art. 6 Abs. 1 lit. f DSGVO zum Zwecke einer Bonit&auml;tspr&uuml;fung an den Anbieter weitergeleitet. Der Anbieter pr&uuml;ft auf Basis der von Ihnen angegebenen pers&ouml;nlichen Daten sowie weiterer Daten (wie etwa Warenkorb, Rechnungsbetrag, Bestellhistorie, Zahlungserfahrungen), ob die von Ihnen ausgew&auml;hlte Zahlungsm&ouml;glichkeit im Hinblick auf Zahlungs- und/oder Forderungsausfallrisiken gew&auml;hrt werden kann.</p>
+
+<p>Die Bonit&auml;tsauskunft kann Wahrscheinlichkeitswerte enthalten (sog. Score-Werte). Soweit Score-Werte in das Ergebnis der Bonit&auml;tsauskunft einflie&szlig;en, haben sie ihre Grundlage in einem wissenschaftlich anerkannten mathematisch-statistischen Verfahren. In die Berechnung der Score-Werte flie&szlig;en unter anderem, aber nicht ausschlie&szlig;lich, Anschriftendaten ein.</p>
+
+<p>Sie k&ouml;nnen dieser Verarbeitung Ihrer Daten jederzeit durch eine Nachricht an uns oder gegen&uuml;ber dem Anbieter widersprechen. Jedoch bleibt der Anbieter ggf. weiterhin berechtigt, Ihre personenbezogenen Daten zu verarbeiten, sofern dies zur vertragsgem&auml;&szlig;en Zahlungsabwicklung erforderlich ist.<br />
+- Paypal Checkout</p>
+
+<p>Diese Website nutzt PayPal Checkout, ein Online-Zahlungssystem von PayPal, das sich aus PayPal-eigenen Zahlungsarten und lokalen Zahlmethoden von Drittanbietern zusammensetzt.</p>
+
+<p>Bei Zahlung via PayPal, Kreditkarte via PayPal, Lastschrift via PayPal oder &ndash; falls angeboten &ndash; &bdquo;Sp&auml;ter Bezahlen&#8220; via PayPal geben wir Ihre Zahlungsdaten im Rahmen der Zahlungsabwicklung an die PayPal (Europe) S.a.r.l. et Cie, S.C.A., 22-24 Boulevard Royal, L-2449 Luxemburg (nachfolgend &bdquo;PayPal&quot;), weiter. Die Weitergabe erfolgt gem&auml;&szlig; Art. 6 Abs. 1 lit. b DSGVO und nur insoweit, als dies f&uuml;r die Zahlungsabwicklung erforderlich ist.</p>
+
+<p>PayPal beh&auml;lt sich f&uuml;r die Zahlungsmethoden Kreditkarte via PayPal, Lastschrift via PayPal oder &ndash; falls angeboten - &bdquo;Sp&auml;ter bezahlen&#8220; via PayPal &ndash; die Durchf&uuml;hrung einer Bonit&auml;tsauskunft vor. Hierf&uuml;r werden Ihre Zahlungsdaten gegebenenfalls gem&auml;&szlig; Art. 6 Abs. 1 lit. f DSGVO auf Basis des berechtigten Interesses von PayPal an der Feststellung Ihrer Zahlungsf&auml;higkeit an Auskunfteien weitergegeben. Das Ergebnis der Bonit&auml;tspr&uuml;fung in Bezug auf die statistische Zahlungsausfallwahrscheinlichkeit verwendet PayPal zum Zweck der Entscheidung &uuml;ber die Bereitstellung der jeweiligen Zahlungsmethode. Die Bonit&auml;tsauskunft kann Wahrscheinlichkeitswerte enthalten (sog. Score-Werte). Soweit Score-Werte in das Ergebnis der Bonit&auml;tsauskunft einflie&szlig;en, haben sie ihre Grundlage in einem wissenschaftlich anerkannten mathematisch-statistischen Verfahren. In die Berechnung der Score-Werte flie&szlig;en unter anderem, aber nicht ausschlie&szlig;lich, Anschriftendaten ein. Sie k&ouml;nnen dieser Verarbeitung Ihrer Daten jederzeit durch eine Nachricht an PayPal widersprechen. Jedoch bleibt PayPal ggf. weiterhin berechtigt, Ihre personenbezogenen Daten zu verarbeiten, sofern dies zur vertragsgem&auml;&szlig;en Zahlungsabwicklung erforderlich ist.</p>
+
+<p>Bei Verf&uuml;gbarkeit und Auswahl der PayPal-Zahlungsart &bdquo;Rechnungskauf&#8220; werden Ihre Zahlungsdaten zur Vorbereitung der Zahlung zun&auml;chst an PayPal &uuml;bermittelt, woraufhin PayPal diese zur Durchf&uuml;hrung der Zahlung an die Ratepay GmbH, Franklinstra&szlig;e 28-29, 10587 Berlin (&bdquo;Ratepay&quot;) weiterleitet. Rechtsgrundlage ist jeweils Art. 6 Abs. 1 lit. b DSGVO. In diesem Fall f&uuml;hrt RatePay im eigenen Namen eine Identit&auml;ts- und Bonit&auml;tspr&uuml;fung zur Feststellung der Zahlungsf&auml;higkeit entsprechend dem oben bereits genannten Prinzip durch und gibt Ihre Zahlungsdaten aufgrund des berechtigten Interesses an der Feststellung der Zahlungsf&auml;higkeit gem&auml;&szlig; Art. 6 Abs. 1 lit. f DSGVO an Auskunfteien weiter. Eine Liste der Auskunfteien, auf die Ratepay zur&uuml;ckgreifen kann, findet sich hier: <a href="https://www.ratepay.com/legal-payment-creditagencies/" target="_blank">https://www.ratepay.com<wbr>/legal-payment-creditagencies<wbr>/</a></p>
+
+<p>Bei Nutzung der Zahlungsart eines lokalen Drittanbieters werden Ihre Zahlungsdaten zur Vorbereitung der Zahlung zun&auml;chst gem&auml;&szlig; Art. 6 Abs. 1 lit. b DSGVO an PayPal weitergegeben. Abh&auml;ngig von Ihrer Auswahl einer verf&uuml;gbaren lokalen Zahlungsart &uuml;bermittelt PayPal Ihre Zahlungsdaten zur Durchf&uuml;hrung der Zahlung sodann gem&auml;&szlig; Art. 6 Abs. 1 lit. b DSGVO an den entsprechenden Anbieter:</p>
+
+<p>- Apple Pay (Apple Distribution International (Apple), Hollyhill Industrial Estate, Hollyhill, Cork, Irland)<br />
+- Google Pay (Google Ireland Limited, Gordon House, 4 Barrow St, Dublin, D04 E5W5, Irland)<br />
+- iDeal (Currence Holding BV, Beethovenstraat 300 Amsterdam, Niederlande)<br />
+- bancontact (Bancontact Payconiq Company, Rue d'Arlon 82, 1040 Br&uuml;ssel, Belgien)<br />
+- blik (Polski Standard P&lstrok;atno&sacute;ci sp. z o.o., ul. Czerniakowska 87A, 00-718 Warschau, Polen)<br />
+- eps (PSA Payment Services Austria GmbH, Handelskai 92, Gate 2<br />
+1200 Wien, &Ouml;sterreich)<br />
+- MyBank (PRETA S.A.S, 40 Rue de Courcelles, F-75008 Paris, Frankreich)<br />
+- Przelewy24 (PayPro SA, Kanclerska 15A, 60-326 Pozna&nacute;, Polen)</p>
+
+<p>Weitere datenschutzrechtliche Informationen entnehmen Sie bitte der Datenschutzerkl&auml;rung von PayPal: <a href="https://www.paypal.com/de/legalhub/paypal/privacy-full" target="_blank">https://www.paypal.com<wbr>/de<wbr>/legalhub<wbr>/paypal<wbr>/privacy-full</a><br />
+- Revolut Pay</p>
+
+<p>Auf dieser Website stehen eine oder mehrere Online-Zahlungsarten des folgenden Anbieters zur Verf&uuml;gung: Revolut Bank UAB, Konstitucijos ave. 21B, 08130 Vilnius, Litauen</p>
+
+<p>Zur Abwicklung Ihrer Zahlung werden m Rahmen des Bestellvorgangs mitgeteilten Zahlungsdaten (darunter Name, Anschrift, Bank- und Zahlkarteninformationen, W&auml;hrung und Transaktionsnummer) sowie Informationen &uuml;ber den Inhalt Ihrer Bestellung gem&auml;&szlig; Art. 6 Abs. 1 lit. b DSGVO an den Anbieter weitergegeben. Die Weitergabe Ihrer Daten erfolgt in diesem Falle ausschlie&szlig;lich zum Zweck der Zahlungsabwicklung mit dem Anbieter und nur insoweit, als sie hierf&uuml;r erforderlich ist.<br />
+- Stripe</p>
+
+<p>Auf dieser Website stehen eine oder mehrere Online-Zahlungsarten des folgenden Anbieters zur Verf&uuml;gung: Stripe Payments Europe Ltd., 1 Grand Canal Street Lower, Grand Canal Dock, Dublin, Irland</p>
+
+<p>Bei Auswahl einer Zahlungsart des Anbieters, bei der Sie in Vorleistung gehen (etwa Kreditkartenzahlung), werden an diesen Ihre im Rahmen des Bestellvorgangs mitgeteilten Zahlungsdaten (darunter Name, Anschrift, Bank- und Zahlkarteninformationen, W&auml;hrung und Transaktionsnummer) sowie Informationen &uuml;ber den Inhalt Ihrer Bestellung gem&auml;&szlig; Art. 6 Abs. 1 lit. b DSGVO weitergegeben. Die Weitergabe Ihrer Daten erfolgt in diesem Falle ausschlie&szlig;lich zum Zweck der Zahlungsabwicklung mit dem Anbieter und nur insoweit, als sie hierf&uuml;r erforderlich ist.</p>
+
+<p>Bei Auswahl einer Zahlungsart, bei der der Anbieter in Vorleistung geht (etwa Rechnungs- oder Ratenkauf bzw. Lastschrift), werden Sie im Bestellablauf auch aufgefordert, bestimmte pers&ouml;nliche Daten (Vor- und Nachname, Stra&szlig;e, Hausnummer, Postleitzahl, Ort, Geburtsdatum, E-Mail-Adresse, Telefonnummer, ggf. Daten zu einem alternativen Zahlungsmittel) anzugeben.</p>
+
+<p>Um unser berechtigtes Interesse an der Feststellung der Zahlungsf&auml;higkeit unserer Kunden zu wahren, werden diese Daten von uns gem&auml;&szlig; Art. 6 Abs. 1 lit. f DSGVO zum Zweck einer Bonit&auml;tspr&uuml;fung an den Anbieter weitergeleitet. Der Anbieter pr&uuml;ft auf Basis der von Ihnen angegebenen pers&ouml;nlichen Daten sowie weiterer Daten (wie etwa Warenkorb, Rechnungsbetrag, Bestellhistorie, Zahlungserfahrungen), ob die von Ihnen ausgew&auml;hlte Zahlungsm&ouml;glichkeit im Hinblick auf Zahlungs- und/oder Forderungsausfallrisiken gew&auml;hrt werden kann.</p>
+
+<p>Die Bonit&auml;tsauskunft kann Wahrscheinlichkeitswerte enthalten (sog. Score-Werte). Soweit Score-Werte in das Ergebnis der Bonit&auml;tsauskunft einflie&szlig;en, haben sie ihre Grundlage in einem wissenschaftlich anerkannten mathematisch-statistischen Verfahren. In die Berechnung der Score-Werte flie&szlig;en unter anderem, aber nicht ausschlie&szlig;lich, Anschriftendaten ein.</p>
+
+<p>Sie k&ouml;nnen dieser Verarbeitung Ihrer Daten jederzeit durch eine Nachricht an uns oder gegen&uuml;ber dem Anbieter widersprechen. Jedoch bleibt der Anbieter ggf. weiterhin berechtigt, Ihre personenbezogenen Daten zu verarbeiten, sofern dies zur vertragsgem&auml;&szlig;en Zahlungsabwicklung erforderlich ist.</p>
+
+<h2>7) Seitenfunktionalit&auml;ten</h2>
+
+<p><b>7.1</b>&nbsp;Einbindung des Instagram-Feeds via Flockler</p>
+
+<p>Auf unserer Website nutzen wir die Dienste der Flockler Oy, Rautatienkatu 21 B, 33100, Tampere, Finnland, um Vorschaubilder unseres Instagram-Profils anzuzeigen. Dabei werden Cookies eingesetzt, also kleine Textdateien, die lokal im Zwischenspeicher Ihres Internet-Browsers gespeichert werden.</p>
+
+<p>Durch das Widget wird eine Verbindung zu Servern der Meta Platforms Ireland Ltd., 4 Grand Canal Square, Grand Canal Harbour, Dublin 2 Ireland (&bdquo;Instagram&#8220;) hergestellt, wenn Besucher unsere Website besuchen. Hierdurch erh&auml;lt Instagram bestimmte Browser-Informationen, darunter auch Ihre IP-Adresse. In Einzelf&auml;llen ist auch eine &Uuml;bertragung an Server der Meta Platforms Inc. mit Sitz in den USA m&ouml;glich.</p>
+
+<p>Daten k&ouml;nnen zudem &uuml;bertragen werden an: Flockler Commerce, Inc., 1201 W Peachtree St NW Ste 2625 #36051, Atlanta, GA 30309, USA</p>
+
+<p>Alle oben beschriebenen Verarbeitungen, insbesondere das Setzen von Cookies f&uuml;r das Auslesen von Informationen auf dem verwendeten Endger&auml;t, werden nur dann vollzogen, wenn Sie uns gem&auml;&szlig; Art. 6 Abs. 1 lit. a DSGVO dazu Ihre ausdr&uuml;ckliche Einwilligung erteilt haben. Sie k&ouml;nnen Ihre erteilte Einwilligung jederzeit mit Wirkung f&uuml;r die Zukunft widerrufen, indem Sie diesen Dienst in dem auf der Webseite bereitgestellten &bdquo;Cookie-Consent-Tool&#8220; deaktivieren.</p>
+
+<p>F&uuml;r die &Uuml;bermittlung von Daten in die USA beruft sich der Anbieter auf Standardvertragsklauseln der Europ&auml;ischen Kommission, welche die Einhaltung des europ&auml;ischen Datenschutzniveaus sicherzustellen sollen.</p>
+
+<p><b>7.2</b>&nbsp;Einbindung des Instagram-Feeds via Lightwidget</p>
+
+<p>Auf unserer Website nutzen wir die Dienste von Lightwidget, einem Widget des Anbieters Black Sail Division, Krystian &#379;wak, Molczyn 17, Leszna Gorna, 43-445 Dziegielow, Polen (www.lightwidget.com), um Vorschaubilder unseres Instagram-Profils anzuzeigen. Dabei werden Cookies eingesetzt, also kleine Textdateien, die lokal im Zwischenspeicher Ihres Internet-Browsers gespeichert werden.</p>
+
+<p>Durch das Widget wird eine Verbindung zu Servern der Meta Platforms Ireland Ltd., 4 Grand Canal Square, Grand Canal Harbour, Dublin 2 Ireland (&bdquo;Instagram&#8220;) hergestellt, wenn Besucher unsere Website besuchen. Hierdurch erh&auml;lt Instagram bestimmte Browser-Informationen, darunter auch Ihre IP-Adresse. In Einzelf&auml;llen ist auch eine &Uuml;bertragung an Server der Meta Platforms Inc. mit Sitz in den USA m&ouml;glich.</p>
+
+<p>Alle oben beschriebenen Verarbeitungen, insbesondere das Setzen von Cookies f&uuml;r das Auslesen von Informationen auf dem verwendeten Endger&auml;t, werden nur dann vollzogen, wenn Sie uns gem&auml;&szlig; Art. 6 Abs. 1 lit. a DSGVO dazu Ihre ausdr&uuml;ckliche Einwilligung erteilt haben. Sie k&ouml;nnen Ihre erteilte Einwilligung jederzeit mit Wirkung f&uuml;r die Zukunft widerrufen, indem Sie diesen Dienst in dem auf der Webseite bereitgestellten &bdquo;Cookie-Consent-Tool&#8220; deaktivieren.</p>
+
+<p>F&uuml;r Daten&uuml;bermittlungen in die USA hat sich die Meta Platforms Inc. dem EU-US-Datenschutzrahmen (EU-US Data Privacy Framework) angeschlossen, das auf Basis eines Angemessenheitsbeschlusses der Europ&auml;ischen Kommission die Einhaltung des europ&auml;ischen Datenschutzniveaus sicherstellt.</p>
+
+<p><b>7.3</b>&nbsp;Einbindung des Instagram-Feeds via Mintt Studio</p>
+
+<p>Auf unserer Website nutzen wir die Dienste von Mintt Studio, Rua Parque da Rep&uacute;blica 116, 4430-164 Vila Nova de Gaia, Portugal, um Vorschaubilder unseres Instagram-Profils anzuzeigen. Dabei werden Cookies eingesetzt, also kleine Textdateien, die lokal im Zwischenspeicher Ihres Internet-Browsers gespeichert werden.</p>
+
+<p>Durch das Widget wird eine Verbindung zu Servern der Meta Platforms Ireland Ltd., 4 Grand Canal Square, Grand Canal Harbour, Dublin 2 Ireland (&bdquo;Instagram&#8220;) hergestellt, wenn Besucher unsere Website besuchen. Hierdurch erh&auml;lt Instagram bestimmte Browser-Informationen, darunter auch Ihre IP-Adresse. In Einzelf&auml;llen ist auch eine &Uuml;bertragung an Server der Meta Platforms Inc. mit Sitz in den USA m&ouml;glich.</p>
+
+<p>Alle oben beschriebenen Verarbeitungen, insbesondere das Setzen von Cookies f&uuml;r das Auslesen von Informationen auf dem verwendeten Endger&auml;t, werden nur dann vollzogen, wenn Sie uns gem&auml;&szlig; Art. 6 Abs. 1 lit. a DSGVO dazu Ihre ausdr&uuml;ckliche Einwilligung erteilt haben. Sie k&ouml;nnen Ihre erteilte Einwilligung jederzeit mit Wirkung f&uuml;r die Zukunft widerrufen, indem Sie diesen Dienst in dem auf der Webseite bereitgestellten &bdquo;Cookie-Consent-Tool&#8220; deaktivieren.</p>
+
+<p><b>7.4</b>&nbsp;Einbindung des Instagram-Feeds via Smash Balloon</p>
+
+<p>Auf unserer Website nutzen wir die Dienste der Smash Balloon LLC, PO Box 126, Long Lake, Minnesota, 55356, USA, um Vorschaubilder unseres Instagram-Profils anzuzeigen. Dabei werden Cookies eingesetzt, also kleine Textdateien, die lokal im Zwischenspeicher Ihres Internet-Browsers gespeichert werden.</p>
+
+<p>Durch das Widget wird eine Verbindung zu Servern der Meta Platforms Ireland Ltd., 4 Grand Canal Square, Grand Canal Harbour, Dublin 2 Ireland (&bdquo;Instagram&#8220;) hergestellt, wenn Besucher unsere Website besuchen. Hierdurch erh&auml;lt Instagram bestimmte Browser-Informationen, darunter auch Ihre IP-Adresse. In Einzelf&auml;llen ist auch eine &Uuml;bertragung an Server der Meta Platforms Inc. mit Sitz in den USA m&ouml;glich.</p>
+
+<p>Alle oben beschriebenen Verarbeitungen, insbesondere das Setzen von Cookies f&uuml;r das Auslesen von Informationen auf dem verwendeten Endger&auml;t, werden nur dann vollzogen, wenn Sie uns gem&auml;&szlig; Art. 6 Abs. 1 lit. a DSGVO dazu Ihre ausdr&uuml;ckliche Einwilligung erteilt haben. Sie k&ouml;nnen Ihre erteilte Einwilligung jederzeit mit Wirkung f&uuml;r die Zukunft widerrufen, indem Sie diesen Dienst in dem auf der Webseite bereitgestellten &bdquo;Cookie-Consent-Tool&#8220; deaktivieren.</p>
+
+<p>F&uuml;r die &Uuml;bermittlung von Daten in die USA beruft sich der Anbieter auf Standardvertragsklauseln der Europ&auml;ischen Kommission, welche die Einhaltung des europ&auml;ischen Datenschutzniveaus sicherzustellen sollen.</p>
+
+<p><b>7.5</b>&nbsp;Instagram-Plugins</p>
+
+<p>Auf unserer Website werden Plugins des sozialen Netzwerkes des folgenden Anbieters verwendet: Meta Platforms Ireland Ltd., 4 Grand Canal Square, Grand Canal Harbour, Dublin 2 Irland</p>
+
+<p>Diese Plugins erm&ouml;glichen direkte Interaktionen mit Inhalten auf dem sozialen Netzwerk.</p>
+
+<p>Um den Schutz Ihrer Daten beim Besuch unserer Website zu erh&ouml;hen, sind die Plugins zun&auml;chst deaktiviert mittels sogenannter &bdquo;2-Klick&#8220;- oder &bdquo;Shariff&#8220;-L&ouml;sung in die Seite eingebunden.</p>
+
+<p>Diese Einbindung gew&auml;hrleistet, dass beim Aufruf einer Seite unseres Webauftritts, die solche Plugins enth&auml;lt, noch keine Verbindung mit den Servern des Anbieters hergestellt wird.</p>
+
+<p>Erst wenn Sie die Plugins aktivieren und damit gem&auml;&szlig; Art. 6 Abs. 1 lit. a DSGVO Ihre Einwilligung in die Daten&uuml;bermittlung erteilen, stellt Ihr Browser eine direkte Verbindung zu den Servern des Anbieters her. Hierbei werden, unabh&auml;ngig von einem Login in ein vorhandenes Nutzerprofil, in bestimmtem Umfang Informationen &uuml;ber Ihr verwendetes Endger&auml;t (darunter Ihre IP-Adresse), Ihren Browser und Ihren Seitenverlauf an den Anbieter &uuml;bermittelt und dort gegebenenfalls weiterverarbeitet.<br />
+<br />
+Wenn Sie in ein vorhandenes Nutzerprofil auf dem sozialen Netzwerk des Anbieters eingeloggt sind, werden Informationen zu &uuml;ber die Plugins vollzogenen Interaktionen au&szlig;erdem dort ver&ouml;ffentlicht und Ihren Kontakten angezeigt.<br />
+Sie k&ouml;nnen Ihre Einwilligung jederzeit widerrufen indem Sie das aktivierte Plugin durch erneutes Anklicken wieder deaktivieren. Der Widerruf hat jedoch keinen Einfluss auf die Daten, die bereits an den Anbieter &uuml;bertragen wurden.</p>
+
+<p>Daten k&ouml;nnen zudem &uuml;bertragen werden: Meta Platforms Inc., USA</p>
+
+<p>Wir haben mit dem Anbieter einen Auftragsverarbeitungsvertrag geschlossen, der den Schutz der Daten unserer Seitenbesucher sicherstellt und eine unberechtigte Weitergabe an Dritte untersagt.</p>
+
+<p>F&uuml;r Daten&uuml;bermittlungen in die USA hat sich der Anbieter dem EU-US-Datenschutzrahmen (EU-US Data Privacy Framework) angeschlossen, das auf Basis eines Angemessenheitsbeschlusses der Europ&auml;ischen Kommission die Einhaltung des europ&auml;ischen Datenschutzniveaus&nbsp;sicherstellt.</p>
+
+<p><b>7.6</b>&nbsp;LinkedIn-Plugins</p>
+
+<p>Auf unserer Website werden Plugins des sozialen Netzwerkes des folgenden Anbieters verwendet: LinkedIn Ireland Unlimited Company, Wilton Place, Dublin 2, Irland</p>
+
+<p>Diese Plugins erm&ouml;glichen direkte Interaktionen mit Inhalten auf dem sozialen Netzwerk.</p>
+
+<p>Um den Schutz Ihrer Daten beim Besuch unserer Website zu erh&ouml;hen, sind die Plugins zun&auml;chst deaktiviert mittels sogenannter &bdquo;2-Klick&#8220;- oder &bdquo;Shariff&#8220;-L&ouml;sung in die Seite eingebunden.</p>
+
+<p>Diese Einbindung gew&auml;hrleistet, dass beim Aufruf einer Seite unseres Webauftritts, die solche Plugins enth&auml;lt, noch keine Verbindung mit den Servern des Anbieters hergestellt wird.</p>
+
+<p>Erst wenn Sie die Plugins aktivieren und damit gem&auml;&szlig; Art. 6 Abs. 1 lit. a DSGVO Ihre Einwilligung in die Daten&uuml;bermittlung erteilen, stellt Ihr Browser eine direkte Verbindung zu den Servern des Anbieters her. Hierbei werden, unabh&auml;ngig von einem Login in ein vorhandenes Nutzerprofil, in bestimmtem Umfang Informationen &uuml;ber Ihr verwendetes Endger&auml;t (darunter Ihre IP-Adresse), Ihren Browser und Ihren Seitenverlauf an den Anbieter &uuml;bermittelt und dort gegebenenfalls weiterverarbeitet.<br />
+<br />
+Wenn Sie in ein vorhandenes Nutzerprofil auf dem sozialen Netzwerk des Anbieters eingeloggt sind, werden Informationen zu &uuml;ber die Plugins vollzogenen Interaktionen au&szlig;erdem dort ver&ouml;ffentlicht und Ihren Kontakten angezeigt.<br />
+Sie k&ouml;nnen Ihre Einwilligung jederzeit widerrufen indem Sie das aktivierte Plugin durch erneutes Anklicken wieder deaktivieren. Der Widerruf hat jedoch keinen Einfluss auf die Daten, die bereits an den Anbieter &uuml;bertragen wurden.</p>
+
+<p>Daten k&ouml;nnen zudem &uuml;bertragen werden an: LinkedIn Inc., USA</p>
+
+<p>Wir haben mit dem Anbieter einen Auftragsverarbeitungsvertrag geschlossen, der den Schutz der Daten unserer Seitenbesucher sicherstellt und eine unberechtigte Weitergabe an Dritte untersagt.</p>
+
+<p>F&uuml;r die &Uuml;bermittlung von Daten in die USA beruft sich der Anbieter auf Standardvertragsklauseln der Europ&auml;ischen Kommission, welche die Einhaltung des europ&auml;ischen Datenschutzniveaus sicherstellen sollen.</p>
+
+<p><b>7.7</b>&nbsp;Youtube</p>
+
+<p>Diese Website nutzt Plugins zur Anzeige und Wiedergabe von Videos des folgenden Anbieters: Google Ireland Limited, Gordon House, 4 Barrow St, Dublin, D04 E5W5, Irland</p>
+
+<p>Daten k&ouml;nnen zudem &uuml;bermittelt werden an: Google LLC., USA</p>
+
+<p>Wenn Sie eine Seite unseres Internetauftritts aufrufen, die ein solches Plugin enth&auml;lt, stellt Ihr Browser sp&auml;testens im Zeitpunkt der Video-Wiedergabe eine direkte Verbindung zu den Servern des Anbieters her, um die Inhalte zu laden. Hierbei werden bestimmte Informationen, einschlie&szlig;lich Ihrer IP-Adresse, an den Anbieter &uuml;bermittelt.</p>
+
+<p>Wird die Wiedergabe eingebetteter Videos &uuml;ber das Plugin gestartet, setzt der Anbieter zudem Cookies ein, um Informationen &uuml;ber das Nutzerverhalten zu sammeln, Wiedergabestatistiken zu erstellen und missbr&auml;uchliches Verhalten zu unterbinden.</p>
+
+<p>Sind Sie w&auml;hrend Ihres Seitenbesuchs in einem Nutzerkonto beim Anbieter eingeloggt, werden Ihre Daten beim Klick auf ein Video direkt Ihrem Konto zugeordnet. Wenn Sie die Zuordnung zu Ihrem Konto nicht w&uuml;nschen, m&uuml;ssen Sie sich vor Bet&auml;tigung der Wiedergabeschaltfl&auml;che ausloggen.</p>
+
+<p>Alle vorgenannten Verarbeitungen, insbesondere das Setzen von Cookies f&uuml;r das Auslesen von Informationen auf dem verwendeten Endger&auml;t, erfolgen nur, wenn Sie uns hierzu Ihre ausdr&uuml;ckliche Einwilligung gem. Art. 6 Abs. 1 lit. a DSGVO erteilt haben. Die erteilte Einwilligung k&ouml;nnen Sie jederzeit mit Wirkung f&uuml;r die Zukunft widerrufen, indem Sie diesen Dienst &uuml;ber das auf der Webseite bereitgestellte &bdquo;Cookie-Consent-Tool&#8220; deaktivieren.</p>
+
+<p>F&uuml;r Daten&uuml;bermittlungen in die USA hat sich der Anbieter dem EU-US-Datenschutzrahmen (EU-US Data Privacy Framework) angeschlossen, das auf Basis eines Angemessenheitsbeschlusses der Europ&auml;ischen Kommission die Einhaltung des europ&auml;ischen Datenschutzniveaus&nbsp;sicherstellt.</p>
+
+<p><b>7.8</b>&nbsp;Google Maps</p>
+
+<p>Diese Webseite nutzt einen Online-Kartendienst des folgenden Anbieters: Google Maps (API) von Google Ireland Limited, Gordon House, 4 Barrow St, Dublin, D04 E5W5, Irland (&#8220;Google&rdquo;).</p>
+
+<p>Google Maps ist ein Webdienst zur Darstellung von interaktiven (Land-)Karten, um geographische Informationen visuell darzustellen. &Uuml;ber die Nutzung dieses Dienstes wird Ihnen unser Standort angezeigt und eine etwaige Anfahrt erleichtert.</p>
+
+<p>Bereits beim Aufrufen derjenigen Unterseiten, in die die Karte von Google Maps eingebunden ist, werden Informationen &uuml;ber Ihre Nutzung unserer Website (wie z.B. Ihre IP-Adresse) an Server von Google &uuml;bertragen und dort gespeichert, hierbei kann es auch zu einer &Uuml;bermittlung an die Server der Google LLC. in den USA kommen. Dies erfolgt unabh&auml;ngig davon, ob Google ein Nutzerkonto bereitstellt, &uuml;ber das Sie eingeloggt sind oder ob ein Nutzerkonto besteht. Wenn Sie bei Google eingeloggt sind, werden Ihre Daten direkt Ihrem Konto zugeordnet. Wenn Sie die Zuordnung mit Ihrem Profil bei Google nicht w&uuml;nschen, m&uuml;ssen Sie sich vor Aktivierung des Buttons ausloggen. Google speichert Ihre Daten (selbst f&uuml;r nicht eingeloggte Nutzer) als Nutzungsprofile und wertet diese aus.</p>
+
+<p>Die Erhebung, Speicherung und die Auswertung erfolgen gem&auml;&szlig; Art. 6 Abs. 1 lit. f DSGVO auf Basis des berechtigten Interesses von Google an der Einblendung personalisierter Werbung, Marktforschung und/oder der bedarfsgerechten Gestaltung von Google-Websites. Ihnen steht ein Widerspruchsrecht gegen die Bildung dieser Nutzerprofile zu, wobei Sie sich f&uuml;r dessen Aus&uuml;bung an Google wenden m&uuml;ssen. Wenn Sie mit der k&uuml;nftigen &Uuml;bermittlung Ihrer Daten an Google im Rahmen der Nutzung von Google Maps nicht einverstanden sind, besteht auch die M&ouml;glichkeit, den Webdienst von Google Maps vollst&auml;ndig zu deaktivieren, indem Sie die Anwendung JavaScript in Ihrem Browser ausschalten. Google Maps und damit auch die Kartenanzeige auf dieser Internetseite kann dann nicht genutzt werden.</p>
+
+<p>Soweit rechtlich erforderlich, haben wir zur vorstehend dargestellten Verarbeitung Ihrer Daten Ihre Einwilligung gem&auml;&szlig; Art. 6 Abs. 1 lit. a DSGVO eingeholt. Sie k&ouml;nnen Ihre erteilte Einwilligung jederzeit mit Wirkung f&uuml;r die Zukunft widerrufen. Um Ihren Widerruf auszu&uuml;ben, befolgen Sie bitte die vorstehend geschilderte M&ouml;glichkeit zur Vornahme eines Widerspruchs.</p>
+
+<p>F&uuml;r Daten&uuml;bermittlungen in die USA hat sich der Anbieter dem EU-US-Datenschutzrahmen (EU-US Data Privacy Framework) angeschlossen, das auf Basis eines Angemessenheitsbeschlusses der Europ&auml;ischen Kommission die Einhaltung des europ&auml;ischen Datenschutzniveaus&nbsp;sicherstellt.</p>
+
+<p>Weitere Hinweise zu den Datenschutzbestimmungen von Google finden sich hier: <a href="https://business.safety.google/intl/de/privacy/" target="_blank">https://business.safety.google<wbr>/intl<wbr>/de<wbr>/privacy<wbr>/</a></p>
+
+<p><b>7.9</b>&nbsp;Google Web Fonts</p>
+
+<p>Diese Seite nutzt zur einheitlichen Darstellung von Schriftarten sogenannte Web Fonts des folgenden Anbieters: Google Ireland Limited, Gordon House, 4 Barrow St, Dublin, D04 E5W5, Irland</p>
+
+<p>Beim Aufruf einer Seite l&auml;dt Ihr Browser die ben&ouml;tigten Web Fonts in ihren Browser-Cache, um Texte und Schriftarten korrekt anzuzeigen und stellt eine direkte Verbindung zu den Servern des Anbieters her. Hierbei werden bestimmte Browserinformationen, einschlie&szlig;lich Ihrer IP-Adresse, an den Anbieter &uuml;bermittelt.</p>
+
+<p>Daten k&ouml;nnen zudem &uuml;bermittelt werden an: Google LLC, USA</p>
+
+<p>Die Verarbeitung von personenbezogenen Daten im Zuge der Verbindungsaufnahme mit dem Anbieter der Schriftarten wird nur dann vollzogen, wenn Sie uns gem&auml;&szlig; Art. 6 Abs. 1 lit. a DSGVO dazu Ihre ausdr&uuml;ckliche Einwilligung erteilt haben. Sie k&ouml;nnen Ihre erteilte Einwilligung jederzeit mit Wirkung f&uuml;r die Zukunft widerrufen, indem Sie diesen Dienst &uuml;ber das auf der Webseite bereitgestellte &bdquo;Cookie-Consent-Tool&#8220; deaktivieren. Falls Ihr Browser keine Web Fonts unterst&uuml;tzt, wird eine Standardschrift von Ihrem Computer genutzt.</p>
+
+<p>F&uuml;r Daten&uuml;bermittlungen in die USA hat sich der Anbieter dem EU-US-Datenschutzrahmen (EU-US Data Privacy Framework) angeschlossen, das auf Basis eines Angemessenheitsbeschlusses der Europ&auml;ischen Kommission die Einhaltung des europ&auml;ischen Datenschutzniveaus&nbsp;sicherstellt.</p>
+
+<p>Weitere Hinweise zu den Datenschutzbestimmungen von Google finden sich hier: <a href="https://business.safety.google/intl/de/privacy/" target="_blank">https://business.safety.google<wbr>/intl<wbr>/de<wbr>/privacy<wbr>/</a></p>
+
+<h2>8) Rechte des Betroffenen</h2>
+
+<p><b>8.1</b>&nbsp;Das geltende Datenschutzrecht gew&auml;hrt Ihnen gegen&uuml;ber dem Verantwortlichen hinsichtlich der Verarbeitung Ihrer personenbezogenen Daten die nachstehenden Betroffenenrechte (Auskunfts- und Interventionsrechte), wobei f&uuml;r die jeweiligen Aus&uuml;bungsvoraussetzungen auf die angef&uuml;hrte Rechtsgrundlage verwiesen wird:</p>
+
+<ul>
+<li>Auskunftsrecht gem&auml;&szlig; Art. 15 DSGVO;</li>
+<li>Recht auf Berichtigung gem&auml;&szlig; Art. 16 DSGVO;</li>
+<li>Recht auf L&ouml;schung gem&auml;&szlig; Art. 17 DSGVO;</li>
+<li>Recht auf Einschr&auml;nkung der Verarbeitung gem&auml;&szlig; Art. 18 DSGVO;</li>
+<li>Recht auf Unterrichtung gem&auml;&szlig; Art. 19 DSGVO;</li>
+<li>Recht auf Daten&uuml;bertragbarkeit gem&auml;&szlig; Art. 20 DSGVO;</li>
+<li>Recht auf Widerruf erteilter Einwilligungen gem&auml;&szlig; Art. 7 Abs. 3 DSGVO;</li>
+<li>Recht auf Beschwerde gem&auml;&szlig; Art. 77 DSGVO.</li>
+</ul>
+
+<p><b>8.2</b>&nbsp;WIDERSPRUCHSRECHT</p>
+
+<p>WENN WIR IM RAHMEN EINER INTERESSENABW&Auml;GUNG IHRE PERSONENBEZOGENEN DATEN AUFGRUND UNSERES &Uuml;BERWIEGENDEN BERECHTIGTEN INTERESSES VERARBEITEN, HABEN SIE DAS JEDERZEITIGE RECHT, AUS GR&Uuml;NDEN, DIE SICH AUS IHRER BESONDEREN SITUATION ERGEBEN, GEGEN DIESE VERARBEITUNG WIDERSPRUCH MIT WIRKUNG F&Uuml;R DIE ZUKUNFT EINZULEGEN.</p>
+
+<p>MACHEN SIE VON IHREM WIDERSPRUCHSRECHT GEBRAUCH, BEENDEN WIR DIE VERARBEITUNG DER BETROFFENEN DATEN. EINE WEITERVERARBEITUNG BLEIBT ABER VORBEHALTEN, WENN WIR ZWINGENDE SCHUTZW&Uuml;RDIGE GR&Uuml;NDE F&Uuml;R DIE VERARBEITUNG NACHWEISEN K&Ouml;NNEN, DIE IHRE INTERESSEN, GRUNDRECHTE UND GRUNDFREIHEITEN &Uuml;BERWIEGEN, ODER WENN DIE VERARBEITUNG DER GELTENDMACHUNG, AUS&Uuml;BUNG ODER VERTEIDIGUNG VON RECHTSANSPR&Uuml;CHEN DIENT.</p>
+
+<p>WERDEN IHRE PERSONENBEZOGENEN DATEN VON UNS VERARBEITET, UM DIREKTWERBUNG ZU BETREIBEN, HABEN SIE DAS RECHT, JEDERZEIT WIDERSPRUCH GEGEN DIE VERARBEITUNG SIE BETREFFENDER PERSONENBEZOGENER DATEN ZUM ZWECKE DERARTIGER WERBUNG EINZULEGEN. SIE K&Ouml;NNEN DEN WIDERSPRUCH WIE OBEN BESCHRIEBEN AUS&Uuml;BEN.</p>
+
+<p>MACHEN SIE VON IHREM WIDERSPRUCHSRECHT GEBRAUCH, BEENDEN WIR DIE VERARBEITUNG DER BETROFFENEN DATEN ZU DIREKTWERBEZWECKEN.</p>
+
+<h2>9) Dauer der Speicherung personenbezogener Daten</h2>
+
+<p>Die Dauer der Speicherung von personenbezogenen Daten bemisst sich anhand der jeweiligen Rechtsgrundlage, am Verarbeitungszweck und &ndash; sofern einschl&auml;gig &ndash; zus&auml;tzlich anhand der jeweiligen gesetzlichen Aufbewahrungsfrist (z.B. handels- und steuerrechtliche Aufbewahrungsfristen).</p>
+
+<p>Bei der Verarbeitung von personenbezogenen Daten auf Grundlage einer ausdr&uuml;cklichen Einwilligung gem&auml;&szlig; Art. 6 Abs. 1 lit. a DSGVO werden die betroffenen Daten so lange gespeichert, bis Sie Ihre Einwilligung widerrufen.</p>
+
+<p>Existieren gesetzliche Aufbewahrungsfristen f&uuml;r Daten, die im Rahmen rechtsgesch&auml;ftlicher bzw. rechtsgesch&auml;fts&auml;hnlicher Verpflichtungen auf der Grundlage von Art. 6 Abs. 1 lit. b DSGVO verarbeitet werden, werden diese Daten nach Ablauf der Aufbewahrungsfristen routinem&auml;&szlig;ig gel&ouml;scht, sofern sie nicht mehr zur Vertragserf&uuml;llung oder Vertragsanbahnung erforderlich sind und/oder unsererseits kein berechtigtes Interesse an der Weiterspeicherung fortbesteht.</p>
+
+<p>Bei der Verarbeitung von personenbezogenen Daten auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO werden diese Daten so lange gespeichert, bis Sie Ihr Widerspruchsrecht nach Art. 21 Abs. 1 DSGVO aus&uuml;ben, es sei denn, wir k&ouml;nnen zwingende schutzw&uuml;rdige Gr&uuml;nde f&uuml;r die Verarbeitung nachweisen, die Ihre Interessen, Rechte und Freiheiten &uuml;berwiegen, oder die Verarbeitung dient der Geltendmachung, Aus&uuml;bung oder Verteidigung von Rechtsanspr&uuml;chen.</p>
+
+<p>Bei der Verarbeitung von personenbezogenen Daten zum Zwecke der Direktwerbung auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO werden diese Daten so lange gespeichert, bis Sie Ihr Widerspruchsrecht nach Art. 21 Abs. 2 DSGVO aus&uuml;ben.</p>
+
+<p>Sofern sich aus den sonstigen Informationen dieser Erkl&auml;rung &uuml;ber spezifische Verarbeitungssituationen nichts anderes ergibt, werden gespeicherte personenbezogene Daten im &Uuml;brigen dann gel&ouml;scht, wenn sie f&uuml;r die Zwecke, f&uuml;r die sie erhoben oder auf sonstige Weise verarbeitet wurden, nicht mehr notwendig sind.</p></div><div id="itkanzlei_txt_copyright" style="font-size: 12px; margin-top: 8em;"><div style="display: inline-block; vertical-align: top;"><a href="https://www.it-recht-kanzlei.de/" target="_blank"><img src="https://www.it-recht-kanzlei.de/logo/Copyright-Logo_Datenschutzerklaerung.png?i=4f606-35d88-39c8-907e-1" id="itkanzlei_img_copyright" alt="&copy; IT-Recht Kanzlei" title="&copy; IT-Recht Kanzlei" style="margin-top: -20px; border-style: none; max-width: 100%;" /></a></div><div style="display: inline-block; vertical-align: top; margin-left: 5px; float: right; white-space: nowrap;">Stand: 22.03.2026, 21:16:06</div><div style="clear: right;"></div></div>
+      </div>
+      <div class="footer-note">Wolf Lasermark · Datenschutz</div>
+    </section>
+  </main>
+</body>
+</html>
