@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nachbestellung | Wolf Lasermark</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0c;
+  --s1: #101014;
+  --s2: #17171c;
+  --border: rgba(0,200,255,0.08);
+  --border2: rgba(255,255,255,0.06);
+  --accent: #00c8ff;
+  --accent2: #0099cc;
+  --text: #eaeaf0;
+  --muted: #5a5a6e;
+  --muted2: #8e8ea0;
+  --green: #22c55e;
+  --orange: #f59e0b;
+  --radius: 16px;
+  --radius-lg: 24px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body {
+  font-family:'Outfit',sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+.bg-fixed { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.bg-noise {
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px;
+}
+.bg-gradient {
+  background: radial-gradient(ellipse 60% 40% at 10% 0%, rgba(0,200,255,0.04), transparent),
+              radial-gradient(ellipse 50% 50% at 90% 100%, rgba(0,100,180,0.035), transparent);
+}
+.wrap {max-width:1120px; margin:0 auto; padding:0 2rem; position:relative; z-index:1;}
+.topbar {
+  position:sticky; top:0; z-index:10;
+  backdrop-filter:blur(16px);
+  background: rgba(10,10,12,0.86);
+  border-bottom:1px solid var(--border);
+}
+.topbar-inner {
+  height:72px; display:flex; align-items:center; justify-content:space-between;
+}
+.brand {
+  display:flex; align-items:center; gap:.7rem; text-decoration:none;
+  color:var(--text);
+}
+.brand img {width:34px;height:34px;object-fit:contain}
+.brand-name {
+  font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--muted2);
+}
+.brand-name span {color:var(--accent)}
+.back-link {
+  text-decoration:none; color:var(--accent); font-weight:700;
+  border:1px solid rgba(0,200,255,0.14); border-radius:999px;
+  padding:.7rem 1rem; background:rgba(0,200,255,0.05);
+}
+.hero {
+  padding:5.5rem 0 2rem; position:relative; z-index:1;
+}
+.section-tag {
+  display:inline-flex; align-items:center; gap:.4rem;
+  font-family:'Space Mono',monospace; font-size:.72rem; font-weight:700;
+  color:var(--accent); text-transform:uppercase; letter-spacing:.12em;
+  margin-bottom:1rem;
+}
+.section-title {
+  font-size:clamp(2rem,5vw,3.4rem); font-weight:900; line-height:1.05;
+  letter-spacing:-.03em; margin-bottom:1rem;
+}
+.section-title span {color:var(--accent)}
+.section-sub {
+  font-size:1.02rem; color:var(--muted2); line-height:1.75; max-width:860px;
+}
+.quick-points {
+  display:flex; flex-wrap:wrap; gap:.65rem; margin-top:1.6rem;
+}
+.chip {
+  display:inline-flex; align-items:center; gap:.4rem; padding:.45rem .9rem;
+  border-radius:999px; font-size:.75rem; color:var(--muted2);
+  border:1px solid rgba(255,255,255,.06); background:rgba(255,255,255,.02);
+}
+.nachbestellung { padding: 2rem 0 5rem; position:relative; z-index:1; }
+.nachbestellung-inner {
+  display:grid; grid-template-columns:1.05fr 1fr; gap:2rem; align-items:start;
+}
+@media(max-width:900px){ .nachbestellung-inner{grid-template-columns:1fr;} }
+.nach-card {
+  background: var(--s1);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,.28);
+}
+.nach-card::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg, var(--accent), transparent);
+}
+.nach-card h3 {
+  font-size:1.2rem; font-weight:800; letter-spacing:-.02em; margin-bottom:.55rem;
+}
+.nach-card > p {
+  color: var(--muted2); font-size: .9rem; line-height:1.7; margin-bottom:1.35rem;
+}
+.nach-grid { display:grid; grid-template-columns:1fr 1fr; gap:.9rem; }
+@media(max-width:520px){ .nach-grid{grid-template-columns:1fr;} }
+.nach-field { display:flex; flex-direction:column; gap:.45rem; }
+.nach-field label {
+  font-family:'Space Mono',monospace; font-size:.68rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.08em; color:var(--muted2);
+}
+.nach-field input, .nach-field textarea {
+  width:100%; background:var(--s2); border:1px solid rgba(255,255,255,.08);
+  border-radius:12px; color:var(--text); padding:.95rem 1rem;
+  font-family:inherit; font-size:.92rem; outline:none; transition:.2s ease;
+}
+.nach-field input:focus, .nach-field textarea:focus {
+  border-color:rgba(0,200,255,.35); box-shadow:0 0 0 4px rgba(0,200,255,.08);
+}
+.nach-field.full { grid-column:1 / -1; }
+.nach-actions { display:flex; flex-wrap:wrap; gap:.85rem; margin-top:1.1rem; }
+.btn-primary, .btn-ghost {
+  display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
+  padding:1rem 1.35rem; border-radius:14px; text-decoration:none; font-weight:700;
+  font-size:.94rem; font-family:inherit; cursor:pointer;
+}
+.btn-primary {
+  background: var(--accent); color: var(--bg); border:none;
+  box-shadow:0 8px 30px rgba(0,200,255,.22);
+}
+.btn-ghost {
+  background: transparent; color: var(--text);
+  border:1.5px solid rgba(255,255,255,.1);
+}
+.nach-hint { margin-top:1rem; font-size:.76rem; color:var(--muted); line-height:1.65; }
+.nach-lookup { display:grid; gap:.9rem; }
+.nach-status {
+  display:inline-flex; align-items:center; gap:.45rem; border-radius:999px;
+  padding:.38rem .85rem; font-size:.75rem; font-weight:700; width:fit-content;
+}
+.nach-status.ok {
+  background: rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.2); color:#86efac;
+}
+.nach-status.warn {
+  background: rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.2); color:#fbbf24;
+}
+.nach-info { display:grid; gap:.75rem; }
+.nach-info-item {
+  background: var(--s2); border:1px solid rgba(255,255,255,.06);
+  border-radius:14px; padding:.95rem 1rem;
+}
+.nach-info-label {
+  font-family:'Space Mono',monospace; font-size:.66rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:.25rem;
+}
+.nach-info-value { font-size:.92rem; color:var(--text); line-height:1.55; }
+.nach-mini-list { display:flex; flex-direction:column; gap:.6rem; margin-top:.25rem; }
+.nach-mini-item { display:flex; gap:.7rem; align-items:flex-start; color:var(--muted2); font-size:.83rem; line-height:1.55; }
+.nach-mini-item span {
+  width:26px; height:26px; border-radius:8px; flex-shrink:0; display:inline-flex;
+  align-items:center; justify-content:center; background:rgba(0,200,255,.06);
+  border:1px solid rgba(0,200,255,.12); color:var(--accent); font-size:.8rem;
+}
+.bottom-note {
+  margin-top:1.2rem; padding:1rem 1.1rem; border-radius:16px;
+  background:rgba(0,200,255,.04); border:1px solid rgba(0,200,255,.1);
+  color:var(--muted2); font-size:.85rem; line-height:1.65;
+}
+</style>
+</head>
+<body>
+<div class="bg-fixed bg-gradient"></div>
+<div class="bg-fixed bg-noise"></div>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a href="index-7-updated.html" class="brand">
+      <img src="images/wolf-lasermark-icon.png" alt="Wolf Lasermark">
+      <div class="brand-name">Wolf <span>Lasermark</span></div>
+    </a>
+    <a href="index-7-updated.html" class="back-link">← Zur Startseite</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="section-tag">🔁 Nachbestellung</div>
+    <h1 class="section-title">Gespeicherte Aufträge <span>schnell erneut anfragen</span></h1>
+    <p class="section-sub">Für Bestandskunden: Einfach die Auftragsnummer eingeben, hinterlegte Auftragsdaten automatisch laden und die gewünschte neue Stückzahl anfragen. So können wiederkehrende Gravuraufträge schneller bearbeitet werden, während Fehler durch manuelle Neuanlage vermieden werden.</p>
+    <div class="quick-points">
+      <span class="chip">⚡ Spart Zeit bei Wiederholaufträgen</span>
+      <span class="chip">🧠 Hinterlegte Daten aus Firebase</span>
+      <span class="chip">🎯 Weniger Fehler durch eindeutige Auftragsnummer</span>
+    </div>
+  </div>
+</section>
+
+<section class="nachbestellung">
+  <div class="wrap">
+    <div class="nachbestellung-inner">
+      <div class="nach-card">
+        <h3>Schnell nachbestellen</h3>
+        <p>Wenn bereits einmal für Sie graviert wurde, reicht in vielen Fällen die Auftragsnummer aus. Wir laden die gespeicherten Infos und Sie können direkt die neue Stückzahl anfragen.</p>
+
+        <form id="nachbestellungForm">
+          <div class="nach-grid">
+            <div class="nach-field">
+              <label for="nachBestellnummer">Auftragsnummer</label>
+              <input type="text" id="nachBestellnummer" name="bestellnummer" placeholder="z. B. WL-2026-001" autocomplete="off" required>
+            </div>
+            <div class="nach-field">
+              <label for="nachStueckzahl">Neue Stückzahl</label>
+              <input type="number" id="nachStueckzahl" name="stueckzahl" min="1" step="1" placeholder="z. B. 250" required>
+            </div>
+            <div class="nach-field full">
+              <label for="nachNotiz">Zusätzliche Info (optional)</label>
+              <textarea id="nachNotiz" name="notiz" rows="4" placeholder="z. B. gleicher Stand wie letzte Lieferung / Express falls möglich"></textarea>
+            </div>
+          </div>
+
+          <div class="nach-actions">
+            <button type="button" class="btn-ghost" id="checkNachbestellungBtn">🔎 Auftragsinfos anzeigen</button>
+            <button type="submit" class="btn-primary">✉️ Nachbestellung per E-Mail senden</button>
+          </div>
+          <p class="nach-hint">Die Auftragsinfos werden anhand der Auftragsnummer aus Firebase geladen. Beim Absenden wird eine strukturierte E-Mail an <strong>info@wolf-lasermark.de</strong> vorbereitet.</p>
+        </form>
+
+        <div class="bottom-note">Diese Seite ist ideal für wiederkehrende Serienaufträge, gespeicherte Layouts und bestehende Kundendaten. Dadurch kann ein Folgeauftrag oft deutlich schneller vorbereitet werden.</div>
+      </div>
+
+      <div class="nach-card nach-lookup">
+        <h3>Auftragsübersicht</h3>
+        <p>Gespeicherte Daten werden nach Eingabe der Auftragsnummer automatisch angezeigt.</p>
+
+        <div id="nachLookupStatus" class="nach-status warn">ℹ️ Noch keine Auftragsnummer geprüft</div>
+
+        <div class="nach-info" id="nachInfoBox">
+          <div class="nach-info-item">
+            <div class="nach-info-label">Kunde</div>
+            <div class="nach-info-value" id="nachInfoKunde">–</div>
+          </div>
+          <div class="nach-info-item">
+            <div class="nach-info-label">Artikel / Auftrag</div>
+            <div class="nach-info-value" id="nachInfoArtikel">–</div>
+          </div>
+          <div class="nach-info-item">
+            <div class="nach-info-label">Material / Kennzeichnung</div>
+            <div class="nach-info-value" id="nachInfoMaterial">–</div>
+          </div>
+          <div class="nach-info-item">
+            <div class="nach-info-label">Hinterlegte Daten</div>
+            <div class="nach-info-value" id="nachInfoDetails">–</div>
+          </div>
+        </div>
+
+        <div class="nach-mini-list">
+          <div class="nach-mini-item"><span>1</span><div>Auftragsnummer eingeben und gespeicherte Infos prüfen.</div></div>
+          <div class="nach-mini-item"><span>2</span><div>Neue gewünschte Stückzahl eintragen.</div></div>
+          <div class="nach-mini-item"><span>3</span><div>Per Klick eine strukturierte Nachbestellungs-Anfrage senden.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script type="module">
+import{initializeApp,getApps}from'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import{getFirestore,doc,getDoc,collection,getDocs}from'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+const firebaseConfig={
+  apiKey:"AIzaSyBLSp0en7wDD_71PF1n3qYXPF0YNTEWmIc",
+  authDomain:"auftrage-edc6d.firebaseapp.com",
+  projectId:"auftrage-edc6d",
+  storageBucket:"auftrage-edc6d.firebasestorage.app",
+  messagingSenderId:"675308449934",
+  appId:"1:675308449934:web:b4c1fc2e190647ace419df"
+};
+
+try{
+  const app=getApps().length?getApps()[0]:initializeApp(firebaseConfig);
+  window.nachbestellungDb=getFirestore(app);
+  window.nachFsDoc=doc;
+  window.nachFsGetDoc=getDoc;
+  window.nachFsCollection=collection;
+  window.nachFsGetDocs=getDocs;
+}catch(e){
+  console.error('Nachbestellung Firebase init failed:',e);
+}
+</script>
+
+<script>
+let nachbestellungCurrentOrder = null;
+let nachLookupInFlight = false;
+
+function clearNachbestellungFields(){
+  document.getElementById('nachInfoKunde').textContent = '–';
+  document.getElementById('nachInfoArtikel').textContent = '–';
+  document.getElementById('nachInfoMaterial').textContent = '–';
+  document.getElementById('nachInfoDetails').textContent = '–';
+}
+
+function setNachbestellungStatus(type, text){
+  const status = document.getElementById('nachLookupStatus');
+  if(!status) return;
+  status.className = `nach-status ${type}`;
+  status.textContent = text;
+}
+
+function formatNachbestellungInfo(order, serials){
+  const projectName = order.projectName || order.project || order.title || '–';
+  const companyName = order.companyName || order.customer || order.company || '–';
+  const markType = order.markType || order.marktype || order.markingType || '';
+  const material = [order.material, markType].filter(Boolean).join(' · ') || '–';
+  const serialCount = Array.isArray(serials) ? serials.length : 0;
+  const qty = order.qty || order.quantity || serialCount || '–';
+  const details = [
+    order.size ? `Größe: ${order.size}` : null,
+    serialCount ? `Seriennummern hinterlegt: ${serialCount}` : null,
+    order.notes ? `Notiz: ${order.notes}` : null
+  ].filter(Boolean).join(' · ') || 'Layout / Auftragsdaten in Firebase gespeichert';
+
+  return {
+    kunde: companyName,
+    artikel: `${projectName}${qty !== '–' ? ` · ${qty} Stk.` : ''}`,
+    material,
+    details
+  };
+}
+
+async function fetchNachbestellungOrder(orderNumber){
+  if(!orderNumber || !window.nachbestellungDb || !window.nachFsGetDoc) return null;
+
+  const snap = await window.nachFsGetDoc(
+    window.nachFsDoc(window.nachbestellungDb, 'orders', orderNumber)
+  );
+
+  if(!snap.exists()) return null;
+
+  let serials = [];
+  try{
+    const serialSnap = await window.nachFsGetDocs(
+      window.nachFsCollection(window.nachbestellungDb, 'orders', orderNumber, 'serials')
+    );
+    serials = serialSnap.docs.map(d => d.data());
+  }catch(err){
+    console.warn('Nachbestellung serial load failed:', err);
+  }
+
+  const order = snap.data();
+  order.id = order.id || orderNumber;
+  return { raw: order, serials, mapped: formatNachbestellungInfo(order, serials) };
+}
+
+async function updateNachbestellungInfo(){
+  const input = document.getElementById('nachBestellnummer');
+  if(!input) return null;
+
+  const bestellnummer = input.value.trim().toUpperCase();
+  input.value = bestellnummer;
+
+  if(!bestellnummer){
+    nachbestellungCurrentOrder = null;
+    clearNachbestellungFields();
+    setNachbestellungStatus('warn', 'ℹ️ Noch keine Auftragsnummer geprüft');
+    return null;
+  }
+
+  if(!window.nachbestellungDb){
+    nachbestellungCurrentOrder = null;
+    clearNachbestellungFields();
+    setNachbestellungStatus('warn', '⚠️ Firebase-Verbindung noch nicht bereit');
+    return null;
+  }
+
+  if(nachLookupInFlight) return null;
+  nachLookupInFlight = true;
+  setNachbestellungStatus('warn', '⏳ Auftragsinfos werden geladen…');
+
+  try{
+    const result = await fetchNachbestellungOrder(bestellnummer);
+
+    if(result){
+      nachbestellungCurrentOrder = result;
+      document.getElementById('nachInfoKunde').textContent = result.mapped.kunde;
+      document.getElementById('nachInfoArtikel').textContent = result.mapped.artikel;
+      document.getElementById('nachInfoMaterial').textContent = result.mapped.material;
+      document.getElementById('nachInfoDetails').textContent = result.mapped.details;
+      setNachbestellungStatus('ok', '✓ Auftragsnummer erkannt');
+      return result;
+    }
+
+    nachbestellungCurrentOrder = null;
+    clearNachbestellungFields();
+    setNachbestellungStatus('warn', '⚠️ Keine hinterlegten Infos gefunden');
+    return null;
+  }catch(error){
+    console.error('Nachbestellung lookup failed:', error);
+    nachbestellungCurrentOrder = null;
+    clearNachbestellungFields();
+    setNachbestellungStatus('warn', '⚠️ Auftragsdaten konnten nicht geladen werden');
+    return null;
+  }finally{
+    nachLookupInFlight = false;
+  }
+}
+
+document.getElementById('checkNachbestellungBtn')?.addEventListener('click', ()=>{ updateNachbestellungInfo(); });
+document.getElementById('nachBestellnummer')?.addEventListener('change', ()=>{ updateNachbestellungInfo(); });
+
+document.getElementById('nachbestellungForm')?.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+
+  const bestellnummer = document.getElementById('nachBestellnummer')?.value.trim().toUpperCase();
+  const stueckzahl = document.getElementById('nachStueckzahl')?.value.trim();
+  const notiz = document.getElementById('nachNotiz')?.value.trim();
+
+  if(!bestellnummer || !stueckzahl){
+    alert('Bitte Auftragsnummer und Stückzahl eingeben.');
+    return;
+  }
+
+  let info = nachbestellungCurrentOrder;
+  if(!info || (info.raw?.id || '').toUpperCase() !== bestellnummer){
+    info = await updateNachbestellungInfo();
+  }
+
+  const mapped = info?.mapped || null;
+  const raw = info?.raw || null;
+
+  const subject = encodeURIComponent(`Nachbestellung ${bestellnummer}`);
+  const bodyLines = [
+    'Hallo Wolf Lasermark,',
+    '',
+    'ich möchte eine Nachbestellung anfragen.',
+    '',
+    `Auftragsnummer: ${bestellnummer}`,
+    `Stückzahl: ${stueckzahl}`
+  ];
+
+  if(mapped){
+    bodyLines.push(
+      `Kunde: ${mapped.kunde}`,
+      `Artikel / Auftrag: ${mapped.artikel}`,
+      `Material / Kennzeichnung: ${mapped.material}`,
+      `Hinterlegte Daten: ${mapped.details}`
+    );
+  }
+
+  if(raw?.contactName) bodyLines.push(`Ansprechpartner: ${raw.contactName}`);
+  if(raw?.email) bodyLines.push(`E-Mail im Auftrag: ${raw.email}`);
+
+  if(notiz){
+    bodyLines.push('', `Zusätzliche Info: ${notiz}`);
+  }
+
+  bodyLines.push('', 'Bitte kurz Rückmeldung zu Preis und Lieferzeit.', '', 'Vielen Dank.');
+
+  const body = encodeURIComponent(bodyLines.join('\n'));
+  window.location.href = `mailto:info@wolf-lasermark.de?subject=${subject}&body=${body}`;
+});
+</script>
+</body>
+</html>
