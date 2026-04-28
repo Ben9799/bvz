@@ -1,0 +1,2255 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gravur bestellen – Wolf Lasermark</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Share+Tech+Mono&family=Orbitron:wght@700&family=Special+Elite&family=Rajdhani:wght@600&family=Courier+Prime:wght@700&family=Oswald:wght@600&family=Bebas+Neue&family=Roboto:wght@700&family=Open+Sans:wght@700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #020617;
+  --s1: #0b1120;
+  --s2: #111827;
+  --s3: #1e293b;
+  --border: rgba(0,212,255,0.12);
+  --accent: #00d4ff;
+  --accent2: #0099bb;
+  --text: #f1f5f9;
+  --muted: #64748b;
+  --muted2: #94a3b8;
+  --green: #22c55e;
+  --orange: #f59e0b;
+  --red: #ef4444;
+  --step-inactive: rgba(255,255,255,0.06);
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+/* BACKGROUND */
+.bg-mesh {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 50% at 15% 5%, rgba(0,212,255,0.06), transparent),
+    radial-gradient(ellipse 60% 60% at 85% 90%, rgba(30,64,175,0.08), transparent),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(0,40,60,0.3), transparent);
+}
+.bg-grid {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.025;
+  background-image: linear-gradient(rgba(0,212,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,1) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* LAYOUT */
+.page { max-width: 1060px; margin: 0 auto; padding: 2rem 1rem 6rem; position: relative; z-index: 1; }
+
+/* HEADER */
+.header { text-align: center; margin-bottom: 2.5rem; }
+.back-link { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--muted2); font-size: 0.82rem; text-decoration: none; margin-bottom: 1.2rem; transition: color 0.2s; }
+.back-link:hover { color: var(--accent); }
+.logo-badge { display: inline-flex; align-items: center; gap: 0.6rem; background: rgba(0,212,255,0.07); border: 1px solid rgba(0,212,255,0.2); border-radius: 999px; padding: 0.4rem 1.1rem; font-size: 0.82rem; color: var(--accent); font-weight: 700; margin-bottom: 1rem; letter-spacing: 0.04em; }
+.header h1 { font-family: 'Syne', sans-serif; font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; line-height: 1.1; margin-bottom: 0.6rem; }
+.header h1 span { color: var(--accent); }
+.header p { color: var(--muted2); font-size: 0.95rem; line-height: 1.6; }
+.trust-pills { display: flex; flex-wrap: wrap; gap: 0.45rem; justify-content: center; margin-top: 1.2rem; }
+.trust-pill { display: inline-flex; align-items: center; gap: 0.35rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 999px; padding: 0.28rem 0.75rem; font-size: 0.75rem; color: var(--muted2); }
+.trust-pill .ic { color: var(--green); font-size: 0.7rem; }
+
+/* PROGRESS BAR */
+.progress-wrap { margin-bottom: 2rem; }
+.progress-steps { display: flex; align-items: center; gap: 0; position: relative; }
+.progress-step { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.4rem; position: relative; cursor: pointer; }
+.progress-step::before {
+  content: ''; position: absolute; top: 17px; left: -50%; right: 50%; height: 2px;
+  background: rgba(255,255,255,0.08); z-index: 0; transition: background 0.4s;
+}
+.progress-step:first-child::before { display: none; }
+.progress-step.done::before { background: var(--accent); }
+.progress-step.active::before { background: linear-gradient(90deg, var(--accent), rgba(0,212,255,0.4)); }
+
+.step-dot {
+  width: 36px; height: 36px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.1);
+  background: var(--s2); display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; font-weight: 700; color: var(--muted); position: relative; z-index: 1;
+  transition: all 0.3s; flex-shrink: 0;
+}
+.progress-step.done .step-dot { background: var(--accent); border-color: var(--accent); color: #020617; }
+.progress-step.active .step-dot { background: rgba(0,212,255,0.15); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 0 4px rgba(0,212,255,0.1); }
+.step-label { font-size: 0.7rem; font-weight: 600; color: var(--muted); text-align: center; transition: color 0.3s; white-space: nowrap; }
+.progress-step.active .step-label { color: var(--accent); }
+.progress-step.done .step-label { color: var(--muted2); }
+
+.progress-bar-line { height: 2px; background: rgba(255,255,255,0.06); border-radius: 1px; margin-bottom: 0.5rem; overflow: hidden; display: none; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #0099bb); border-radius: 1px; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); }
+
+/* MAIN LAYOUT */
+.main-layout { display: grid; grid-template-columns: 1fr 290px; gap: 1.5rem; align-items: start; }
+@media (max-width: 780px) { .main-layout { grid-template-columns: 1fr; } }
+
+/* STEP PANELS */
+.step-panel { display: none; animation: fadeIn 0.35s ease; }
+.step-panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-8px); } }
+
+/* CARD */
+.card {
+  background: var(--s1); border: 1px solid var(--border); border-radius: 18px;
+  padding: 1.75rem; margin-bottom: 1.2rem; position: relative; overflow: hidden;
+}
+.card::before { content: ''; position: absolute; inset: 0; border-radius: 18px; background: linear-gradient(135deg, rgba(0,212,255,0.02), transparent); pointer-events: none; }
+
+.sec-head { display: flex; align-items: flex-start; gap: 0.85rem; margin-bottom: 1.5rem; }
+.sec-icon { width: 40px; height: 40px; border-radius: 12px; background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.18); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+.sec-title { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700; line-height: 1.2; }
+.sec-sub { font-size: 0.78rem; color: var(--muted2); margin-top: 0.2rem; }
+
+/* FORM FIELDS */
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.85rem; }
+.s2 { grid-column: span 2; }
+@media (max-width: 520px) { .g2, .g3 { grid-template-columns: 1fr; } .s2 { grid-column: span 1; } }
+
+.field { display: flex; flex-direction: column; gap: 0.4rem; }
+.field label { font-size: 0.82rem; font-weight: 600; color: #cbd5e1; display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+.req-badge { font-size: 0.65rem; background: rgba(0,212,255,0.12); color: var(--accent); border: 1px solid rgba(0,212,255,0.25); border-radius: 4px; padding: 0.1rem 0.4rem; font-weight: 700; }
+.opt-badge { font-size: 0.65rem; background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 0.1rem 0.4rem; font-weight: 700; }
+.hint-badge { font-size: 0.65rem; background: rgba(245,158,11,0.1); color: var(--orange); border: 1px solid rgba(245,158,11,0.2); border-radius: 4px; padding: 0.1rem 0.4rem; font-weight: 700; }
+
+input, textarea, select {
+  background: var(--s2); border: 1.5px solid rgba(255,255,255,0.07);
+  border-radius: 10px; color: var(--text); font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem; padding: 0.72rem 0.95rem; width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s; appearance: none;
+}
+input:focus, textarea:focus, select:focus {
+  outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,212,255,0.1);
+  background: rgba(0,212,255,0.03);
+}
+input::placeholder, textarea::placeholder { color: #2d4060; }
+textarea { resize: vertical; min-height: 100px; }
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2300d4ff'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 0.9rem center; padding-right: 2.5rem; cursor: pointer;
+}
+select option { background: #111827; }
+input.err, select.err { border-color: var(--red) !important; box-shadow: 0 0 0 3px rgba(239,68,68,0.1) !important; }
+.emsg { font-size: 0.74rem; color: var(--red); display: none; margin-top: 0.2rem; }
+.emsg.show { display: flex; align-items: center; gap: 0.3rem; }
+.emsg.show::before { content: '⚠'; font-size: 0.8rem; }
+input.valid { border-color: rgba(34,197,94,0.4); }
+
+/* MATERIAL GRID */
+.mat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.65rem; }
+@media (max-width: 500px) { .mat-grid { grid-template-columns: repeat(2, 1fr); } }
+.mat-card {
+  border: 1.5px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 1rem 0.6rem;
+  text-align: center; cursor: pointer; transition: all 0.2s; background: var(--s2); position: relative;
+}
+.mat-card:hover { border-color: rgba(0,212,255,0.35); transform: translateY(-2px); background: rgba(0,212,255,0.03); }
+.mat-card.on { border-color: var(--accent); background: rgba(0,212,255,0.08); }
+.mat-card.on::after { content: '✓'; position: absolute; top: 6px; right: 8px; font-size: 0.65rem; color: var(--accent); font-weight: 700; }
+.mat-icon { font-size: 1.5rem; margin-bottom: 0.4rem; display: block; }
+.mat-name { font-size: 0.78rem; font-weight: 700; }
+.mat-note { font-size: 0.65rem; color: var(--muted2); margin-top: 0.15rem; }
+.mat-factor { font-size: 0.62rem; color: var(--accent); margin-top: 0.2rem; font-weight: 600; opacity: 0.7; }
+
+/* SURFACE CARDS */
+.surf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.surf-card {
+  border: 1.5px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 1.1rem;
+  cursor: pointer; transition: all 0.2s; background: var(--s2); position: relative;
+}
+.surf-card:hover { border-color: rgba(0,212,255,0.3); transform: translateY(-2px); }
+.surf-card.on { border-color: var(--accent); background: rgba(0,212,255,0.07); }
+.surf-card.on::after { content: '✓'; position: absolute; top: 8px; right: 10px; font-size: 0.65rem; color: var(--accent); font-weight: 700; }
+.surf-icon { font-size: 1.4rem; margin-bottom: 0.4rem; }
+.surf-name { font-size: 0.88rem; font-weight: 700; }
+.surf-desc { font-size: 0.72rem; color: var(--muted2); margin-top: 0.2rem; }
+.surf-badge { font-size: 0.65rem; color: var(--accent); background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2); border-radius: 4px; padding: 0.1rem 0.4rem; margin-top: 0.4rem; display: inline-block; font-weight: 600; }
+
+/* SKALA EXTRA */
+.skala-toggle-btn {
+  display: flex; align-items: center; gap: 0.6rem; padding: 0.75rem 1rem;
+  border: 1.5px dashed rgba(0,212,255,0.2); border-radius: 10px; cursor: pointer;
+  font-size: 0.83rem; color: var(--muted2); transition: all 0.2s; background: rgba(0,212,255,0.02); margin-top: 0.75rem;
+}
+.skala-toggle-btn:hover { border-color: rgba(0,212,255,0.4); color: var(--text); }
+.skala-toggle-btn.on { border-color: var(--accent); border-style: solid; color: var(--accent); background: rgba(0,212,255,0.06); }
+.skala-toggle-icon { font-size: 1rem; }
+.skala-extra { margin-top: 0.85rem; padding: 1rem; background: rgba(0,212,255,0.03); border: 1px solid rgba(0,212,255,0.12); border-radius: 12px; display: none; }
+.skala-extra.show { display: block; animation: fadeIn 0.25s ease; }
+.skala-umfang-display { font-size: 0.8rem; color: var(--accent); font-weight: 600; margin-top: 0.5rem; background: rgba(0,212,255,0.06); border-radius: 8px; padding: 0.5rem 0.75rem; display: none; }
+.skala-umfang-display.show { display: block; }
+
+/* PILLS (content type) */
+.pill-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.pill {
+  display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.9rem;
+  border: 1.5px solid rgba(255,255,255,0.09); border-radius: 999px; background: var(--s2);
+  font-size: 0.82rem; font-weight: 500; color: var(--muted2); cursor: pointer;
+  transition: all 0.18s; user-select: none;
+}
+.pill:hover { border-color: rgba(0,212,255,0.3); color: var(--text); transform: translateY(-1px); }
+.pill.on { border-color: var(--accent); background: rgba(0,212,255,0.1); color: var(--text); }
+.pill .check { display: none; color: var(--accent); font-size: 0.7rem; }
+.pill.on .check { display: inline; }
+
+/* MARKING CARDS */
+.mark-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.65rem; }
+@media (max-width: 400px) { .mark-grid { grid-template-columns: 1fr; } }
+.mark-card {
+  border: 1.5px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 0.9rem;
+  cursor: pointer; transition: all 0.2s; background: var(--s2); position: relative;
+}
+.mark-card:hover { border-color: rgba(0,212,255,0.3); transform: translateY(-1px); }
+.mark-card.on { border-color: var(--accent); background: rgba(0,212,255,0.07); }
+.mark-card.on::after { content: '✓'; position: absolute; top: 7px; right: 9px; font-size: 0.65rem; color: var(--accent); font-weight: 700; }
+.mark-icon { font-size: 1.2rem; margin-bottom: 0.3rem; }
+.mark-name { font-size: 0.83rem; font-weight: 700; }
+.mark-desc { font-size: 0.7rem; color: var(--muted2); margin-top: 0.15rem; }
+
+/* URGENCY CARDS */
+.urg-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.65rem; }
+@media (max-width: 440px) { .urg-grid { grid-template-columns: 1fr; } }
+.urg-card {
+  border: 1.5px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 1rem 0.75rem;
+  cursor: pointer; transition: all 0.2s; background: var(--s2); text-align: center; position: relative;
+}
+.urg-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.15); }
+.urg-card.on { border-color: var(--accent); background: rgba(0,212,255,0.07); }
+.urg-card.on::after { content: '✓'; position: absolute; top: 6px; right: 8px; font-size: 0.65rem; color: var(--accent); font-weight: 700; }
+.urg-icon { font-size: 1.4rem; margin-bottom: 0.3rem; }
+.urg-name { font-size: 0.84rem; font-weight: 700; }
+.urg-days { font-size: 0.7rem; color: var(--muted2); margin-top: 0.15rem; }
+.urg-price { font-size: 0.72rem; margin-top: 0.3rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 6px; display: inline-block; }
+.urg-price.free { color: var(--green); background: rgba(34,197,94,0.08); }
+.urg-price.warn { color: var(--orange); background: rgba(245,158,11,0.08); }
+.urg-price.hot { color: var(--red); background: rgba(239,68,68,0.08); }
+
+/* UPLOAD */
+.upload-zone {
+  border: 2px dashed rgba(0,212,255,0.2); border-radius: 14px; padding: 1.5rem;
+  text-align: center; cursor: pointer; background: rgba(0,212,255,0.02); transition: all 0.2s; position: relative;
+}
+.upload-zone:hover, .upload-zone.drag { border-color: var(--accent); background: rgba(0,212,255,0.05); }
+.upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.upload-icon { font-size: 1.8rem; margin-bottom: 0.4rem; }
+.upload-text { font-size: 0.82rem; color: var(--muted2); line-height: 1.5; }
+.upload-text strong { color: var(--accent); }
+.file-chips { margin-top: 0.6rem; display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.file-chip { display: inline-flex; align-items: center; gap: 0.35rem; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.2); border-radius: 8px; padding: 0.25rem 0.6rem; font-size: 0.76rem; color: var(--accent); }
+.chip-x { cursor: pointer; color: var(--muted); transition: color 0.15s; margin-left: 0.1rem; }
+.chip-x:hover { color: var(--red); }
+
+/* STEP BUTTONS */
+.step-nav { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
+.btn-next {
+  flex: 1; background: var(--accent); color: #020617; border: none; border-radius: 12px;
+  padding: 0.95rem 1.5rem; font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700;
+  cursor: pointer; transition: all 0.25s; box-shadow: 0 6px 20px rgba(0,212,255,0.2);
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+}
+.btn-next:hover { background: #00c4ee; transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,212,255,0.3); }
+.btn-back {
+  background: var(--s2); color: var(--muted2); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 0.95rem 1.4rem; font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+}
+.btn-back:hover { background: var(--s3); color: var(--text); }
+.btn-submit {
+  flex: 1; background: linear-gradient(135deg, #00d4ff, #0099bb); color: #020617; border: none;
+  border-radius: 12px; padding: 1rem 1.5rem; font-family: 'Syne', sans-serif; font-size: 1rem;
+  font-weight: 700; cursor: pointer; transition: all 0.25s; box-shadow: 0 8px 24px rgba(0,212,255,0.25);
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+}
+.btn-submit:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(0,212,255,0.35); }
+.btn-submit:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+/* SUMMARY */
+.summary-section { margin-bottom: 1rem; }
+.summary-label { font-size: 0.72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+.summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.summary-item { background: var(--s2); border-radius: 10px; padding: 0.65rem 0.85rem; }
+.summary-item-label { font-size: 0.7rem; color: var(--muted2); margin-bottom: 0.15rem; }
+.summary-item-val { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+.summary-item-val.accent { color: var(--accent); }
+.summary-edit-btn { font-size: 0.72rem; color: var(--accent); background: none; border: none; cursor: pointer; padding: 0; text-decoration: underline; float: right; margin-top: -1.5rem; }
+
+/* SIDEBAR PRICE CALC */
+.sidebar { position: sticky; top: 1.5rem; }
+@media (max-width: 780px) { .sidebar { position: relative; top: 0; } }
+.calc-card { background: var(--s1); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
+.calc-header { background: linear-gradient(135deg, #0a1928, #0d2244); padding: 1.1rem 1.4rem; border-bottom: 1px solid var(--border); }
+.calc-title { font-family: 'Syne', sans-serif; font-size: 0.82rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; }
+.calc-subtitle { font-size: 0.72rem; color: var(--muted); margin-top: 0.1rem; }
+.calc-rows { padding: 1rem 1.4rem; }
+.calc-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 0.45rem 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.8rem; gap: 0.5rem; }
+.calc-row:last-child { border-bottom: none; }
+.calc-row-label { color: var(--muted); flex-shrink: 0; }
+.calc-row-val { font-weight: 600; text-align: right; max-width: 150px; font-size: 0.8rem; }
+.calc-row-val.green { color: var(--green); }
+.calc-row-val.orange { color: var(--orange); }
+.calc-total-section { padding: 1rem 1.4rem; background: rgba(0,212,255,0.04); border-top: 1px solid var(--border); }
+.calc-total-label { font-size: 0.7rem; color: var(--muted); margin-bottom: 0.2rem; }
+.calc-total-val { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--accent); line-height: 1; }
+.calc-total-sub { font-size: 0.7rem; color: var(--muted); margin-top: 0.3rem; line-height: 1.4; }
+.calc-disclaimer { padding: 0.65rem 1.4rem; font-size: 0.7rem; color: var(--muted); line-height: 1.5; border-top: 1px solid var(--border); }
+
+/* Competitor comparison box */
+.compare-box:empty { display: none; }
+.compare-box {
+  margin: 0.25rem 1.4rem 0.6rem;
+  padding: 0.7rem 0.85rem;
+  background: linear-gradient(135deg, rgba(34,197,94,0.08), rgba(0,212,255,0.05));
+  border: 1px solid rgba(34,197,94,0.25);
+  border-radius: 10px;
+  font-size: 0.75rem;
+}
+.compare-box .cmp-head { font-size: 0.68rem; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.25rem; font-weight: 600; }
+.compare-box .cmp-range { color: var(--text); font-weight: 600; }
+.compare-box .cmp-saving { color: #86efac; margin-top: 0.25rem; font-size: 0.78rem; }
+.compare-box .cmp-saving strong { color: var(--green); font-weight: 800; }
+.compare-box .cmp-note { color: var(--muted); font-size: 0.65rem; margin-top: 0.25rem; font-style: italic; }
+
+/* Save / Share actions */
+.calc-actions {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 0.4rem; padding: 0.6rem 1.4rem 0.85rem;
+}
+.calc-act-btn {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.55rem 0.3rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 0.15rem;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+.calc-act-btn:hover {
+  background: rgba(0,212,255,0.08);
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+.calc-act-btn span:first-child { font-size: 1.1rem; }
+
+/* Draft restore banner */
+.draft-banner {
+  display: none;
+  align-items: center; gap: 0.8rem;
+  padding: 0.7rem 1rem;
+  margin: 0 auto 1rem;
+  max-width: 1200px;
+  background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(245,158,11,0.04));
+  border: 1px solid rgba(245,158,11,0.3);
+  border-radius: 10px;
+  font-size: 0.85rem;
+  color: #fcd34d;
+}
+.draft-banner .db-icon { font-size: 1.2rem; }
+.draft-banner .db-msg { flex: 1; }
+.draft-banner .db-actions { display: flex; gap: 0.4rem; }
+.draft-banner button {
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid rgba(245,158,11,0.4);
+  background: rgba(245,158,11,0.15);
+  color: #fcd34d;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+.draft-banner button:hover { background: rgba(245,158,11,0.25); }
+.draft-banner button.primary { background: var(--orange); color: #1a1400; border-color: var(--orange); }
+.draft-banner button.primary:hover { background: #fb923c; }
+
+/* Quick-preset bar */
+.preset-bar {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  padding: 0.7rem 0;
+  margin-bottom: 0.5rem;
+}
+.preset-card {
+  flex: 1; min-width: 140px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.7rem 0.85rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+.preset-card:hover {
+  background: rgba(0,212,255,0.05);
+  border-color: rgba(0,212,255,0.35);
+  transform: translateY(-1px);
+}
+.preset-card .p-icon { font-size: 1.3rem; margin-bottom: 0.3rem; }
+.preset-card .p-name { font-weight: 700; font-size: 0.82rem; color: var(--text); }
+.preset-card .p-spec { color: var(--muted2); font-size: 0.68rem; margin-top: 0.15rem; line-height: 1.4; }
+.preset-card .p-price { color: var(--accent); font-weight: 700; font-size: 0.78rem; margin-top: 0.35rem; }
+
+/* Trust row */
+.trust-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.6rem;
+  margin: 1.2rem auto;
+  max-width: 1200px;
+}
+.trust-chip {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.75rem 0.8rem;
+  display: flex; align-items: center; gap: 0.55rem;
+  font-size: 0.78rem;
+  color: var(--text);
+}
+.trust-chip .t-icon {
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  background: rgba(0,212,255,0.1);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--accent); font-size: 1rem;
+  flex-shrink: 0;
+}
+.trust-chip .t-title { font-weight: 700; line-height: 1.2; }
+.trust-chip .t-sub { color: var(--muted2); font-size: 0.68rem; margin-top: 0.1rem; }
+
+/* Process flow */
+.process-flow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.7rem;
+  margin: 1.5rem auto;
+  max-width: 1200px;
+}
+.process-step {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: left;
+  position: relative;
+}
+.process-step .ps-num {
+  position: absolute; top: 10px; right: 12px;
+  font-size: 2rem; font-weight: 800;
+  color: rgba(0,212,255,0.12);
+  line-height: 1;
+}
+.process-step .ps-icon { font-size: 1.5rem; margin-bottom: 0.4rem; }
+.process-step .ps-title { font-weight: 700; font-size: 0.9rem; color: var(--text); }
+.process-step .ps-desc { color: var(--muted2); font-size: 0.74rem; line-height: 1.55; margin-top: 0.25rem; }
+
+/* FAQ */
+.faq-wrap {
+  max-width: 1200px; margin: 1.5rem auto;
+  display: flex; flex-direction: column; gap: 0.4rem;
+}
+.faq-item {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.faq-item summary {
+  list-style: none;
+  padding: 0.85rem 1.1rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text);
+  display: flex; justify-content: space-between; align-items: center;
+  user-select: none;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after {
+  content: '+';
+  color: var(--accent);
+  font-size: 1.3rem;
+  font-weight: 300;
+  transition: transform 0.2s ease;
+}
+.faq-item[open] summary::after { transform: rotate(45deg); }
+.faq-item[open] summary { border-bottom: 1px solid var(--border); }
+.faq-item .faq-body {
+  padding: 0.85rem 1.1rem 1rem;
+  color: var(--muted2);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+.faq-item .faq-body strong { color: var(--text); }
+
+/* Section divider/title */
+.section-title {
+  max-width: 1200px;
+  margin: 2rem auto 0.7rem;
+  padding-left: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+.section-title .sec-sub {
+  display: block;
+  font-weight: 400;
+  color: var(--muted2);
+  font-size: 0.82rem;
+  margin-top: 0.2rem;
+}
+
+.hint-box { background: rgba(34,197,94,0.05); border: 1px solid rgba(34,197,94,0.18); border-radius: 12px; padding: 0.85rem 1rem; margin-top: 1rem; font-size: 0.78rem; color: #86efac; line-height: 1.6; }
+.hint-box strong { color: var(--green); }
+
+/* STEP INDICATOR IN SIDEBAR */
+.step-indicator-mini { background: var(--s1); border: 1px solid var(--border); border-radius: 14px; padding: 1rem 1.2rem; margin-bottom: 1rem; }
+.sim-title { font-size: 0.7rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.65rem; }
+.sim-steps { display: flex; flex-direction: column; gap: 0.4rem; }
+.sim-step { display: flex; align-items: center; gap: 0.6rem; font-size: 0.78rem; color: var(--muted); transition: color 0.2s; }
+.sim-step.done { color: var(--muted2); }
+.sim-step.active { color: var(--text); font-weight: 600; }
+.sim-step-dot { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.1); background: var(--s2); display: flex; align-items: center; justify-content: center; font-size: 0.55rem; flex-shrink: 0; transition: all 0.3s; }
+.sim-step.done .sim-step-dot { background: var(--green); border-color: var(--green); color: #020617; font-size: 0.6rem; }
+.sim-step.active .sim-step-dot { background: rgba(0,212,255,0.15); border-color: var(--accent); color: var(--accent); font-size: 0.6rem; }
+
+/* HINT BOX */
+.hint-box { background: rgba(34,197,94,0.05); border: 1px solid rgba(34,197,94,0.18); border-radius: 12px; padding: 0.85rem 1rem; margin-top: 1rem; font-size: 0.78rem; color: #86efac; line-height: 1.6; }
+.hint-box strong { color: var(--green); }
+
+/* SUCCESS */
+.success-wrap { display: none; text-align: center; padding: 3rem 2rem; }
+.success-wrap.show { display: block; animation: fadeIn 0.5s ease; }
+.success-icon { width: 76px; height: 76px; border-radius: 50%; background: rgba(34,197,94,0.1); border: 2px solid var(--green); display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 1.5rem; animation: pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes pop { from { transform: scale(0.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.success-wrap h2 { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; margin-bottom: 0.75rem; }
+.success-sub { color: var(--muted2); line-height: 1.7; font-size: 0.95rem; }
+.success-back { display: inline-block; margin-top: 1.5rem; color: var(--accent); font-weight: 600; text-decoration: none; border: 1px solid rgba(0,212,255,0.3); border-radius: 10px; padding: 0.6rem 1.4rem; transition: all 0.2s; }
+.success-back:hover { background: rgba(0,212,255,0.07); }
+
+/* SPINNER */
+.spin { width: 18px; height: 18px; border: 2px solid rgba(2,6,23,0.3); border-top-color: #020617; border-radius: 50%; animation: rot 0.7s linear infinite; }
+@keyframes rot { to { transform: rotate(360deg); } }
+
+/* DISCOUNT INFO */
+.discount-info { background: rgba(34,197,94,0.05); border: 1px solid rgba(34,197,94,0.15); border-radius: 10px; padding: 0.65rem 0.85rem; font-size: 0.75rem; color: #86efac; margin-top: 0.5rem; }
+.discount-info span { color: var(--green); font-weight: 700; }
+
+/* TOOLTIP */
+.tooltip-wrap { position: relative; display: inline-flex; align-items: center; }
+.tooltip-icon { width: 15px; height: 15px; border-radius: 50%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; font-size: 0.6rem; color: var(--muted); cursor: help; }
+.tooltip-box { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: var(--s3); border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem 0.7rem; font-size: 0.72rem; color: var(--muted2); white-space: nowrap; z-index: 100; display: none; pointer-events: none; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+.tooltip-wrap:hover .tooltip-box { display: block; }
+
+/* QUANTITY INPUT SPECIAL */
+.qty-wrap { position: relative; }
+.qty-display { position: absolute; right: 0.9rem; top: 50%; transform: translateY(-50%); font-size: 0.7rem; color: var(--accent); font-weight: 700; pointer-events: none; }
+
+/* MOBILE ADJUSTMENTS */
+@media (max-width: 560px) {
+  .mat-grid { grid-template-columns: repeat(3, 1fr); }
+  .urg-grid { grid-template-columns: 1fr; }
+  .surf-grid { grid-template-columns: 1fr; }
+  .mark-grid { grid-template-columns: 1fr; }
+}
+
+/* SECTION DIVIDER */
+.divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(0,212,255,0.15), transparent); margin: 1.25rem 0; }
+
+/* COMPLETION PROGRESS inside form */
+.completion-bar { height: 3px; background: rgba(255,255,255,0.06); border-radius: 2px; margin-bottom: 1.5rem; overflow: hidden; }
+.completion-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #22c55e); border-radius: 2px; transition: width 0.4s ease; }
+</style>
+</head>
+<body>
+<div class="bg-mesh"></div>
+<div class="bg-grid"></div>
+
+<div class="page">
+
+<!-- HEADER -->
+<div class="header">
+  <a href="index.html" class="back-link">← Zurück zur Startseite</a>
+  <div class="logo-badge">⚡ Wolf Lasermark · Bruckmühl</div>
+  <h1>Gravur <span>bestellen</span></h1>
+  <p>Kostenlose, unverbindliche Gravur-Anfrage in 4 Schritten. Antwort in der Regel <strong style="color:var(--text)">innerhalb von 3 Stunden</strong>.</p>
+  <div class="trust-pills">
+    <span class="trust-pill"><span class="ic">✓</span> Kostenlos & unverbindlich</span>
+    <span class="trust-pill"><span class="ic">✓</span> Antwort ≤ 3h</span>
+    <span class="trust-pill"><span class="ic">✓</span> Keine Mindestmenge</span>
+    <span class="trust-pill"><span class="ic">✓</span> Einzelstücke & Serien</span>
+    <span class="trust-pill" style="background:rgba(34,197,94,0.12);border-color:rgba(34,197,94,0.3);color:#86efac"><span class="ic">€</span> ~15% günstiger als Branchenschnitt</span>
+  </div>
+</div>
+
+<!-- DRAFT RESTORE BANNER -->
+<div class="draft-banner" id="draftBanner">
+  <span class="db-icon">💾</span>
+  <div class="db-msg">
+    <strong>Gespeicherte Kalkulation gefunden.</strong> Möchten Sie Ihre letzten Eingaben wiederherstellen?
+  </div>
+  <div class="db-actions">
+    <button onclick="loadDraftFromStorage();document.getElementById('draftBanner').style.display='none'" class="primary">✓ Wiederherstellen</button>
+    <button onclick="clearDraft()">✕ Verwerfen</button>
+  </div>
+</div>
+
+<!-- QUICK PRESETS -->
+<div style="max-width:1200px;margin:0 auto 1rem;padding:0 0.5rem">
+  <div style="font-size:0.75rem;color:var(--muted2);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:0.5rem">⚡ Schnell­start — typische Aufträge</div>
+  <div class="preset-bar">
+    <div class="preset-card" onclick="applyPreset('typenschild')">
+      <div class="p-icon">🏷️</div>
+      <div class="p-name">Typenschild</div>
+      <div class="p-spec">80×30 mm · Edelstahl · CE + Seriennr.</div>
+      <div class="p-price">ab ca. 3,90 €/Stk</div>
+    </div>
+    <div class="preset-card" onclick="applyPreset('schild')">
+      <div class="p-icon">🪧</div>
+      <div class="p-name">Klein­schild</div>
+      <div class="p-spec">40×15 mm · Edelstahl · Nummer</div>
+      <div class="p-price">ab ca. 1,95 €/Stk</div>
+    </div>
+    <div class="preset-card" onclick="applyPreset('werkzeug')">
+      <div class="p-icon">🔧</div>
+      <div class="p-name">Werkzeug­kennzeichnung</div>
+      <div class="p-spec">25×8 mm · Metall · Code</div>
+      <div class="p-price">ab ca. 1,40 €/Stk</div>
+    </div>
+    <div class="preset-card" onclick="applyPreset('anhaenger')">
+      <div class="p-icon">🔑</div>
+      <div class="p-name">Schlüssel­anhänger</div>
+      <div class="p-spec">30 mm · Edelstahl · Text + Logo</div>
+      <div class="p-price">ab ca. 2,90 €/Stk</div>
+    </div>
+    <div class="preset-card" onclick="applyPreset('qr')">
+      <div class="p-icon">📱</div>
+      <div class="p-name">QR-Code auf Metall</div>
+      <div class="p-spec">15×15 mm · Aluminium</div>
+      <div class="p-price">ab ca. 1,25 €/Stk</div>
+    </div>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-wrap">
+  <div class="progress-steps" id="progressSteps">
+    <div class="progress-step active" data-step="1" onclick="jumpStep(1)">
+      <div class="step-dot">1</div>
+      <div class="step-label">Kontakt</div>
+    </div>
+    <div class="progress-step" data-step="2" onclick="jumpStep(2)">
+      <div class="step-dot">2</div>
+      <div class="step-label">Material</div>
+    </div>
+    <div class="progress-step" data-step="3" onclick="jumpStep(3)">
+      <div class="step-dot">3</div>
+      <div class="step-label">Gravur</div>
+    </div>
+    <div class="progress-step" data-step="4" onclick="jumpStep(4)">
+      <div class="step-dot">4</div>
+      <div class="step-label">Details</div>
+    </div>
+    <div class="progress-step" data-step="5" onclick="jumpStep(5)">
+      <div class="step-dot">5</div>
+      <div class="step-label">Abschicken</div>
+    </div>
+  </div>
+</div>
+
+<div class="main-layout" id="mainLayout">
+
+<!-- LEFT COLUMN: STEPS -->
+<div>
+
+<!-- ===================== STEP 1: KONTAKT ===================== -->
+<div class="step-panel active" id="step1">
+  <div class="card">
+    <div class="sec-head">
+      <div class="sec-icon">👤</div>
+      <div>
+        <div class="sec-title">Kontaktdaten</div>
+        <div class="sec-sub">Damit wir Sie schnell und direkt erreichen können</div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label>Name <span class="req-badge">PFLICHT</span></label>
+        <input type="text" id="name" placeholder="Max Mustermann" oninput="onFieldInput(this,'nameErr',v=>v.trim().length>1);calc()">
+        <span class="emsg" id="nameErr">Bitte Namen eingeben</span>
+      </div>
+      <div class="field">
+        <label>E-Mail <span class="req-badge">PFLICHT</span></label>
+        <input type="email" id="email" placeholder="max@firma.de" oninput="onFieldInput(this,'emailErr',v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v));calc()">
+        <span class="emsg" id="emailErr">Bitte gültige E-Mail eingeben</span>
+      </div>
+      <div class="field">
+        <label>Firma <span class="opt-badge">OPTIONAL</span> <span style="font-size:0.7rem;color:var(--muted);font-weight:400;">→ B2B-Preise</span></label>
+        <input type="text" id="firma" placeholder="Mustermann GmbH">
+      </div>
+      <div class="field">
+        <label>Telefon <span class="opt-badge">OPTIONAL</span></label>
+        <input type="text" id="telefon" placeholder="+49 123 456789">
+      </div>
+    </div>
+  </div>
+
+  <div class="step-nav">
+    <button class="btn-next" onclick="nextStep(1)">Weiter: Material auswählen →</button>
+  </div>
+</div>
+
+<!-- ===================== STEP 2: MATERIAL & OBERFLÄCHE ===================== -->
+<div class="step-panel" id="step2">
+  <div class="card">
+    <div class="sec-head">
+      <div class="sec-icon">🔩</div>
+      <div>
+        <div class="sec-title">Material <span style="color:var(--accent)">*</span></div>
+        <div class="sec-sub">Welches Material soll graviert werden?</div>
+      </div>
+    </div>
+    <div class="mat-grid">
+      <div class="mat-card" onclick="selMat(this,'Edelstahl',1.15)">
+        <span class="mat-icon">🔩</span>
+        <div class="mat-name">Edelstahl</div>
+        <div class="mat-note">Rostfrei, robust</div>
+        <div class="mat-factor">Standard</div>
+      </div>
+      <div class="mat-card" onclick="selMat(this,'Aluminium',1.0)">
+        <span class="mat-icon">🔲</span>
+        <div class="mat-name">Aluminium</div>
+        <div class="mat-note">Leicht, schnell</div>
+        <div class="mat-factor">Günstig</div>
+      </div>
+      <div class="mat-card" onclick="selMat(this,'Titan',1.35)">
+        <span class="mat-icon">⚙️</span>
+        <div class="mat-name">Titan</div>
+        <div class="mat-note">Extrem hart</div>
+        <div class="mat-factor">Premium</div>
+      </div>
+      <div class="mat-card" onclick="selMat(this,'Messing',1.15)">
+        <span class="mat-icon">🏅</span>
+        <div class="mat-name">Messing</div>
+        <div class="mat-note">Edel, klassisch</div>
+        <div class="mat-factor">Standard</div>
+      </div>
+      <div class="mat-card" onclick="selMat(this,'Leder',1.0)">
+        <span class="mat-icon">🟫</span>
+        <div class="mat-name">Leder</div>
+        <div class="mat-note">Weich, fein</div>
+        <div class="mat-factor">Günstig</div>
+      </div>
+      <div class="mat-card" onclick="selMat(this,'Kunststoff',1.0)">
+        <span class="mat-icon">🧱</span>
+        <div class="mat-name">Kunststoff</div>
+        <div class="mat-note">Vielseitig</div>
+        <div class="mat-factor">Günstig</div>
+      </div>
+      <div class="mat-card" onclick="selMat(this,'Sonstiges',1.1)">
+        <span class="mat-icon">❓</span>
+        <div class="mat-name">Sonstiges</div>
+        <div class="mat-note">Auf Anfrage</div>
+        <div class="mat-factor">Individuell</div>
+      </div>
+    </div>
+    <span class="emsg" id="matErr" style="margin-top:0.6rem;">Bitte Material auswählen</span>
+  </div>
+
+  <div class="card">
+    <div class="sec-head">
+      <div class="sec-icon">📐</div>
+      <div>
+        <div class="sec-title">Oberfläche <span style="color:var(--accent)">*</span></div>
+        <div class="sec-sub">Wie ist das Werkstück geformt?</div>
+      </div>
+    </div>
+    <div class="surf-grid">
+      <div class="surf-card" onclick="selSurf(this,'Ebene Fläche',1.0)">
+        <div class="surf-icon">▭</div>
+        <div class="surf-name">Ebene Fläche</div>
+        <div class="surf-desc">Platte, Schild, Blech, flache Oberflächen</div>
+        <div class="surf-badge">Standardpreis</div>
+      </div>
+      <div class="surf-card" onclick="selSurf(this,'Rotationskörper',1.25)">
+        <div class="surf-icon">🔵</div>
+        <div class="surf-name">Rotationskörper</div>
+        <div class="surf-desc">Zylinder, Ring, Welle, Rohr</div>
+        <div class="surf-badge">+25% für Drehachse</div>
+      </div>
+    </div>
+    <span class="emsg" id="surfErr" style="margin-top:0.5rem;">Bitte Oberfläche auswählen</span>
+
+    <!-- Skala Toggle (only visible when Rotationskörper selected) -->
+    <div id="skalaToggleWrap" style="display:none;">
+      <div class="divider"></div>
+      <div class="skala-toggle-btn" id="skalaToggleBtn" onclick="toggleSkala()">
+        <span class="skala-toggle-icon">📏</span>
+        <div>
+          <div style="font-weight:600;font-size:0.84rem;">Skalengravur hinzufügen?</div>
+          <div style="font-size:0.7rem;color:var(--muted);margin-top:0.1rem;">Teilstriche + Beschriftung auf dem Zylinder</div>
+        </div>
+        <div style="margin-left:auto;font-size:0.72rem;color:var(--accent);" id="skalaToggleStatus">Nein</div>
+      </div>
+      <div class="skala-extra" id="skalaExtra">
+        <div class="g2" style="gap:0.75rem;">
+          <div class="field">
+            <label>Durchmesser (mm) <span class="req-badge">PFLICHT</span></label>
+            <input type="number" id="durchmesser" placeholder="z.B. 50" min="1" oninput="calcSkala();calc();">
+          </div>
+          <div class="field">
+            <label>Skalenlänge (mm) <span class="opt-badge">OPTIONAL</span></label>
+            <input type="number" id="skalaLaenge" placeholder="z.B. 120" min="1" oninput="calc();">
+            <div style="font-size:0.67rem;color:var(--muted);margin-top:0.2rem;">Länge des zu gravierenden Bereichs</div>
+          </div>
+        </div>
+        <div class="skala-umfang-display" id="skalaUmfangDisplay"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sec-head">
+      <div class="sec-icon">📦</div>
+      <div>
+        <div class="sec-title">Menge & Abmessungen</div>
+        <div class="sec-sub">Stückzahl und Gravurbereich angeben</div>
+      </div>
+    </div>
+    <div class="g3">
+      <div class="field">
+        <label>Stückzahl <span class="req-badge">PFLICHT</span></label>
+        <div class="qty-wrap">
+          <input type="number" id="stueckzahl" placeholder="z.B. 50" min="1" oninput="onFieldInput(this,'stkErr',v=>parseInt(v)>0);calc();updateDiscountInfo();">
+          <span class="qty-display" id="qtyDiscount"></span>
+        </div>
+        <span class="emsg" id="stkErr">Bitte Stückzahl eingeben</span>
+      </div>
+      <div class="field">
+        <label>Gravurbreite (mm)
+          <div class="tooltip-wrap"><div class="tooltip-icon">?</div><div class="tooltip-box">Breite des Gravurbereichs auf dem Werkstück</div></div>
+        </label>
+        <input type="number" id="breite" placeholder="z.B. 80" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Gravurhöhe (mm)
+          <div class="tooltip-wrap"><div class="tooltip-icon">?</div><div class="tooltip-box">Höhe des Gravurbereichs auf dem Werkstück</div></div>
+        </label>
+        <input type="number" id="hoehe" placeholder="z.B. 30" oninput="calc()">
+      </div>
+    </div>
+    <div class="discount-info" id="discountInfo">
+      Mengenrabatt: <span>10+ Stk: −5%</span> · <span>50+: −10%</span> · <span>100+: −15%</span> · <span>250+: −20%</span> · <span>500+: −25%</span>
+    </div>
+  </div>
+
+  <div class="step-nav">
+    <button class="btn-back" onclick="goStep(1)">← Zurück</button>
+    <button class="btn-next" onclick="nextStep(2)">Weiter: Gravurinhalt →</button>
+  </div>
+</div>
+
+<!-- ===================== STEP 3: GRAVUR-INHALT & MARKIERUNG ===================== -->
+<div class="step-panel" id="step3">
+  <div class="card">
+    <div class="sec-head">
+      <div class="sec-icon">✏️</div>
+      <div>
+        <div class="sec-title">Gravur-Inhalt <span style="color:var(--accent)">*</span></div>
+        <div class="sec-sub">Was soll graviert werden? Mehrfachauswahl möglich</div>
+      </div>
+    </div>
+    <div class="pill-group" id="contentPills">
+      <div class="pill" data-val="Seriennummern" data-f="1.0" onclick="togglePill(this)"><span class="check">✓ </span>🔢 Seriennummern</div>
+      <div class="pill" data-val="Text / Schrift" data-f="1.0" onclick="togglePill(this)"><span class="check">✓ </span>📝 Text / Schrift</div>
+      <div class="pill" data-val="QR-Code / Barcode" data-f="1.1" onclick="togglePill(this)"><span class="check">✓ </span>📱 QR-Code / Barcode</div>
+      <div class="pill" data-val="DataMatrix-Code" data-f="1.1" onclick="togglePill(this)"><span class="check">✓ </span>⬛ DataMatrix-Code</div>
+      <div class="pill" data-val="CE-Kennzeichnung" data-f="1.05" onclick="togglePill(this)"><span class="check">✓ </span>🏷️ CE-Kennzeichnung</div>
+      <div class="pill" data-val="Firmenlogo" data-f="1.3" onclick="togglePill(this)"><span class="check">✓ </span>🏢 Firmenlogo</div>
+      <div class="pill" data-val="Motiv / Bild" data-f="1.3" onclick="togglePill(this)"><span class="check">✓ </span>🖼️ Motiv / Bild</div>
+      <div class="pill" data-val="Personalisierung (pro Stück individuell)" data-f="1.5" onclick="togglePill(this)"><span class="check">✓ </span>🎯 Individuell / Stück</div>
+    </div>
+    <span class="emsg" id="contentErr" style="margin-top:0.6rem;">Bitte mindestens einen Inhalt wählen</span>
+  </div>
+
+  <div class="card">
+    <div class="sec-head">
+      <div class="sec-icon">🎨</div>
+      <div>
+        <div class="sec-title">Markierungsart <span style="color:var(--accent)">*</span></div>
+        <div class="sec-sub">Wie soll die Gravur aussehen?</div>
+      </div>
+    </div>
+    <div class="mark-grid">
+      <div class="mark-card" onclick="selMark(this,'Standard',1.0)">
+        <div class="mark-icon">⬜</div>
+        <div class="mark-name">Standard</div>
+        <div class="mark-desc">Helle, saubere Liniengravur</div>
+      </div>
+      <div class="mark-card" onclick="selMark(this,'Schwarze Markierung',1.1)">
+        <div class="mark-icon">⬛</div>
+        <div class="mark-name">Schwarze Markierung</div>
+        <div class="mark-desc">Kontrastreiche dunkle Gravur</div>
+      </div>
+      <div class="mark-card" onclick="selMark(this,'Tiefgravur',1.2)">
+        <div class="mark-icon">🔲</div>
+        <div class="mark-name">Tiefgravur</div>
+        <div class="mark-desc">Tastbar, tiefer eingearbeitet</div>
+      </div>
+      <div class="mark-card" onclick="selMark(this,'Farbige Gravur',1.4)">
+        <div class="mark-icon">🌈</div>
+        <div class="mark-name">Farbige Gravur</div>
+        <div class="mark-desc">Mit Farbfüllung nach Wunsch</div>
+      </div>
+    </div>
+    <span class="emsg" id="markErr" style="margin-top:0.5rem;">Bitte eine Markierungsart wählen</span>
+  </div>
+
+  <div class="card">
+    <div class="sec-head">
+      <div class="sec-icon">✏️</div>
+      <div>
+        <div class="sec-title">Beschreibung / Gravurtext <span class="hint-badge">↑ SCHNELLER</span></div>
+        <div class="sec-sub">Was genau soll graviert werden?</div>
+      </div>
+    </div>
+    <div class="field">
+      <textarea id="beschreibung" placeholder="z.B. Gravurrahmen: 40×15 mm, Position: Unterseite rechts&#10;Text: 'SN-2024-001 bis SN-2024-100'&#10;Gravur soll ca. 80% des Rahmens ausfüllen&#10;&#10;💡 Tipp: Gravurrahmen-Größe + Position = schnellstes Angebot!"></textarea>
+    </div>
+
+
+  </div>
+
+  <div class="card">
+    <div class="sec-head">
+      <div class="sec-icon">📝</div>
+      <div>
+        <div class="sec-title">Notiz <span class="opt-badge">OPTIONAL</span></div>
+        <div class="sec-sub">Besondere Wünsche, Anmerkungen oder Rückfragen</div>
+      </div>
+    </div>
+    <div class="field">
+      <textarea id="notiz" placeholder="z.B. Bitte Muster vorab zusenden&#10;Verpackung einzeln gewünscht&#10;Rückfrage zur Schriftgröße…" style="min-height:90px;"></textarea>
+    </div>
+
+  </div>
+
+  <div class="step-nav">
+    <button class="btn-back" onclick="goStep(2)">← Zurück</button>
+    <button class="btn-next" onclick="nextStep(3)">Weiter: Termin & Details →</button>
+  </div>
+</div>
+
+<!-- ===================== STEP 4: DETAILS & TERMIN ===================== -->
+<div class="step-panel" id="step4">
+  <div class="card">
+    <div class="sec-head">
+      <div class="sec-icon">⚡</div>
+      <div>
+        <div class="sec-title">Dringlichkeit <span style="color:var(--accent)">*</span></div>
+        <div class="sec-sub">Wann brauchen Sie die Gravur?</div>
+      </div>
+    </div>
+    <div class="urg-grid">
+      <div class="urg-card" onclick="selUrg(this,'Standard (5–10 Werktage)',0)">
+        <div class="urg-icon">🕐</div>
+        <div class="urg-name">Standard</div>
+        <div class="urg-days">5–10 Werktage</div>
+        <div class="urg-price free">Basispreis</div>
+      </div>
+      <div class="urg-card" onclick="selUrg(this,'Schnell (3–5 Werktage)',0.15)">
+        <div class="urg-icon">⚡</div>
+        <div class="urg-name">Schnell</div>
+        <div class="urg-days">3–5 Werktage</div>
+        <div class="urg-price warn">+15% Aufpreis</div>
+      </div>
+      <div class="urg-card" onclick="selUrg(this,'Express (1–2 Werktage)',0.30)">
+        <div class="urg-icon">🔥</div>
+        <div class="urg-name">Express</div>
+        <div class="urg-days">1–2 Werktage</div>
+        <div class="urg-price hot">+30% Aufpreis</div>
+      </div>
+    </div>
+    <span class="emsg" id="urgErr" style="margin-top:0.5rem;">Bitte Dringlichkeit auswählen</span>
+  </div>
+
+  <div class="card">
+    <div class="sec-head">
+      <div class="sec-icon">📋</div>
+      <div>
+        <div class="sec-title">Wunschtermin <span class="opt-badge">OPTIONAL</span></div>
+        <div class="sec-sub">Haben Sie einen bestimmten Liefertermin?</div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="field">
+        <label>Gewünschter Termin</label>
+        <input type="date" id="termin">
+      </div>
+    </div>
+  </div>
+
+  <div class="step-nav">
+    <button class="btn-back" onclick="goStep(3)">← Zurück</button>
+    <button class="btn-next" onclick="nextStep(4)">Weiter: Zusammenfassung →</button>
+  </div>
+</div>
+
+<!-- ===================== STEP 5: SUMMARY & SUBMIT ===================== -->
+<div class="step-panel" id="step5">
+  <div class="card">
+    <div class="sec-head">
+      <div class="sec-icon">✅</div>
+      <div>
+        <div class="sec-title">Zusammenfassung</div>
+        <div class="sec-sub">Bitte prüfen Sie Ihre Angaben</div>
+      </div>
+    </div>
+
+    <div class="summary-section">
+      <div class="summary-label">👤 Kontakt <button class="summary-edit-btn" onclick="goStep(1)">✏️ bearbeiten</button></div>
+      <div class="summary-grid">
+        <div class="summary-item"><div class="summary-item-label">Name</div><div class="summary-item-val" id="sumName">–</div></div>
+        <div class="summary-item"><div class="summary-item-label">E-Mail</div><div class="summary-item-val" id="sumEmail">–</div></div>
+        <div class="summary-item"><div class="summary-item-label">Firma</div><div class="summary-item-val" id="sumFirma">–</div></div>
+        <div class="summary-item"><div class="summary-item-label">Telefon</div><div class="summary-item-val" id="sumTel">–</div></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="summary-section">
+      <div class="summary-label">🔩 Material & Auftrag <button class="summary-edit-btn" onclick="goStep(2)">✏️ bearbeiten</button></div>
+      <div class="summary-grid">
+        <div class="summary-item"><div class="summary-item-label">Material</div><div class="summary-item-val accent" id="sumMat">–</div></div>
+        <div class="summary-item"><div class="summary-item-label">Oberfläche</div><div class="summary-item-val" id="sumSurf">–</div></div>
+        <div class="summary-item"><div class="summary-item-label">Stückzahl</div><div class="summary-item-val accent" id="sumStk">–</div></div>
+        <div class="summary-item"><div class="summary-item-label">Gravurfläche</div><div class="summary-item-val" id="sumArea">–</div></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="summary-section">
+      <div class="summary-label">✏️ Gravur <button class="summary-edit-btn" onclick="goStep(3)">✏️ bearbeiten</button></div>
+      <div class="summary-grid">
+        <div class="summary-item"><div class="summary-item-label">Inhalt</div><div class="summary-item-val" id="sumContent">–</div></div>
+        <div class="summary-item"><div class="summary-item-label">Markierungsart</div><div class="summary-item-val" id="sumMark">–</div></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="summary-section">
+      <div class="summary-label">⏱ Termin <button class="summary-edit-btn" onclick="goStep(4)">✏️ bearbeiten</button></div>
+      <div class="summary-grid">
+        <div class="summary-item"><div class="summary-item-label">Dringlichkeit</div><div class="summary-item-val accent" id="sumUrg">–</div></div>
+        <div class="summary-item"><div class="summary-item-label">Wunschtermin</div><div class="summary-item-val" id="sumTermin">nicht angegeben</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-nav">
+    <button class="btn-back" onclick="goStep(4)">← Zurück</button>
+    <button class="btn-submit" id="submitBtn" onclick="submitForm()">
+      <span id="btnText">📩 Gravur-Anfrage kostenlos & unverbindlich absenden</span>
+    </button>
+  </div>
+  <p style="text-align:center;font-size:0.75rem;color:var(--muted);margin-top:0.6rem;">✓ Keine Kaufpflicht &nbsp;·&nbsp; ✓ Keine Vorauszahlung &nbsp;·&nbsp; ✓ Antwort ≤ 3h werktags</p>
+</div>
+
+</div><!-- end steps column -->
+
+<!-- ===================== RIGHT SIDEBAR ===================== -->
+<div class="sidebar">
+
+  <!-- Mini step overview -->
+  <div class="step-indicator-mini" id="sidebarStepIndicator">
+    <div class="sim-title">Fortschritt</div>
+    <div class="sim-steps">
+      <div class="sim-step active" id="sim1"><div class="sim-step-dot">1</div>Kontakt</div>
+      <div class="sim-step" id="sim2"><div class="sim-step-dot">2</div>Material & Menge</div>
+      <div class="sim-step" id="sim3"><div class="sim-step-dot">3</div>Gravur-Inhalt</div>
+      <div class="sim-step" id="sim4"><div class="sim-step-dot">4</div>Details & Termin</div>
+      <div class="sim-step" id="sim5"><div class="sim-step-dot">5</div>Zusammenfassung</div>
+    </div>
+  </div>
+
+  <!-- Price Calculator -->
+  <div class="calc-card">
+    <div class="calc-header">
+      <div class="calc-title">💰 Preisschätzung</div>
+      <div class="calc-subtitle">Live · aktualisiert sich automatisch</div>
+    </div>
+    <div class="calc-rows">
+      <div class="calc-row"><span class="calc-row-label">Material</span><span class="calc-row-val" id="cMat">–</span></div>
+      <div class="calc-row"><span class="calc-row-label">Oberfläche</span><span class="calc-row-val" id="cSurf">–</span></div>
+      <div class="calc-row" id="cDiamRow" style="display:none;"><span class="calc-row-label">Durchmesser</span><span class="calc-row-val" id="cDiam">–</span></div>
+      <div class="calc-row" id="cUmfangRow" style="display:none;"><span class="calc-row-label">Umfang</span><span class="calc-row-val" id="cUmfang" style="color:var(--accent);">–</span></div>
+      <div class="calc-row"><span class="calc-row-label">Stückzahl</span><span class="calc-row-val" id="cStk">–</span></div>
+      <div class="calc-row"><span class="calc-row-label">Inhalt</span><span class="calc-row-val" id="cContent" style="max-width:140px;word-break:break-word;font-size:0.72rem;">–</span></div>
+      <div class="calc-row"><span class="calc-row-label">Markierung</span><span class="calc-row-val" id="cMark">–</span></div>
+      <div class="calc-row"><span class="calc-row-label">Gravurfläche</span><span class="calc-row-val" id="cArea">–</span></div>
+      <span id="cContentFee" style="display:none;">–</span>
+      <div class="calc-row"><span class="calc-row-label">Preis / Stück</span><span class="calc-row-val" id="cPPS">–</span></div>
+      <div class="calc-row"><span class="calc-row-label">Einrichtung &amp; Datencheck</span><span class="calc-row-val" id="cSetup">–</span></div>
+      <div class="calc-row"><span class="calc-row-label">Dringlichkeit</span><span class="calc-row-val orange" id="cUrg">–</span></div>
+      <div class="calc-row"><span class="calc-row-label">Mengenrabatt</span><span class="calc-row-val green" id="cDisc">–</span></div>
+    </div>
+    <div class="calc-total-section">
+      <div class="calc-total-label">Ihr Preis (Endpreis)</div>
+      <div class="calc-total-val" id="cTotal">–</div>
+      <div class="calc-total-sub" id="cSub">Alle Pflichtfelder ausfüllen für Schätzung</div>
+    </div>
+
+    <!-- Competitor comparison — only renders when calc is complete -->
+    <div id="cCompare" class="compare-box"></div>
+
+    <!-- Save / Share buttons -->
+    <div class="calc-actions">
+      <button class="calc-act-btn" onclick="downloadQuotePdf()" title="Als PDF drucken oder speichern">
+        <span>📄</span><span>PDF</span>
+      </button>
+      <button class="calc-act-btn" onclick="shareQuoteByEmail()" title="An meine eigene E-Mail senden">
+        <span>✉️</span><span>E-Mail</span>
+      </button>
+      <button class="calc-act-btn" onclick="downloadQuoteJson()" title="JSON-Datei (für spätere Wiederverwendung)">
+        <span>💾</span><span>JSON</span>
+      </button>
+    </div>
+
+    <div class="calc-disclaimer">* Richtwert. Tatsächlicher Preis im individuellen Angebot.<br>Endpreise gemäß §19 UStG — keine MwSt. ausgewiesen.<br>Unverbindliche Anfrage — keine Kaufpflicht.<br><span id="draftStatus" style="color:var(--green);opacity:0.5;font-size:10px;transition:opacity 0.5s"></span></div>
+  </div>
+
+  <div class="hint-box">
+    <strong>Antwort in ≤ 3 Stunden</strong> 🚀<br>
+    Persönliche Prüfung + maßgeschneidertes Angebot.<br>Teststück auf Wunsch möglich.
+  </div>
+</div>
+
+</div><!-- end main-layout -->
+
+<!-- TRUST ROW -->
+<div class="section-title">✅ Warum Wolf Lasermark
+  <span class="sec-sub">Industriequalität aus Bayern · persönlicher Kontakt · faire Preise</span>
+</div>
+<div class="trust-row">
+  <div class="trust-chip">
+    <div class="t-icon">⚡</div>
+    <div>
+      <div class="t-title">100 W MOPA Faserlaser</div>
+      <div class="t-sub">Industriestandard für Metalle</div>
+    </div>
+  </div>
+  <div class="trust-chip">
+    <div class="t-icon">🎯</div>
+    <div>
+      <div class="t-title">Maßanfertigung</div>
+      <div class="t-sub">3D-Vorrichtungen inklusive</div>
+    </div>
+  </div>
+  <div class="trust-chip">
+    <div class="t-icon">⏱️</div>
+    <div>
+      <div class="t-title">Antwort ≤ 3 h</div>
+      <div class="t-sub">Persönlich, kein Callcenter</div>
+    </div>
+  </div>
+  <div class="trust-chip">
+    <div class="t-icon">🧪</div>
+    <div>
+      <div class="t-title">Muster vorab</div>
+      <div class="t-sub">Freigabe bevor Sie zahlen</div>
+    </div>
+  </div>
+  <div class="trust-chip">
+    <div class="t-icon">🤝</div>
+    <div>
+      <div class="t-title">Abholung / Übergabe</div>
+      <div class="t-sub">Werkstatt Bruckmühl oder persönlich</div>
+    </div>
+  </div>
+  <div class="trust-chip">
+    <div class="t-icon">🔄</div>
+    <div>
+      <div class="t-title">Nach­bestellung</div>
+      <div class="t-sub">Ihre Daten bleiben gespeichert</div>
+    </div>
+  </div>
+  <div class="trust-chip">
+    <div class="t-icon">🧾</div>
+    <div>
+      <div class="t-title">§19 UStG</div>
+      <div class="t-sub">Keine MwSt. — Endpreis</div>
+    </div>
+  </div>
+  <div class="trust-chip">
+    <div class="t-icon">🇩🇪</div>
+    <div>
+      <div class="t-title">Made in Bayern</div>
+      <div class="t-sub">Bruckmühl · Rosenheim</div>
+    </div>
+  </div>
+</div>
+
+<!-- PROCESS FLOW -->
+<div class="section-title">📋 So läuft es ab
+  <span class="sec-sub">Transparent von der Anfrage bis zur Übergabe</span>
+</div>
+<div class="process-flow">
+  <div class="process-step">
+    <div class="ps-num">1</div>
+    <div class="ps-icon">📝</div>
+    <div class="ps-title">Anfrage absenden</div>
+    <div class="ps-desc">Füllen Sie dieses Formular aus — dauert 2–3 Minuten. Sie sehen den Preis live.</div>
+  </div>
+  <div class="process-step">
+    <div class="ps-num">2</div>
+    <div class="ps-icon">💬</div>
+    <div class="ps-title">Persönliche Antwort</div>
+    <div class="ps-desc">Innerhalb von 3 Std. werktags: verbindliches Angebot + technische Rückfragen.</div>
+  </div>
+  <div class="process-step">
+    <div class="ps-num">3</div>
+    <div class="ps-icon">🧪</div>
+    <div class="ps-title">Muster / Proof</div>
+    <div class="ps-desc">Auf Wunsch ein Muster vorab — Sie sehen das Ergebnis, bevor wir produzieren.</div>
+  </div>
+  <div class="process-step">
+    <div class="ps-num">4</div>
+    <div class="ps-icon">🎯</div>
+    <div class="ps-title">Produktion</div>
+    <div class="ps-desc">Lasergravur mit 100 W MOPA · optional 3D-Vorrichtung für präzise Positionierung.</div>
+  </div>
+  <div class="process-step">
+    <div class="ps-num">5</div>
+    <div class="ps-icon">🤝</div>
+    <div class="ps-title">Übergabe / Abholung</div>
+    <div class="ps-desc">Abholung in der Werkstatt in Bruckmühl oder persönliche Übergabe nach Absprache.</div>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div class="section-title">❓ Häufige Fragen
+  <span class="sec-sub">Keine Antwort hier? Schreiben Sie uns direkt</span>
+</div>
+<div class="faq-wrap">
+  <details class="faq-item">
+    <summary>Was ist die Mindest­bestellmenge?</summary>
+    <div class="faq-body">
+      Wir haben <strong>keine Mindest­bestellmenge</strong>. Ab 1 Stück graviert. Bei Einzel­stücken ist eine Einrichtung / Datenprüfung ab <strong>15 €</strong> im Richtpreis enthalten — je nach Inhalt (z. B. Logo, QR-Code, Seriennummer) kommt ein kleiner Datenaufbereitungs-Anteil dazu. Bei Serien verteilt sich dieser Betrag über alle Teile und wird kaum spürbar. Ab 10 Stück bekommen Sie <strong>5 % Mengenrabatt</strong>, ab 500 Stück <strong>bis zu 25 %</strong>.
+    </div>
+  </details>
+  <details class="faq-item">
+    <summary>Wie sauber / dauerhaft ist die Laser­gravur?</summary>
+    <div class="faq-body">
+      Wir nutzen einen <strong>100 W MOPA Faserlaser</strong> (JPT) — Industrie­standard für Metalle. Die Gravur ist <strong>dauerhaft, abriebfest und UV-beständig</strong>. Auf Edelstahl erzeugen wir schwarze Anlass­beschriftungen, die die Ober­fläche glatt lassen (ideal für Hygiene- und Medizin­technik). Tief­gravur ist ebenfalls möglich.
+    </div>
+  </details>
+  <details class="faq-item">
+    <summary>Welche Materialien werden graviert?</summary>
+    <div class="faq-body">
+      <strong>Edelstahl</strong> (V2A, V4A), <strong>Aluminium</strong> (blank oder eloxiert), <strong>Messing, Kupfer, Titan</strong>, eloxierte und beschichtete Metalle, <strong>Kunststoffe</strong> (ABS, POM, PMMA), <strong>Leder</strong>. Für Glas und Holz verfügen wir nicht über die Maschine — dafür empfehlen wir gerne andere Anbieter.
+    </div>
+  </details>
+  <details class="faq-item">
+    <summary>Kann ich mein eigenes Logo / eine Datei schicken?</summary>
+    <div class="faq-body">
+      Ja, gerne. <strong>Bevorzugt Vektordaten</strong> (SVG, AI, PDF, DXF). Pixelbilder (PNG, JPG) funktionieren auch ab ausreichender Auflösung (≥ 300 dpi). Wenn Sie keine Vorlage haben, erstellen wir diese nach Ihren Angaben — kostenlos bis 15 Minuten Aufwand.
+    </div>
+  </details>
+  <details class="faq-item">
+    <summary>Warum sind Sie günstiger als andere Anbieter?</summary>
+    <div class="faq-body">
+      Wir sind ein <strong>Einzel­betrieb</strong> in Bruckmühl — <strong>kein Call­center, keine Vertriebs­kette, keine Zwischen­händler</strong>. Außerdem arbeiten wir nach §19 UStG (Klein­unternehmer­regelung) — unsere Preise sind <strong>End­preise ohne MwSt.</strong>, während andere Anbieter zusätzlich 19 % MwSt. aufschlagen. Für Privat­kunden und Klein­gewerbe ohne Vor­steuer­abzug ist das ein <strong>erheblicher Vorteil</strong>.
+    </div>
+  </details>
+  <details class="faq-item">
+    <summary>Wie lange dauert die Fertigstellung?</summary>
+    <div class="faq-body">
+      <strong>Standard: 5–10 Werktage</strong> nach Auftrags­bestätigung bis zur Fertigstellung.<br>
+      <strong>Schnell (+15 %): 3–5 Werktage</strong> für geplante Aufträge.<br>
+      <strong>Express (+30 %): 1–2 Werktage</strong> für echte Eil­aufträge — Abholung in der Werkstatt oder persönliche Übergabe nach Absprache.
+    </div>
+  </details>
+  <details class="faq-item">
+    <summary>Ist die Kalkulation verbindlich?</summary>
+    <div class="faq-body">
+      Nein, die Live-Kalkulation ist ein <strong>unverbindlicher Richtwert</strong> — basiert auf durchschnittlicher Laser­zeit pro cm² Gravur­fläche. Das endgültige Angebot bekommen Sie nach persönlicher Prüfung Ihrer Vorgaben per E-Mail. In 95 % der Fälle bleibt der Preis innerhalb ±5 % der Schätzung. Bei komplexen Logos oder Sonder­wünschen kann die Abweichung größer sein — wir informieren Sie transparent darüber.
+    </div>
+  </details>
+  <details class="faq-item">
+    <summary>Kann ich meine Kalkulation speichern oder teilen?</summary>
+    <div class="faq-body">
+      Ja. Unter dem Preis in der Seitenleiste finden Sie drei Buttons:<br>
+      <strong>📄 PDF</strong> — druckt oder speichert Ihre Kalkulation als PDF (für Firmen­intern­aufträge, Einkaufsabteilung etc.)<br>
+      <strong>✉️ E-Mail</strong> — sendet die Kalkulation an Ihre eigene E-Mail­adresse<br>
+      <strong>💾 JSON</strong> — exportiert die Daten als JSON-Datei für spätere Wieder­verwendung<br><br>
+      Außerdem wird Ihre Eingabe automatisch <strong>im Browser lokal gespeichert</strong>, auch wenn Sie das Fenster schließen.
+    </div>
+  </details>
+  <details class="faq-item">
+    <summary>Was passiert mit meinen Daten?</summary>
+    <div class="faq-body">
+      Ihre Daten gehen direkt an <code>info@wolf-lasermark.de</code> — <strong>keine Weitergabe an Dritte</strong>, kein CRM, kein Tracking. Die lokale Browser-Speicherung bleibt ausschließlich auf Ihrem Gerät. Löschen können Sie sie jederzeit über den Button „Verwerfen" oder im Browser-Speicher.
+    </div>
+  </details>
+</div>
+
+<!-- SUCCESS SCREEN -->
+<div class="card success-wrap" id="successScreen">
+  <div class="success-icon">✓</div>
+  <h2>Anfrage gesendet! 🎉</h2>
+  <p class="success-sub">
+    Danke, <strong id="successName" style="color:var(--text)"></strong>!<br>
+    Wir melden uns <strong style="color:var(--text)">innerhalb von 3 Stunden</strong> (werktags) mit einem unverbindlichen Angebot.<br><br>
+    <span style="font-size:0.82rem;color:var(--muted);">Wolf Lasermark · Bruckmühl bei Rosenheim</span>
+  </p>
+  <a href="index.html" class="success-back">← Zurück zur Startseite</a>
+</div>
+
+</div><!-- end page -->
+
+<script>
+// ===== STATE =====
+let currentStep = 1;
+let matName = null, matF = 1;
+let surfName = null, surfF = 1;
+let urgSurcharge = 0, urgName = 'Standard (5–10 Werktage)';
+let isSkala = false;
+const uploadedFiles = [];
+
+// ===== NAVIGATION =====
+function goStep(n) {
+  document.getElementById('step' + currentStep).classList.remove('active');
+  currentStep = n;
+  document.getElementById('step' + n).classList.add('active');
+  updateProgress();
+  if (n === 5) fillSummary();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function nextStep(fromStep) {
+  if (!validateStep(fromStep)) return;
+  goStep(fromStep + 1);
+}
+
+function jumpStep(n) {
+  if (n < currentStep) goStep(n);
+}
+
+function updateProgress() {
+  const steps = document.querySelectorAll('.progress-step');
+  steps.forEach((el, i) => {
+    const s = i + 1;
+    el.classList.remove('active', 'done');
+    if (s < currentStep) el.classList.add('done');
+    if (s === currentStep) el.classList.add('active');
+    // Update dot content
+    const dot = el.querySelector('.step-dot');
+    dot.textContent = s < currentStep ? '✓' : s;
+  });
+
+  // Update sidebar mini steps
+  for (let i = 1; i <= 5; i++) {
+    const el = document.getElementById('sim' + i);
+    el.classList.remove('active', 'done');
+    const dot = el.querySelector('.sim-step-dot');
+    if (i < currentStep) { el.classList.add('done'); dot.textContent = '✓'; }
+    else if (i === currentStep) { el.classList.add('active'); dot.textContent = i; }
+    else { dot.textContent = i; }
+  }
+}
+
+// ===== VALIDATION PER STEP =====
+function validateStep(step) {
+  let ok = true;
+
+  if (step === 1) {
+    const checks = [
+      { id: 'name', eid: 'nameErr', fn: v => v.trim().length > 1 },
+      { id: 'email', eid: 'emailErr', fn: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) },
+    ];
+    checks.forEach(({ id, eid, fn }) => {
+      const el = document.getElementById(id);
+      const err = document.getElementById(eid);
+      if (!fn(el.value)) { el.classList.add('err'); err.classList.add('show'); ok = false; }
+      else { el.classList.remove('err'); err.classList.remove('show'); }
+    });
+  }
+
+  if (step === 2) {
+    if (!matName) { document.getElementById('matErr').classList.add('show'); ok = false; }
+    else document.getElementById('matErr').classList.remove('show');
+
+    if (!surfName) { document.getElementById('surfErr').classList.add('show'); ok = false; }
+    else document.getElementById('surfErr').classList.remove('show');
+
+    const stkEl = document.getElementById('stueckzahl');
+    const stkErr = document.getElementById('stkErr');
+    if (!parseInt(stkEl.value) > 0 || !stkEl.value) { stkEl.classList.add('err'); stkErr.classList.add('show'); ok = false; }
+    else { stkEl.classList.remove('err'); stkErr.classList.remove('show'); }
+  }
+
+  if (step === 3) {
+    if (!activeContentPills().length) { document.getElementById('contentErr').classList.add('show'); ok = false; }
+    else document.getElementById('contentErr').classList.remove('show');
+
+    if (!activeMarkPill()) { document.getElementById('markErr').classList.add('show'); ok = false; }
+    else document.getElementById('markErr').classList.remove('show');
+  }
+
+  if (step === 4) {
+    // Standard ist bereits vorausgewählt. Der Kunde kann in Schritt 4 nur noch
+    // auf Schnell/Express wechseln, wenn er möchte.
+    if (urgSurcharge === null) {
+      urgSurcharge = 0;
+      urgName = 'Standard (5–10 Werktage)';
+    }
+    const defaultUrgCard = document.querySelector('.urg-card');
+    if (defaultUrgCard && !document.querySelector('.urg-card.on')) {
+      defaultUrgCard.classList.add('on');
+    }
+    document.getElementById('urgErr').classList.remove('show');
+  }
+
+  if (!ok) {
+    const firstErr = document.querySelector('.err, .emsg.show');
+    if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  return ok;
+}
+
+// ===== FIELD INPUT HELPER =====
+function onFieldInput(el, errId, fn) {
+  const err = document.getElementById(errId);
+  if (fn(el.value)) { el.classList.remove('err'); el.classList.add('valid'); err.classList.remove('show'); }
+  else { el.classList.remove('valid'); }
+}
+
+// ===== MATERIAL =====
+function selMat(el, name, factor) {
+  document.querySelectorAll('.mat-card').forEach(m => m.classList.remove('on'));
+  el.classList.add('on');
+  matName = name; matF = factor;
+  document.getElementById('matErr').classList.remove('show');
+  calc();
+}
+
+// ===== SURFACE =====
+function selSurf(el, name, factor) {
+  document.querySelectorAll('.surf-card').forEach(u => u.classList.remove('on'));
+  el.classList.add('on');
+  surfName = name; surfF = factor;
+  document.getElementById('surfErr').classList.remove('show');
+
+  const wrap = document.getElementById('skalaToggleWrap');
+  if (name === 'Rotationskörper') {
+    wrap.style.display = 'block';
+    setTimeout(() => wrap.style.opacity = '1', 10);
+  } else {
+    wrap.style.display = 'none';
+    resetSkala();
+  }
+  calc();
+}
+
+function resetSkala() {
+  isSkala = false;
+  const btn = document.getElementById('skalaToggleBtn');
+  const extra = document.getElementById('skalaExtra');
+  btn.classList.remove('on');
+  document.getElementById('skalaToggleStatus').textContent = 'Nein';
+  extra.classList.remove('show');
+  document.getElementById('cDiamRow').style.display = 'none';
+  document.getElementById('cUmfangRow').style.display = 'none';
+}
+
+function toggleSkala() {
+  const btn = document.getElementById('skalaToggleBtn');
+  const extra = document.getElementById('skalaExtra');
+  isSkala = !btn.classList.contains('on');
+  btn.classList.toggle('on', isSkala);
+  document.getElementById('skalaToggleStatus').textContent = isSkala ? 'Ja ✓' : 'Nein';
+  extra.classList.toggle('show', isSkala);
+
+  if (isSkala) { surfName = 'Skalengravur (Zylinder)'; surfF = 1.6; }
+  else { surfName = 'Rotationskörper'; surfF = 1.25; }
+
+  document.getElementById('cDiamRow').style.display = isSkala ? 'flex' : 'none';
+  document.getElementById('cUmfangRow').style.display = isSkala ? 'flex' : 'none';
+  calc();
+}
+
+function calcSkala() {
+  const d = parseFloat(document.getElementById('durchmesser').value) || 0;
+  const el = document.getElementById('skalaUmfangDisplay');
+  const cUmfang = document.getElementById('cUmfang');
+  if (d > 0) {
+    const u = (Math.PI * d).toFixed(1);
+    el.textContent = '→ Umfang: ' + u + ' mm  (π × ' + d + ' mm)';
+    el.classList.add('show');
+    cUmfang.textContent = u + ' mm';
+  } else {
+    el.classList.remove('show');
+    cUmfang.textContent = '–';
+  }
+}
+
+// ===== CONTENT PILLS (Multi) =====
+function togglePill(el) {
+  el.classList.toggle('on');
+  if (activeContentPills().length) document.getElementById('contentErr').classList.remove('show');
+  calc();
+}
+function activeContentPills() { return [...document.querySelectorAll('#contentPills .pill.on')]; }
+function maxContentF() { const p = activeContentPills(); return p.length ? Math.max(...p.map(x => parseFloat(x.dataset.f))) : 1; }
+
+// ===== MARKING (Single) =====
+function selMark(el, name, factor) {
+  document.querySelectorAll('.mark-card').forEach(m => m.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('markErr').classList.remove('show');
+  calc();
+}
+function activeMarkPill() { return document.querySelector('.mark-card.on'); }
+function markF() { const p = activeMarkPill(); return p ? parseFloat(p.dataset.f || 1) : 1; }
+
+// Manually assign data-f values
+document.addEventListener('DOMContentLoaded', () => {
+  const markFs = [1.0, 1.1, 1.2, 1.4];
+  document.querySelectorAll('.mark-card').forEach((el, i) => el.dataset.f = markFs[i]);
+
+  // Standard-Dringlichkeit ist vorausgewählt, damit die Preisschätzung
+  // bereits im Schritt \"Gravur\" erscheint, sobald Material, Menge, Inhalt
+  // und Markierungsart vollständig gewählt sind.
+  const defaultUrgCard = document.querySelector('.urg-card');
+  if (defaultUrgCard && !document.querySelector('.urg-card.on')) {
+    defaultUrgCard.classList.add('on');
+  }
+  const urgErr = document.getElementById('urgErr');
+  if (urgErr) urgErr.classList.remove('show');
+
+  calc();
+
+  // Offer to restore a saved draft, if any
+  if (hasDraft()) {
+    const banner = document.getElementById('draftBanner');
+    if (banner) banner.style.display = 'flex';
+  }
+});
+
+// ===== URGENCY =====
+function selUrg(el, name, surcharge) {
+  document.querySelectorAll('.urg-card').forEach(u => u.classList.remove('on'));
+  el.classList.add('on');
+  urgSurcharge = surcharge; urgName = name;
+  document.getElementById('urgErr').classList.remove('show');
+  calc();
+}
+
+// ===== FILE UPLOAD =====
+function handleFiles(files) {
+  const chips = document.getElementById('fileChips');
+  for (const f of files) {
+    if (uploadedFiles.find(x => x.name === f.name)) continue;
+    uploadedFiles.push(f);
+    const chip = document.createElement('div');
+    chip.className = 'file-chip';
+    chip.innerHTML = `📎 ${f.name} <span class="chip-x" onclick="removeFile('${f.name}',this)">✕</span>`;
+    chips.appendChild(chip);
+  }
+}
+function removeFile(name, el) {
+  const idx = uploadedFiles.findIndex(f => f.name === name);
+  if (idx > -1) uploadedFiles.splice(idx, 1);
+  el.parentElement.remove();
+}
+
+// ===== DISCOUNT INFO =====
+function updateDiscountInfo() {
+  const stk = parseInt(document.getElementById('stueckzahl').value) || 0;
+  const el = document.getElementById('qtyDiscount');
+  if (stk >= 500) el.textContent = '−25%';
+  else if (stk >= 250) el.textContent = '−20%';
+  else if (stk >= 100) el.textContent = '−15%';
+  else if (stk >= 50) el.textContent = '−10%';
+  else if (stk >= 10) el.textContent = '−5%';
+  else el.textContent = '';
+}
+
+// ===== PRICE CALC =====
+function fmt(n) { return n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'; }
+function fmt0(n) { return n.toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + ' €'; }
+
+// Preislogik Wolf Lasermark (Kleinunternehmer): fair für Kunden, aber nicht unter Wert.
+// Wichtig: Jeder ausgewählte Gravur-Inhalt wird als eigener Zusatz berechnet.
+const BASE_SETUP_FEE = 15;   // Einrichtung & Datencheck
+const MIN_TOTAL = 29;        // sinnvoller Mindestpreis für Einzelstücke / Kleinstaufträge
+
+const CONTENT_PRICING = {
+  'Seriennummern': { label: 'Seriennummern', factor: 0.13, min: 0.18, setup: 4 },
+  'Text / Schrift': { label: 'Text', factor: 0.11, min: 0.15, setup: 2 },
+  'QR-Code / Barcode': { label: 'QR/Barcode', factor: 0.22, min: 0.35, setup: 5 },
+  'DataMatrix-Code': { label: 'DataMatrix', factor: 0.25, min: 0.40, setup: 6 },
+  'CE-Kennzeichnung': { label: 'CE', factor: 0.10, min: 0.12, setup: 3 },
+  'Firmenlogo': { label: 'Logo', factor: 0.30, min: 0.45, setup: 10 },
+  'Motiv / Bild': { label: 'Motiv/Bild', factor: 0.40, min: 0.60, setup: 15 },
+  'Personalisierung (pro Stück individuell)': { label: 'Individuell/Stück', factor: 0.45, min: 0.75, setup: 10 }
+};
+
+function quantityDiscount(stk) {
+  if (stk >= 500) return 0.25;
+  if (stk >= 250) return 0.20;
+  if (stk >= 100) return 0.15;
+  if (stk >= 50) return 0.10;
+  if (stk >= 10) return 0.05;
+  return 0;
+}
+
+// Sanfte Grundkurve nach Gravurfläche. Kleine Markierungen bleiben günstig,
+// große Flächen steigen moderat, damit der Richtwert kundengewinnend bleibt.
+function baseByArea(cm2) {
+  if (cm2 <= 0) return 1.10;
+  const v = 0.50 * Math.pow(cm2, 0.34);
+  return Math.max(0.50, Math.min(4.20, v));
+}
+
+function skalaBasePrice() {
+  const d = parseFloat(document.getElementById('durchmesser').value) || 0;
+  const sLen = parseFloat(document.getElementById('skalaLaenge').value) || 0;
+  if (d <= 0) return 1.30;
+  const umfang = Math.PI * d;
+  if (sLen > 0) {
+    const cm2 = (umfang * sLen) / 100;
+    return baseByArea(cm2);
+  }
+  let base = umfang * 0.028;
+  return Math.max(1.20, Math.min(4.00, base));
+}
+
+function contentBreakdown(baseRaw, pills = activeContentPills()) {
+  const items = pills.map(p => {
+    const val = p.dataset.val;
+    const cfg = CONTENT_PRICING[val] || { label: val, factor: 0.18, min: 0.20, setup: 2 };
+    const unitBase = Math.max(cfg.min, baseRaw * cfg.factor);
+    return { val, label: cfg.label, factor: cfg.factor, min: cfg.min, unitBase, setup: cfg.setup };
+  });
+  return {
+    items,
+    unitBase: items.reduce((sum, x) => sum + x.unitBase, 0),
+    setup: items.reduce((sum, x) => sum + x.setup, 0)
+  };
+}
+
+function calculatePrice() {
+  const stk = parseInt(document.getElementById('stueckzahl').value) || 0;
+  const breite = parseFloat(document.getElementById('breite').value) || 0;
+  const hoehe = parseFloat(document.getElementById('hoehe').value) || 0;
+  const areaCm2 = (breite * hoehe) / 100;
+  const pills = activeContentPills();
+  const mark = activeMarkPill();
+  const mf = markF();
+  const disc = quantityDiscount(stk);
+  const complete = !!(matName && stk >= 1 && pills.length && mark && surfName);
+
+  const baseRaw = isSkala ? skalaBasePrice() : baseByArea(areaCm2);
+  const content = contentBreakdown(baseRaw, pills);
+  const surfaceFactor = surfF || 1;
+  const baseUnit = baseRaw * matF * mf * surfaceFactor;
+  const contentUnit = content.unitBase * matF * mf * surfaceFactor;
+  const ppsRaw = baseUnit + contentUnit;
+  const pps = ppsRaw * (1 - disc);
+  const setup = BASE_SETUP_FEE + content.setup + (isSkala ? 12 : 0);
+  const lineSubtotal = setup + (pps * stk);
+  const totalNetto = complete ? Math.max(MIN_TOTAL, lineSubtotal * (1 + (urgSurcharge || 0))) : 0;
+  const competitorGrossLow = totalNetto * 1.12 * 1.19;
+  const competitorGrossHigh = totalNetto * 1.28 * 1.19;
+  const savingsMid = ((competitorGrossLow + competitorGrossHigh) / 2) - totalNetto;
+
+  return { complete, stk, breite, hoehe, areaCm2, pills, mark, mf, disc, baseRaw, baseUnit, contentUnit, contentItems: content.items, contentSetup: content.setup, setupBase: BASE_SETUP_FEE, setup, ppsRaw, pps, lineSubtotal, totalNetto, competitorGrossLow, competitorGrossHigh, savingsMid };
+}
+
+function calc() {
+  const price = calculatePrice();
+  const d = parseFloat(document.getElementById('durchmesser').value) || 0;
+  const umfangMm = Math.PI * d;
+
+  document.getElementById('cMat').textContent = matName || '–';
+  document.getElementById('cSurf').textContent = surfName || '–';
+  document.getElementById('cStk').textContent = price.stk > 0 ? price.stk + ' Stk.' : '–';
+  document.getElementById('cContent').textContent = price.pills.length ? price.pills.map(p => p.dataset.val).join(', ') : '–';
+  document.getElementById('cMark').textContent = price.mark ? price.mark.querySelector('.mark-name').textContent : '–';
+  document.getElementById('cUrg').textContent = urgName || '–';
+
+  if (isSkala && d > 0) {
+    document.getElementById('cDiam').textContent = d + ' mm';
+    document.getElementById('cUmfang').textContent = umfangMm.toFixed(1) + ' mm';
+  }
+
+  const areaEl = document.getElementById('cArea');
+  if (isSkala && d > 0) {
+    const sLen = parseFloat(document.getElementById('skalaLaenge').value) || 0;
+    if (sLen > 0) areaEl.textContent = ((umfangMm * sLen) / 100).toFixed(1) + ' cm²';
+    else areaEl.textContent = umfangMm.toFixed(1) + ' mm Umfang';
+  } else {
+    areaEl.textContent = price.areaCm2 > 0 ? price.areaCm2.toFixed(1) + ' cm²' : 'nicht angegeben';
+  }
+
+  if (!price.complete) {
+    document.getElementById('cContentFee').textContent = '–';
+    document.getElementById('cPPS').textContent = '–';
+    document.getElementById('cSetup').textContent = '–';
+    document.getElementById('cDisc').textContent = '–';
+    document.getElementById('cTotal').textContent = '–';
+    document.getElementById('cSub').textContent = 'Pflichtfelder noch ausfüllen';
+    const cmpEl = document.getElementById('cCompare');
+    if (cmpEl) cmpEl.innerHTML = '';
+    return;
+  }
+
+  const contentText = price.contentItems.length ? price.contentItems.map(x => `${x.label}: ${fmt(x.unitBase * matF * price.mf * (surfF || 1))}/Stk`).join(' · ') : '–';
+  document.getElementById('cContentFee').textContent = contentText;
+  document.getElementById('cPPS').textContent = fmt(price.pps);
+  document.getElementById('cSetup').textContent = fmt(price.setup) + ' enthalten';
+  document.getElementById('cDisc').textContent = price.disc > 0 ? '-' + (price.disc * 100).toFixed(0) + '% ✓' : 'Kein Rabatt';
+  document.getElementById('cTotal').textContent = fmt(price.totalNetto);
+  document.getElementById('cSub').textContent = fmt(price.pps) + ' × ' + price.stk + ' + ' + fmt(price.setup) + ' Rüst/Daten' + (urgSurcharge > 0 ? ' +' + Math.round(urgSurcharge * 100) + '% Express' : '');
+
+  const cmpEl = document.getElementById('cCompare');
+  if (cmpEl && price.savingsMid > 2) {
+    cmpEl.innerHTML = `
+      <div class="cmp-head">🔎 Marktvergleich (inkl. MwSt.)</div>
+      <div class="cmp-range">Wettbewerb ca.: ${fmt(price.competitorGrossLow)} – ${fmt(price.competitorGrossHigh)}</div>
+      <div class="cmp-saving">Sie sparen ca. <strong>${fmt(price.savingsMid)}</strong></div>
+      <div class="cmp-note">§19 UStG — keine MwSt. · Richtwert, kein verbindliches Angebot</div>
+    `;
+  } else if (cmpEl) cmpEl.innerHTML = '';
+
+  try { saveDraft(); } catch(e) {}
+}
+
+// ===== QUICK PRESETS =====
+const PRESETS = {
+  typenschild: {
+    material: 'Edelstahl', matF: 1.15, matIdx: 0,
+    surface: 'Ebene Fläche', surfF: 1.0, surfIdx: 0,
+    breite: 80, hoehe: 30, stueckzahl: 10,
+    content: ['Seriennummern', 'CE-Kennzeichnung'], contentF: 1.05,
+    mark: 'Schwarze Markierung', markIdx: 1,
+    urgency: 'Standard (5–10 Werktage)', urgSurcharge: 0, urgIdx: 0
+  },
+  schild: {
+    material: 'Edelstahl', matF: 1.15, matIdx: 0,
+    surface: 'Ebene Fläche', surfF: 1.0, surfIdx: 0,
+    breite: 40, hoehe: 15, stueckzahl: 20,
+    content: ['Seriennummern'], contentF: 1.0,
+    mark: 'Standard', markIdx: 0,
+    urgency: 'Standard (5–10 Werktage)', urgSurcharge: 0, urgIdx: 0
+  },
+  werkzeug: {
+    material: 'Edelstahl', matF: 1.15, matIdx: 0,
+    surface: 'Ebene Fläche', surfF: 1.0, surfIdx: 0,
+    breite: 25, hoehe: 8, stueckzahl: 50,
+    content: ['DataMatrix-Code'], contentF: 1.1,
+    mark: 'Standard', markIdx: 0,
+    urgency: 'Standard (5–10 Werktage)', urgSurcharge: 0, urgIdx: 0
+  },
+  anhaenger: {
+    material: 'Edelstahl', matF: 1.15, matIdx: 0,
+    surface: 'Ebene Fläche', surfF: 1.0, surfIdx: 0,
+    breite: 30, hoehe: 30, stueckzahl: 25,
+    content: ['Text / Schrift', 'Firmenlogo'], contentF: 1.3,
+    mark: 'Schwarze Markierung', markIdx: 1,
+    urgency: 'Standard (5–10 Werktage)', urgSurcharge: 0, urgIdx: 0
+  },
+  qr: {
+    material: 'Aluminium', matF: 1.0, matIdx: 1,
+    surface: 'Ebene Fläche', surfF: 1.0, surfIdx: 0,
+    breite: 15, hoehe: 15, stueckzahl: 50,
+    content: ['QR-Code / Barcode'], contentF: 1.1,
+    mark: 'Standard', markIdx: 0,
+    urgency: 'Standard (5–10 Werktage)', urgSurcharge: 0, urgIdx: 0
+  }
+};
+
+function applyPreset(key) {
+  const p = PRESETS[key];
+  if (!p) return;
+  // Jump to step 2 first so all elements are rendered
+  goStep(2);
+
+  // Material card
+  const matCards = document.querySelectorAll('.mat-card');
+  if (matCards[p.matIdx]) matCards[p.matIdx].click();
+  // Surface card
+  const surfCards = document.querySelectorAll('.surf-card');
+  if (surfCards[p.surfIdx]) surfCards[p.surfIdx].click();
+  // Dimensions + Stück
+  document.getElementById('breite').value = p.breite;
+  document.getElementById('hoehe').value = p.hoehe;
+  document.getElementById('stueckzahl').value = p.stueckzahl;
+  // Content pills — clear all, activate selected
+  document.querySelectorAll('#contentPills .pill').forEach(pl => pl.classList.remove('on'));
+  for (const cv of p.content) {
+    const pill = document.querySelector(`#contentPills .pill[data-val="${cv}"]`);
+    if (pill) pill.classList.add('on');
+  }
+  // Mark card
+  const markCards = document.querySelectorAll('.mark-card');
+  if (markCards[p.markIdx]) markCards[p.markIdx].click();
+  // Urgency
+  const urgCards = document.querySelectorAll('.urg-card');
+  if (urgCards[p.urgIdx]) urgCards[p.urgIdx].click();
+
+  // Trigger recalc
+  updateDiscountInfo();
+  calc();
+
+  // Scroll to the price
+  setTimeout(() => {
+    const p = document.querySelector('.calc-card');
+    if (p) p.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 100);
+}
+
+// ===== QUOTE SAVE / SHARE =====
+const DRAFT_KEY = 'wolfBestellungDraft_v2';
+
+function collectQuoteData() {
+  const price = calculatePrice();
+  return {
+    v: 2,
+    ts: new Date().toISOString(),
+    contact: {
+      name: document.getElementById('name').value || '',
+      email: document.getElementById('email').value || '',
+      firma: document.getElementById('firma').value || '',
+      telefon: document.getElementById('telefon').value || ''
+    },
+    spec: {
+      material: matName || '',
+      matF: matF,
+      oberflaeche: surfName || '',
+      surfF: surfF,
+      isSkala: isSkala,
+      durchmesser: document.getElementById('durchmesser')?.value || '',
+      skalaLaenge: document.getElementById('skalaLaenge')?.value || '',
+      breite: document.getElementById('breite').value || '',
+      hoehe: document.getElementById('hoehe').value || '',
+      areaCm2: price.areaCm2,
+      stueckzahl: price.stk,
+      gravurInhalt: price.pills.map(p => p.dataset.val),
+      inhaltEinzelpreise: price.contentItems.map(x => ({ name: x.val, label: x.label, basisProStueck: x.unitBase, setup: x.setup })),
+      markierung: price.mark ? price.mark.querySelector('.mark-name').textContent : '',
+      markF: price.mf,
+      dringlichkeit: urgName || '',
+      urgSurcharge: urgSurcharge,
+      wunschtermin: document.getElementById('termin').value || '',
+      beschreibung: document.getElementById('beschreibung').value || '',
+      notiz: document.getElementById('notiz').value || '',
+      schriftart: selectedFont || 'Arial'
+    },
+    price: {
+      complete: price.complete,
+      baseRaw: price.baseRaw,
+      baseUnit: price.baseUnit,
+      contentUnit: price.contentUnit,
+      contentItems: price.contentItems,
+      setupBase: price.setupBase,
+      setupContent: price.contentSetup,
+      setup: price.setup,
+      ppsRaw: price.ppsRaw,
+      pps: price.pps,
+      stk: price.stk,
+      discount: price.disc,
+      urgSurcharge: urgSurcharge || 0,
+      totalNetto: price.totalNetto,
+      currency: 'EUR',
+      kleinunternehmer: true
+    }
+  };
+}
+
+function saveDraft() {
+  try {
+    const data = collectQuoteData();
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+    const el = document.getElementById('draftStatus');
+    if (el) {
+      el.textContent = '💾 Zwischenspeichern: ' + new Date().toLocaleTimeString('de-DE').slice(0, 5);
+      el.style.opacity = '1';
+      clearTimeout(saveDraft._t);
+      saveDraft._t = setTimeout(() => { el.style.opacity = '0.5'; }, 1500);
+    }
+  } catch(e) {}
+}
+
+function hasDraft() {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return false;
+    const d = JSON.parse(raw);
+    return d && d.v === 2 && (d.contact?.email || d.spec?.material || d.spec?.stueckzahl);
+  } catch { return false; }
+}
+
+function loadDraftFromStorage() {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    if (!d || d.v !== 2) return;
+    if (d.contact) {
+      if (d.contact.name) document.getElementById('name').value = d.contact.name;
+      if (d.contact.email) document.getElementById('email').value = d.contact.email;
+      if (d.contact.firma) document.getElementById('firma').value = d.contact.firma;
+      if (d.contact.telefon) document.getElementById('telefon').value = d.contact.telefon;
+    }
+    if (d.spec) {
+      if (d.spec.breite) document.getElementById('breite').value = d.spec.breite;
+      if (d.spec.hoehe) document.getElementById('hoehe').value = d.spec.hoehe;
+      if (d.spec.stueckzahl) document.getElementById('stueckzahl').value = d.spec.stueckzahl;
+      if (d.spec.beschreibung) document.getElementById('beschreibung').value = d.spec.beschreibung;
+      if (d.spec.notiz) document.getElementById('notiz').value = d.spec.notiz;
+      if (d.spec.wunschtermin) document.getElementById('termin').value = d.spec.wunschtermin;
+      if (d.spec.durchmesser) { const el = document.getElementById('durchmesser'); if (el) el.value = d.spec.durchmesser; }
+      if (d.spec.skalaLaenge) { const el = document.getElementById('skalaLaenge'); if (el) el.value = d.spec.skalaLaenge; }
+      // Material, surface, content, mark, urgency, font must be restored by clicking cards — skip for safety
+    }
+    updateDiscountInfo();
+    calc();
+  } catch(e) { console.warn('Draft load failed:', e); }
+}
+
+function clearDraft() {
+  if (!confirm('Wirklich alle eingegebenen Daten löschen?')) return;
+  try { localStorage.removeItem(DRAFT_KEY); } catch {}
+  location.reload();
+}
+
+function downloadQuoteJson() {
+  const data = collectQuoteData();
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const ts = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = `Wolf-Lasermark_Kalkulation_${ts}.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function downloadQuotePdf() {
+  // Opens a print-ready popup window; user can save as PDF via browser print dialog.
+  const d = collectQuoteData();
+  if (!d.price.complete) {
+    alert('Bitte füllen Sie zuerst alle Pflichtfelder aus (Material, Stückzahl, Inhalt, Markierung, Dringlichkeit).');
+    return;
+  }
+  const html = buildQuotePrintHtml(d);
+  const w = window.open('', '_blank');
+  if (!w) { alert('Popup blockiert. Bitte erlauben Sie Popups für diese Seite.'); return; }
+  w.document.open(); w.document.write(html); w.document.close();
+  setTimeout(() => { try { w.focus(); w.print(); } catch(e) {} }, 300);
+}
+
+function buildQuotePrintHtml(d) {
+  const e = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const fmtE = (n) => (typeof n === 'number' ? n : parseFloat(n) || 0).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+  const today = new Date().toLocaleDateString('de-DE', { year: 'numeric', month: 'long', day: 'numeric' });
+  const validUntil = new Date(Date.now() + 14 * 86400000).toLocaleDateString('de-DE');
+  const disc = d.price.discount || 0;
+  const urgS = d.price.urgSurcharge || 0;
+  const surfaceFactor = d.spec.surfF || 1;
+  const matFactor = d.spec.matF || 1;
+  const markFactor = d.spec.markF || 1;
+  const contentRows = '';
+  return `<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><title>Kalkulation Wolf Lasermark</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1a1a1a; font-size: 10.5pt; line-height: 1.5; }
+  .hdr { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #00d4ff; padding-bottom: 12px; margin-bottom: 20px; }
+  .hdr h1 { font-size: 22pt; color: #00a5c7; font-weight: 800; letter-spacing: -0.5px; }
+  .hdr .sub { color: #666; font-size: 10pt; margin-top: 2px; }
+  .hdr .right { text-align: right; font-size: 9pt; color: #666; }
+  .hdr .right strong { color: #1a1a1a; font-size: 11pt; }
+  h2 { font-size: 12pt; color: #00a5c7; border-bottom: 1px solid #e5e5e5; padding-bottom: 4px; margin: 18px 0 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 20px; font-size: 10pt; }
+  .info-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px dotted #e5e5e5; }
+  .info-row .k { color: #666; }
+  .info-row .v { color: #1a1a1a; font-weight: 600; text-align: right; }
+  .price-box { margin: 20px 0; padding: 14px 18px; background: linear-gradient(135deg, #eff9ff, #e0f4fc); border-left: 4px solid #00d4ff; border-radius: 4px; }
+  .price-box .row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 10pt; }
+  .price-box .row.total { border-top: 2px solid #00d4ff; margin-top: 8px; padding-top: 8px; font-size: 12pt; font-weight: 800; }
+  .price-box .row.brutto { color: #555; font-size: 10pt; }
+  .note { font-size: 9pt; color: #666; margin-top: 14px; line-height: 1.6; }
+  .footer { margin-top: 30px; padding-top: 14px; border-top: 1px solid #e5e5e5; font-size: 9pt; color: #666; display: flex; justify-content: space-between; }
+  .descr { margin-top: 10px; padding: 10px 14px; background: #f9f9f9; border-radius: 4px; font-size: 9.5pt; white-space: pre-wrap; color: #333; }
+</style></head>
+<body>
+<div class="hdr">
+  <div>
+    <h1>⚡ WOLF LASERMARK</h1>
+    <div class="sub">Industriegravur mit 100 W MOPA Faserlaser · Bruckmühl · info@wolf-lasermark.de</div>
+  </div>
+  <div class="right">
+    <strong>Kalkulation</strong><br>
+    ${e(today)}<br>
+    <span style="font-size:8pt">Gültig bis ${e(validUntil)}</span>
+  </div>
+</div>
+
+<h2>Kunde</h2>
+<div class="info-grid">
+  <div class="info-row"><span class="k">Name</span><span class="v">${e(d.contact.name || '—')}</span></div>
+  <div class="info-row"><span class="k">E-Mail</span><span class="v">${e(d.contact.email || '—')}</span></div>
+  <div class="info-row"><span class="k">Firma</span><span class="v">${e(d.contact.firma || '—')}</span></div>
+  <div class="info-row"><span class="k">Telefon</span><span class="v">${e(d.contact.telefon || '—')}</span></div>
+</div>
+
+<h2>Spezifikation</h2>
+<div class="info-grid">
+  <div class="info-row"><span class="k">Material</span><span class="v">${e(d.spec.material || '—')}</span></div>
+  <div class="info-row"><span class="k">Oberfläche</span><span class="v">${e(d.spec.oberflaeche || '—')}</span></div>
+  <div class="info-row"><span class="k">Gravurfläche</span><span class="v">${d.spec.isSkala ? (d.spec.durchmesser + ' mm ⌀ × ' + (d.spec.skalaLaenge || '—') + ' mm') : ((d.spec.breite || '—') + ' × ' + (d.spec.hoehe || '—') + ' mm')}</span></div>
+  <div class="info-row"><span class="k">Stückzahl</span><span class="v">${e(d.spec.stueckzahl)} Stk.</span></div>
+  <div class="info-row"><span class="k">Inhalt</span><span class="v">${e((d.spec.gravurInhalt || []).join(', ') || '—')}</span></div>
+  <div class="info-row"><span class="k">Markierungsart</span><span class="v">${e(d.spec.markierung || '—')}</span></div>
+  <div class="info-row"><span class="k">Schriftart</span><span class="v">${e(d.spec.schriftart || 'Arial')}</span></div>
+  <div class="info-row"><span class="k">Dringlichkeit</span><span class="v">${e(d.spec.dringlichkeit || '—')}</span></div>
+</div>
+${d.spec.beschreibung ? `<div class="descr"><strong>Beschreibung:</strong>\n${e(d.spec.beschreibung)}</div>` : ''}
+
+<h2>Preisstaffel</h2>
+<div class="price-box">
+  <div class="row"><span>Basis nach Fläche / Stück</span><span>${fmtE(d.price.baseUnit || 0)}</span></div>
+  ${contentRows}
+  ${disc > 0 ? `<div class="row" style="color:#059669"><span>Mengenrabatt (ab ${e(d.spec.stueckzahl)} Stk.)</span><span>−${(disc*100).toFixed(0)}%</span></div>` : ''}
+  <div class="row"><span><strong>Preis pro Stück</strong></span><span><strong>${fmtE(d.price.pps)}</strong></span></div>
+  <div class="row"><span>× Stückzahl ${e(d.spec.stueckzahl)}</span><span>${fmtE(d.price.pps * d.spec.stueckzahl)}</span></div>
+  <div class="row"><span>+ Einrichtung / Datencheck</span><span>${fmtE(d.price.setup || 0)}</span></div>
+  ${urgS > 0 ? `<div class="row" style="color:#d97706"><span>+ Express-Zuschlag (${(urgS*100).toFixed(0)}%)</span><span>${fmtE((d.price.pps * d.spec.stueckzahl + d.price.setup) * urgS)}</span></div>` : ''}
+  <div class="row total"><span>Gesamtpreis</span><span>${fmtE(d.price.totalNetto)}</span></div>
+  <div class="row brutto"><span>Endpreis gemäß §19 UStG — keine MwSt. ausweisbar</span><span></span></div>
+</div>
+
+<div class="note">
+  <strong>Hinweise:</strong> Diese Kalkulation ist unverbindlich und dient als Richtwert. Verbindliches Angebot nach Freigabe durch Wolf Lasermark. Alle Preise in EUR. Abholung in der Werkstatt Bruckmühl oder persönliche Übergabe nach Absprache. Zahlung innerhalb 14 Tagen nach Erhalt.
+</div>
+
+<div class="footer">
+  <div>Wolf Lasermark · Bruckmühl / Großkarolinenfeld · info@wolf-lasermark.de</div>
+  <div>Kalkulation generiert: ${e(new Date().toLocaleString('de-DE'))}</div>
+</div>
+</body></html>`;
+}
+
+function shareQuoteByEmail() {
+  const d = collectQuoteData();
+  const lines = [];
+  lines.push('Meine Kalkulation bei Wolf Lasermark:');
+  lines.push('');
+  if (d.spec.material) lines.push(`Material: ${d.spec.material}`);
+  if (d.spec.oberflaeche) lines.push(`Oberfläche: ${d.spec.oberflaeche}`);
+  if (d.spec.breite && d.spec.hoehe) lines.push(`Gravurfläche: ${d.spec.breite} × ${d.spec.hoehe} mm`);
+  if (d.spec.stueckzahl) lines.push(`Stückzahl: ${d.spec.stueckzahl}`);
+  if (d.spec.gravurInhalt?.length) lines.push(`Inhalt: ${d.spec.gravurInhalt.join(', ')}`);
+  if (d.spec.markierung) lines.push(`Markierungsart: ${d.spec.markierung}`);
+  if (d.spec.dringlichkeit) lines.push(`Dringlichkeit: ${d.spec.dringlichkeit}`);
+  if (d.price.complete) {
+    lines.push('');
+    lines.push(`Preis pro Stück: ${fmt(d.price.pps)}`);
+    lines.push(`Gesamtpreis: ${fmt(d.price.totalNetto)}`);
+    lines.push('(Endpreis gemäß §19 UStG — keine MwSt.)');
+  }
+  lines.push('');
+  lines.push('— berechnet auf wolf-lasermark.de');
+  const subject = 'Meine Gravur-Kalkulation';
+  const body = lines.join('\n');
+  window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+// ===== FILL SUMMARY =====
+function fillSummary() {
+  const stk = parseInt(document.getElementById('stueckzahl').value) || 0;
+  const breite = parseFloat(document.getElementById('breite').value) || 0;
+  const hoehe = parseFloat(document.getElementById('hoehe').value) || 0;
+  document.getElementById('sumName').textContent = document.getElementById('name').value || '–';
+  document.getElementById('sumEmail').textContent = document.getElementById('email').value || '–';
+  document.getElementById('sumFirma').textContent = document.getElementById('firma').value || '–';
+  document.getElementById('sumTel').textContent = document.getElementById('telefon').value || '–';
+  document.getElementById('sumMat').textContent = matName || '–';
+  document.getElementById('sumSurf').textContent = surfName || '–';
+  document.getElementById('sumStk').textContent = stk ? stk + ' Stk.' : '–';
+  document.getElementById('sumArea').textContent = (breite && hoehe) ? ((breite * hoehe) / 100).toFixed(1) + ' cm²' : '–';
+  document.getElementById('sumContent').textContent = activeContentPills().map(p => p.dataset.val).join(', ') || '–';
+  const mark = activeMarkPill();
+  document.getElementById('sumMark').textContent = mark ? mark.querySelector('.mark-name').textContent : '–';
+  document.getElementById('sumUrg').textContent = urgName || '–';
+  document.getElementById('sumTermin').textContent = document.getElementById('termin').value || 'nicht angegeben';
+}
+
+// ===== SUBMIT =====
+async function submitForm() {
+  const btn = document.getElementById('submitBtn');
+  const bt = document.getElementById('btnText');
+  btn.disabled = true;
+  bt.innerHTML = '<div class="spin"></div> Wird gesendet…';
+
+  const price = calculatePrice();
+  const stk = price.stk;
+
+  const payload = {
+    standort: 'Bruckmühl',
+    name: document.getElementById('name').value,
+    email: document.getElementById('email').value,
+    firma: document.getElementById('firma').value || '–',
+    telefon: document.getElementById('telefon').value || '–',
+    material: matName,
+    oberflaeche: surfName,
+    durchmesser: isSkala ? (document.getElementById('durchmesser').value || '–') : '–',
+    skalaLaenge: isSkala ? (document.getElementById('skalaLaenge').value || '–') : '–',
+    stueckzahl: stk,
+    breite: document.getElementById('breite').value || '–',
+    hoehe: document.getElementById('hoehe').value || '–',
+    gravurInhalt: activeContentPills().map(p => p.dataset.val).join(', '),
+    markierungsart: activeMarkPill() ? activeMarkPill().querySelector('.mark-name').textContent : '–',
+    beschreibung: document.getElementById('beschreibung').value || '–',
+    notiz: document.getElementById('notiz').value || '–',
+    schriftart: selectedFont || 'Arial',
+    dringlichkeit: urgName,
+    wunschtermin: document.getElementById('termin').value || '–',
+    preisschaetzung: fmt(price.totalNetto) + ' Endpreis gemäß §19 UStG (Richtwert)',
+    _subject: `✨ Neue Gravur-Anfrage: ${matName}, ${stk} Stk. – ${document.getElementById('name').value}`
+  };
+
+  try {
+    const formData = new FormData();
+    Object.entries(payload).forEach(([key, value]) => {
+      formData.append(key, value == null ? '' : String(value));
+    });
+    formData.append('_replyto', document.getElementById('email').value || '');
+    formData.append('_to', 'info@wolf-lasermark.de');
+
+    const res = await fetch('https://formspree.io/f/xpqjjobb', {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      body: formData
+    });
+
+    let data = null;
+    try { data = await res.json(); } catch(e) {}
+    if (!res.ok || (data && data.ok === false)) {
+      throw new Error((data && (data.error || data.errors?.map(x => x.message).join(', '))) || 'Send failed');
+    }
+
+    document.getElementById('successName').textContent = document.getElementById('name').value;
+    document.getElementById('mainLayout').style.display = 'none';
+    document.querySelector('.progress-wrap').style.display = 'none';
+    document.getElementById('successScreen').classList.add('show');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (err) {
+    console.error('Form send error:', err);
+    btn.disabled = false;
+    bt.textContent = '📩 Gravur-Anfrage kostenlos & unverbindlich absenden';
+
+    const subject = encodeURIComponent(payload._subject || 'Neue Gravur-Anfrage');
+    const body = encodeURIComponent(
+`Name: ${payload.name}
+E-Mail: ${payload.email}
+Firma: ${payload.firma}
+Telefon: ${payload.telefon}
+
+Material: ${payload.material}
+Oberfläche: ${payload.oberflaeche}
+Durchmesser: ${payload.durchmesser}
+Skalenlänge: ${payload.skalaLaenge}
+Stückzahl: ${payload.stueckzahl}
+Breite: ${payload.breite}
+Höhe: ${payload.hoehe}
+Gravur-Inhalt: ${payload.gravurInhalt}
+Markierungsart: ${payload.markierungsart}
+Schriftart: ${payload.schriftart}
+Dringlichkeit: ${payload.dringlichkeit}
+Wunschtermin: ${payload.wunschtermin}
+Preisschätzung: ${payload.preisschaetzung}
+
+Beschreibung:
+${payload.beschreibung}
+
+Notiz:
+${payload.notiz}`
+    );
+
+    const fallback = confirm('Das automatische Senden hat nicht funktioniert. Möchten Sie die Anfrage jetzt direkt per E-Mail an info@wolf-lasermark.de öffnen?');
+    if (fallback) {
+      window.location.href = `mailto:info@wolf-lasermark.de?subject=${subject}&body=${body}`;
+    }
+  }
+}
+
+// Init
+updateProgress();
+</script>
+
+<script>
+// ============================================================
+// SCHRIFTART SELECTOR
+// ============================================================
+function togglePreview() {}
+function updatePreview() {}
+function updateFontLivePreview() {}
+
+var selectedFont = 'Arial';
+
+function selFont(card, fontFamily, fontName) {
+  document.querySelectorAll('.font-card').forEach(function(c){ c.classList.remove('on'); });
+  card.classList.add('on');
+  selectedFont = fontFamily;
+  try { saveDraft(); calc(); } catch(e) {}
+}
+
+function updateFontLivePreview() {
+  var el = document.getElementById('fontLiveText');
+  var bel = document.getElementById('beschreibung');
+  if (!el) return;
+  var txt = bel && bel.value.trim() ? bel.value.trim().split('\n')[0] : 'Wolf Lasermark · SN-2024-001';
+  el.textContent = txt;
+  el.style.fontFamily = "'" + selectedFont + "', monospace";
+}
+
+function updateFontSelectorVisibility() {
+  var pills = document.querySelectorAll('#contentPills .pill.on');
+  var hasText = false;
+  pills.forEach(function(p){
+    var v = p.dataset.val;
+    if (v === 'Text / Schrift' || v === 'Seriennummern' || v === 'CE-Kennzeichnung' || v === 'Personalisierung (pro Stück individuell)') hasText = true;
+  });
+  var wrap = document.getElementById('fontSelectorWrap');
+  if (wrap) wrap.classList.toggle('show', hasText);
+}
+
+// Hook togglePill to also update font visibility
+var _origTogglePill = window.togglePill;
+window.togglePill = function(el) {
+  _origTogglePill(el);
+  updateFontSelectorVisibility();
+  try { saveDraft(); calc(); } catch(e) {}
+};
+
+</script>
+
+
+</body>
+</html>
