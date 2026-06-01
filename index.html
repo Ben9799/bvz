@@ -3222,6 +3222,58 @@ body.mode-firmen .privat-only { display: none !important; }
   </div>
 </div>
 
+<script type="module">
+// ============================================================
+// FIREBASE STORAGE — Zeichnungs-Upload für den Angebot-Kalkulator
+// Uploads gehen ausschließlich nach angebot-uploads/ (per Security Rule
+// auf Größe/Typ begrenzt). Der API-Key ist ein öffentlicher Projekt-
+// Identifier (kein Secret) — Schutz erfolgt über die Storage-Rules.
+// ============================================================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBLSp0en7wDD_71PF1n3qYXPF0YNTEWmIc",
+  authDomain: "auftrage-edc6d.firebaseapp.com",
+  projectId: "auftrage-edc6d",
+  storageBucket: "auftrage-edc6d.firebasestorage.app",
+  messagingSenderId: "675308449934",
+  appId: "1:675308449934:web:b4c1fc2e190647ace419df"
+};
+
+const fbApp = initializeApp(firebaseConfig, "wl-website");
+const storage = getStorage(fbApp);
+
+// Erlaubte Dateitypen (Endung-basiert, da CAD-MIME-Typen unzuverlässig sind)
+const ALLOWED_EXT = ["dxf","dwg","step","stp","stl","igs","iges","pdf","png","jpg","jpeg","webp","svg","ai","eps","zip"];
+const MAX_BYTES = 25 * 1024 * 1024;
+
+window.wlUploadZeichnung = function(file, onProgress){
+  return new Promise((resolve, reject) => {
+    const ext = (file.name.split(".").pop() || "").toLowerCase();
+    if (!ALLOWED_EXT.includes(ext)){
+      reject(new Error("Dateityp nicht erlaubt (" + ext + ")")); return;
+    }
+    if (file.size > MAX_BYTES){
+      reject(new Error("Datei zu groß (max. 25 MB)")); return;
+    }
+    const safe = file.name.replace(/[^\w.\-]+/g, "_").slice(-80);
+    const path = "angebot-uploads/" + Date.now() + "-" + Math.random().toString(36).slice(2,8) + "-" + safe;
+    const task = uploadBytesResumable(ref(storage, path), file, {
+      contentType: file.type || "application/octet-stream"
+    });
+    task.on("state_changed",
+      (snap) => { if (onProgress) onProgress(snap.totalBytes ? snap.bytesTransferred / snap.totalBytes : 0); },
+      (err) => reject(err),
+      async () => {
+        try { resolve({ url: await getDownloadURL(task.snapshot.ref), name: file.name }); }
+        catch (e) { reject(e); }
+      }
+    );
+  });
+};
+</script>
+
 <script>
 // ============================================================
 // OFFER CHAT ASSISTANT — full logic
@@ -3248,6 +3300,8 @@ body.mode-firmen .privat-only { display: none !important; }
     termin: '',
     beschreibung: '',
     notiz: '',
+    zeichnungUrl: '',
+    zeichnungName: '',
     started: false,
     submitted: false
   };
@@ -3822,11 +3876,16 @@ body.mode-firmen .privat-only { display: none !important; }
   }
 
   function step8_details(){
-    addBotMessage('Möchten Sie <strong>Beschreibung</strong>, <strong>Notiz</strong> oder einen <strong>Wunschtermin</strong> hinzufügen? <em>Alles optional — kann auch übersprungen werden.</em>', 450).then(() => {
+    addBotMessage('Möchten Sie <strong>Beschreibung</strong>, eine <strong>technische Zeichnung</strong>, <strong>Notiz</strong> oder einen <strong>Wunschtermin</strong> hinzufügen? <em>Alles optional — kann auch übersprungen werden.</em>', 450).then(() => {
       const formHtml = `
         <div>
           <label>Beschreibung / Gravurtext <span class="field-hint">optional · macht das Angebot schneller</span></label>
           <textarea id="cf-beschr" placeholder="z. B. Gravurrahmen 40×15 mm, Position Unterseite rechts. Text: 'SN-2024-001 bis SN-2024-100'."></textarea>
+        </div>
+        <div>
+          <label>Technische Zeichnung / Datei <span class="field-hint">optional · DXF, STEP, STL, PDF, Bild · max. 25 MB</span></label>
+          <input type="file" id="cf-zeichnung" accept=".dxf,.dwg,.step,.stp,.stl,.igs,.iges,.pdf,.png,.jpg,.jpeg,.webp,.svg,.ai,.eps,.zip">
+          <div id="cf-upl-status" class="field-hint" style="margin-top:6px;display:none;"></div>
         </div>
         <div>
           <label>Notiz <span class="field-hint">optional</span></label>
@@ -3843,9 +3902,46 @@ body.mode-firmen .privat-only { display: none !important; }
         state.notiz = f.querySelector('#cf-notiz').value || '';
         state.termin = f.querySelector('#cf-termin').value || '';
         disablePreviousInteractives();
-        const hasAny = state.beschreibung || state.notiz || state.termin;
+        const hasAny = state.beschreibung || state.notiz || state.termin || state.zeichnungUrl;
         addUserMessage(hasAny ? 'Details hinzugefügt' : 'Übersprungen');
         step9_summary();
+      });
+
+      // Datei-Upload nach Firebase Storage (sofort bei Auswahl)
+      const fileInput = form.querySelector('#cf-zeichnung');
+      const statusEl = form.querySelector('#cf-upl-status');
+      const submitBtn = form.querySelector('[data-submit]');
+      fileInput.addEventListener('change', () => {
+        const file = fileInput.files && fileInput.files[0];
+        if (!file) return;
+        state.zeichnungUrl = ''; state.zeichnungName = '';
+        statusEl.style.display = 'block';
+        statusEl.style.color = '';
+        statusEl.textContent = '⏳ Wird hochgeladen … 0 %';
+        fileInput.disabled = true;
+        if (submitBtn) submitBtn.disabled = true;
+        if (typeof window.wlUploadZeichnung !== 'function'){
+          statusEl.style.color = '#fca5a5';
+          statusEl.textContent = '⚠️ Upload momentan nicht verfügbar — bitte Datei später per E-Mail senden.';
+          fileInput.disabled = false; if (submitBtn) submitBtn.disabled = false;
+          return;
+        }
+        window.wlUploadZeichnung(file, (p) => {
+          statusEl.textContent = '⏳ Wird hochgeladen … ' + Math.round((p||0)*100) + ' %';
+        }).then((res) => {
+          state.zeichnungUrl = res.url;
+          state.zeichnungName = res.name;
+          statusEl.style.color = '#86efac';
+          statusEl.textContent = '✓ „' + res.name + '" hochgeladen';
+          if (submitBtn) submitBtn.disabled = false;
+        }).catch((err) => {
+          console.error('Zeichnung-Upload:', err);
+          state.zeichnungUrl = ''; state.zeichnungName = '';
+          statusEl.style.color = '#fca5a5';
+          statusEl.textContent = '⚠️ Upload fehlgeschlagen (' + (err && err.message ? err.message : 'Fehler') + '). Sie können die Datei auch später per E-Mail nachreichen.';
+          fileInput.disabled = false; fileInput.value = '';
+          if (submitBtn) submitBtn.disabled = false;
+        });
       });
     });
   }
@@ -3867,6 +3963,7 @@ body.mode-firmen .privat-only { display: none !important; }
       }
       rows.push(['📦 Stückzahl', stk + ' Stk.']);
       rows.push(['✏️ Inhalt', state.contentVals.join(' · ') || '–']);
+      if (state.zeichnungUrl) rows.push(['📎 Zeichnung', state.zeichnungName || 'hochgeladen']);
       rows.push(['🎨 Markierung', state.markName || '–']);
       rows.push(['⚡ Termin', state.urgName + (state.termin ? ' · ' + state.termin : '')]);
       rows.push(['💰 Preis / Stück', fmt(p.pps)]);
@@ -3978,6 +4075,7 @@ body.mode-firmen .privat-only { display: none !important; }
       gravurInhalt: state.contentVals.join(', '),
       markierungsart: state.markName || '–',
       beschreibung: state.beschreibung || '–',
+      zeichnung: state.zeichnungUrl ? (state.zeichnungName + ': ' + state.zeichnungUrl) : '–',
       notiz: state.notiz || '–',
       dringlichkeit: state.urgName,
       wunschtermin: state.termin || '–',
@@ -4033,6 +4131,7 @@ Markierung: ${payload.markierungsart}
 Dringlichkeit: ${payload.dringlichkeit}
 Wunschtermin: ${payload.wunschtermin}
 Preisschätzung: ${payload.preisschaetzung}
+Zeichnung: ${payload.zeichnung}
 
 Beschreibung:
 ${payload.beschreibung}
@@ -4081,6 +4180,7 @@ ${payload.notiz}`
     state.markName = null; state.markF = 1;
     state.urgName = 'Standard (5–10 Werktage)'; state.urgSurcharge = 0;
     state.termin = ''; state.beschreibung = ''; state.notiz = '';
+    state.zeichnungUrl = ''; state.zeichnungName = '';
     state.started = false;
     state.submitted = false;
     $msgs().innerHTML = '';
