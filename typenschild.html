@@ -206,6 +206,7 @@
           <button class="btn btn-primary" id="order" style="flex:2;">Anfrage senden →</button>
           <button class="btn btn-ghost admin-only" id="dlpng" style="display:none;">⬇ PNG</button>
           <button class="btn btn-ghost admin-only" id="dlsvg" style="display:none;">⬇ SVG</button>
+          <button class="btn btn-ghost admin-only" id="dllbrn" style="display:none;">⬇ LightBurn</button>
         </div>
         <div class="hint">Simulierte Darstellung. Senden Sie Ihre Anfrage — wir erstellen Ihr Typenschild passgenau.</div>
       </div>
@@ -365,7 +366,7 @@ fileEl.addEventListener('change',e=>loadImg(e.target.files[0]));
 ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag');}));
 ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag');}));
 drop.addEventListener('drop',e=>{ if(e.dataTransfer.files[0]) loadImg(e.dataTransfer.files[0]); });
-function loadImg(f){ if(!f)return; const img=new Image(); img.onload=()=>{ state.img=img; document.getElementById('fileHint').textContent='✓ '+f.name; render(); }; img.src=URL.createObjectURL(f); }
+function loadImg(f){ if(!f)return; const r=new FileReader(); r.onload=()=>{ const img=new Image(); img.onload=()=>{ state.img=img; document.getElementById('fileHint').textContent='✓ '+f.name; render(); }; img.src=r.result; }; r.readAsDataURL(f); }
 
 // ---------- MATERIAL TEXTURE ----------
 function paintMaterial(g,ox,oy,ww,hh){
@@ -685,6 +686,7 @@ function updatePrice(){
 // ---------- EXPORTS ----------
 document.getElementById('dlpng').onclick=()=>{ const a=document.createElement('a'); a.download='wolf-typenschild.png'; a.href=cv.toDataURL('image/png'); a.click(); };
 document.getElementById('dlsvg').onclick=downloadSVG;
+document.getElementById('dllbrn').onclick=downloadLBRN;
 // ---------- ANFRAGE (Formspree + Firebase) ----------
 const ov=document.getElementById('anfrageOverlay');
 const closeOv=()=>{ ov.style.display='none'; };
@@ -825,6 +827,54 @@ function downloadSVG(){
   const svg=renderSVGFromOps();
   const blob=new Blob([svg],{type:'image/svg+xml'}); const a=document.createElement('a');
   a.download='wolf-typenschild-lightburn.svg'; a.href=URL.createObjectURL(blob); a.click();
+}
+
+// ---------- LightBurn .lbrn export (Gravur=Füllung/Scan, Schnitt=Linie/Cut) ----------
+function drawLogoInkColor(g,x,y,w,h){ const im=state.img; if(!im||w<1||h<1)return; const lc=document.createElement('canvas'); lc.width=Math.ceil(w); lc.height=Math.ceil(h); const lg=lc.getContext('2d'); lg.drawImage(im,0,0,w,h); const d=lg.getImageData(0,0,lc.width,lc.height),p=d.data; for(let i=0;i<p.length;i+=4){ const a=p[i+3],lum=a?(0.299*p[i]+0.587*p[i+1]+0.114*p[i+2]):255; const ink=Math.min(1,(a/255)*(1-lum/255)*1.6); p[i]=p[i+1]=p[i+2]=0; p[i+3]=Math.round(ink*255);} lg.putImageData(d,0,0); g.drawImage(lc,x,y); }
+function drawSymbolColor(g,sym,x,y,w,h,color){ const vb=sym==='ce'?CE_VB:WEEE_VB, paths=sym==='ce'?CE_PATHS:[WEEE_PATH]; g.save(); g.translate(x,y); g.scale(w/vb.w,h/vb.h); g.fillStyle=color; paths.forEach(d=>g.fill(new Path2D(d))); g.restore(); }
+// Render engrave content black-on-white at high DPI (faithful to preview → image-fill engraving).
+function renderInkCanvas(ops,pxPerMm,pw,ph){
+  const c=document.createElement('canvas'); c.width=pw; c.height=ph; const g=c.getContext('2d');
+  g.fillStyle='#fff'; g.fillRect(0,0,pw,ph);
+  const X=v=>v*pxPerMm, Y=v=>v*pxPerMm, S=v=>v*pxPerMm;
+  const f=FONTS[+document.getElementById('font').value], cr=capRatio(f.css,f.weight);
+  g.fillStyle='#000'; g.strokeStyle='#000';
+  ops.forEach(o=>{
+    if(o.preview) return;
+    if(o.t==='text'){ if(!o.str)return; g.font=`${f.weight} ${(o.cap*pxPerMm)/cr}px ${f.css}`; g.textAlign=o.anchor==='middle'?'center':(o.anchor==='end'?'right':'left'); g.textBaseline='middle'; g.fillText(o.str,X(o.x),Y(o.y)); }
+    else if(o.t==='line'){ g.lineWidth=Math.max(1,S(o.w)); g.beginPath(); g.moveTo(X(o.x1),Y(o.y1)); g.lineTo(X(o.x2),Y(o.y2)); g.stroke(); }
+    else if(o.t==='rrect'){ g.lineWidth=Math.max(1,S(o.sw)); strokeRound(g,X(o.x),Y(o.y),S(o.w),S(o.h),S(o.r)); }
+    else if(o.t==='circle'){ g.lineWidth=Math.max(1,S(o.sw||0.3)); g.beginPath(); g.arc(X(o.cx),Y(o.cy),S(o.r),0,7); if(o.fill)g.fill(); else g.stroke(); }
+    else if(o.t==='dotline'){ const n=Math.max(0,Math.floor((o.x2-o.x1)/o.gap)); for(let i=0;i<=n;i++){ g.beginPath(); g.arc(X(o.x1+i*o.gap),Y(o.y),Math.max(0.6,S(o.r)),0,7); g.fill(); } }
+    else if(o.t==='img'){ drawLogoInkColor(g,X(o.x),Y(o.y),S(o.w),S(o.h)); }
+    else if(o.t==='code'){ const cw=S(o.cellW), ch=S(o.cellH); o.dark.forEach(([r,cc])=>g.fillRect(X(o.x)+cc*cw,Y(o.y)+r*ch,Math.ceil(cw)+0.5,Math.ceil(ch)+0.5)); }
+    else if(o.t==='sym'){ drawSymbolColor(g,o.sym,X(o.x),Y(o.y),S(o.w),S(o.h),'#000'); }
+  });
+  return c;
+}
+function renderLBRN(){
+  const wmm=geo.wmm, hmm=geo.hmm;
+  const {ops,cut}=computeLayout();
+  let pxPerMm=16; // ~406 DPI; genug für scharfe QR/DataMatrix
+  let pw=Math.round(wmm*pxPerMm), ph=Math.round(hmm*pxPerMm);
+  const MAXDIM=6000; const sc=Math.min(1,MAXDIM/Math.max(pw,ph)); if(sc<1){ pxPerMm*=sc; pw=Math.round(wmm*pxPerMm); ph=Math.round(hmm*pxPerMm); }
+  const ink=renderInkCanvas(ops,pxPerMm,pw,ph);
+  const b64=ink.toDataURL('image/png').split(',')[1];
+  // Bitmap: lokale Pixel zentriert (±W/2,±H/2) → mm; Y gespiegelt (LightBurn Y-up).
+  const sx=(wmm/pw).toFixed(6), sy=(hmm/ph).toFixed(6);
+  let shapes=`<Shape Type="Bitmap" CutIndex="0" W="${pw}" H="${ph}" File=""><XForm>${sx} 0 0 -${sy} ${(wmm/2).toFixed(3)} ${(hmm/2).toFixed(3)}</XForm><Data>${b64}</Data></Shape>`;
+  cut.forEach(o=>{ if(o.t==='circle'){ shapes+=`<Shape Type="Ellipse" CutIndex="1" Rx="${o.r.toFixed(3)}" Ry="${o.r.toFixed(3)}"><XForm>1 0 0 1 ${o.cx.toFixed(3)} ${(hmm-o.cy).toFixed(3)}</XForm></Shape>`; } });
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<LightBurnProject AppVersion="1.6.00" FormatVersion="1" MaterialHeight="0" MirrorX="False" MirrorY="False">
+  <CutSetting type="Scan"><index Value="0"/><name Value="Gravur"/><minPower Value="20"/><maxPower Value="80"/><speed Value="200"/><priority Value="0"/></CutSetting>
+  <CutSetting type="Cut"><index Value="1"/><name Value="Schnitt"/><minPower Value="60"/><maxPower Value="100"/><speed Value="15"/><priority Value="1"/></CutSetting>
+  ${shapes}
+</LightBurnProject>`;
+}
+function downloadLBRN(){
+  const out=renderLBRN();
+  const blob=new Blob([out],{type:'application/xml'}); const a=document.createElement('a');
+  a.download='wolf-typenschild.lbrn'; a.href=URL.createObjectURL(blob); a.click();
 }
 
 // ---------- helpers ----------
