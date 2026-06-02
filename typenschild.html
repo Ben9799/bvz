@@ -527,7 +527,9 @@ function computeLayout(){
     ops.push({t:'rrect',x:fi,y:fi,w:wmm-2*fi,h:hmm-2*fi,r:Math.min(wmm,hmm)*0.04,sw:0.6}); }
 
   // ---- HOLES (cut layer; preview-only ring shown in mask) ----
-  if(document.getElementById('optHoles').checked){ const d=+document.getElementById('holeD').value, r=d/2, inset=Math.max(m*0.9,d*0.9);
+  if(document.getElementById('optHoles').checked){ const d=+document.getElementById('holeD').value, r=d/2,
+      frameOn=document.getElementById('optFrame').checked, fi=m*0.55,
+      inset=frameOn ? fi+r+m*0.55 : Math.max(m*0.9,d*0.9);
     [[inset,inset],[wmm-inset,inset],[inset,hmm-inset],[wmm-inset,hmm-inset]].forEach(([px,py])=>{
       cut.push({t:'circle',cx:px,cy:py,r,sw:0.2});
       ops.push({t:'circle',cx:px,cy:py,r,sw:0.35,preview:true});
