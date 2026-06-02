@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wolf Lasermark — Typenschild-Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0c; --panel:#101015; --panel2:#16161d; --border:rgba(0,200,255,0.10);
+    --accent:#00c8ff; --accent2:#0099cc; --glow:rgba(0,200,255,0.15);
+    --warm:#e8dcc8; --text:#eaeaf0; --muted:#7a7a8e; --muted2:#aab6c7; --warn:#f59e0b;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Outfit',system-ui,sans-serif;color:var(--text);min-height:100vh;padding:1.4rem 1.2rem 2.4rem;
+    background:
+      radial-gradient(900px 500px at 15% -10%, rgba(0,200,255,0.06), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, rgba(0,153,204,0.05), transparent 55%),
+      var(--bg);
+    background-attachment:fixed;}
+  .wrap{max-width:1140px;margin:0 auto;}
+  .brandbar{display:flex;align-items:center;justify-content:center;gap:0.6rem;margin-bottom:1.1rem;}
+  .brandbar img{width:34px;height:34px;object-fit:contain;}
+  .brandbar .wm{font-weight:800;font-size:1.05rem;letter-spacing:0.02em;}
+  .brandbar .wm span{color:var(--accent);}
+  .head{text-align:center;margin-bottom:1.6rem;}
+  .head h1{font-weight:800;font-size:clamp(1.6rem,4.2vw,2.5rem);line-height:1.08;letter-spacing:-0.02em;}
+  .head h1 span{color:var(--accent);}
+  .head p{color:var(--muted2);margin-top:0.55rem;font-size:0.96rem;max-width:560px;margin-left:auto;margin-right:auto;}
+  .badge-demo{display:inline-flex;align-items:center;gap:0.45rem;margin-top:0.8rem;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;color:var(--accent);background:var(--glow);border:1px solid rgba(0,200,255,0.25);border-radius:30px;padding:0.32rem 0.9rem;}
+  .badge-demo::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);}
+  .grid{display:grid;grid-template-columns:1fr 1.05fr;gap:1.2rem;}
+  @media(max-width:860px){.grid{grid-template-columns:1fr;}}
+  .card{background:linear-gradient(180deg,var(--panel),#0d0d12);border:1px solid var(--border);border-radius:var(--radius);padding:1.3rem;box-shadow:0 1px 0 rgba(255,255,255,0.03) inset, 0 18px 50px -25px rgba(0,0,0,0.8);}
+  .lbl{font-weight:700;font-size:0.74rem;text-transform:uppercase;letter-spacing:0.09em;color:var(--accent);margin-bottom:0.75rem;margin-top:1.2rem;display:flex;align-items:center;gap:0.5rem;}
+  .lbl:first-of-type{margin-top:0;}
+  .lbl::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
+  .field{margin-bottom:1rem;}
+  .field label{display:block;font-size:0.78rem;color:var(--muted2);margin-bottom:0.35rem;}
+  input[type=text],input[type=number],input[type=email],input[type=tel],textarea,select{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:0.6rem 0.75rem;font-family:inherit;font-size:0.9rem;}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);}
+  input[type=range]{width:100%;accent-color:var(--accent);}
+  .row{display:flex;gap:0.7rem;}
+  .row>*{flex:1;}
+  .mat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;}
+  .mat{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:0.7rem 0.3rem 0.6rem;text-align:center;cursor:pointer;transition:all .18s;position:relative;overflow:hidden;}
+  .mat:hover{border-color:rgba(0,200,255,0.4);transform:translateY(-2px);box-shadow:0 10px 24px -14px rgba(0,200,255,0.5);}
+  .mat.sel{border-color:var(--accent);background:rgba(0,200,255,0.08);box-shadow:0 0 0 1px var(--accent) inset;}
+  .mat .chip{width:100%;height:22px;border-radius:6px;margin-bottom:0.4rem;box-shadow:0 1px 3px rgba(0,0,0,0.4) inset;}
+  .mat .mn{font-size:0.72rem;font-weight:600;}
+  .fields-list{display:flex;flex-direction:column;gap:0.5rem;}
+  .frow{display:flex;gap:0.5rem;align-items:center;}
+  .crow{display:flex;gap:0.5rem;align-items:center;margin-bottom:0.5rem;}
+  .crow select{flex:0 0 38%;}
+  .crow input{flex:1;}
+  .btn-sm{padding:0.45rem 0.8rem;font-size:0.85rem;margin-top:0.1rem;}
+  .note{font-size:0.78rem;color:var(--muted);line-height:1.4;margin:0.3rem 0 0;padding:0.5rem 0.6rem;background:rgba(255,200,0,0.06);border:1px solid rgba(255,200,0,0.18);border-radius:8px;}
+  .frow.dragging{opacity:0.45;}
+  .frow .drag{flex:0 0 auto;cursor:grab;color:var(--muted2);font-size:0.85rem;letter-spacing:-2px;user-select:none;line-height:1;}
+  .frow .drag:active{cursor:grabbing;}
+  .frow input{flex:1;}
+  .frow input.k{flex:0 0 38%;font-weight:600;}
+  .frow .del{flex:0 0 auto;width:32px;height:32px;border:1px solid var(--border);background:var(--panel2);color:var(--muted2);border-radius:9px;cursor:pointer;font-size:1rem;line-height:1;}
+  .frow .del:hover{border-color:var(--warn);color:var(--warn);}
+  .addbtn{margin-top:0.6rem;width:100%;border:1px dashed rgba(0,212,255,0.3);background:transparent;color:var(--accent);border-radius:10px;padding:0.55rem;font-family:inherit;font-size:0.82rem;font-weight:600;cursor:pointer;}
+  .addbtn:hover{background:rgba(0,212,255,0.05);}
+  .upload{border:2px dashed rgba(0,212,255,0.25);border-radius:11px;padding:0.75rem;text-align:center;cursor:pointer;position:relative;transition:all .18s;font-size:0.8rem;color:var(--muted2);}
+  .upload:hover,.upload.drag{border-color:var(--accent);background:rgba(0,212,255,0.04);}
+  .upload input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+  .upload strong{color:var(--accent);}
+  .slider-val{font-weight:700;color:var(--accent);}
+  .opts{display:flex;flex-direction:column;gap:0.55rem;}
+  .chk{display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;color:var(--muted2);cursor:pointer;user-select:none;}
+  .chk input{width:auto;}
+  .preview-wrap{display:flex;flex-direction:column;align-items:center;}
+  .canvas-stage{width:100%;aspect-ratio:1;border-radius:14px;overflow:hidden;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(120% 120% at 50% 12%, #1a1c22 0%, #101116 45%, #0a0a0c 100%);
+    border:1px solid var(--border);box-shadow:0 24px 60px -30px rgba(0,0,0,0.9) inset, 0 0 0 1px rgba(255,255,255,0.02) inset;}
+  canvas{max-width:100%;max-height:100%;}
+  .readout{margin-top:0.9rem;width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:0.85rem 1rem;font-size:0.82rem;line-height:1.8;}
+  .readout .k{color:var(--muted);} .readout b{color:var(--text);font-family:'Space Mono',monospace;font-weight:700;letter-spacing:-0.02em;}
+  .actions{display:flex;gap:0.6rem;margin-top:0.9rem;width:100%;flex-wrap:wrap;}
+  .btn{flex:1;min-width:120px;border:none;border-radius:12px;padding:0.8rem;font-family:inherit;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all .2s;}
+  .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#041018;box-shadow:0 8px 22px -8px rgba(0,200,255,0.6);}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 28px -8px rgba(0,200,255,0.7);}
+  .btn-ghost{background:var(--panel2);border:1px solid var(--border);color:var(--text);}
+  .btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+  .hint{font-size:0.73rem;color:var(--muted);margin-top:0.5rem;line-height:1.5;text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brandbar">
+    <img src="images/wolf-lasermark-icon.png" alt="Wolf Lasermark" onerror="this.style.display='none'">
+    <div class="wm">WOLF <span>LASERMARK</span></div>
+  </div>
+  <div class="head">
+    <h1>Typenschild <span>selbst gestalten</span></h1>
+    <p>Daten eingeben, Material wählen — Ihr graviertes Typenschild entsteht in Echtzeit, maßgenau in mm.</p>
+    <span class="badge-demo">Live-Vorschau</span>
+  </div>
+
+  <div class="grid">
+    <!-- CONTROLS -->
+    <div class="card">
+      <span class="lbl">1 · Kopfzeile</span>
+      <div class="field" style="margin-bottom:0.7rem;">
+        <label>Firma / Überschrift</label>
+        <input type="text" id="firma" value="WOLF LASERMARK">
+      </div>
+      <div class="field">
+        <label>Logo (optional)</label>
+        <div class="upload" id="drop">
+          <input type="file" id="file" accept="image/*">
+          <div>📎 <strong>Logo wählen</strong> · <span id="fileHint">dunkles Motiv ideal</span></div>
+        </div>
+      </div>
+
+      <span class="lbl">2 · Datenfelder</span>
+      <div class="fields-list" id="fieldsList"></div>
+      <button class="addbtn" id="addField">+ Feld hinzufügen</button>
+
+      <span class="lbl">3 · Maße & Schrift</span>
+      <div class="row">
+        <div class="field"><label>Breite (mm)</label><input type="number" id="wmm" value="100" min="20" max="600"></div>
+        <div class="field"><label>Höhe (mm)</label><input type="number" id="hmm" value="70" min="15" max="600"></div>
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label>Schriftart (LightBurn-kompatibel)</label>
+        <select id="font">
+          <option value="0">Arial</option>
+          <option value="1">Arial Bold</option>
+          <option value="2">Times New Roman</option>
+          <option value="3">Courier New</option>
+          <option value="4">Impact</option>
+          <option value="5">Verdana</option>
+        </select>
+      </div>
+
+      <span class="lbl">4 · Layout</span>
+      <div class="row">
+        <div class="field" style="margin-bottom:0;">
+          <label>Vorlage</label>
+          <select id="template">
+            <option value="klassisch">Klassisch (Kopf links)</option>
+            <option value="logo-top">Logo zentriert oben</option>
+            <option value="zweispaltig">2-spaltig (viele Daten)</option>
+            <option value="kompakt">Kompakt</option>
+          </select>
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label>Werte-Ausrichtung</label>
+          <select id="align">
+            <option value="links">Linksbündig</option>
+            <option value="gepunktet">Gepunktet (……)</option>
+            <option value="rechts">Rechtsbündig</option>
+          </select>
+        </div>
+      </div>
+
+      <span class="lbl">5 · Codes (QR / DataMatrix)</span>
+      <div id="codesList"></div>
+      <button class="btn btn-ghost btn-sm" id="addCode">+ Code hinzufügen</button>
+
+      <span class="lbl">6 · Material</span>
+      <div class="mat-grid" id="matGrid"></div>
+
+      <span class="lbl">7 · Optionen</span>
+      <div class="opts">
+        <label class="chk"><input type="checkbox" id="optFrame" checked> Rahmen (gravierte Umrandung)</label>
+        <label class="chk"><input type="checkbox" id="optHoles" checked> Befestigungslöcher (4 Ecken)</label>
+        <label class="chk"><input type="checkbox" id="optCE"> CE-Kennzeichen</label>
+        <label class="chk"><input type="checkbox" id="optWEEE"> WEEE (durchgestrichene Tonne)</label>
+        <p class="note" id="ceNote" style="display:none;">ℹ️ Für die Rechtmäßigkeit der CE-Kennzeichnung und der Konformitätserklärung ist der Auftraggeber verantwortlich.</p>
+        <div class="field" id="holeWrap" style="margin:0.2rem 0 0;">
+          <label>Lochdurchmesser: <span class="slider-val" id="holeVal">4.0 mm</span></label>
+          <input type="range" id="holeD" min="2" max="8" step="0.5" value="4">
+        </div>
+        <div class="field" style="margin:0.2rem 0 0;">
+          <label>Fußzeile (optional)</label>
+          <input type="text" id="footer" value="Made in Germany">
+        </div>
+      </div>
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="card">
+      <span class="lbl">Ihr Typenschild — Vorschau</span>
+      <div class="preview-wrap">
+        <div class="canvas-stage">
+          <canvas id="cv" width="1000" height="1000"></canvas>
+        </div>
+        <div class="readout" id="readout"></div>
+        <div class="actions">
+          <button class="btn btn-primary" id="order" style="flex:2;">Anfrage senden →</button>
+          <button class="btn btn-ghost admin-only" id="dlpng" style="display:none;">⬇ PNG</button>
+          <button class="btn btn-ghost admin-only" id="dlsvg" style="display:none;">⬇ SVG</button>
+        </div>
+        <div class="hint">Simulierte Darstellung. Senden Sie Ihre Anfrage — wir erstellen Ihr Typenschild passgenau.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ANFRAGE MODAL -->
+<div id="anfrageOverlay" style="display:none;position:fixed;inset:0;background:rgba(4,6,15,.72);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center;padding:1rem;">
+  <div class="card" style="max-width:440px;width:100%;max-height:92vh;overflow:auto;">
+    <span class="lbl">Anfrage senden</span>
+    <p class="hint" style="margin:.2rem 0 .8rem;">Wir erstellen Ihr Typenschild passgenau nach Ihrem Entwurf und melden uns mit einem Angebot.</p>
+    <div class="field"><label>Name *</label><input type="text" id="cName" autocomplete="name"></div>
+    <div class="field"><label>E-Mail *</label><input type="email" id="cEmail" autocomplete="email"></div>
+    <div class="field"><label>Telefon (optional)</label><input type="tel" id="cPhone" autocomplete="tel"></div>
+    <div class="field"><label>Firma (optional)</label><input type="text" id="cFirma" autocomplete="organization"></div>
+    <div class="field"><label>Stückzahl (optional)</label><input type="text" id="cQty" placeholder="z. B. 25"></div>
+    <div class="field"><label>Nachricht (optional)</label><textarea id="cMsg" rows="3" style="resize:vertical;"></textarea></div>
+    <p class="note" id="anfrageErr" style="display:none;color:#ff9b9b;"></p>
+    <div class="actions" style="margin-top:.6rem;">
+      <button class="btn btn-primary" id="anfrageSubmit" style="flex:2;">Absenden →</button>
+      <button class="btn btn-ghost" id="anfrageCancel">Abbrechen</button>
+    </div>
+    <div id="anfrageOk" style="display:none;text-align:center;padding:.5rem 0;">
+      <p style="font-size:1.05rem;font-weight:700;">✅ Anfrage gesendet!</p>
+      <p class="hint">Vielen Dank — wir melden uns in Kürze bei Ihnen.</p>
+      <button class="btn btn-ghost" id="anfrageClose" style="margin-top:.6rem;">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+  const firebaseConfig = {
+    apiKey: "AIzaSyBLSp0en7wDD_71PF1n3qYXPF0YNTEWmIc",
+    authDomain: "auftrage-edc6d.firebaseapp.com",
+    projectId: "auftrage-edc6d",
+    storageBucket: "auftrage-edc6d.firebasestorage.app",
+    messagingSenderId: "675308449934",
+    appId: "1:675308449934:web:b4c1fc2e190647ace419df"
+  };
+  const storage = getStorage(initializeApp(firebaseConfig, "wl-typenschild"));
+  window.wlUploadTS = function(blob, ext, contentType){
+    return new Promise((resolve, reject) => {
+      const path = "typenschild-specs/" + Date.now() + "-" + Math.random().toString(36).slice(2,8) + "." + ext;
+      const task = uploadBytesResumable(ref(storage, path), blob, { contentType });
+      task.on("state_changed", null, reject, async () => {
+        try { resolve(await getDownloadURL(task.snapshot.ref)); } catch(e){ reject(e); }
+      });
+    });
+  };
+</script>
+
+<script src="qrcode.min.js"></script>
+<script src="datamatrix.min.js"></script>
+<script>
+// ---------- FONTS (must match LightBurn system fonts) ----------
+const FONTS = [
+  {name:'Arial',           css:'Arial, sans-serif',           weight:400},
+  {name:'Arial Bold',      css:'Arial, sans-serif',           weight:700},
+  {name:'Times New Roman', css:'"Times New Roman", serif',    weight:400},
+  {name:'Courier New',     css:'"Courier New", monospace',    weight:400},
+  {name:'Impact',          css:'Impact, sans-serif',          weight:400},
+  {name:'Verdana',         css:'Verdana, sans-serif',         weight:400},
+];
+
+// ---------- MATERIALS ----------
+const MATERIALS = {
+  Aluminium:  {engrave:'dark',  base:'#b8bdc4', tex:'brushed', tint:'#d6dade'},
+  Edelstahl:  {engrave:'dark',  base:'#9aa3ad', tex:'brushed', tint:'#c2c9d2'},
+  Messing:    {engrave:'dark',  base:'#b08d3e', tex:'brushed', tint:'#e3c878'},
+  Titan:      {engrave:'dark',  base:'#7d8893', tex:'brushed', tint:'#9fb0bd'},
+  'Alu schwarz':{engrave:'light',base:'#1c1f24', tex:'matte',  tint:'#2a2e35'},
+  Kunststoff: {engrave:'light', base:'#22272f', tex:'matte',   tint:'#2c333d'},
+};
+
+const W=1000,H=1000;
+const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+let state={ mat:'Aluminium', img:null,
+  fields:[
+    {k:'Typ',         v:'WL-2000'},
+    {k:'Serien-Nr.',  v:'SN-000123'},
+    {k:'Artikel-Nr.', v:'ART-4567'},
+    {k:'Baujahr',     v:'2026'},
+    {k:'Spannung',    v:'230 V / 50 Hz'},
+    {k:'Leistung',    v:'1,5 kW'},
+  ],
+  codes:[]
+};
+let geo={ ox:0, oy:0, ppmm:1, wmm:100, hmm:70 };
+
+// ---------- build UI ----------
+const matGrid=document.getElementById('matGrid');
+Object.entries(MATERIALS).forEach(([name,m])=>{
+  const d=document.createElement('div');
+  d.className='mat'+(name===state.mat?' sel':'');
+  d.innerHTML=`<div class="chip" style="background:linear-gradient(135deg,${m.tint},${m.base})"></div><span class="mn">${name}</span>`;
+  d.onclick=()=>{ state.mat=name; [...matGrid.children].forEach(c=>c.classList.remove('sel')); d.classList.add('sel'); render(); };
+  matGrid.appendChild(d);
+});
+
+const fieldsList=document.getElementById('fieldsList');
+function renderFields(){
+  fieldsList.innerHTML='';
+  state.fields.forEach((f,i)=>{
+    const row=document.createElement('div'); row.className='frow'; row.draggable=true; row.dataset.i=i;
+    row.innerHTML=`<span class="drag" title="Ziehen zum Sortieren">⋮⋮</span>`+
+                  `<input class="k" type="text" value="${escAttr(f.k)}" placeholder="Bezeichnung">`+
+                  `<input type="text" value="${escAttr(f.v)}" placeholder="Wert">`+
+                  `<button class="del" title="Löschen">×</button>`;
+    const [ik,iv]=row.querySelectorAll('input');
+    ik.addEventListener('input',()=>{ state.fields[i].k=ik.value; render(); });
+    iv.addEventListener('input',()=>{ state.fields[i].v=iv.value; render(); });
+    row.querySelector('.del').onclick=()=>{ state.fields.splice(i,1); renderFields(); render(); };
+    row.addEventListener('dragstart',e=>{ dragFrom=i; row.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; });
+    row.addEventListener('dragend',()=>row.classList.remove('dragging'));
+    row.addEventListener('dragover',e=>{ e.preventDefault(); });
+    row.addEventListener('drop',e=>{ e.preventDefault(); const to=+row.dataset.i; if(dragFrom===null||dragFrom===to)return;
+      const [moved]=state.fields.splice(dragFrom,1); state.fields.splice(to,0,moved); dragFrom=null; renderFields(); render(); });
+    fieldsList.appendChild(row);
+  });
+}
+let dragFrom=null;
+document.getElementById('addField').onclick=()=>{ state.fields.push({k:'Feld',v:''}); renderFields(); render(); };
+renderFields();
+
+// ---- Codes (QR / DataMatrix) ----
+const codesList=document.getElementById('codesList');
+function renderCodes(){
+  codesList.innerHTML='';
+  state.codes.forEach((c,i)=>{
+    const row=document.createElement('div'); row.className='crow';
+    row.innerHTML=`<select><option value="qr"${c.type==='qr'?' selected':''}>QR-Code</option><option value="datamatrix"${c.type==='datamatrix'?' selected':''}>DataMatrix</option></select>`+
+                  `<input type="text" value="${escAttr(c.text)}" placeholder="Text / URL / Seriennr. …">`+
+                  `<button class="del" title="Löschen">×</button>`;
+    const sel=row.querySelector('select'), inp=row.querySelector('input');
+    sel.addEventListener('change',()=>{ state.codes[i].type=sel.value; render(); });
+    inp.addEventListener('input',()=>{ state.codes[i].text=inp.value; render(); });
+    row.querySelector('.del').onclick=()=>{ state.codes.splice(i,1); renderCodes(); render(); };
+    codesList.appendChild(row);
+  });
+}
+document.getElementById('addCode').onclick=()=>{ state.codes.push({type:'qr',text:''}); renderCodes(); render(); };
+renderCodes();
+
+['firma','wmm','hmm','font','footer','holeD'].forEach(id=>document.getElementById(id).addEventListener('input',render));
+['template','align'].forEach(id=>document.getElementById(id).addEventListener('change',render));
+['optFrame','optHoles','optCE','optWEEE'].forEach(id=>document.getElementById(id).addEventListener('change',render));
+document.getElementById('optCE').addEventListener('change',e=>{ document.getElementById('ceNote').style.display=e.target.checked?'block':'none'; });
+document.getElementById('holeD').addEventListener('input',()=>{ document.getElementById('holeVal').textContent=(+document.getElementById('holeD').value).toFixed(1)+' mm'; });
+
+// logo upload
+const fileEl=document.getElementById('file'), drop=document.getElementById('drop');
+fileEl.addEventListener('change',e=>loadImg(e.target.files[0]));
+['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag');}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag');}));
+drop.addEventListener('drop',e=>{ if(e.dataTransfer.files[0]) loadImg(e.dataTransfer.files[0]); });
+function loadImg(f){ if(!f)return; const img=new Image(); img.onload=()=>{ state.img=img; document.getElementById('fileHint').textContent='✓ '+f.name; render(); }; img.src=URL.createObjectURL(f); }
+
+// ---------- MATERIAL TEXTURE ----------
+function paintMaterial(g,ox,oy,ww,hh){
+  const m=MATERIALS[state.mat];
+  const grad=g.createLinearGradient(ox,oy,ox+ww,oy+hh);
+  grad.addColorStop(0,m.tint); grad.addColorStop(0.5,m.base); grad.addColorStop(1,shade(m.base,-22));
+  g.fillStyle=grad; g.fillRect(ox,oy,ww,hh);
+  if(m.tex==='brushed'){
+    g.globalAlpha=0.06; g.strokeStyle='#000';
+    for(let y=oy;y<oy+hh;y+=2){ g.beginPath(); g.moveTo(ox,y); g.lineTo(ox+ww,y+(Math.random()-0.5)*2); g.stroke(); }
+    g.globalAlpha=0.05; g.strokeStyle='#fff';
+    for(let y=oy+1;y<oy+hh;y+=5){ g.beginPath(); g.moveTo(ox,y); g.lineTo(ox+ww,y); g.stroke(); }
+    g.globalAlpha=1;
+    const sp=g.createLinearGradient(ox,oy,ox+ww*0.85,oy+hh);
+    sp.addColorStop(0,'rgba(255,255,255,0)'); sp.addColorStop(0.45,'rgba(255,255,255,0.05)');
+    sp.addColorStop(0.55,'rgba(255,255,255,0.18)'); sp.addColorStop(0.62,'rgba(255,255,255,0.05)');
+    sp.addColorStop(1,'rgba(255,255,255,0)'); g.fillStyle=sp; g.fillRect(ox,oy,ww,hh);
+  } else if(m.tex==='matte'){
+    g.globalAlpha=0.04;
+    for(let i=0;i<9000;i++){ const x=ox+Math.random()*ww,y=oy+Math.random()*hh; g.fillStyle=Math.random()>0.5?'#fff':'#000'; g.fillRect(x,y,1.5,1.5); }
+    g.globalAlpha=1;
+  }
+  const hs=g.createRadialGradient(ox+ww*0.30,oy+hh*0.18,0,ox+ww*0.30,oy+hh*0.18,Math.max(ww,hh)*0.7);
+  hs.addColorStop(0,'rgba(255,255,255,0.10)'); hs.addColorStop(0.5,'rgba(255,255,255,0.02)'); hs.addColorStop(1,'rgba(255,255,255,0)');
+  g.fillStyle=hs; g.fillRect(ox,oy,ww,hh);
+  const v=g.createRadialGradient(ox+ww/2,oy+hh/2,Math.min(ww,hh)*0.25,ox+ww/2,oy+hh/2,Math.max(ww,hh)*0.75);
+  v.addColorStop(0,'rgba(0,0,0,0)'); v.addColorStop(1,'rgba(0,0,0,0.26)');
+  g.fillStyle=v; g.fillRect(ox,oy,ww,hh);
+}
+
+// cap-height ratio for a font at 100px (cap height / em)
+const capRatioCache={};
+function capRatio(css,weight){
+  const key=weight+'|'+css; if(capRatioCache[key]) return capRatioCache[key];
+  const c=document.createElement('canvas'); c.width=200;c.height=200; const g=c.getContext('2d');
+  g.fillStyle='#fff'; g.textAlign='center'; g.textBaseline='alphabetic'; g.font=`${weight} 100px ${css}`;
+  g.fillText('H',100,150);
+  const p=g.getImageData(0,0,200,200).data; let y0=200,y1=0;
+  for(let y=0;y<200;y++)for(let x=0;x<200;x++){ if(p[(y*200+x)*4+3]>20){ if(y<y0)y0=y; if(y>y1)y1=y; } }
+  const r=(y1>y0)?(y1-y0)/100:0.7; capRatioCache[key]=r; return r;
+}
+
+state.firmaVal=()=>document.getElementById('firma').value.trim();
+
+// ---------- SHARED LAYOUT MODEL (mm-space ops → consumed by BOTH canvas preview and SVG export) ----------
+const measCtx=document.createElement('canvas').getContext('2d');
+function emWidthRatio(str,f){ measCtx.font=`${f.weight} 100px ${f.css}`; return measCtx.measureText(str||'').width/100; }
+function textWmm(str,capMM,f){ const emMM=capMM/capRatio(f.css,f.weight); return emWidthRatio(str,f)*emMM; }
+function fitCap(str,capMM,maxWmm,f){ if(!maxWmm||!str) return capMM; const w=textWmm(str,capMM,f); return w>maxWmm? capMM*(maxWmm/w):capMM; }
+function qrModules(text){ try{ const qr=qrcode(0,'M'); qr.addData(String(text||'')); qr.make(); const n=qr.getModuleCount(); const dark=[]; for(let r=0;r<n;r++)for(let c=0;c<n;c++) if(qr.isDark(r,c)) dark.push([r,c]); return {rows:n,cols:n,dark}; }catch(e){ return null; } }
+function dmModules(text){ try{ const svg=DATAMatrix({msg:String(text||''),dim:100,pad:0}); const vb=svg.getAttribute('viewBox').split(' ').map(Number); const cols=vb[2],rows=vb[3];
+  const paths=svg.querySelectorAll('path'); const d=paths[paths.length-1].getAttribute('d'); const dark=[]; const re=/M(\d+),(\d+)h(\d+)/g; let m;
+  while((m=re.exec(d))){ const u=+m[1],a=+m[2],s=+m[3]; for(let k=0;k<s;k++) dark.push([a,u+k]); }
+  return {rows,cols,dark}; }catch(e){ return null; } }
+function codeModules(type,text){ return type==='datamatrix'? dmModules(text) : qrModules(text); }
+// Official symbol vectors (Wikimedia Commons, public): CE viewBox 280x200, WEEE viewBox 420.487x597.04
+const CE_VB={w:280,h:200}, CE_PATHS=[
+  'M110,199.498744A100,100 0 0 1 100,200A100,100 0 0 1 100,0A100,100 0 0 1 110,0.501256L110,30.501256A70,70 0 0 0 100,30A70,70 0 0 0 100,170A70,70 0 0 0 110,169.498744Z',
+  'M280,199.498744A100,100 0 0 1 270,200A100,100 0 0 1 270,0A100,100 0 0 1 280,0.501256L280,30.501256A70,70 0 0 0 270,30A70,70 0 0 0 201.620283,85L260,85L260,115L201.620283,115A70,70 0 0 0 270,170A70,70 0 0 0 280,169.498744Z'
+];
+const WEEE_VB={w:420.487,h:597.04}, WEEE_PATH='M236.379,48.548h-34.999v5.502h34.999V48.548z M136.377,65.629c-5.415,2.942-9.624,6.535-11.948,10.919h11.948V65.629z M318.088,117.987l-13.185,13.43l-0.637,6.83h15.825v-20.26H318.088z M199.088,225.298l-68.126-71.864L142.13,283.26L199.088,225.298z M212.563,225.475l65.129,68.592l13.516-145.03h-1.333v-2.314L212.563,225.475z M129.647,138.151l76.208,80.26l45.077-45.87h-63.552v-24h73.501v13.875l28.994-29.504v-25.715h5.232l1.691-18.151H125.423L129.647,138.151z M313.64,346.135c0.314,1.874,0.478,3.799,0.478,5.763c0,19.089-15.474,34.562-34.562,34.562c-13.255,0-24.768-7.461-30.566-18.413h-84.52v18.055h-22.237v-18.101c-2.604-0.366-5.102-2.842-5.325-5.439l-4.748-55.187L14.359,427.368l-7.042-6.92L131.055,294.53l-13.339-155.069L0,15.286V1.611l116.403,122.592l-3.067-35.654H98.88v-12h12.719c0.219-0.674,0.509-1.462,0.89-2.342c4.229-9.775,12.964-16.763,23.889-21.734v-7.931h20.505v1.227c10.683-2.455,21.978-3.79,32.499-4.468v-4.752h58.999V66.05h-58.999V53.588c-10.451,0.781-21.987,2.208-32.499,4.709v18.252h139.444c-5.472-12.912-26.749-18.958-47.947-21.699V42.631c21.275,2.637,43.143,8.586,54.121,21.438c2.929-3.729,7.48-6.125,12.59-6.125c8.837,0,16,7.163,16,16c0,8.836-7.163,16-16,16c-2.2,0-4.297-0.444-6.205-1.248l-1.725,18.5h7.986L420.487,0v13.682l-91.805,93.513h1.911v41.842h-27.331l-14.594,156.588L396.623,419.32l-7.162,6.797L313.64,346.135z M244.992,351.898c0-17.718,13.331-32.322,30.51-34.328l0.99-10.621l-70.699-74.578l-62.56,63.724l5.157,59.953h96.848C245.076,354.687,244.992,353.302,244.992,351.898z M261.58,351.898c0,9.927,8.047,17.975,17.975,17.975c9.927,0,17.975-8.048,17.975-17.975c0-9.928-8.048-17.975-17.975-17.975C269.627,333.923,261.58,341.97,261.58,351.898z M267.881,351.898c0-6.447,5.227-11.674,11.674-11.674s11.674,5.227,11.674,11.674s-5.227,11.673-11.674,11.673S267.881,358.345,267.881,351.898z M33.878,512.379h347.673v84.661H33.878V512.379z';
+
+function computeLayout(){
+  const f=FONTS[+document.getElementById('font').value];
+  const wmm=geo.wmm, hmm=geo.hmm;
+  const m=Math.max(3,Math.min(7,Math.min(wmm,hmm)*0.07));
+  const tmpl=document.getElementById('template').value;
+  const align=document.getElementById('align').value;
+  const cx=m, cy=m, cw=wmm-2*m, ch=hmm-2*m;
+  const ops=[], cut=[];
+  const fields=state.fields.filter(x=>x.k||x.v);
+  const firma=state.firmaVal();
+  const footStr=(document.getElementById('footer').value||'').trim();
+  const hasLogo=!!state.img;
+  const ce=document.getElementById('optCE').checked, weee=document.getElementById('optWEEE').checked;
+  const codes=state.codes.filter(c=>(c.text||'').trim());
+  const logoAR=hasLogo? state.img.width/state.img.height : 1;
+
+  let cursorY=cy;
+  // ---- HEADER ----
+  if(firma||hasLogo){
+    let headerH;
+    if(tmpl==='kompakt'){
+      headerH=Math.min(ch*0.20, 9);
+      if(firma) ops.push({t:'text',x:cx,y:cursorY+headerH/2,cap:fitCap(firma,headerH*0.62,cw,f),anchor:'start',str:firma});
+    } else if(tmpl==='logo-top'){
+      headerH=Math.min(ch*(fields.length?0.42:1.0), hmm*0.45);
+      let yy=cursorY;
+      if(hasLogo){ const box=headerH*0.55, ih=Math.min(box,box), iw=ih*logoAR; ops.push({t:'img',x:cx+cw/2-iw/2,y:yy,w:iw,h:ih}); yy+=ih+1.5; }
+      if(firma){ const zoneLeft=headerH-(yy-cursorY); ops.push({t:'text',x:cx+cw/2,y:yy+zoneLeft/2,cap:fitCap(firma,Math.min(zoneLeft*0.6,7),cw,f),anchor:'middle',str:firma}); }
+    } else { // klassisch & zweispaltig
+      headerH=Math.min(ch*0.30, 18);
+      if(hasLogo){ const box=headerH*0.92, ih=box, iw=ih*logoAR; ops.push({t:'img',x:cx,y:cursorY+(headerH-ih)/2,w:iw,h:ih});
+        if(firma) ops.push({t:'text',x:cx+iw+3,y:cursorY+headerH/2,cap:fitCap(firma,headerH*0.42,cw-iw-3,f),anchor:'start',str:firma}); }
+      else if(firma){ ops.push({t:'text',x:cx+cw/2,y:cursorY+headerH/2,cap:fitCap(firma,headerH*0.5,cw,f),anchor:'middle',str:firma}); }
+    }
+    cursorY+=headerH;
+    if(fields.length){ const dy=cursorY+1.5; ops.push({t:'line',x1:cx,y1:dy,x2:cx+cw,y2:dy,w:0.4}); cursorY=dy+1.5; }
+  }
+
+  // ---- FOOTER ----
+  let footBottom=cy+ch;
+  if(footStr){ const footCapMM=Math.min(3.0,hmm*0.045), fH=footCapMM*1.7;
+    ops.push({t:'text',x:cx+cw/2,y:cy+ch-fH*0.55,cap:fitCap(footStr,footCapMM,cw,f),anchor:'middle',str:footStr});
+    footBottom=cy+ch-fH-1.5; }
+
+  // ---- CODES (QR / DataMatrix) right column + MARKS (CE / WEEE) ----
+  const zoneTop=cursorY; let zoneBottom=footBottom, dataRight=cx+cw;
+  const haveMarks=ce||weee;
+  let markH=haveMarks? Math.min((zoneBottom-zoneTop)*0.45, 11) : 0;
+  if(codes.length){
+    const colW=Math.min(cw*0.34, Math.max(12, zoneBottom-zoneTop));
+    const colX=cx+cw-colW, gapC=2.5;
+    const codeBottom=zoneBottom-(haveMarks? markH+2 : 0);
+    const avail=Math.max(8, codeBottom-zoneTop);
+    const size=Math.min(colW, (avail-(codes.length-1)*gapC)/codes.length);
+    let cyy=zoneTop;
+    codes.forEach(c=>{ const mods=codeModules(c.type,c.text);
+      if(mods){ ops.push({t:'code',x:colX+(colW-size)/2,y:cyy,cellW:size/mods.cols,cellH:size/mods.rows,dark:mods.dark}); }
+      cyy+=size+gapC; });
+    dataRight=colX-3;
+    if(haveMarks){ markH=Math.min(markH, colW*0.5); let mx=cx+cw, my=zoneBottom-markH;
+      if(ce){ const w=markH*(CE_VB.w/CE_VB.h); mx-=w; ops.push({t:'sym',sym:'ce',x:mx,y:my,w,h:markH}); mx-=2; }
+      if(weee){ const w=markH*(WEEE_VB.w/WEEE_VB.h); mx-=w; ops.push({t:'sym',sym:'weee',x:mx,y:my,w,h:markH}); } }
+  } else if(haveMarks){
+    let mx=cx+cw, my=zoneBottom-markH;
+    if(ce){ const w=markH*(CE_VB.w/CE_VB.h); mx-=w; ops.push({t:'sym',sym:'ce',x:mx,y:my,w,h:markH}); mx-=2; }
+    if(weee){ const w=markH*(WEEE_VB.w/WEEE_VB.h); mx-=w; ops.push({t:'sym',sym:'weee',x:mx,y:my,w,h:markH}); }
+    zoneBottom=my-1.5;
+  }
+
+  // ---- DATA ROWS ----
+  if(fields.length){
+    const twoCol=(tmpl==='zweispaltig');
+    const cwData=dataRight-cx;
+    const cols=twoCol?2:1, colGap=4;
+    const colW=(cwData-(cols-1)*colGap)/cols, perCol=Math.ceil(fields.length/cols);
+    const zoneH=Math.max(2,zoneBottom-zoneTop), rowH=zoneH/perCol;
+    const capMM=Math.min(rowH*0.46, twoCol?3.0:4.2);
+    for(let i=0;i<fields.length;i++){
+      const col=Math.floor(i/perCol), idx=i%perCol, colX=cx+col*(colW+colGap), yc=zoneTop+rowH*(idx+0.5);
+      const labelW=colW*0.42, valX=colX+labelW+2, valRight=colX+colW, fl=fields[i];
+      const klabel=(fl.k||'')+(fl.k?':':'');
+      ops.push({t:'text',x:colX,y:yc,cap:fitCap(klabel,capMM,labelW-1,f),anchor:'start',str:klabel});
+      const v=fl.v||'';
+      if(align==='rechts'){ ops.push({t:'text',x:valRight,y:yc,cap:fitCap(v,capMM,colW-labelW-3,f),anchor:'end',str:v}); }
+      else if(align==='gepunktet'){ const vcap=fitCap(v,capMM,colW-labelW-3,f);
+        ops.push({t:'text',x:valRight,y:yc,cap:vcap,anchor:'end',str:v});
+        const labEnd=colX+Math.min(textWmm(klabel,capMM,f),labelW-1)+1.5, valStart=valRight-textWmm(v,vcap,f)-1.5;
+        if(valStart>labEnd) ops.push({t:'dotline',x1:labEnd,x2:valStart,y:yc+capMM*0.18,r:0.22,gap:1.3}); }
+      else { ops.push({t:'text',x:valX,y:yc,cap:fitCap(v,capMM,colW-labelW-3,f),anchor:'start',str:v}); }
+    }
+    if(twoCol){ const dx=cx+colW+colGap/2; ops.push({t:'line',x1:dx,y1:zoneTop,x2:dx,y2:zoneBottom,w:0.25}); }
+  }
+
+  // ---- FRAME ----
+  if(document.getElementById('optFrame').checked){ const fi=m*0.55;
+    ops.push({t:'rrect',x:fi,y:fi,w:wmm-2*fi,h:hmm-2*fi,r:Math.min(wmm,hmm)*0.04,sw:0.6}); }
+
+  // ---- HOLES (cut layer; preview-only ring shown in mask) ----
+  if(document.getElementById('optHoles').checked){ const d=+document.getElementById('holeD').value, r=d/2, inset=Math.max(m*0.9,d*0.9);
+    [[inset,inset],[wmm-inset,inset],[inset,hmm-inset],[wmm-inset,hmm-inset]].forEach(([px,py])=>{
+      cut.push({t:'circle',cx:px,cy:py,r,sw:0.2});
+      ops.push({t:'circle',cx:px,cy:py,r,sw:0.35,preview:true});
+      ops.push({t:'circle',cx:px,cy:py,r:0.45,fill:true,preview:true}); }); }
+
+  return {ops,cut,f};
+}
+
+// ---- render ops onto the white-ink MASK canvas ----
+function renderMaskFromOps(ops,ox,oy){
+  const c=document.createElement('canvas'); c.width=W; c.height=H; const g=c.getContext('2d');
+  const ppmm=geo.ppmm, X=v=>ox+v*ppmm, Y=v=>oy+v*ppmm, S=v=>v*ppmm;
+  const f=FONTS[+document.getElementById('font').value], cr=capRatio(f.css,f.weight);
+  g.fillStyle='#fff'; g.strokeStyle='#fff';
+  ops.forEach(o=>{
+    if(o.t==='text'){ if(!o.str)return; g.font=`${f.weight} ${(o.cap*ppmm)/cr}px ${f.css}`; g.textAlign=o.anchor==='middle'?'center':(o.anchor==='end'?'right':'left'); g.textBaseline='middle'; g.fillText(o.str,X(o.x),Y(o.y)); }
+    else if(o.t==='line'){ g.lineWidth=Math.max(1,S(o.w)); g.beginPath(); g.moveTo(X(o.x1),Y(o.y1)); g.lineTo(X(o.x2),Y(o.y2)); g.stroke(); }
+    else if(o.t==='rrect'){ g.lineWidth=Math.max(1.4,S(o.sw)); strokeRound(g,X(o.x),Y(o.y),S(o.w),S(o.h),S(o.r)); }
+    else if(o.t==='circle'){ g.lineWidth=Math.max(1.2,S(o.sw||0.3)); g.beginPath(); g.arc(X(o.cx),Y(o.cy),S(o.r),0,7); if(o.fill)g.fill(); else g.stroke(); }
+    else if(o.t==='dotline'){ const n=Math.max(0,Math.floor((o.x2-o.x1)/o.gap)); for(let i=0;i<=n;i++){ g.beginPath(); g.arc(X(o.x1+i*o.gap),Y(o.y),Math.max(0.8,S(o.r)),0,7); g.fill(); } }
+    else if(o.t==='img'){ drawLogoInk(g,X(o.x),Y(o.y),S(o.w),S(o.h)); }
+    else if(o.t==='code'){ const cw=S(o.cellW), ch=S(o.cellH); o.dark.forEach(([r,cc])=>g.fillRect(X(o.x)+cc*cw,Y(o.y)+r*ch,cw+0.6,ch+0.6)); }
+    else if(o.t==='sym'){ drawSymbol(g,o.sym,X(o.x),Y(o.y),S(o.w),S(o.h)); }
+  });
+  return c;
+}
+function drawSymbol(g,sym,x,y,w,h){ const vb=sym==='ce'?CE_VB:WEEE_VB, paths=sym==='ce'?CE_PATHS:[WEEE_PATH];
+  g.save(); g.translate(x,y); g.scale(w/vb.w,h/vb.h); g.fillStyle='#fff';
+  paths.forEach(d=>g.fill(new Path2D(d))); g.restore(); }
+function drawLogoInk(g,x,y,w,h){ const im=state.img; if(!im||w<1||h<1)return; const lc=document.createElement('canvas'); lc.width=Math.ceil(w); lc.height=Math.ceil(h); const lg=lc.getContext('2d'); lg.drawImage(im,0,0,w,h); const d=lg.getImageData(0,0,lc.width,lc.height),p=d.data; for(let i=0;i<p.length;i+=4){ const a=p[i+3],lum=a?(0.299*p[i]+0.587*p[i+1]+0.114*p[i+2]):255; const ink=Math.min(1,(a/255)*(1-lum/255)*1.6); p[i]=p[i+1]=p[i+2]=255; p[i+3]=Math.round(ink*255);} lg.putImageData(d,0,0); g.drawImage(lc,x,y); }
+function strokeRound(c,x,y,w,h,r){ r=Math.min(r,w/2,h/2); c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath(); c.stroke(); }
+
+// ---------- ENGRAVE COMPOSITE ----------
+const SUPPORTS_FILTER=(function(){try{const c=document.createElement('canvas').getContext('2d');c.filter='blur(2px)';return c.filter==='blur(2px)';}catch(e){return false;}})();
+function stampEngrave(g,mask,mode,scalePx){
+  const blurR=Math.min(3,Math.max(0.6,scalePx*0.18));
+  const off=Math.max(0.8,scalePx*0.16);
+  const tmp=document.createElement('canvas'); tmp.width=W; tmp.height=H; const tg=tmp.getContext('2d');
+  function layer(color,dx,dy,alpha,blend,blur){
+    tg.clearRect(0,0,W,H); tg.globalCompositeOperation='source-over';
+    tg.filter=(blur&&SUPPORTS_FILTER)?`blur(${blur}px)`:'none';
+    tg.drawImage(mask,dx,dy); tg.filter='none';
+    tg.globalCompositeOperation='source-in'; tg.fillStyle=color; tg.fillRect(0,0,W,H);
+    g.globalAlpha=alpha; g.globalCompositeOperation=blend; g.drawImage(tmp,0,0);
+    g.globalAlpha=1; g.globalCompositeOperation='source-over';
+  }
+  if(mode==='dark'){
+    layer('#ffffff',-off,-off,0.40,'screen',blurR);
+    layer('#06080b',0,0,0.86,'multiply',blurR*0.5);
+    layer('#000000', off, off,0.28,'multiply',blurR);
+  } else {
+    layer('#000000', off, off,0.34,'multiply',blurR);
+    layer('#f4f7fb',0,0,0.92,'screen',blurR*0.5);
+    layer('#ffffff',-off,-off,0.30,'screen',blurR);
+  }
+}
+
+// ---------- RENDER ----------
+function render(){
+  const wmm=clampNum('wmm',20,600,100), hmm=clampNum('hmm',15,600,70);
+  const ppmm=Math.min(W*0.86/wmm, H*0.86/hmm);
+  const ww=wmm*ppmm, hh=hmm*ppmm, ox=(W-ww)/2, oy=(H-hh)/2;
+  geo={ox,oy,ppmm,wmm,hmm};
+
+  const m=MATERIALS[state.mat];
+  const flat=document.createElement('canvas'); flat.width=W; flat.height=H; const g=flat.getContext('2d');
+  // floating drop shadow
+  g.save(); g.filter='blur(22px)'; g.fillStyle='rgba(0,0,0,0.55)';
+  strokeFillRound(g, ox+ww*0.03, oy+hh*0.12, ww*0.94, hh*0.96, Math.min(ww,hh)*0.05); g.restore();
+  g.save(); roundClip(g,ox,oy,ww,hh,Math.min(ww,hh)*0.035);
+  paintMaterial(g,ox,oy,ww,hh);
+  const {ops}=computeLayout();
+  const mask=renderMaskFromOps(ops,ox,oy);
+  const rowCapPx=ppmm*3.5;
+  stampEngrave(g,mask,m.engrave,rowCapPx);
+  g.restore();
+  // edge bevel
+  g.strokeStyle='rgba(255,255,255,0.12)'; g.lineWidth=2;
+  strokeRound(g,ox,oy,ww,hh,Math.min(ww,hh)*0.035);
+  g.strokeStyle='rgba(0,0,0,0.25)'; g.lineWidth=1;
+  strokeRound(g,ox+1.5,oy+1.5,ww-3,hh-3,Math.min(ww,hh)*0.035);
+
+  ctx.clearRect(0,0,W,H);
+  ctx.drawImage(flat,0,0);
+  updateReadout();
+}
+function roundClip(c,x,y,w,h,r){ r=Math.min(r,w/2,h/2); c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath(); c.clip(); }
+function strokeFillRound(c,x,y,w,h,r){ r=Math.min(r,w/2,h/2); c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath(); c.fill(); }
+
+function updateReadout(){
+  const n=state.fields.filter(f=>f.k||f.v).length;
+  document.getElementById('readout').innerHTML=
+    `<span class="k">Material:</span> <b>${state.mat}</b> · <span class="k">Größe:</span> <b>${geo.wmm}×${geo.hmm} mm</b><br>`+
+    `<span class="k">Datenfelder:</span> <b>${n}</b> · <span class="k">Löcher:</span> <b>${document.getElementById('optHoles').checked?('4 × Ø'+(+document.getElementById('holeD').value).toFixed(1)+' mm'):'—'}</b>`;
+}
+
+// ---------- ADMIN GATE (nur Bence: PNG/SVG-Download) ----------
+(function(){ try{
+  const url=new URL(location.href);
+  if(url.searchParams.get('admin')!==null || location.hash.indexOf('admin')>=0){ localStorage.setItem('wl_admin','1'); }
+  if(localStorage.getItem('wl_admin')==='1'){ document.querySelectorAll('.admin-only').forEach(el=>el.style.display=''); }
+}catch(e){} })();
+
+// ---------- EXPORTS ----------
+document.getElementById('dlpng').onclick=()=>{ const a=document.createElement('a'); a.download='wolf-typenschild.png'; a.href=cv.toDataURL('image/png'); a.click(); };
+document.getElementById('dlsvg').onclick=downloadSVG;
+// ---------- ANFRAGE (Formspree + Firebase) ----------
+const ov=document.getElementById('anfrageOverlay');
+const closeOv=()=>{ ov.style.display='none'; };
+document.getElementById('order').onclick=()=>{
+  document.getElementById('anfrageErr').style.display='none';
+  document.getElementById('anfrageOk').style.display='none';
+  document.querySelector('#anfrageOverlay .actions').style.display='flex';
+  ov.style.display='flex';
+  setTimeout(()=>document.getElementById('cName').focus(),50);
+};
+document.getElementById('anfrageCancel').onclick=closeOv;
+document.getElementById('anfrageClose').onclick=closeOv;
+ov.addEventListener('click',e=>{ if(e.target===ov) closeOv(); });
+
+function canvasBlob(){ return new Promise(res=>{ try{ cv.toBlob(b=>res(b),'image/png'); }catch(e){ res(null); } }); }
+
+document.getElementById('anfrageSubmit').onclick=async()=>{
+  const btn=document.getElementById('anfrageSubmit');
+  const errEl=document.getElementById('anfrageErr');
+  const name=document.getElementById('cName').value.trim();
+  const email=document.getElementById('cEmail').value.trim();
+  const showErr=m=>{ errEl.textContent=m; errEl.style.display='block'; };
+  errEl.style.display='none';
+  if(!name){ showErr('Bitte geben Sie Ihren Namen an.'); return; }
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ showErr('Bitte geben Sie eine gültige E-Mail-Adresse an.'); return; }
+  btn.disabled=true; const orig=btn.textContent; btn.textContent='Wird gesendet …';
+
+  const spec=buildSpec().text;
+  let svgUrl='', pngUrl='';
+  try{
+    const svgBlob=new Blob([renderSVGFromOps()],{type:'image/svg+xml'});
+    svgUrl=await window.wlUploadTS(svgBlob,'svg','image/svg+xml');
+    const png=await canvasBlob();
+    if(png) pngUrl=await window.wlUploadTS(png,'png','image/png');
+  }catch(e){ console.warn('Upload fehlgeschlagen:',e); }
+
+  const payload={
+    name, email,
+    telefon:document.getElementById('cPhone').value.trim()||'–',
+    firma:document.getElementById('cFirma').value.trim()||'–',
+    stueckzahl:document.getElementById('cQty').value.trim()||'–',
+    nachricht:document.getElementById('cMsg').value.trim()||'–',
+    spezifikation:spec,
+    lightburn_svg:svgUrl||'(Upload fehlgeschlagen)',
+    vorschau_png:pngUrl||'(Upload fehlgeschlagen)',
+    _subject:`🏷️ Neue Typenschild-Anfrage – ${name}`
+  };
+  try{
+    const fd=new FormData();
+    Object.entries(payload).forEach(([k,v])=>fd.append(k,v==null?'':String(v)));
+    fd.append('_replyto',email);
+    fd.append('_to','info@wolf-lasermark.de');
+    const res=await fetch('https://formspree.io/f/xpqjjobb',{method:'POST',headers:{'Accept':'application/json'},body:fd});
+    let data=null; try{ data=await res.json(); }catch(e){}
+    if(!res.ok||(data&&data.ok===false)) throw new Error('send failed');
+    document.querySelector('#anfrageOverlay .actions').style.display='none';
+    document.getElementById('anfrageOk').style.display='block';
+  }catch(err){
+    console.error('Anfrage-Fehler:',err);
+    btn.disabled=false; btn.textContent=orig;
+    const subject=encodeURIComponent(payload._subject);
+    const body=encodeURIComponent(`Name: ${name}\nE-Mail: ${email}\nTelefon: ${payload.telefon}\nFirma: ${payload.firma}\nStückzahl: ${payload.stueckzahl}\nNachricht: ${payload.nachricht}\n\n${spec}\n\nLightBurn-SVG: ${payload.lightburn_svg}\nVorschau: ${payload.vorschau_png}`);
+    showErr('Senden fehlgeschlagen. ');
+    errEl.innerHTML='Senden fehlgeschlagen. <a href="mailto:info@wolf-lasermark.de?subject='+subject+'&body='+body+'" style="color:var(--accent);">Per E-Mail senden →</a>';
+    errEl.style.display='block';
+  }
+};
+
+function buildSpec(){
+  const f=FONTS[+document.getElementById('font').value];
+  const fields=state.fields.filter(f=>f.k||f.v).map(f=>`  ${f.k}: ${f.v}`).join('\n');
+  const tmplMap={klassisch:'Klassisch',['logo-top']:'Logo oben',zweispaltig:'Zweispaltig',kompakt:'Kompakt'};
+  const alignMap={links:'linksbündig',gepunktet:'gepunktet',rechts:'rechtsbündig'};
+  const syms=[]; if(document.getElementById('optCE').checked)syms.push('CE'); if(document.getElementById('optWEEE').checked)syms.push('WEEE');
+  const codes=state.codes.filter(c=>(c.text||'').trim()).map(c=>`  ${c.type==='datamatrix'?'DataMatrix':'QR-Code'}: ${c.text}`).join('\n');
+  const txt=`Typenschild-Anfrage\n`+
+    `Firma/Kopf: ${state.firmaVal()||'—'}${state.img?' (+ Logo hochgeladen)':''}\n`+
+    `Datenfelder:\n${fields||'  —'}\n`+
+    `Codes:\n${codes||'  —'}\n`+
+    `Fußzeile: ${document.getElementById('footer').value||'—'}\n`+
+    `Material: ${state.mat}\n`+
+    `Maße: ${geo.wmm} × ${geo.hmm} mm\n`+
+    `Schriftart: ${f.name}\n`+
+    `Layout: ${tmplMap[document.getElementById('template').value]||'—'}\n`+
+    `Wert-Ausrichtung: ${alignMap[document.getElementById('align').value]||'—'}\n`+
+    `Symbole: ${syms.length?syms.join(', '):'keine'}\n`+
+    `Rahmen: ${document.getElementById('optFrame').checked?'ja':'nein'}\n`+
+    `Löcher: ${document.getElementById('optHoles').checked?('4 × Ø '+(+document.getElementById('holeD').value).toFixed(1)+' mm'):'nein'}`;
+  return {text:txt};
+}
+
+function renderSVGFromOps(){
+  const wmm=geo.wmm,hmm=geo.hmm;
+  const {ops,cut,f}=computeLayout();
+  const cr=capRatio(f.css,f.weight);
+  const esc=escapeXML;
+  let eng='', sch='';
+  function svgText(str,x,y,capMM,anchor){ if(!str)return ''; const fs=(capMM/cr).toFixed(2);
+    const ta=anchor==='middle'?'middle':(anchor==='end'?'end':'start');
+    return `<text x="${x.toFixed(2)}" y="${y.toFixed(2)}" font-family="${f.name}" font-weight="${f.weight}" font-size="${fs}" text-anchor="${ta}" dominant-baseline="central" fill="#000">${esc(str)}</text>`; }
+  ops.forEach(o=>{
+    if(o.preview) return; // hole rings/dots are preview-only → go to cut layer instead
+    if(o.t==='text'){ eng+=svgText(o.str,o.x,o.y,o.cap,o.anchor); }
+    else if(o.t==='line'){ eng+=`<line x1="${o.x1.toFixed(2)}" y1="${o.y1.toFixed(2)}" x2="${o.x2.toFixed(2)}" y2="${o.y2.toFixed(2)}" stroke="#000" stroke-width="${(o.w||0.4).toFixed(2)}"/>`; }
+    else if(o.t==='rrect'){ eng+=`<rect x="${o.x.toFixed(2)}" y="${o.y.toFixed(2)}" width="${o.w.toFixed(2)}" height="${o.h.toFixed(2)}" rx="${(o.r||0).toFixed(2)}" fill="none" stroke="#000" stroke-width="${(o.sw||0.6).toFixed(2)}"/>`; }
+    else if(o.t==='dotline'){ const n=Math.max(0,Math.floor((o.x2-o.x1)/o.gap)); for(let i=0;i<=n;i++){ eng+=`<circle cx="${(o.x1+i*o.gap).toFixed(2)}" cy="${o.y.toFixed(2)}" r="${(o.r||0.22).toFixed(2)}" fill="#000"/>`; } }
+    else if(o.t==='img'){ if(state.img) eng+=`<image x="${o.x.toFixed(2)}" y="${o.y.toFixed(2)}" width="${o.w.toFixed(2)}" height="${o.h.toFixed(2)}" href="${state.img.src}"/>`; }
+    else if(o.t==='code'){ o.dark.forEach(([r,c])=>{ eng+=`<rect x="${(o.x+c*o.cellW).toFixed(3)}" y="${(o.y+r*o.cellH).toFixed(3)}" width="${(o.cellW+0.02).toFixed(3)}" height="${(o.cellH+0.02).toFixed(3)}" fill="#000"/>`; }); }
+    else if(o.t==='sym'){ eng+=svgSymbol(o.sym,o.x,o.y,o.w,o.h); }
+  });
+  cut.forEach(o=>{ if(o.t==='circle') sch+=`<circle cx="${o.cx.toFixed(2)}" cy="${o.cy.toFixed(2)}" r="${o.r.toFixed(2)}" fill="none" stroke="#ff0000" stroke-width="${(o.sw||0.2).toFixed(2)}"/>`; });
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="${wmm}mm" height="${hmm}mm" viewBox="0 0 ${wmm} ${hmm}">
+  <rect x="0" y="0" width="${wmm}" height="${hmm}" fill="none" stroke="#cccccc" stroke-width="0.15"/>
+  <g id="Gravur">${eng}</g>
+  <g id="Schnitt">${sch}</g>
+</svg>`;
+}
+function svgSymbol(sym,x,y,w,h){ const vb=sym==='ce'?CE_VB:WEEE_VB, paths=sym==='ce'?CE_PATHS:[WEEE_PATH];
+  const sx=(w/vb.w).toFixed(5), sy=(h/vb.h).toFixed(5);
+  const inner=paths.map(d=>`<path d="${d}"/>`).join('');
+  return `<g transform="translate(${x.toFixed(2)},${y.toFixed(2)}) scale(${sx},${sy})" fill="#000">${inner}</g>`; }
+function downloadSVG(){
+  const svg=renderSVGFromOps();
+  const blob=new Blob([svg],{type:'image/svg+xml'}); const a=document.createElement('a');
+  a.download='wolf-typenschild-lightburn.svg'; a.href=URL.createObjectURL(blob); a.click();
+}
+
+// ---------- helpers ----------
+function clampNum(id,min,max,def){ let v=parseFloat(document.getElementById(id).value); if(isNaN(v))v=def; v=Math.max(min,Math.min(max,v)); return v; }
+function shade(hex,amt){ let c=hex.replace('#',''); if(c.length===3)c=c.split('').map(x=>x+x).join(''); const cl=v=>Math.max(0,Math.min(255,v));
+  return `rgb(${cl(parseInt(c.slice(0,2),16)+amt)},${cl(parseInt(c.slice(2,4),16)+amt)},${cl(parseInt(c.slice(4,6),16)+amt)})`; }
+function escapeXML(s){return (s||'').replace(/[<>&'"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;',"'":'&apos;','"':'&quot;'}[c]));}
+function escAttr(s){return (s||'').replace(/"/g,'&quot;');}
+
+if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(render); }
+render();
+</script>
+</body>
+</html>
