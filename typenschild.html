@@ -82,6 +82,12 @@
   canvas{max-width:100%;max-height:100%;}
   .readout{margin-top:0.9rem;width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:0.85rem 1rem;font-size:0.82rem;line-height:1.8;}
   .readout .k{color:var(--muted);} .readout b{color:var(--text);font-family:'Space Mono',monospace;font-weight:700;letter-spacing:-0.02em;}
+  .pricebox{margin-top:0.7rem;width:100%;background:linear-gradient(135deg,rgba(0,200,255,0.10),rgba(0,153,204,0.05));border:1px solid rgba(0,200,255,0.28);border-radius:12px;padding:0.85rem 1rem;}
+  .pricebox .pb-top{display:flex;justify-content:space-between;align-items:baseline;gap:0.5rem;}
+  .pricebox .pb-label{font-size:0.74rem;text-transform:uppercase;letter-spacing:0.09em;color:var(--muted);font-weight:600;}
+  .pricebox .pb-total{font-family:'Space Mono',monospace;font-weight:700;font-size:1.45rem;color:var(--accent);letter-spacing:-0.02em;}
+  .pricebox .pb-sub{font-size:0.74rem;color:var(--muted);margin-top:0.35rem;line-height:1.5;}
+  .pricebox .pb-pps{color:var(--text);font-family:'Space Mono',monospace;}
   .actions{display:flex;gap:0.6rem;margin-top:0.9rem;width:100%;flex-wrap:wrap;}
   .btn{flex:1;min-width:120px;border:none;border-radius:12px;padding:0.8rem;font-family:inherit;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all .2s;}
   .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#041018;box-shadow:0 8px 22px -8px rgba(0,200,255,0.6);}
@@ -127,6 +133,7 @@
       <div class="row">
         <div class="field"><label>Breite (mm)</label><input type="number" id="wmm" value="100" min="20" max="600"></div>
         <div class="field"><label>Höhe (mm)</label><input type="number" id="hmm" value="70" min="15" max="600"></div>
+        <div class="field"><label>Stückzahl</label><input type="number" id="menge" value="1" min="1" max="100000"></div>
       </div>
       <div class="field" style="margin-bottom:0;">
         <label>Schriftart (LightBurn-kompatibel)</label>
@@ -194,6 +201,7 @@
           <canvas id="cv" width="1000" height="1000"></canvas>
         </div>
         <div class="readout" id="readout"></div>
+        <div class="pricebox" id="pricebox"></div>
         <div class="actions">
           <button class="btn btn-primary" id="order" style="flex:2;">Anfrage senden →</button>
           <button class="btn btn-ghost admin-only" id="dlpng" style="display:none;">⬇ PNG</button>
@@ -209,7 +217,8 @@
 <div id="anfrageOverlay" style="display:none;position:fixed;inset:0;background:rgba(4,6,15,.72);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center;padding:1rem;">
   <div class="card" style="max-width:440px;width:100%;max-height:92vh;overflow:auto;">
     <span class="lbl">Anfrage senden</span>
-    <p class="hint" style="margin:.2rem 0 .8rem;">Wir erstellen Ihr Typenschild passgenau nach Ihrem Entwurf und melden uns mit einem Angebot.</p>
+    <p class="hint" style="margin:.2rem 0 .5rem;">Wir erstellen Ihr Typenschild passgenau nach Ihrem Entwurf und melden uns mit einem Angebot.</p>
+    <p id="anfragePreis" style="margin:0 0 .8rem;font-family:'Space Mono',monospace;font-weight:700;font-size:.9rem;color:var(--accent);"></p>
     <div class="field"><label>Name *</label><input type="text" id="cName" autocomplete="name"></div>
     <div class="field"><label>E-Mail *</label><input type="email" id="cEmail" autocomplete="email"></div>
     <div class="field"><label>Telefon (optional)</label><input type="tel" id="cPhone" autocomplete="tel"></div>
@@ -344,7 +353,7 @@ function renderCodes(){
 document.getElementById('addCode').onclick=()=>{ state.codes.push({type:'qr',text:''}); renderCodes(); render(); };
 renderCodes();
 
-['firma','wmm','hmm','font','footer','holeD'].forEach(id=>document.getElementById(id).addEventListener('input',render));
+['firma','wmm','hmm','menge','font','footer','holeD'].forEach(id=>document.getElementById(id).addEventListener('input',render));
 ['template','align'].forEach(id=>document.getElementById(id).addEventListener('change',render));
 ['optFrame','optHoles','optCE','optWEEE'].forEach(id=>document.getElementById(id).addEventListener('change',render));
 document.getElementById('optCE').addEventListener('change',e=>{ document.getElementById('ceNote').style.display=e.target.checked?'block':'none'; });
@@ -603,6 +612,7 @@ function render(){
   ctx.clearRect(0,0,W,H);
   ctx.drawImage(flat,0,0);
   updateReadout();
+  updatePrice();
 }
 function roundClip(c,x,y,w,h,r){ r=Math.min(r,w/2,h/2); c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath(); c.clip(); }
 function strokeFillRound(c,x,y,w,h,r){ r=Math.min(r,w/2,h/2); c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath(); c.fill(); }
@@ -612,6 +622,57 @@ function updateReadout(){
   document.getElementById('readout').innerHTML=
     `<span class="k">Material:</span> <b>${state.mat}</b> · <span class="k">Größe:</span> <b>${geo.wmm}×${geo.hmm} mm</b><br>`+
     `<span class="k">Datenfelder:</span> <b>${n}</b> · <span class="k">Löcher:</span> <b>${document.getElementById('optHoles').checked?('4 × Ø'+(+document.getElementById('holeD').value).toFixed(1)+' mm'):'—'}</b>`;
+}
+
+// ---------- PREISLOGIK (1:1 wie Angebot-Kalkulator, §19 UStG / Kleinunternehmer) ----------
+const MATF = { Aluminium:1.0, 'Alu schwarz':1.0, Edelstahl:1.15, Messing:1.15, Titan:1.35, Kunststoff:1.0 };
+const BASE_SETUP_FEE=15, MIN_TOTAL=29;
+const CONTENT_PRICING={
+  serien:{label:'Seriennummern',factor:0.13,min:0.18,setup:4},
+  text:{label:'Text',factor:0.11,min:0.15,setup:2},
+  qr:{label:'QR-Code',factor:0.22,min:0.35,setup:5},
+  datamatrix:{label:'DataMatrix',factor:0.25,min:0.40,setup:6},
+  ce:{label:'CE/WEEE',factor:0.10,min:0.12,setup:3},
+  logo:{label:'Logo',factor:0.30,min:0.45,setup:10}
+};
+function quantityDiscount(stk){ if(stk>=500)return .25; if(stk>=250)return .20; if(stk>=100)return .15; if(stk>=50)return .10; if(stk>=10)return .05; return 0; }
+function baseByArea(cm2){ if(cm2<=0)return 1.10; const v=0.50*Math.pow(cm2,0.34); return Math.max(0.50,Math.min(4.20,v)); }
+function priceContentTypes(){
+  const types=[];
+  const fields=state.fields.filter(f=>(f.v||'').trim());
+  const hasSerien=fields.some(f=>/serien|seriennr|^sn\b|s\/n|serial/i.test((f.k||'')));
+  if(hasSerien) types.push('serien');
+  if(fields.length) types.push('text');
+  const codeTypes=new Set(state.codes.filter(c=>(c.text||'').trim()).map(c=>c.type));
+  if(codeTypes.has('qr')) types.push('qr');
+  if(codeTypes.has('datamatrix')) types.push('datamatrix');
+  if(document.getElementById('optCE').checked) types.push('ce');
+  if(document.getElementById('optWEEE').checked) types.push('ce');
+  if(state.img) types.push('logo');
+  return types;
+}
+function computePrice(){
+  const stk=Math.max(1, parseInt(document.getElementById('menge').value)||1);
+  const areaCm2=(geo.wmm*geo.hmm)/100;
+  const matF=MATF[state.mat]||1;
+  const baseRaw=baseByArea(areaCm2);
+  const types=priceContentTypes();
+  let unitBase=0, setupSum=0;
+  types.forEach(k=>{ const c=CONTENT_PRICING[k]; unitBase+=Math.max(c.min, baseRaw*c.factor); setupSum+=c.setup; });
+  const ppsRaw=(baseRaw+unitBase)*matF;
+  const disc=quantityDiscount(stk);
+  const pps=ppsRaw*(1-disc);
+  const setup=BASE_SETUP_FEE+setupSum;
+  const totalNetto=Math.max(MIN_TOTAL, setup+pps*stk);
+  return {stk, areaCm2, pps, setup, disc, totalNetto, types};
+}
+function fmt(n){ return (n||0).toLocaleString('de-DE',{style:'currency',currency:'EUR'}); }
+function updatePrice(){
+  const p=computePrice();
+  const discTxt=p.disc>0?` · <span style="color:#7CFFA0;">−${Math.round(p.disc*100)}% Mengenrabatt</span>`:'';
+  document.getElementById('pricebox').innerHTML=
+    `<div class="pb-top"><span class="pb-label">Richtpreis gesamt</span><span class="pb-total">${fmt(p.totalNetto)}</span></div>`+
+    `<div class="pb-sub"><span class="pb-pps">${fmt(p.pps)}</span> / Stück · ${p.stk} Stk. · Einrichtung ${fmt(p.setup)} enthalten${discTxt}<br>Endpreis gemäß §19 UStG — keine MwSt. · unverbindlicher Richtwert</div>`;
 }
 
 // ---------- ADMIN GATE (nur Bence: PNG/SVG-Download) ----------
@@ -631,12 +692,21 @@ document.getElementById('order').onclick=()=>{
   document.getElementById('anfrageErr').style.display='none';
   document.getElementById('anfrageOk').style.display='none';
   document.querySelector('#anfrageOverlay .actions').style.display='flex';
+  const p=computePrice();
+  document.getElementById('cQty').value=p.stk;
+  document.getElementById('anfragePreis').textContent=`${fmt(p.totalNetto)} gesamt · ${fmt(p.pps)}/Stück (Richtwert, §19 UStG)`;
   ov.style.display='flex';
   setTimeout(()=>document.getElementById('cName').focus(),50);
 };
 document.getElementById('anfrageCancel').onclick=closeOv;
 document.getElementById('anfrageClose').onclick=closeOv;
 ov.addEventListener('click',e=>{ if(e.target===ov) closeOv(); });
+document.getElementById('cQty').addEventListener('input',()=>{
+  const q=parseInt(document.getElementById('cQty').value);
+  if(q>0){ document.getElementById('menge').value=q; render();
+    const p=computePrice();
+    document.getElementById('anfragePreis').textContent=`${fmt(p.totalNetto)} gesamt · ${fmt(p.pps)}/Stück (Richtwert, §19 UStG)`; }
+});
 
 function canvasBlob(){ return new Promise(res=>{ try{ cv.toBlob(b=>res(b),'image/png'); }catch(e){ res(null); } }); }
 
@@ -651,7 +721,7 @@ document.getElementById('anfrageSubmit').onclick=async()=>{
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ showErr('Bitte geben Sie eine gültige E-Mail-Adresse an.'); return; }
   btn.disabled=true; const orig=btn.textContent; btn.textContent='Wird gesendet …';
 
-  const spec=buildSpec().text;
+  const built=buildSpec(); const spec=built.text; const pr=built.price;
   let svgUrl='', pngUrl='';
   try{
     const svgBlob=new Blob([renderSVGFromOps()],{type:'image/svg+xml'});
@@ -666,6 +736,7 @@ document.getElementById('anfrageSubmit').onclick=async()=>{
     firma:document.getElementById('cFirma').value.trim()||'–',
     stueckzahl:document.getElementById('cQty').value.trim()||'–',
     nachricht:document.getElementById('cMsg').value.trim()||'–',
+    richtpreis:`${fmt(pr.totalNetto)} gesamt / ${fmt(pr.pps)} pro Stück (§19 UStG, ohne MwSt., Richtwert)`,
     spezifikation:spec,
     lightburn_svg:svgUrl||'(Upload fehlgeschlagen)',
     vorschau_png:pngUrl||'(Upload fehlgeschlagen)',
@@ -699,6 +770,7 @@ function buildSpec(){
   const alignMap={links:'linksbündig',gepunktet:'gepunktet',rechts:'rechtsbündig'};
   const syms=[]; if(document.getElementById('optCE').checked)syms.push('CE'); if(document.getElementById('optWEEE').checked)syms.push('WEEE');
   const codes=state.codes.filter(c=>(c.text||'').trim()).map(c=>`  ${c.type==='datamatrix'?'DataMatrix':'QR-Code'}: ${c.text}`).join('\n');
+  const p=computePrice();
   const txt=`Typenschild-Anfrage\n`+
     `Firma/Kopf: ${state.firmaVal()||'—'}${state.img?' (+ Logo hochgeladen)':''}\n`+
     `Datenfelder:\n${fields||'  —'}\n`+
@@ -706,13 +778,15 @@ function buildSpec(){
     `Fußzeile: ${document.getElementById('footer').value||'—'}\n`+
     `Material: ${state.mat}\n`+
     `Maße: ${geo.wmm} × ${geo.hmm} mm\n`+
+    `Stückzahl: ${p.stk}\n`+
     `Schriftart: ${f.name}\n`+
     `Layout: ${tmplMap[document.getElementById('template').value]||'—'}\n`+
     `Wert-Ausrichtung: ${alignMap[document.getElementById('align').value]||'—'}\n`+
     `Symbole: ${syms.length?syms.join(', '):'keine'}\n`+
     `Rahmen: ${document.getElementById('optFrame').checked?'ja':'nein'}\n`+
-    `Löcher: ${document.getElementById('optHoles').checked?('4 × Ø '+(+document.getElementById('holeD').value).toFixed(1)+' mm'):'nein'}`;
-  return {text:txt};
+    `Löcher: ${document.getElementById('optHoles').checked?('4 × Ø '+(+document.getElementById('holeD').value).toFixed(1)+' mm'):'nein'}\n`+
+    `\nRichtpreis (§19 UStG, ohne MwSt.): ${fmt(p.totalNetto)} gesamt für ${p.stk} Stk. (${fmt(p.pps)}/Stück, inkl. Einrichtung ${fmt(p.setup)}${p.disc>0?', −'+Math.round(p.disc*100)+'% Mengenrabatt':''}) — unverbindlicher Richtwert`;
+  return {text:txt, price:p};
 }
 
 function renderSVGFromOps(){
