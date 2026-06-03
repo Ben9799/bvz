@@ -295,6 +295,7 @@ nav a:hover { color: #fff; background: rgba(255,255,255,0.04); }
     linear-gradient(90deg, transparent calc(25% - 0.5px), rgba(255,255,255,0.01) 25%, transparent calc(25% + 0.5px)),
     linear-gradient(90deg, transparent calc(75% - 0.5px), rgba(255,255,255,0.01) 75%, transparent calc(75% + 0.5px));
 }
+picture { display: contents; }
 .hero-watermark {
   position: absolute; top: 50%; left: 50%;
   transform: translate(-50%, -50%);
@@ -2507,7 +2508,7 @@ body.mode-firmen .privat-only { display: none !important; }
 <div id="overlay">
   <div class="ov-inner">
     <div class="ov-logo">
-      <img src="images/wolf-lasermark-icon.png" alt="Wolf Lasermark">
+      <picture><source srcset="images/wolf-lasermark-icon.webp" type="image/webp"><img src="images/wolf-lasermark-icon.png" alt="Wolf Lasermark" width="64" height="64"></picture>
       <div class="ov-logo-text">Wolf <span>Lasermark</span></div>
     </div>
     <h1>Willkommen bei Wolf Lasermark</h1>
@@ -2557,7 +2558,7 @@ body.mode-firmen .privat-only { display: none !important; }
   <header>
     <div class="header-inner">
       <a href="#" class="brand">
-        <img src="images/wolf-lasermark-icon.png" alt="Wolf Lasermark">
+        <picture><source srcset="images/wolf-lasermark-icon.webp" type="image/webp"><img src="images/wolf-lasermark-icon.png" alt="Wolf Lasermark" width="40" height="40"></picture>
         <div class="brand-name">Wolf <span>Lasermark</span></div>
       </a>
       <button class="hamburger" id="hamburger" onclick="toggleNav()" aria-label="Menü">
@@ -2585,7 +2586,7 @@ body.mode-firmen .privat-only { display: none !important; }
   <!-- ====== HERO ====== -->
   <section class="hero">
     <div class="hero-lines"></div>
-    <img class="hero-watermark" src="images/wolf-lasermark.png" alt="" aria-hidden="true">
+    <picture><source srcset="images/wolf-lasermark.webp" type="image/webp"><img class="hero-watermark" src="images/wolf-lasermark.png" alt="" aria-hidden="true"></picture>
     <div class="hero-inner">
       <div class="hero-badge">⚡ Wolf Lasermark · Bruckmühl bei Rosenheim</div>
 
@@ -2765,7 +2766,7 @@ body.mode-firmen .privat-only { display: none !important; }
 
             <div class="bsp-slide">
               <div class="bsp-img-wrap" data-full="images/seriennummern.jpg">
-                <img src="images/seriennummern.jpg" alt="Seriennummern auf Metall" loading="lazy">
+                <picture><source srcset="images/seriennummern.webp" type="image/webp"><img src="images/seriennummern.jpg" alt="Seriennummern auf Metall" loading="lazy"></picture>
                 <span class="bsp-badge">Serie</span>
               </div>
               <div class="bsp-info">
@@ -2776,7 +2777,7 @@ body.mode-firmen .privat-only { display: none !important; }
 
             <div class="bsp-slide">
               <div class="bsp-img-wrap" data-full="images/qrcodes.jpg">
-                <img src="images/qrcodes.jpg" alt="QR Codes auf Metall" loading="lazy">
+                <picture><source srcset="images/qrcodes.webp" type="image/webp"><img src="images/qrcodes.jpg" alt="QR Codes auf Metall" loading="lazy"></picture>
                 <span class="bsp-badge">Code</span>
               </div>
               <div class="bsp-info">
@@ -2787,7 +2788,7 @@ body.mode-firmen .privat-only { display: none !important; }
 
             <div class="bsp-slide">
               <div class="bsp-img-wrap" data-full="images/Logo.jpg">
-                <img src="images/Logo.jpg" alt="Logo Gravur" loading="lazy">
+                <picture><source srcset="images/Logo.webp" type="image/webp"><img src="images/Logo.jpg" alt="Logo Gravur" loading="lazy"></picture>
                 <span class="bsp-badge">Branding</span>
               </div>
               <div class="bsp-info">
@@ -2798,7 +2799,7 @@ body.mode-firmen .privat-only { display: none !important; }
 
             <div class="bsp-slide">
               <div class="bsp-img-wrap" data-full="images/werkzeugkennzeichnung.jpg">
-                <img src="images/werkzeugkennzeichnung.jpg" alt="Werkzeugkennzeichnung" loading="lazy">
+                <picture><source srcset="images/werkzeugkennzeichnung.webp" type="image/webp"><img src="images/werkzeugkennzeichnung.jpg" alt="Werkzeugkennzeichnung" loading="lazy"></picture>
                 <span class="bsp-badge">Industrie</span>
               </div>
               <div class="bsp-info">
@@ -2809,7 +2810,7 @@ body.mode-firmen .privat-only { display: none !important; }
 
             <div class="bsp-slide">
               <div class="bsp-img-wrap" data-full="images/farbige.jpg">
-                <img src="images/farbige.jpg" alt="Farbige Gravur auf Edelstahl" loading="lazy">
+                <picture><source srcset="images/farbige.webp" type="image/webp"><img src="images/farbige.jpg" alt="Farbige Gravur auf Edelstahl" loading="lazy"></picture>
                 <span class="bsp-badge">Finish</span>
               </div>
               <div class="bsp-info">
@@ -2820,7 +2821,7 @@ body.mode-firmen .privat-only { display: none !important; }
 
             <div class="bsp-slide">
               <div class="bsp-img-wrap" data-full="images/geschenk.jpg">
-                <img src="images/geschenk.jpg" alt="Personalisierte Gravur" loading="lazy">
+                <picture><source srcset="images/geschenk.webp" type="image/webp"><img src="images/geschenk.jpg" alt="Personalisierte Gravur" loading="lazy"></picture>
                 <span class="bsp-badge">Custom</span>
               </div>
               <div class="bsp-info">
@@ -3024,7 +3025,7 @@ body.mode-firmen .privat-only { display: none !important; }
   <section class="about reveal" id="about">
     <div class="about-inner wrap">
       <div class="about-photo-wrap">
-        <img class="about-photo" src="bence-veda.jpg" alt="Bence und Veda von Wolf Lasermark">
+        <picture><source srcset="bence-veda.webp" type="image/webp"><img class="about-photo" src="bence-veda.jpg" alt="Bence und Veda von Wolf Lasermark" width="200" height="200" loading="lazy"></picture>
         <div class="about-name">Bence & Veda</div>
         <div class="about-role">Wolf Lasermark</div>
       </div>
@@ -3182,7 +3183,7 @@ body.mode-firmen .privat-only { display: none !important; }
    <div class="footer-inner">
     <div class="footer-brand">
       <div class="footer-logo-row">
-        <img src="images/wolf-lasermark-icon.png" alt="Wolf Lasermark Logo" class="footer-logo">
+        <picture><source srcset="images/wolf-lasermark-icon.webp" type="image/webp"><img src="images/wolf-lasermark-icon.png" alt="Wolf Lasermark Logo" class="footer-logo" width="34" height="34" loading="lazy"></picture>
         <div class="footer-brand-name">Wolf <span>Lasermark</span></div>
       </div>
      

@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wolf Lasermark — Live Gravur-Vorschau</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0c; --panel:#101015; --panel2:#16161d; --border:rgba(0,200,255,0.10);
+    --accent:#00c8ff; --accent2:#0099cc; --glow:rgba(0,200,255,0.15);
+    --warm:#e8dcc8; --text:#eaeaf0; --muted:#7a7a8e; --muted2:#aab6c7; --warn:#f59e0b;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Outfit',system-ui,sans-serif;color:var(--text);min-height:100vh;padding:1.4rem 1.2rem 2.4rem;
+    background:
+      radial-gradient(900px 500px at 15% -10%, rgba(0,200,255,0.06), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, rgba(0,153,204,0.05), transparent 55%),
+      var(--bg);
+    background-attachment:fixed;}
+  .wrap{max-width:1140px;margin:0 auto;}
+  .brandbar{display:flex;align-items:center;justify-content:center;gap:0.6rem;margin-bottom:1.1rem;}
+  .brandbar img{width:34px;height:34px;object-fit:contain;}
+  .brandbar .wm{font-weight:800;font-size:1.05rem;letter-spacing:0.02em;}
+  .brandbar .wm span{color:var(--accent);}
+  .head{text-align:center;margin-bottom:1.6rem;}
+  .head h1{font-weight:800;font-size:clamp(1.6rem,4.2vw,2.5rem);line-height:1.08;letter-spacing:-0.02em;}
+  .head h1 span{color:var(--accent);}
+  .head p{color:var(--muted2);margin-top:0.55rem;font-size:0.96rem;max-width:560px;margin-left:auto;margin-right:auto;}
+  .badge-demo{display:inline-flex;align-items:center;gap:0.45rem;margin-top:0.8rem;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;color:var(--accent);background:var(--glow);border:1px solid rgba(0,200,255,0.25);border-radius:30px;padding:0.32rem 0.9rem;}
+  .badge-demo::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);}
+  .grid{display:grid;grid-template-columns:1fr 1.05fr;gap:1.2rem;}
+  @media(max-width:860px){.grid{grid-template-columns:1fr;}}
+  .card{background:linear-gradient(180deg,var(--panel),#0d0d12);border:1px solid var(--border);border-radius:var(--radius);padding:1.3rem;box-shadow:0 1px 0 rgba(255,255,255,0.03) inset, 0 18px 50px -25px rgba(0,0,0,0.8);}
+  .lbl{font-weight:700;font-size:0.74rem;text-transform:uppercase;letter-spacing:0.09em;color:var(--accent);margin-bottom:0.75rem;display:flex;align-items:center;gap:0.5rem;}
+  .lbl::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
+  .field{margin-bottom:1rem;}
+  .field label{display:block;font-size:0.78rem;color:var(--muted2);margin-bottom:0.35rem;}
+  input[type=text],input[type=number],textarea,select{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:0.65rem 0.8rem;font-family:inherit;font-size:0.9rem;}
+  textarea{resize:vertical;min-height:56px;}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);}
+  input[type=range]{width:100%;accent-color:var(--accent);}
+  .row{display:flex;gap:0.7rem;}
+  .row>*{flex:1;}
+  .mat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;}
+  .mat{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:0.7rem 0.3rem 0.6rem;text-align:center;cursor:pointer;transition:all .18s;position:relative;overflow:hidden;}
+  .mat:hover{border-color:rgba(0,200,255,0.4);transform:translateY(-2px);box-shadow:0 10px 24px -14px rgba(0,200,255,0.5);}
+  .mat.sel{border-color:var(--accent);background:rgba(0,200,255,0.08);box-shadow:0 0 0 1px var(--accent) inset;}
+  .mat .chip{width:100%;height:22px;border-radius:6px;margin-bottom:0.4rem;box-shadow:0 1px 3px rgba(0,0,0,0.4) inset;}
+  .mat .mn{font-size:0.72rem;font-weight:600;}
+  .seg{display:flex;gap:0.5rem;}
+  .seg button{flex:1;background:var(--panel2);border:1px solid var(--border);border-radius:10px;color:var(--muted2);padding:0.55rem;font-family:inherit;font-size:0.82rem;cursor:pointer;transition:all .18s;}
+  .seg button.sel{border-color:var(--accent);background:rgba(0,212,255,0.08);color:var(--accent);font-weight:600;}
+  .upload{border:2px dashed rgba(0,212,255,0.25);border-radius:11px;padding:0.85rem;text-align:center;cursor:pointer;position:relative;transition:all .18s;font-size:0.8rem;color:var(--muted2);}
+  .upload:hover,.upload.drag{border-color:var(--accent);background:rgba(0,212,255,0.04);}
+  .upload input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+  .upload strong{color:var(--accent);}
+  .slider-val{font-weight:700;color:var(--accent);}
+  .chk{display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;color:var(--muted2);cursor:pointer;user-select:none;}
+  .chk input{width:auto;}
+  .preview-wrap{display:flex;flex-direction:column;align-items:center;}
+  .canvas-stage{width:100%;aspect-ratio:1;border-radius:14px;overflow:hidden;display:flex;align-items:center;justify-content:center;touch-action:none;
+    background:radial-gradient(120% 120% at 50% 12%, #1a1c22 0%, #101116 45%, #0a0a0c 100%);
+    border:1px solid var(--border);box-shadow:0 24px 60px -30px rgba(0,0,0,0.9) inset, 0 0 0 1px rgba(255,255,255,0.02) inset;}
+  canvas{max-width:100%;max-height:100%;cursor:grab;}
+  canvas.grabbing{cursor:grabbing;}
+  .readout{margin-top:0.9rem;width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:0.85rem 1rem;font-size:0.82rem;line-height:1.8;}
+  .readout .k{color:var(--muted);} .readout b{color:var(--text);font-family:'Space Mono',monospace;font-weight:700;letter-spacing:-0.02em;}
+  .readout .lb{color:var(--accent);font-weight:700;}
+  .warn{color:var(--warn);font-size:0.78rem;margin-top:0.4rem;display:none;}
+  .warn.show{display:block;}
+  .actions{display:flex;gap:0.6rem;margin-top:0.9rem;width:100%;flex-wrap:wrap;}
+  .btn{flex:1;min-width:120px;border:none;border-radius:12px;padding:0.8rem;font-family:inherit;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all .2s;}
+  .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#041018;box-shadow:0 8px 22px -8px rgba(0,200,255,0.6);}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 28px -8px rgba(0,200,255,0.7);}
+  .btn-ghost{background:var(--panel2);border:1px solid var(--border);color:var(--text);}
+  .btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+  .hint{font-size:0.73rem;color:var(--muted);margin-top:0.5rem;line-height:1.5;text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brandbar">
+    <picture><source srcset="images/wolf-lasermark-icon.webp" type="image/webp"><img src="images/wolf-lasermark-icon.png" alt="Wolf Lasermark" onerror="this.style.display='none'"></picture>
+    <div class="wm">WOLF <span>LASERMARK</span></div>
+  </div>
+  <div class="head">
+    <h1>Sehen Sie Ihre Gravur <span>in Echtzeit</span></h1>
+    <p>Beschriftung positionieren, Material wählen — die Vorschau zeigt Ihr Ergebnis sofort auf dem echten Werkstoff.</p>
+    <span class="badge-demo">Live-Vorschau</span>
+  </div>
+
+  <div class="grid">
+    <!-- CONTROLS -->
+    <div class="card">
+      <span class="lbl">1 · Was gravieren?</span>
+      <div class="field">
+        <label>Text / Beschriftung</label>
+        <textarea id="txt" placeholder="z.B. WOLF LASERMARK">WOLF
+LASERMARK</textarea>
+      </div>
+      <div class="row">
+        <div class="field" style="margin-bottom:0">
+          <label>Schriftart (LightBurn-kompatibel)</label>
+          <select id="font">
+            <option value="0">Arial</option>
+            <option value="1">Arial Bold</option>
+            <option value="2">Times New Roman</option>
+            <option value="3">Courier New</option>
+            <option value="4">Impact</option>
+            <option value="5">Verdana</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" style="margin-top:1rem;">
+        <label>Schriftgröße: <span class="slider-val" id="thVal">10.0 mm</span></label>
+        <input type="range" id="th" min="1" max="60" step="0.5" value="10">
+      </div>
+      <div class="field">
+        <label>… oder eigenes Logo / Bild hochladen</label>
+        <div class="upload" id="drop">
+          <input type="file" id="file" accept="image/*">
+          <div>📎 <strong>Bild wählen</strong> oder hierher ziehen · <span id="fileHint">dunkles Motiv auf hellem Grund ideal</span></div>
+        </div>
+      </div>
+
+      <span class="lbl">2 · Werkstück-Größe</span>
+      <div class="row">
+        <div class="field"><label>Breite (mm)</label><input type="number" id="wmm" value="100" min="5" max="600"></div>
+        <div class="field"><label>Höhe (mm)</label><input type="number" id="hmm" value="50" min="5" max="600"></div>
+      </div>
+
+      <span class="lbl">3 · Material</span>
+      <div class="mat-grid" id="matGrid"></div>
+
+      <span class="lbl" style="margin-top:1.1rem;">4 · Oberfläche</span>
+      <div class="seg" id="surfSeg" style="margin-bottom:0.9rem;">
+        <button data-s="flat" class="sel">▭ Ebene Fläche</button>
+        <button data-s="cyl">🛢 Rundkörper</button>
+      </div>
+      <label class="chk"><input type="checkbox" id="guides"> Hilfslinien (Raster + Mitte) anzeigen</label>
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="card">
+      <span class="lbl">Ihre Gravur-Vorschau <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;">— zum Verschieben ziehen</span></span>
+      <div class="preview-wrap">
+        <div class="canvas-stage">
+          <canvas id="cv" width="800" height="800"></canvas>
+        </div>
+        <div class="readout" id="readout"></div>
+        <div class="warn" id="warn">⚠ Sehr kleine Gravur — Lesbarkeit prüfen.</div>
+        <div class="actions">
+          <button class="btn btn-ghost" id="center">⊹ Zentrieren</button>
+          <button class="btn btn-ghost" id="dlpng">⬇ Bild (PNG)</button>
+          <button class="btn btn-ghost" id="dlsvg">⬇ LightBurn (SVG)</button>
+          <button class="btn btn-primary" id="order">Anfragen →</button>
+        </div>
+        <div class="hint">Simulierte Darstellung. Die SVG-Datei lässt sich direkt in LightBurn importieren (Maße in mm).</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---------- FONTS (must match LightBurn system fonts) ----------
+const FONTS = [
+  {name:'Arial',           css:'Arial, sans-serif',           weight:400},
+  {name:'Arial Bold',      css:'Arial, sans-serif',           weight:700},
+  {name:'Times New Roman', css:'"Times New Roman", serif',    weight:400},
+  {name:'Courier New',     css:'"Courier New", monospace',    weight:400},
+  {name:'Impact',          css:'Impact, sans-serif',          weight:400},
+  {name:'Verdana',         css:'Verdana, sans-serif',         weight:400},
+];
+
+// ---------- MATERIALS ----------
+const MATERIALS = {
+  Edelstahl:  {icon:'🔩', engrave:'dark',  base:'#9aa3ad', tex:'brushed', tint:'#c2c9d2'},
+  Aluminium:  {icon:'🔲', engrave:'dark',  base:'#b8bdc4', tex:'brushed', tint:'#d6dade'},
+  Titan:      {icon:'⚙️', engrave:'dark',  base:'#7d8893', tex:'brushed', tint:'#9fb0bd'},
+  Messing:    {icon:'🏅', engrave:'dark',  base:'#b08d3e', tex:'brushed', tint:'#e3c878'},
+  Leder:      {icon:'🟫', engrave:'burn',  base:'#7a4a25', tex:'leather', tint:'#9a6238'},
+  Kunststoff: {icon:'🧱', engrave:'light', base:'#22272f', tex:'matte',   tint:'#2c333d'},
+};
+
+const W=800,H=800,NAT_FS=240;
+const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+let state={ mat:'Edelstahl', surf:'flat', img:null, posMM:null /*{x,y}=center on workpiece*/ };
+let geo={ ox:0, oy:0, ppmm:1, wmm:100, hmm:50 };     // workpiece placement in canvas
+let last={ wMM:0, hMM:0 };                            // last content bbox in mm
+
+// build material buttons
+const matGrid=document.getElementById('matGrid');
+Object.entries(MATERIALS).forEach(([name,m])=>{
+  const d=document.createElement('div');
+  d.className='mat'+(name===state.mat?' sel':'');
+  d.innerHTML=`<div class="chip" style="background:linear-gradient(135deg,${m.tint},${m.base})"></div><span class="mn">${name}</span>`;
+  d.onclick=()=>{ state.mat=name; [...matGrid.children].forEach(c=>c.classList.remove('sel')); d.classList.add('sel'); render(); };
+  matGrid.appendChild(d);
+});
+document.querySelectorAll('#surfSeg button').forEach(b=>{
+  b.onclick=()=>{ state.surf=b.dataset.s; document.querySelectorAll('#surfSeg button').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); render(); };
+});
+['txt','font','th','wmm','hmm','guides'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{ if(id==='wmm'||id==='hmm') state.posMM=null; render(); }));
+
+// file upload
+const fileEl=document.getElementById('file'), drop=document.getElementById('drop');
+fileEl.addEventListener('change',e=>loadImg(e.target.files[0]));
+['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag');}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag');}));
+drop.addEventListener('drop',e=>{ if(e.dataTransfer.files[0]) loadImg(e.dataTransfer.files[0]); });
+function loadImg(f){ if(!f)return; const img=new Image(); img.onload=()=>{ state.img=img; document.getElementById('fileHint').textContent='✓ '+f.name; render(); }; img.src=URL.createObjectURL(f); }
+
+// ---------- CONTENT MASK at natural size, then tight bbox ----------
+// returns {canvas, bx,by,bw,bh}  (white ink on transparent, tight bbox in px)
+function buildContentNatural(){
+  if(state.img){
+    const c=document.createElement('canvas'); c.width=1200; c.height=1200; const g=c.getContext('2d');
+    const im=state.img, r=Math.min(1000/im.width,1000/im.height), w=im.width*r,h=im.height*r;
+    g.drawImage(im,(1200-w)/2,(1200-h)/2,w,h);
+    const d=g.getImageData(0,0,1200,1200),p=d.data;
+    for(let i=0;i<p.length;i+=4){ const a=p[i+3]; const lum=a?(0.299*p[i]+0.587*p[i+1]+0.114*p[i+2]):255;
+      let ink=Math.min(1,(a/255)*(1-lum/255)*1.6); p[i]=p[i+1]=p[i+2]=255; p[i+3]=Math.round(ink*255); }
+    g.putImageData(d,0,0);
+    const bb=tightBBox(g,1200,1200); if(!bb) return null;
+    return Object.assign({canvas:c},bb);
+  }
+  const lines=(document.getElementById('txt').value||'').split('\n').filter(s=>s.length);
+  if(!lines.length) return null;
+  const f=FONTS[+document.getElementById('font').value];
+  const fs=NAT_FS, lh=fs*1.14, pad=80, fontStr=`${f.weight} ${fs}px ${f.css}`;
+  // measure to size canvas (avoid clipping long lines)
+  const mc=document.createElement('canvas').getContext('2d'); mc.font=fontStr;
+  let maxW=0; lines.forEach(ln=>maxW=Math.max(maxW,mc.measureText(ln).width));
+  const cw=Math.ceil(maxW+pad*2), ch=Math.ceil(lh*lines.length+pad*2);
+  const c=document.createElement('canvas'); c.width=cw; c.height=ch; const g=c.getContext('2d');
+  g.fillStyle='#fff'; g.textAlign='center'; g.textBaseline='alphabetic'; g.font=fontStr;
+  const startY=pad+fs;
+  lines.forEach((ln,i)=>g.fillText(ln,cw/2,startY+i*lh));
+  const bb=tightBBox(g,cw,ch); if(!bb) return null;
+  return Object.assign({canvas:c},bb);
+}
+// cap height (px) of a reference uppercase glyph at the given font string
+function capHeightPx(fontStr){
+  const c=document.createElement('canvas'); c.width=400; c.height=400; const g=c.getContext('2d');
+  g.fillStyle='#fff'; g.textAlign='center'; g.textBaseline='alphabetic'; g.font=fontStr;
+  g.fillText('H',200,300);
+  const bb=tightBBox(g,400,400); return bb?bb.bh:NAT_FS*0.7;
+}
+function tightBBox(g,w,h){
+  const p=g.getImageData(0,0,w,h).data; let x0=w,y0=h,x1=0,y1=0,found=false;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){ if(p[(y*w+x)*4+3]>12){ found=true; if(x<x0)x0=x; if(x>x1)x1=x; if(y<y0)y0=y; if(y>y1)y1=y; } }
+  if(!found) return null;
+  return {bx:x0,by:y0,bw:x1-x0+1,bh:y1-y0+1};
+}
+
+// ---------- MATERIAL TEXTURE (within workpiece rect) ----------
+function paintMaterial(g,ox,oy,ww,hh){
+  const m=MATERIALS[state.mat];
+  const grad=g.createLinearGradient(ox,oy,ox+ww,oy+hh);
+  grad.addColorStop(0,m.tint); grad.addColorStop(0.5,m.base); grad.addColorStop(1,shade(m.base,-22));
+  g.fillStyle=grad; g.fillRect(ox,oy,ww,hh);
+  if(m.tex==='brushed'){
+    g.globalAlpha=0.06; g.strokeStyle='#000';
+    for(let y=oy;y<oy+hh;y+=2){ g.beginPath(); g.moveTo(ox,y); g.lineTo(ox+ww,y+(Math.random()-0.5)*2); g.stroke(); }
+    g.globalAlpha=0.05; g.strokeStyle='#fff';
+    for(let y=oy+1;y<oy+hh;y+=5){ g.beginPath(); g.moveTo(ox,y); g.lineTo(ox+ww,y); g.stroke(); }
+    g.globalAlpha=1;
+  } else if(m.tex==='leather'){
+    g.globalAlpha=0.5;
+    for(let i=0;i<2200;i++){ const x=ox+Math.random()*ww,y=oy+Math.random()*hh,r=Math.random()*3+1;
+      g.fillStyle=Math.random()>0.5?shade(m.base,12):shade(m.base,-14); g.beginPath(); g.arc(x,y,r,0,7); g.fill(); }
+    g.globalAlpha=1;
+  } else if(m.tex==='matte'){
+    g.globalAlpha=0.04;
+    for(let i=0;i<7000;i++){ const x=ox+Math.random()*ww,y=oy+Math.random()*hh; g.fillStyle=Math.random()>0.5?'#fff':'#000'; g.fillRect(x,y,1.5,1.5); }
+    g.globalAlpha=1;
+  }
+  // specular sweep — metallic sheen / glossy reflection band
+  if(m.tex==='brushed'){
+    const sp=g.createLinearGradient(ox,oy,ox+ww*0.85,oy+hh);
+    sp.addColorStop(0,'rgba(255,255,255,0)'); sp.addColorStop(0.40,'rgba(255,255,255,0.05)');
+    sp.addColorStop(0.52,'rgba(255,255,255,0.26)'); sp.addColorStop(0.60,'rgba(255,255,255,0.07)');
+    sp.addColorStop(1,'rgba(255,255,255,0)');
+    g.fillStyle=sp; g.fillRect(ox,oy,ww,hh);
+  } else if(m.tex==='matte'){
+    const sp=g.createLinearGradient(ox,oy,ox+ww,oy+hh);
+    sp.addColorStop(0,'rgba(255,255,255,0.05)'); sp.addColorStop(0.5,'rgba(255,255,255,0)'); sp.addColorStop(1,'rgba(255,255,255,0)');
+    g.fillStyle=sp; g.fillRect(ox,oy,ww,hh);
+  }
+  // top-left light hotspot
+  const hs=g.createRadialGradient(ox+ww*0.30,oy+hh*0.18,0,ox+ww*0.30,oy+hh*0.18,Math.max(ww,hh)*0.6);
+  hs.addColorStop(0,'rgba(255,255,255,0.12)'); hs.addColorStop(0.5,'rgba(255,255,255,0.03)'); hs.addColorStop(1,'rgba(255,255,255,0)');
+  g.fillStyle=hs; g.fillRect(ox,oy,ww,hh);
+  // vignette
+  const v=g.createRadialGradient(ox+ww/2,oy+hh/2,Math.min(ww,hh)*0.2,ox+ww/2,oy+hh/2,Math.max(ww,hh)*0.7);
+  v.addColorStop(0,'rgba(0,0,0,0)'); v.addColorStop(1,'rgba(0,0,0,0.30)');
+  g.fillStyle=v; g.fillRect(ox,oy,ww,hh);
+}
+
+// ---------- RENDER ----------
+function render(){
+  const wmm=clampNum('wmm',5,600,100), hmm=clampNum('hmm',5,600,50);
+  const thmm=+document.getElementById('th').value;
+  document.getElementById('thVal').textContent=thmm.toFixed(1)+' mm';
+  // size slider max relative to workpiece
+  document.getElementById('th').max=Math.max(2,Math.round(hmm));
+
+  // workpiece placement in canvas
+  const ppmm=Math.min(W*0.88/wmm, H*0.88/hmm);
+  const ww=wmm*ppmm, hh=hmm*ppmm, ox=(W-ww)/2, oy=(H-hh)/2;
+  geo={ox,oy,ppmm,wmm,hmm};
+  if(!state.posMM) state.posMM={x:wmm/2,y:hmm/2};
+  // clamp position within workpiece
+  state.posMM.x=Math.max(0,Math.min(wmm,state.posMM.x));
+  state.posMM.y=Math.max(0,Math.min(hmm,state.posMM.y));
+
+  const m=MATERIALS[state.mat];
+  const flat=document.createElement('canvas'); flat.width=W; flat.height=H;
+  const g=flat.getContext('2d');
+  // soft drop shadow under the plate (premium floating look) — transparent elsewhere
+  g.save(); g.filter='blur(20px)'; g.fillStyle='rgba(0,0,0,0.6)';
+  roundRectPath(g, ox+ww*0.03, oy+hh*0.11, ww*0.94, hh*0.97, Math.min(ww,hh)*0.06); g.fill(); g.restore();
+  g.save(); roundRectPath(g,ox,oy,ww,hh,Math.min(ww,hh)*0.04); g.clip();
+  paintMaterial(g,ox,oy,ww,hh);
+
+  // content — `thmm` is the customer's Schriftgröße (cap height for text / size for image)
+  const nat=buildContentNatural();
+  if(nat){
+    let sc;
+    if(state.img){ sc=(thmm*ppmm)/nat.bh; }                 // image: size = bbox height
+    else {                                                  // text: scale so CAP height = thmm
+      const f=FONTS[+document.getElementById('font').value];
+      const capPx=capHeightPx(`${f.weight} ${NAT_FS}px ${f.css}`);
+      sc=(thmm*ppmm)/capPx;
+    }
+    const drawW=nat.bw*sc, drawH=nat.bh*sc;
+    const cxpx=ox+state.posMM.x*ppmm, cypx=oy+state.posMM.y*ppmm;
+    const dx=cxpx-drawW/2, dy=cypx-drawH/2;
+    last={ wMM:drawW/ppmm, hMM:drawH/ppmm, sgMM:thmm };     // hMM = Rahmenhöhe (computed)
+    // prepared mask (cropped to bbox) scaled into a W×H canvas at placement
+    const mask=document.createElement('canvas'); mask.width=W; mask.height=H;
+    mask.getContext('2d').drawImage(nat.canvas, nat.bx,nat.by,nat.bw,nat.bh, dx,dy,drawW,drawH);
+    stampEngrave(g,mask,m.engrave);
+  } else { last={wMM:0,hMM:0,sgMM:thmm}; }
+  g.restore();
+  // workpiece border
+  g.strokeStyle='rgba(255,255,255,0.10)'; g.lineWidth=2;
+  roundRectPath(g,ox,oy,ww,hh,Math.min(ww,hh)*0.04); g.stroke();
+
+  // guides
+  if(document.getElementById('guides').checked) drawGuides(g,ox,oy,ww,hh,wmm,hmm);
+
+  // output
+  ctx.clearRect(0,0,W,H);
+  if(state.surf==='flat') ctx.drawImage(flat,0,0);
+  else drawCylinder(flat,ox,oy,ww,hh);
+
+  updateReadout(thmm);
+}
+
+const SUPPORTS_FILTER=(function(){try{const c=document.createElement('canvas').getContext('2d');c.filter='blur(2px)';return c.filter==='blur(2px)';}catch(e){return false;}})();
+
+function stampEngrave(g,mask,mode){
+  // bevel geometry scales with the engraved content size (mm → px)
+  const hpx=(last&&last.hMM?last.hMM:8)*geo.ppmm;
+  const scalePx=Math.max(2,hpx*0.05);
+  const blurR=Math.min(7,Math.max(1.1,scalePx*0.55));
+  const off=Math.max(1.2,scalePx*0.55);
+  const tmp=document.createElement('canvas'); tmp.width=W; tmp.height=H; const tg=tmp.getContext('2d');
+  // paint the mask, optionally shifted+blurred, tinted with `color`, onto g with given blend
+  function layer(color,dx,dy,alpha,blend,blur){
+    tg.clearRect(0,0,W,H); tg.globalCompositeOperation='source-over';
+    tg.filter=(blur&&SUPPORTS_FILTER)?`blur(${blur}px)`:'none';
+    tg.drawImage(mask,dx,dy);
+    tg.filter='none';
+    tg.globalCompositeOperation='source-in'; tg.fillStyle=color; tg.fillRect(0,0,W,H);
+    g.globalAlpha=alpha; g.globalCompositeOperation=blend; g.drawImage(tmp,0,0);
+    g.globalAlpha=1; g.globalCompositeOperation='source-over';
+  }
+  // light comes from top-left → bright bevel wall top-left, shadow wall bottom-right, recessed floor centre
+  if(mode==='dark'){            // laser mark on metal: dark recessed mark, crisp lit groove edge
+    layer('#ffffff',-off*0.75,-off*0.75,0.42,'screen',blurR);
+    layer('#05070a',0,0,0.84,'multiply',blurR*0.45);
+    layer('#000000', off*0.75, off*0.75,0.30,'multiply',blurR);
+  } else if(mode==='burn'){     // leather/wood: charred recess with singed highlight rim
+    layer('#ffe0ad',-off*0.65,-off*0.65,0.22,'screen',blurR);
+    layer('#1d0d04',0,0,0.90,'multiply',blurR*0.45);
+    layer('#3a1d0a', off*0.65, off*0.65,0.32,'multiply',blurR);
+  } else {                      // dark plastic: engrave reveals light core
+    layer('#000000', off*0.65, off*0.65,0.36,'multiply',blurR);
+    layer('#f4f7fb',0,0,0.92,'screen',blurR*0.45);
+    layer('#ffffff',-off*0.65,-off*0.65,0.32,'screen',blurR);
+  }
+}
+
+function drawGuides(g,ox,oy,ww,hh,wmm,hmm){
+  g.save(); roundRectPath(g,ox,oy,ww,hh,Math.min(ww,hh)*0.04); g.clip();
+  g.strokeStyle='rgba(0,212,255,0.18)'; g.lineWidth=1;
+  for(let x=10;x<wmm;x+=10){ const px=ox+x*geo.ppmm; g.beginPath(); g.moveTo(px,oy); g.lineTo(px,oy+hh); g.stroke(); }
+  for(let y=10;y<hmm;y+=10){ const py=oy+y*geo.ppmm; g.beginPath(); g.moveTo(ox,py); g.lineTo(ox+ww,py); g.stroke(); }
+  g.strokeStyle='rgba(0,212,255,0.55)'; g.lineWidth=1.5;
+  g.beginPath(); g.moveTo(ox+ww/2,oy); g.lineTo(ox+ww/2,oy+hh); g.moveTo(ox,oy+hh/2); g.lineTo(ox+ww,oy+hh/2); g.stroke();
+  g.restore();
+}
+
+function drawCylinder(flat,ox,oy,ww,hh){
+  // a REAL cylindrical body sized to the Werkstück aspect ratio (Breite : Höhe)
+  const ar=ww/hh;                                       // = wmm/hmm
+  const availW=W*0.72, availH=H*0.66;
+  let Wc,Hc; if(availW/availH>ar){ Hc=availH; Wc=Hc*ar; } else { Wc=availW; Hc=Wc/ar; }
+  const Xc=W/2, Yc=H/2, x0=Xc-Wc/2, y0=Yc-Hc/2, Rc=Wc/2;
+  const capRy=Math.min(Wc*0.13, Hc*0.22);              // perspective depth of the round top/bottom
+  const mb=hexRGB(MATERIALS[state.mat].base);
+  const L=-0.30;                                        // light azimuth (rad) — gentle, from front-left
+  const src=flat.getContext('2d').getImageData(0,0,W,H), out=ctx.createImageData(W,H);
+  for(let x=0;x<W;x++){
+    const nx=(x-Xc)/Rc; if(nx<-1||nx>1) continue;       // outside cylinder silhouette
+    const ang=Math.asin(nx);
+    const u=(ang/(Math.PI/2))*0.5+0.5;                  // unwrap → 0..1 across the label width
+    const sxf=ox+u*ww;
+    const diff=Math.max(0,Math.cos(ang-L));
+    const shade=0.46+0.54*diff;                         // soft cylinder gradient, NO blown-out highlight
+    const spec=Math.pow(diff,42)*70;                    // a faint glossy hint only
+    for(let y=y0|0;y<=(y0+Hc)|0;y++){
+      const v=(y-y0)/Hc, syf=oy+v*hh;
+      const si=((Math.round(syf)*W)+Math.round(sxf))*4, di=((y*W)+x)*4;
+      let r,g2,b; if(src.data[si+3]<12){ r=mb[0]; g2=mb[1]; b=mb[2]; } else { r=src.data[si]; g2=src.data[si+1]; b=src.data[si+2]; }
+      out.data[di]=Math.min(255,r*shade+spec); out.data[di+1]=Math.min(255,g2*shade+spec); out.data[di+2]=Math.min(255,b*shade+spec); out.data[di+3]=255;
+    }
+  }
+  const tmp=document.createElement('canvas');tmp.width=W;tmp.height=H; tmp.getContext('2d').putImageData(out,0,0);
+  ctx.clearRect(0,0,W,H);
+  // contact shadow on the ground
+  ctx.save(); ctx.filter='blur(20px)'; ctx.fillStyle='rgba(0,0,0,0.45)';
+  ctx.beginPath(); ctx.ellipse(Xc,y0+Hc+capRy*0.4,Wc*0.52,capRy*0.7,0,0,7); ctx.fill(); ctx.restore();
+  // body clip = straight sides + elliptical top & bottom (true cylinder silhouette)
+  function bodyPath(){ ctx.beginPath();
+    ctx.ellipse(Xc,y0+Hc,Rc,capRy,0,0,Math.PI);                    // bottom front arc
+    ctx.lineTo(x0,y0); ctx.ellipse(Xc,y0,Rc,capRy,0,Math.PI,0,true); ctx.lineTo(x0+Wc,y0+Hc); ctx.closePath(); }
+  ctx.save(); bodyPath(); ctx.clip();
+  ctx.drawImage(tmp,0,0);
+  // very subtle vertical volume (top a touch lighter, bottom grounded) — kept low to avoid over-lighting
+  const vg=ctx.createLinearGradient(0,y0,0,y0+Hc);
+  vg.addColorStop(0,'rgba(255,255,255,0.04)'); vg.addColorStop(0.5,'rgba(255,255,255,0)'); vg.addColorStop(1,'rgba(0,0,0,0.14)');
+  ctx.fillStyle=vg; ctx.fillRect(x0,y0,Wc,Hc);
+  ctx.restore();
+  // top cap = visible round end of the cylinder (material-toned, gentle rim)
+  ctx.save();
+  const capFill=ctx.createLinearGradient(0,y0-capRy,0,y0+capRy);
+  capFill.addColorStop(0,`rgb(${Math.min(255,mb[0]*1.25)|0},${Math.min(255,mb[1]*1.25)|0},${Math.min(255,mb[2]*1.25)|0})`);
+  capFill.addColorStop(1,`rgb(${mb[0]*0.78|0},${mb[1]*0.78|0},${mb[2]*0.78|0})`);
+  ctx.fillStyle=capFill; ctx.beginPath(); ctx.ellipse(Xc,y0,Rc,capRy,0,0,7); ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.10)'; ctx.lineWidth=1; ctx.stroke();
+  ctx.restore();
+}
+
+function hexRGB(h){ h=h.replace('#',''); return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]; }
+
+function updateReadout(thmm){
+  // customer-facing: NO LightBurn jargon, no Rahmenhöhe, NO generalised effect claim
+  // (the real mark colour/contrast depends on material colour, laser power etc. — preview is illustrative only)
+  document.getElementById('readout').innerHTML=
+    `<span class="k">Material:</span> <b>${state.mat}</b><br>`+
+    `<span class="k">Schriftgröße:</span> <b>${thmm.toFixed(1)} mm</b> · <span class="k">Breite:</span> <b>${last.wMM.toFixed(1)} mm</b> · <span class="k">Werkstück:</span> <b>${geo.wmm}×${geo.hmm} mm</b>`;
+  document.getElementById('warn').classList.toggle('show', thmm<2);
+}
+
+// builds the internal LightBurn-spec that goes into the email (NOT shown to customer)
+function buildEmailSpec(){
+  const f=FONTS[+document.getElementById('font').value];
+  const px=state.posMM.x-last.wMM/2, py=state.posMM.y-last.hMM/2;   // top-left of bbox
+  const content=state.img?'Bild/Logo (Upload)':(document.getElementById('txt').value||'').replace(/\n/g,' / ');
+  return {
+    inhalt:content,
+    schriftart:state.img?'(Bild)':f.name,
+    schriftgroesse_mm:(+document.getElementById('th').value).toFixed(1),
+    rahmenhoehe_mm:last.hMM.toFixed(1),
+    rahmenbreite_mm:last.wMM.toFixed(1),
+    position_mm:`X ${px.toFixed(1)} · Y ${py.toFixed(1)} (oben-links)`,
+    material:state.mat, oberflaeche:(state.surf==='flat'?'Ebene Fläche':'Rundkörper'),
+    werkstueck_mm:`${geo.wmm}×${geo.hmm}`
+  };
+}
+
+// ---------- DRAG ----------
+let dragging=false, grab={dx:0,dy:0};
+function ptMM(e){ const r=cv.getBoundingClientRect(); const sx=(e.clientX-r.left)/r.width*W, sy=(e.clientY-r.top)/r.height*H;
+  return { x:(sx-geo.ox)/geo.ppmm, y:(sy-geo.oy)/geo.ppmm }; }
+cv.addEventListener('pointerdown',e=>{ if(state.surf!=='flat')return; dragging=true; cv.classList.add('grabbing'); cv.setPointerCapture(e.pointerId);
+  const p=ptMM(e); grab.dx=state.posMM.x-p.x; grab.dy=state.posMM.y-p.y; });
+cv.addEventListener('pointermove',e=>{ if(!dragging)return; const p=ptMM(e); state.posMM.x=p.x+grab.dx; state.posMM.y=p.y+grab.dy; render(); });
+cv.addEventListener('pointerup',e=>{ dragging=false; cv.classList.remove('grabbing'); });
+
+document.getElementById('center').onclick=()=>{ state.posMM={x:geo.wmm/2,y:geo.hmm/2}; render(); };
+
+// ---------- EXPORTS ----------
+document.getElementById('dlpng').onclick=()=>{ const a=document.createElement('a'); a.download='wolf-gravur-vorschau.png'; a.href=cv.toDataURL('image/png'); a.click(); };
+document.getElementById('dlsvg').onclick=()=>downloadSVG();
+document.getElementById('order').onclick=()=>{
+  const s=buildEmailSpec();
+  alert('DEMO — diese LightBurn-Spec bekommt Wolf Lasermark per E-Mail (Kunde sieht das NICHT):\n\n'+
+    `Inhalt: ${s.inhalt}\n`+
+    `Schriftart: ${s.schriftart}\n`+
+    `Schriftgröße (Kundenangabe): ${s.schriftgroesse_mm} mm\n`+
+    `→ Rahmenhöhe (für LightBurn): ${s.rahmenhoehe_mm} mm\n`+
+    `→ Rahmenbreite: ${s.rahmenbreite_mm} mm\n`+
+    `Position: ${s.position_mm}\n`+
+    `Material: ${s.material} · Oberfläche: ${s.oberflaeche}\n`+
+    `Werkstück: ${s.werkstueck_mm} mm`);
+};
+
+function downloadSVG(){
+  const wmm=geo.wmm,hmm=geo.hmm,thmm=+document.getElementById('th').value;
+  const px=(state.posMM.x-last.wMM/2), py=(state.posMM.y-last.hMM/2);
+  let inner='';
+  if(state.img){
+    inner=`<image x="${px.toFixed(2)}" y="${py.toFixed(2)}" width="${last.wMM.toFixed(2)}" height="${last.hMM.toFixed(2)}" href="${state.img.src}"/>`;
+  } else {
+    const lines=(document.getElementById('txt').value||'').split('\n').filter(s=>s.length);
+    const f=FONTS[+document.getElementById('font').value];
+    const perLine=last.hMM/lines.length;            // visual line height in mm (bbox-based)
+    const tspans=lines.map((ln,i)=>`<tspan x="${(px+last.wMM/2).toFixed(2)}" y="${(py+(i+0.82)*perLine).toFixed(2)}">${escapeXML(ln)}</tspan>`).join('');
+    inner=`<text font-family="${f.name}" font-weight="${f.weight}" font-size="${(perLine*1.32).toFixed(2)}" text-anchor="middle" fill="#000">${tspans}</text>`;
+  }
+  const svg=`<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="${wmm}mm" height="${hmm}mm" viewBox="0 0 ${wmm} ${hmm}">
+  <rect x="0" y="0" width="${wmm}" height="${hmm}" fill="none" stroke="#cccccc" stroke-width="0.2"/>
+  ${inner}
+</svg>`;
+  const blob=new Blob([svg],{type:'image/svg+xml'}); const a=document.createElement('a');
+  a.download='wolf-gravur-lightburn.svg'; a.href=URL.createObjectURL(blob); a.click();
+}
+function escapeXML(s){return s.replace(/[<>&'"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;',"'":'&apos;','"':'&quot;'}[c]));}
+
+// ---------- helpers ----------
+function clampNum(id,min,max,def){ let v=parseFloat(document.getElementById(id).value); if(isNaN(v))v=def; v=Math.max(min,Math.min(max,v)); return v; }
+function roundRectPath(c,x,y,w,h,r){ r=Math.min(r,w/2,h/2); c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath(); }
+function shade(hex,amt){ let c=hex.replace('#',''); if(c.length===3)c=c.split('').map(x=>x+x).join(''); const cl=v=>Math.max(0,Math.min(255,v));
+  return `rgb(${cl(parseInt(c.slice(0,2),16)+amt)},${cl(parseInt(c.slice(2,4),16)+amt)},${cl(parseInt(c.slice(4,6),16)+amt)})`; }
+
+if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(render); }
+render();
+</script>
+</body>
+</html>
