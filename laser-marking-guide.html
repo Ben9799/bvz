@@ -1384,3 +1384,12 @@ window.addEventListener('scroll', () => {
   let current = '';
   sections.forEach(s => {
     if(window.scrollY >= s.offsetTop - 120) current = s.getAttribute('id');
+  });
+  navLinks.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+});
+</script>
+<script type="module" src="analytics.js"></script>
+</body>
+</html>
