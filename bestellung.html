@@ -671,19 +671,19 @@ input.valid { border-color: rgba(34,197,94,0.4); }
   <div class="progress-steps" id="progressSteps">
     <div class="progress-step active" data-step="1" onclick="jumpStep(1)">
       <div class="step-dot">1</div>
-      <div class="step-label">Kontakt</div>
+      <div class="step-label">Material</div>
     </div>
     <div class="progress-step" data-step="2" onclick="jumpStep(2)">
       <div class="step-dot">2</div>
-      <div class="step-label">Material</div>
+      <div class="step-label">Gravur</div>
     </div>
     <div class="progress-step" data-step="3" onclick="jumpStep(3)">
       <div class="step-dot">3</div>
-      <div class="step-label">Gravur</div>
+      <div class="step-label">Details</div>
     </div>
     <div class="progress-step" data-step="4" onclick="jumpStep(4)">
       <div class="step-dot">4</div>
-      <div class="step-label">Details</div>
+      <div class="step-label">Kontakt</div>
     </div>
     <div class="progress-step" data-step="5" onclick="jumpStep(5)">
       <div class="step-dot">5</div>
@@ -697,8 +697,8 @@ input.valid { border-color: rgba(34,197,94,0.4); }
 <!-- LEFT COLUMN: STEPS -->
 <div>
 
-<!-- ===================== STEP 1: KONTAKT ===================== -->
-<div class="step-panel active" id="step1">
+<!-- ===================== STEP 4: KONTAKT ===================== -->
+<div class="step-panel" id="step4">
   <div class="card">
     <div class="sec-head">
       <div class="sec-icon">👤</div>
@@ -730,12 +730,13 @@ input.valid { border-color: rgba(34,197,94,0.4); }
   </div>
 
   <div class="step-nav">
-    <button class="btn-next" onclick="nextStep(1)">Weiter: Material auswählen →</button>
+    <button class="btn-back" onclick="goStep(3)">← Zurück</button>
+    <button class="btn-next" onclick="nextStep(4)">Weiter: Zusammenfassung →</button>
   </div>
 </div>
 
-<!-- ===================== STEP 2: MATERIAL & OBERFLÄCHE ===================== -->
-<div class="step-panel" id="step2">
+<!-- ===================== STEP 1: MATERIAL & OBERFLÄCHE ===================== -->
+<div class="step-panel active" id="step1">
   <div class="card">
     <div class="sec-head">
       <div class="sec-icon">🔩</div>
@@ -879,13 +880,12 @@ input.valid { border-color: rgba(34,197,94,0.4); }
   </div>
 
   <div class="step-nav">
-    <button class="btn-back" onclick="goStep(1)">← Zurück</button>
-    <button class="btn-next" onclick="nextStep(2)">Weiter: Gravurinhalt →</button>
+    <button class="btn-next" onclick="nextStep(1)">Weiter: Gravurinhalt →</button>
   </div>
 </div>
 
-<!-- ===================== STEP 3: GRAVUR-INHALT & MARKIERUNG ===================== -->
-<div class="step-panel" id="step3">
+<!-- ===================== STEP 2: GRAVUR-INHALT & MARKIERUNG ===================== -->
+<div class="step-panel" id="step2">
   <div class="card">
     <div class="sec-head">
       <div class="sec-icon">✏️</div>
@@ -970,13 +970,13 @@ input.valid { border-color: rgba(34,197,94,0.4); }
   </div>
 
   <div class="step-nav">
-    <button class="btn-back" onclick="goStep(2)">← Zurück</button>
-    <button class="btn-next" onclick="nextStep(3)">Weiter: Termin & Details →</button>
+    <button class="btn-back" onclick="goStep(1)">← Zurück</button>
+    <button class="btn-next" onclick="nextStep(2)">Weiter: Termin & Details →</button>
   </div>
 </div>
 
-<!-- ===================== STEP 4: DETAILS & TERMIN ===================== -->
-<div class="step-panel" id="step4">
+<!-- ===================== STEP 3: DETAILS & TERMIN ===================== -->
+<div class="step-panel" id="step3">
   <div class="card">
     <div class="sec-head">
       <div class="sec-icon">⚡</div>
@@ -1025,8 +1025,8 @@ input.valid { border-color: rgba(34,197,94,0.4); }
   </div>
 
   <div class="step-nav">
-    <button class="btn-back" onclick="goStep(3)">← Zurück</button>
-    <button class="btn-next" onclick="nextStep(4)">Weiter: Zusammenfassung →</button>
+    <button class="btn-back" onclick="goStep(2)">← Zurück</button>
+    <button class="btn-next" onclick="nextStep(3)">Weiter: Kontaktdaten →</button>
   </div>
 </div>
 
@@ -1042,7 +1042,7 @@ input.valid { border-color: rgba(34,197,94,0.4); }
     </div>
 
     <div class="summary-section">
-      <div class="summary-label">👤 Kontakt <button class="summary-edit-btn" onclick="goStep(1)">✏️ bearbeiten</button></div>
+      <div class="summary-label">👤 Kontakt <button class="summary-edit-btn" onclick="goStep(4)">✏️ bearbeiten</button></div>
       <div class="summary-grid">
         <div class="summary-item"><div class="summary-item-label">Name</div><div class="summary-item-val" id="sumName">–</div></div>
         <div class="summary-item"><div class="summary-item-label">E-Mail</div><div class="summary-item-val" id="sumEmail">–</div></div>
@@ -1054,7 +1054,7 @@ input.valid { border-color: rgba(34,197,94,0.4); }
     <div class="divider"></div>
 
     <div class="summary-section">
-      <div class="summary-label">🔩 Material & Auftrag <button class="summary-edit-btn" onclick="goStep(2)">✏️ bearbeiten</button></div>
+      <div class="summary-label">🔩 Material & Auftrag <button class="summary-edit-btn" onclick="goStep(1)">✏️ bearbeiten</button></div>
       <div class="summary-grid">
         <div class="summary-item"><div class="summary-item-label">Material</div><div class="summary-item-val accent" id="sumMat">–</div></div>
         <div class="summary-item"><div class="summary-item-label">Oberfläche</div><div class="summary-item-val" id="sumSurf">–</div></div>
@@ -1066,7 +1066,7 @@ input.valid { border-color: rgba(34,197,94,0.4); }
     <div class="divider"></div>
 
     <div class="summary-section">
-      <div class="summary-label">✏️ Gravur <button class="summary-edit-btn" onclick="goStep(3)">✏️ bearbeiten</button></div>
+      <div class="summary-label">✏️ Gravur <button class="summary-edit-btn" onclick="goStep(2)">✏️ bearbeiten</button></div>
       <div class="summary-grid">
         <div class="summary-item"><div class="summary-item-label">Inhalt</div><div class="summary-item-val" id="sumContent">–</div></div>
         <div class="summary-item"><div class="summary-item-label">Markierungsart</div><div class="summary-item-val" id="sumMark">–</div></div>
@@ -1076,7 +1076,7 @@ input.valid { border-color: rgba(34,197,94,0.4); }
     <div class="divider"></div>
 
     <div class="summary-section">
-      <div class="summary-label">⏱ Termin <button class="summary-edit-btn" onclick="goStep(4)">✏️ bearbeiten</button></div>
+      <div class="summary-label">⏱ Termin <button class="summary-edit-btn" onclick="goStep(3)">✏️ bearbeiten</button></div>
       <div class="summary-grid">
         <div class="summary-item"><div class="summary-item-label">Dringlichkeit</div><div class="summary-item-val accent" id="sumUrg">–</div></div>
         <div class="summary-item"><div class="summary-item-label">Wunschtermin</div><div class="summary-item-val" id="sumTermin">nicht angegeben</div></div>
@@ -1102,10 +1102,10 @@ input.valid { border-color: rgba(34,197,94,0.4); }
   <div class="step-indicator-mini" id="sidebarStepIndicator">
     <div class="sim-title">Fortschritt</div>
     <div class="sim-steps">
-      <div class="sim-step active" id="sim1"><div class="sim-step-dot">1</div>Kontakt</div>
-      <div class="sim-step" id="sim2"><div class="sim-step-dot">2</div>Material & Menge</div>
-      <div class="sim-step" id="sim3"><div class="sim-step-dot">3</div>Gravur-Inhalt</div>
-      <div class="sim-step" id="sim4"><div class="sim-step-dot">4</div>Details & Termin</div>
+      <div class="sim-step active" id="sim1"><div class="sim-step-dot">1</div>Material & Menge</div>
+      <div class="sim-step" id="sim2"><div class="sim-step-dot">2</div>Gravur-Inhalt</div>
+      <div class="sim-step" id="sim3"><div class="sim-step-dot">3</div>Details & Termin</div>
+      <div class="sim-step" id="sim4"><div class="sim-step-dot">4</div>Kontakt</div>
       <div class="sim-step" id="sim5"><div class="sim-step-dot">5</div>Zusammenfassung</div>
     </div>
   </div>
@@ -1400,7 +1400,7 @@ function updateProgress() {
 function validateStep(step) {
   let ok = true;
 
-  if (step === 1) {
+  if (step === 4) {
     const checks = [
       { id: 'name', eid: 'nameErr', fn: v => v.trim().length > 1 },
       { id: 'email', eid: 'emailErr', fn: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) },
@@ -1413,7 +1413,7 @@ function validateStep(step) {
     });
   }
 
-  if (step === 2) {
+  if (step === 1) {
     if (!matName) { document.getElementById('matErr').classList.add('show'); ok = false; }
     else document.getElementById('matErr').classList.remove('show');
 
@@ -1426,7 +1426,7 @@ function validateStep(step) {
     else { stkEl.classList.remove('err'); stkErr.classList.remove('show'); }
   }
 
-  if (step === 3) {
+  if (step === 2) {
     if (!activeContentPills().length) { document.getElementById('contentErr').classList.add('show'); ok = false; }
     else document.getElementById('contentErr').classList.remove('show');
 
@@ -1434,7 +1434,7 @@ function validateStep(step) {
     else document.getElementById('markErr').classList.remove('show');
   }
 
-  if (step === 4) {
+  if (step === 3) {
     // Standard ist bereits vorausgewählt. Der Kunde kann in Schritt 4 nur noch
     // auf Schnell/Express wechseln, wenn er möchte.
     if (urgSurcharge === null) {

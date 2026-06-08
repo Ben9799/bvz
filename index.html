@@ -42,7 +42,9 @@
   "sameAs": ["https://www.instagram.com/wolf_lasermark"]
 }
 </script>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #0a0a0c;
@@ -189,7 +191,7 @@ body {
 /* ========================
    MAIN
    ======================== */
-#main { display: none; position: relative; z-index: 1; }
+#main { display: block; position: relative; z-index: 1; }
 
 /* MODE BAR */
 .mode-bar {
@@ -2136,6 +2138,46 @@ body.mode-firmen .privat-only { display: none !important; }
 .chat-close:hover { background: rgba(255,255,255,0.1); color: #fff; }
 
 /* Live price strip */
+.chat-progress {
+  display: none;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  flex-shrink: 0;
+}
+.chat-progress.show { display: flex; }
+.chat-progress-track {
+  flex: 1;
+  height: 5px;
+  border-radius: 99px;
+  background: rgba(255,255,255,0.08);
+  overflow: hidden;
+}
+.chat-progress-bar {
+  height: 100%;
+  width: 0;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--accent2), var(--accent));
+  transition: width 0.45s ease;
+}
+.chat-progress-label {
+  font-size: 0.7rem;
+  color: #8eb6c5;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.chat-trust {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #9fd3e3;
+  background: rgba(0,200,255,0.06);
+  border: 1px solid rgba(0,200,255,0.14);
+  border-radius: 10px;
+  padding: 0.5rem 0.75rem;
+  margin: 0.1rem 0 0.4rem;
+}
+.chat-trust strong { color: var(--accent); }
 .chat-price-strip {
   background: linear-gradient(180deg, rgba(0,200,255,0.06), transparent);
   padding: 0.55rem 1rem;
@@ -2548,9 +2590,36 @@ body.mode-firmen .privat-only { display: none !important; }
 .ratgeber-card .rg-desc { font-size:0.86rem; color:var(--muted2); line-height:1.6; flex:1; }
 .ratgeber-card .rg-arrow { font-size:0.85rem; font-weight:700; color:var(--accent); margin-top:0.3rem; }
 
+/* Inline Kontaktformular */
+.contact-form { margin:1.25rem 0 0.5rem; }
+.contact-form .cf-row { display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; }
+.contact-form .cf-field { display:flex; flex-direction:column; margin-bottom:0.75rem; }
+.contact-form label { font-size:0.78rem; font-weight:600; color:var(--muted2); margin-bottom:0.35rem; }
+.contact-form input, .contact-form textarea {
+  background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.12); border-radius:10px;
+  padding:0.7rem 0.85rem; color:var(--text); font-family:inherit; font-size:0.9rem; width:100%; transition:border-color .15s, box-shadow .15s;
+}
+.contact-form input:focus, .contact-form textarea:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(0,200,255,0.12); }
+.contact-form input.cf-invalid, .contact-form textarea.cf-invalid { border-color:#ff5c5c; }
+.contact-form textarea { resize:vertical; min-height:96px; }
+.cf-submit {
+  width:100%; background:var(--accent); color:#062430; border:none; border-radius:10px;
+  padding:0.85rem 1rem; font-family:inherit; font-size:0.95rem; font-weight:800; cursor:pointer; transition:transform .12s, opacity .15s; margin-top:0.25rem;
+}
+.cf-submit:hover { transform:translateY(-1px); }
+.cf-submit:disabled { opacity:0.6; cursor:default; transform:none; }
+.cf-status { font-size:0.88rem; font-weight:600; margin-top:0.7rem; min-height:1.2em; }
+.cf-status.ok { color:#3ddc84; }
+.cf-status.err { color:#ff7b7b; }
+.cf-hint { font-size:0.72rem; color:var(--muted); line-height:1.5; margin-top:0.6rem; }
+.cf-hint a { color:var(--muted2); }
+.contact-or { display:flex; align-items:center; text-align:center; gap:0.75rem; color:var(--muted); font-size:0.78rem; margin:1.1rem 0 0.9rem; }
+.contact-or::before, .contact-or::after { content:""; flex:1; height:1px; background:rgba(255,255,255,0.1); }
+@media (max-width:560px){ .contact-form .cf-row { grid-template-columns:1fr; } }
+
 </style>
 </head>
-<body>
+<body class="mode-firmen">
 
 <!-- BACKGROUND -->
 <div class="bg-mesh"></div>
@@ -2559,7 +2628,7 @@ body.mode-firmen .privat-only { display: none !important; }
 <!-- ========================
      OVERLAY
      ======================== -->
-<div id="overlay">
+<div id="overlay" style="display:none">
   <div class="ov-inner">
     <div class="ov-logo">
       <picture><source srcset="images/wolf-lasermark-icon.webp" type="image/webp"><img src="images/wolf-lasermark-icon.png" alt="Wolf Lasermark" width="64" height="64"></picture>
@@ -2601,8 +2670,8 @@ body.mode-firmen .privat-only { display: none !important; }
     </div>
   </div>
 
-  <!-- MODE BAR -->
-  <div class="mode-bar">
+  <!-- MODE BAR — nur sichtbar, wenn Privatkundenbereich aktiv ist -->
+  <div class="mode-bar" style="display:none">
     <span id="mode-badge" class="mode-badge">–</span>
     <span id="mode-label"></span>
     <button onclick="resetMode()">Ansicht wechseln</button>
@@ -3269,7 +3338,30 @@ body.mode-firmen .privat-only { display: none !important; }
       </div>
       <div class="contact-box">
         <h3>Kontakt aufnehmen</h3>
-        <p>Für ein schnelles Angebot oder bei Fragen – wählen Sie Ihren bevorzugten Weg:</p>
+        <p>Schreiben Sie uns direkt – wir melden uns in der Regel innerhalb von 8 Stunden.</p>
+
+        <form id="contactForm" class="contact-form" novalidate>
+          <div class="cf-row">
+            <div class="cf-field">
+              <label for="cf-name">Name *</label>
+              <input type="text" id="cf-name" name="name" required placeholder="Max Mustermann" autocomplete="name">
+            </div>
+            <div class="cf-field">
+              <label for="cf-email">E-Mail *</label>
+              <input type="email" id="cf-email" name="email" required placeholder="max@firma.de" autocomplete="email">
+            </div>
+          </div>
+          <div class="cf-field">
+            <label for="cf-msg">Ihre Nachricht *</label>
+            <textarea id="cf-msg" name="nachricht" rows="4" required placeholder="Was möchten Sie gravieren lassen? Material, Stückzahl, Wunschtermin …"></textarea>
+          </div>
+          <button type="submit" class="cf-submit" id="cf-submit">✉️ Nachricht senden</button>
+          <div class="cf-status" id="cf-status" role="status" aria-live="polite"></div>
+          <p class="cf-hint">Mit dem Absenden stimmen Sie der Verarbeitung Ihrer Angaben zur Bearbeitung der Anfrage zu (siehe <a href="datenschutz.html">Datenschutz</a>).</p>
+        </form>
+
+        <div class="contact-or"><span>oder direkt</span></div>
+
         <div class="contact-email-row">
           <div>
             <div class="contact-email-label">E-Mail</div>
@@ -3378,6 +3470,11 @@ body.mode-firmen .privat-only { display: none !important; }
       <div class="chat-head-sub">Angebot-Assistent · Antwort ≤ 3 h werktags</div>
     </div>
     <button class="chat-close" onclick="closeOfferChat()" aria-label="Schließen">✕</button>
+  </div>
+
+  <div class="chat-progress" id="chatProgress" aria-hidden="true">
+    <div class="chat-progress-track"><div class="chat-progress-bar" id="chatProgressBar"></div></div>
+    <div class="chat-progress-label" id="chatProgressLabel"></div>
   </div>
 
   <div class="chat-price-strip" id="chatPriceStrip">
@@ -3725,6 +3822,7 @@ window.wlUploadZeichnung = function(file, onProgress){
   }
 
   function step2_material(){
+    enterStep(1);
     const opts = MATERIALS.map(m => ({
       value: m.name, label: m.name, ico: m.icon, note: m.note
     }));
@@ -3778,6 +3876,7 @@ window.wlUploadZeichnung = function(file, onProgress){
   }
 
   function step3_surface(){
+    enterStep(2);
     addBotMessage('Wie ist das Werkstück <strong>geformt</strong>?', 350).then(() => {
       const opts = SURFACES.map(s => ({
         value: s.name, label: s.name, ico: s.icon, note: s.desc
@@ -3870,6 +3969,7 @@ window.wlUploadZeichnung = function(file, onProgress){
   }
 
   function step4_maße(){
+    enterStep(3);
     const isSkala = state.isSkala;
     const promptText = isSkala
       ? 'Wie viele Stück benötigen Sie? <em>Bei größerer Stückzahl wird der Stückpreis automatisch günstiger.</em>'
@@ -3999,6 +4099,7 @@ window.wlUploadZeichnung = function(file, onProgress){
   }
 
   function step5_inhalt(){
+    enterStep(4);
     addBotMessage('Was soll <strong>graviert</strong> werden? <em>Mehrfachauswahl möglich.</em>', 400).then(() => {
       const opts = CONTENTS.map(c => ({
         value: c.val, label: c.label, ico: c.icon
@@ -4014,6 +4115,7 @@ window.wlUploadZeichnung = function(file, onProgress){
   }
 
   function step6_mark(){
+    enterStep(5);
     addBotMessage('Welche <strong>Markierungsart</strong> wünschen Sie?', 400).then(() => {
       const opts = MARKS.map(m => ({
         value: m.name, label: m.name, ico: m.icon, note: m.desc
@@ -4030,6 +4132,7 @@ window.wlUploadZeichnung = function(file, onProgress){
   }
 
   function step7_urgency(){
+    enterStep(6);
     addBotMessage('Wann brauchen Sie die Gravur? Express-Aufträge sind in der Regel möglich.', 400).then(() => {
       const opts = URGENCIES.map(u => ({
         value: u.name, label: u.short, ico: u.icon, note: u.desc
@@ -4046,6 +4149,7 @@ window.wlUploadZeichnung = function(file, onProgress){
   }
 
   function step8_details(){
+    enterStep(7);
     addBotMessage('Möchten Sie <strong>Beschreibung</strong>, eine <strong>technische Zeichnung</strong>, <strong>Notiz</strong> oder einen <strong>Wunschtermin</strong> hinzufügen? <em>Alles optional — kann auch übersprungen werden.</em>', 450).then(() => {
       const formHtml = `
         <div>
@@ -4117,6 +4221,7 @@ window.wlUploadZeichnung = function(file, onProgress){
   }
 
   function step9_summary(){
+    enterStep(8);
     const p = calculatePrice();
     addBotMessage('Hier Ihr <strong>unverbindlicher Richtwert</strong>. Bitte prüfen Sie die Angaben:', 450).then(() => {
       const stk = parseInt(state.stueckzahl) || 0;
@@ -4153,7 +4258,7 @@ window.wlUploadZeichnung = function(file, onProgress){
       row.className = 'chat-actions-row';
       row.innerHTML = `
         <button class="chat-btn-ghost" id="ch-restart">↺ Neu starten</button>
-        <button class="chat-btn-primary" id="ch-next" style="flex:1;">Kontaktdaten eingeben →</button>
+        <button class="chat-btn-primary" id="ch-next" style="flex:1;">Angebot anfordern →</button>
       `;
       $msgs().appendChild(row);
       scrollDown();
@@ -4172,6 +4277,7 @@ window.wlUploadZeichnung = function(file, onProgress){
   }
 
   function step10_contact(){
+    enterStep(9);
     addBotMessage('Letzter Schritt 👇 Wohin dürfen wir das <strong>verbindliche Angebot</strong> senden? Antwort werktags <strong>innerhalb von 3 Stunden</strong>.', 400).then(() => {
       const formHtml = `
         <div>
@@ -4192,6 +4298,7 @@ window.wlUploadZeichnung = function(file, onProgress){
             <input type="tel" id="cf-telefon" placeholder="+49 …" autocomplete="tel">
           </div>
         </div>
+        <div class="chat-trust">🤝 Bereits <strong>16 Auftraggeber</strong> vertrauen auf Wolf Lasermark.</div>
         <button type="button" class="chat-btn-primary" data-submit id="cf-send-btn">
           <span>📩 Unverbindliche Anfrage senden</span>
         </button>
@@ -4273,6 +4380,7 @@ window.wlUploadZeichnung = function(file, onProgress){
       // success
       disablePreviousInteractives();
       state.submitted = true;
+      clearSavedChat();
       showSuccess();
     } catch (err){
       console.error('Chat submit error:', err);
@@ -4336,8 +4444,123 @@ ${payload.notiz}`
     scrollDown();
   }
 
+  // ====== FORTSCHRITT + WIEDERAUFNAHME (Abbruch-Recovery) ======
+  const CHAT_TOTAL = 9; // Material … Kontakt
+  const CHAT_SAVE_KEY = 'wl_chat_v1';
+  const CHAT_SAVE_MAXAGE = 7 * 24 * 60 * 60 * 1000; // 7 Tage
+
+  function setChatProgress(i){
+    const wrap = document.getElementById('chatProgress');
+    const bar  = document.getElementById('chatProgressBar');
+    const lbl  = document.getElementById('chatProgressLabel');
+    if (wrap) wrap.classList.toggle('show', i >= 1);
+    if (bar)  bar.style.width = Math.max(0, Math.min(100, Math.round(i / CHAT_TOTAL * 100))) + '%';
+    if (lbl)  lbl.textContent = i >= 1 ? ('Schritt ' + i + ' von ' + CHAT_TOTAL) : '';
+  }
+
+  function persistChat(){
+    try {
+      if (state.submitted){ localStorage.removeItem(CHAT_SAVE_KEY); return; }
+      const snap = {
+        v: 1, ts: Date.now(), step: state.resumeStep || 0,
+        matName: state.matName, matF: state.matF,
+        surfName: state.surfName, surfF: state.surfF,
+        isSkala: state.isSkala, durchmesser: state.durchmesser, skalaLaenge: state.skalaLaenge,
+        breite: state.breite, hoehe: state.hoehe, stueckzahl: state.stueckzahl,
+        contentVals: state.contentVals, markName: state.markName, markF: state.markF,
+        urgName: state.urgName, urgSurcharge: state.urgSurcharge,
+        termin: state.termin, beschreibung: state.beschreibung, notiz: state.notiz,
+        zeichnungUrl: state.zeichnungUrl, zeichnungName: state.zeichnungName
+      };
+      localStorage.setItem(CHAT_SAVE_KEY, JSON.stringify(snap));
+    } catch(e){}
+  }
+
+  function loadSavedChat(){
+    try {
+      const raw = localStorage.getItem(CHAT_SAVE_KEY);
+      if (!raw) return null;
+      const s = JSON.parse(raw);
+      if (!s || !s.step || s.step < 1) return null;
+      if (!s.ts || (Date.now() - s.ts) > CHAT_SAVE_MAXAGE){ localStorage.removeItem(CHAT_SAVE_KEY); return null; }
+      return s;
+    } catch(e){ return null; }
+  }
+
+  function clearSavedChat(){ try { localStorage.removeItem(CHAT_SAVE_KEY); } catch(e){} }
+
+  // Bei jedem Hauptschritt: Fortschritt anzeigen + Stand sichern.
+  function enterStep(i){
+    state.resumeStep = i;
+    setChatProgress(i);
+    persistChat();
+  }
+
+  function gotoStep(n){
+    const fns = [null, step2_material, step3_surface, step4_maße, step5_inhalt,
+                 step6_mark, step7_urgency, step8_details, step9_summary, step10_contact];
+    (fns[n] || step1_welcome)();
+  }
+
+  function buildRecap(s){
+    const parts = [];
+    if (s.matName) parts.push(s.matName);
+    if (s.surfName) parts.push(s.surfName);
+    if (s.stueckzahl) parts.push(s.stueckzahl + ' Stk.');
+    if (s.contentVals && s.contentVals.length) parts.push(s.contentVals.join(', '));
+    if (s.markName) parts.push(s.markName);
+    return parts.join(' · ');
+  }
+
+  function restoreState(s){
+    state.matName = s.matName; state.matF = s.matF || 1;
+    state.surfName = s.surfName; state.surfF = s.surfF || 1;
+    state.isSkala = !!s.isSkala; state.durchmesser = s.durchmesser || ''; state.skalaLaenge = s.skalaLaenge || '';
+    state.breite = s.breite || ''; state.hoehe = s.hoehe || ''; state.stueckzahl = s.stueckzahl || '';
+    state.contentVals = Array.isArray(s.contentVals) ? s.contentVals : [];
+    state.markName = s.markName; state.markF = s.markF || 1;
+    state.urgName = s.urgName || 'Standard (5–10 Werktage)'; state.urgSurcharge = s.urgSurcharge || 0;
+    state.termin = s.termin || ''; state.beschreibung = s.beschreibung || ''; state.notiz = s.notiz || '';
+    state.zeichnungUrl = s.zeichnungUrl || ''; state.zeichnungName = s.zeichnungName || '';
+  }
+
+  function offerResume(saved){
+    state.started = true;
+    addBotMessage('Willkommen zurück 👋 Ihre letzte Anfrage wurde noch nicht abgeschlossen.', 250).then(() => {
+      const recap = buildRecap(saved);
+      return addBotMessage(
+        (recap ? 'Bisher gewählt: <strong>' + escapeHtml(recap) + '</strong>.<br>' : '') +
+        'Möchten Sie dort weitermachen, wo Sie aufgehört haben?', 450);
+    }).then(() => {
+      const row = document.createElement('div');
+      row.className = 'chat-actions-row';
+      row.innerHTML =
+        '<button class="chat-btn-ghost" id="ch-fresh">↺ Neu beginnen</button>' +
+        '<button class="chat-btn-primary" id="ch-resume" style="flex:1;">✓ Weitermachen →</button>';
+      $msgs().appendChild(row);
+      scrollDown();
+      row.querySelector('#ch-resume').onclick = () => {
+        row.querySelectorAll('button').forEach(b => b.disabled = true);
+        restoreState(saved);
+        updatePriceStrip();
+        addUserMessage('Weitermachen');
+        gotoStep(saved.step);
+      };
+      row.querySelector('#ch-fresh').onclick = () => {
+        row.querySelectorAll('button').forEach(b => b.disabled = true);
+        clearSavedChat();
+        resetChat();
+        state.started = true;
+        step1_welcome();
+      };
+    });
+  }
+
   function resetChat(){
     // wipe state
+    clearSavedChat();
+    state.resumeStep = 0;
+    setChatProgress(0);
     state.step = 0;
     state.contact = { name:'', email:'', firma:'', telefon:'' };
     state.matName = null; state.matF = 1;
@@ -4364,8 +4587,13 @@ ${payload.notiz}`
     document.getElementById('offerLauncher').classList.add('hidden');
     document.body.style.overflow = window.innerWidth <= 640 ? 'hidden' : '';
     if (!state.started && !state.submitted){
-      state.started = true;
-      step1_welcome();
+      const saved = loadSavedChat();
+      if (saved){
+        offerResume(saved);
+      } else {
+        state.started = true;
+        step1_welcome();
+      }
     }
   };
   window.closeOfferChat = function(){
@@ -4468,17 +4696,19 @@ function resetMode(){
   togglePrivateDevelopmentCurtain(false);
 }
 
-// Init on load
+// Init on load — kein Auswahl-Gate mehr: direkt in Firmenansicht starten.
 window.addEventListener('DOMContentLoaded',()=>{
-  const saved=localStorage.getItem('kundenMode');
-  if(saved){
-    if(saved==='privat' && !PRIVATE_MODE_ENABLED){
-      localStorage.removeItem('kundenMode');
-      return;
-    }
-    applyMode(saved);
-    document.getElementById('overlay').style.display='none';
-    document.getElementById('main').style.display='block';
+  let saved=localStorage.getItem('kundenMode');
+  if(saved==='privat' && !PRIVATE_MODE_ENABLED){
+    localStorage.removeItem('kundenMode');
+    saved=null;
+  }
+  applyMode(saved || 'firmen');
+  document.getElementById('overlay').style.display='none';
+  document.getElementById('main').style.display='block';
+  if(PRIVATE_MODE_ENABLED){
+    const mb=document.querySelector('.mode-bar');
+    if(mb) mb.style.display='';
   }
 });
 
@@ -4673,6 +4903,51 @@ revealEls.forEach(el=>revealObs.observe(el));
   }
   // Falls der Hash erst nach dem Laden gesetzt wird (z.B. interner Klick)
   window.addEventListener('hashchange', launchOfferChat);
+})();
+</script>
+
+<script>
+/* Inline Kontaktformular -> Formspree (mit mailto-Fallback) */
+(function(){
+  var form = document.getElementById('contactForm');
+  if(!form) return;
+  var statusEl = document.getElementById('cf-status');
+  var btn = document.getElementById('cf-submit');
+  var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  function setStatus(msg, kind){ statusEl.textContent = msg; statusEl.className = 'cf-status' + (kind ? ' '+kind : ''); }
+  function mark(el, ok){ el.classList.toggle('cf-invalid', !ok); return ok; }
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    var name = document.getElementById('cf-name');
+    var email = document.getElementById('cf-email');
+    var msg = document.getElementById('cf-msg');
+    var vName = mark(name, name.value.trim().length > 1);
+    var vMail = mark(email, emailRe.test(email.value.trim()));
+    var vMsg  = mark(msg, msg.value.trim().length > 4);
+    if(!(vName && vMail && vMsg)){ setStatus('Bitte füllen Sie die markierten Felder aus.', 'err'); return; }
+
+    btn.disabled = true; setStatus('Wird gesendet …', '');
+    var fd = new FormData();
+    fd.append('name', name.value.trim());
+    fd.append('email', email.value.trim());
+    fd.append('nachricht', msg.value.trim());
+    fd.append('_subject', 'Neue Anfrage über Kontaktformular – ' + name.value.trim());
+    try {
+      var res = await fetch('https://formspree.io/f/xpqjjobb', {
+        method:'POST', body:fd, headers:{ 'Accept':'application/json' }
+      });
+      if(res.ok){
+        form.reset();
+        setStatus('✓ Vielen Dank! Ihre Nachricht ist angekommen – wir melden uns in der Regel innerhalb von 8 Stunden.', 'ok');
+      } else { throw new Error('formspree'); }
+    } catch(err){
+      setStatus('Senden derzeit nicht möglich. Wir öffnen Ihr E-Mail-Programm …', 'err');
+      var body = encodeURIComponent('Name: ' + name.value.trim() + '\nE-Mail: ' + email.value.trim() + '\n\n' + msg.value.trim());
+      window.location.href = 'mailto:info@wolf-lasermark.de?subject=' + encodeURIComponent('Anfrage') + '&body=' + body;
+    } finally { btn.disabled = false; }
+  });
 })();
 </script>
 
