@@ -2730,6 +2730,7 @@ body.mode-firmen .privat-only { display: none !important; }
       </div>
 
       <div class="hero-trust">
+        <span class="trust-chip"><span class="ic">🤝</span> Bereits <strong class="js-anf-count">109</strong>&nbsp;Anfragen bearbeitet</span>
         <span class="trust-chip"><span class="ic">✓</span> 100W JPT Faserlaser</span>
         <span class="trust-chip"><span class="ic">✓</span> ±0,01 mm Präzision</span>
         <span class="trust-chip"><span class="ic">✓</span> Antwort in ≤ 8h</span>
@@ -3522,8 +3523,7 @@ window.__wlAnfragen = null;
     const n = parseInt(j && j.fields && j.fields.count && j.fields.count.integerValue, 10);
     if (Number.isFinite(n) && n > 0) {
       window.__wlAnfragen = n;
-      const el = document.getElementById('ct-anf-count');
-      if (el) el.textContent = String(n);
+      document.querySelectorAll('.js-anf-count').forEach(el => { el.textContent = String(n); });
     }
   } catch (_) {}
 })();
@@ -4315,7 +4315,7 @@ window.wlUploadZeichnung = function(file, onProgress){
             <input type="tel" id="cf-telefon" placeholder="+49 …" autocomplete="tel">
           </div>
         </div>
-        <div class="chat-trust">🤝 Bereits <strong id="ct-anf-count">${window.__wlAnfragen || 109}</strong> Anfragen bearbeitet.</div>
+        <div class="chat-trust">🤝 Bereits <strong id="ct-anf-count" class="js-anf-count">${window.__wlAnfragen || 109}</strong> Anfragen bearbeitet.</div>
         <button type="button" class="chat-btn-primary" data-submit id="cf-send-btn">
           <span>📩 Unverbindliche Anfrage senden</span>
         </button>
