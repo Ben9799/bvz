@@ -1659,7 +1659,7 @@ body.mode-firmen #leistungen .leist-grid {
 
 .footer-links {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
 }
 
@@ -2540,6 +2540,14 @@ body.mode-firmen .privat-only { display: none !important; }
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+.ratgeber-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1.2rem; margin-top:0.5rem; }
+.ratgeber-card { display:flex; flex-direction:column; gap:0.55rem; padding:1.6rem; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:18px; text-decoration:none; transition:transform .18s ease, border-color .18s ease, background .18s ease; }
+.ratgeber-card:hover { transform:translateY(-3px); border-color:rgba(0,200,255,0.25); background:rgba(0,200,255,0.03); }
+.ratgeber-card .rg-icon { font-size:1.6rem; }
+.ratgeber-card .rg-title { font-weight:800; font-size:1.05rem; color:var(--text); letter-spacing:-0.01em; line-height:1.25; }
+.ratgeber-card .rg-desc { font-size:0.86rem; color:var(--muted2); line-height:1.6; flex:1; }
+.ratgeber-card .rg-arrow { font-size:0.85rem; font-weight:700; color:var(--accent); margin-top:0.3rem; }
+
 </style>
 </head>
 <body>
@@ -2965,6 +2973,43 @@ body.mode-firmen .privat-only { display: none !important; }
     </div>
   </section>
 
+  <!-- ====== RATGEBER & WISSEN ====== -->
+  <section class="leistungen reveal" id="ratgeber">
+    <div class="leistungen-inner">
+      <div class="leistungen-header">
+        <div class="section-tag">📚 Ratgeber &amp; Wissen</div>
+        <h2 class="section-title">Fachwissen zur <span>Laserkennzeichnung</span></h2>
+        <p class="section-sub">Praxisnahe Leitfäden zu Materialien, Codes und Normen – damit Ihre Kennzeichnung von Anfang an richtig geplant ist.</p>
+      </div>
+      <div class="ratgeber-grid">
+        <a href="laser-marking-guide.html" class="ratgeber-card">
+          <div class="rg-icon">📘</div>
+          <div class="rg-title">Leitfaden Bauteilkennzeichnung</div>
+          <div class="rg-desc">Der komplette Überblick: Gravur vs. Beschriftung, Schriftgrößen, Normen und Rückverfolgbarkeit.</div>
+          <span class="rg-arrow">Mehr erfahren →</span>
+        </a>
+        <a href="seriennummern-kennzeichnung.html" class="ratgeber-card">
+          <div class="rg-icon">🔢</div>
+          <div class="rg-title">Seriennummern-Kennzeichnung</div>
+          <div class="rg-desc">Fortlaufende, rückverfolgbare Nummerierung für Industrie, Maschinenbau und CNC-Fertigung.</div>
+          <span class="rg-arrow">Mehr erfahren →</span>
+        </a>
+        <a href="qr-code-datamatrix-metall.html" class="ratgeber-card">
+          <div class="rg-icon">📱</div>
+          <div class="rg-title">QR-Code &amp; DataMatrix auf Metall</div>
+          <div class="rg-desc">Maschinenlesbare Codes direkt im Werkstück – für GS1, UDI und digitale Rückverfolgbarkeit.</div>
+          <span class="rg-arrow">Mehr erfahren →</span>
+        </a>
+        <a href="edelstahl-gravieren.html" class="ratgeber-card">
+          <div class="rg-icon">🔩</div>
+          <div class="rg-title">Edelstahl gravieren lassen</div>
+          <div class="rg-desc">Dauerhafte, korrosionsbeständige Lasergravur auf V2A und V4A – Anlassen oder Tiefengravur.</div>
+          <span class="rg-arrow">Mehr erfahren →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
   <!-- ====== PROCESS ====== -->
   <section class="process reveal" id="process">
     <div class="process-inner">
@@ -3248,6 +3293,14 @@ body.mode-firmen .privat-only { display: none !important; }
         <a href="#services">Beispiele</a>
         <a href="#bewertungen">Stimmen</a>
         <a href="#contact">Kontakt</a>
+      </div>
+
+      <div class="footer-col">
+        <div class="footer-heading">Ratgeber</div>
+        <a href="laser-marking-guide.html">Leitfaden Kennzeichnung</a>
+        <a href="seriennummern-kennzeichnung.html">Seriennummern</a>
+        <a href="qr-code-datamatrix-metall.html">QR &amp; DataMatrix</a>
+        <a href="edelstahl-gravieren.html">Edelstahl gravieren</a>
       </div>
 
       <div class="footer-col">
