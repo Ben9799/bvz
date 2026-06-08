@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Wolf Lasermark – Gravurvorlage
+  https://wolf-lasermark.de/daten-anliefern.html
+
+  So nutzen Sie diese Vorlage:
+  - Alle Masse sind in Millimeter (mm), Massstab 1:1.
+  - Platzieren Sie Ihr Motiv / Ihre Schrift INNERHALB des gruenen Gravurfeldes.
+  - Halten Sie den grauen Sicherheitsrand (3 mm) frei.
+  - Wandeln Sie Schrift in Pfade um (Text -> in Pfad/Kurven konvertieren).
+  - Loeschen Sie vor dem Senden die Hilfsebene "HILFE" (oder die Hilfslinien).
+  - Bezugskante = untere linke Ecke (0/0).
+
+  Plattengroesse hier: 80 x 40 mm  (Sie koennen sie an Ihr Teil anpassen.)
+-->
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="80mm" height="40mm"
+     viewBox="0 0 80 40"
+     version="1.1">
+
+  <defs>
+    <style>
+      .plate   { fill:#ffffff; stroke:#222222; stroke-width:0.25; }
+      .safety  { fill:none; stroke:#bbbbbb; stroke-width:0.2; stroke-dasharray:1,1; }
+      .field   { fill:none; stroke:#1f9d55; stroke-width:0.3; stroke-dasharray:2,1; }
+      .help    { stroke:#cfd8dc; stroke-width:0.12; }
+      .center  { stroke:#1f9d55; stroke-width:0.18; stroke-dasharray:1.5,1; }
+      .lbl     { font-family:Arial, sans-serif; font-size:2px; fill:#1f9d55; }
+      .lbls    { font-family:Arial, sans-serif; font-size:1.6px; fill:#888888; }
+      .dim     { font-family:Arial, sans-serif; font-size:1.8px; fill:#444444; }
+      .ref     { fill:#e53e3e; }
+      .reftxt  { font-family:Arial, sans-serif; font-size:1.8px; fill:#e53e3e; }
+    </style>
+  </defs>
+
+  <!-- Hilfsebene: vor dem Senden loeschen -->
+  <g id="HILFE">
+    <!-- mm-Raster (10 mm) -->
+    <g class="help">
+      <line x1="10" y1="0" x2="10" y2="40"/>
+      <line x1="20" y1="0" x2="20" y2="40"/>
+      <line x1="30" y1="0" x2="30" y2="40"/>
+      <line x1="40" y1="0" x2="40" y2="40"/>
+      <line x1="50" y1="0" x2="50" y2="40"/>
+      <line x1="60" y1="0" x2="60" y2="40"/>
+      <line x1="70" y1="0" x2="70" y2="40"/>
+      <line x1="0"  y1="10" x2="80" y2="10"/>
+      <line x1="0"  y1="20" x2="80" y2="20"/>
+      <line x1="0"  y1="30" x2="80" y2="30"/>
+    </g>
+
+    <!-- Mittelkreuz -->
+    <g class="center">
+      <line x1="40" y1="14" x2="40" y2="26"/>
+      <line x1="34" y1="20" x2="46" y2="20"/>
+    </g>
+
+    <!-- Bezugskante (0/0) unten links -->
+    <circle class="ref" cx="0" cy="40" r="0.9"/>
+    <text class="reftxt" x="2" y="38.6">Bezugskante 0/0</text>
+
+    <!-- Beschriftungen -->
+    <text class="dim" x="33" y="2.6">80 mm</text>
+    <text class="dim" x="1" y="21" transform="rotate(-90 1,21)">40 mm</text>
+    <text class="lbl" x="6" y="6">GRAVURFELD – Motiv hier platzieren</text>
+    <text class="lbls" x="6" y="9">Sicherheitsrand 3 mm freihalten · Schrift in Pfade · Hilfsebene vor dem Senden loeschen</text>
+  </g>
+
+  <!-- Plattenkontur -->
+  <rect class="plate" x="0" y="0" width="80" height="40" rx="1.5"/>
+
+  <!-- Sicherheitsrand (3 mm) -->
+  <rect class="safety" x="3" y="3" width="74" height="34"/>
+
+  <!-- Gravurfeld (nutzbare Flaeche) -->
+  <rect class="field" x="6" y="10" width="68" height="26"/>
+
+</svg>
