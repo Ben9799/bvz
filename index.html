@@ -432,6 +432,24 @@ picture { display: contents; }
   letter-spacing: 0.02em;
 }
 .trust-chip .ic { color: var(--green); }
+.trust-chip.featured {
+  background: rgba(0,200,255,0.10);
+  border-color: rgba(0,200,255,0.45);
+  color: var(--text);
+  font-weight: 700;
+  font-size: 0.74rem;
+  padding: 0.34rem 0.95rem;
+  animation: anfPulse 2.8s ease-in-out infinite;
+}
+.trust-chip.featured .ic { color: var(--accent); }
+.trust-chip.featured strong { color: var(--accent); font-weight: 800; }
+@keyframes anfPulse {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(0,200,255,0.18), 0 0 0 rgba(0,200,255,0); }
+  50% { box-shadow: 0 0 0 1px rgba(0,200,255,0.40), 0 0 18px rgba(0,200,255,0.22); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .trust-chip.featured { animation: none; }
+}
 
 /* ========================
    SHARED SECTION STYLES
@@ -2730,7 +2748,7 @@ body.mode-firmen .privat-only { display: none !important; }
       </div>
 
       <div class="hero-trust">
-        <span class="trust-chip"><span class="ic">🤝</span> Bereits <strong class="js-anf-count">109</strong>&nbsp;Anfragen bearbeitet</span>
+        <span class="trust-chip featured"><span class="ic">🤝</span> Bereits <strong class="js-anf-count">109</strong>&nbsp;Anfragen bearbeitet</span>
         <span class="trust-chip"><span class="ic">✓</span> 100W JPT Faserlaser</span>
         <span class="trust-chip"><span class="ic">✓</span> ±0,01 mm Präzision</span>
         <span class="trust-chip"><span class="ic">✓</span> Antwort in ≤ 8h</span>
