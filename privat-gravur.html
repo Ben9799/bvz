@@ -70,6 +70,15 @@ input[type=range]{flex:1;accent-color:var(--accent)}
 .logo-box input[type=file]::file-selector-button{background:rgba(0,212,255,0.1);border:1px solid var(--accent);color:var(--text);border-radius:9px;padding:.4rem .7rem;margin-right:.6rem;cursor:pointer;font-family:inherit}
 .logo-hint{font-size:.76rem;color:var(--muted);margin-top:.4rem}
 #logoStatus{color:var(--accent)}
+#cv{touch-action:none;cursor:grab}
+#cv.grabbing{cursor:grabbing}
+.clip-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:.5rem;margin-top:.6rem}
+.clip{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:11px;padding:.4rem;cursor:pointer;transition:.15s;display:flex;flex-direction:column;align-items:center;gap:.2rem}
+.clip:hover{border-color:var(--accent);background:rgba(0,212,255,0.08)}
+.clip svg{width:38px;height:38px;display:block}
+.clip span{font-size:.6rem;color:var(--muted);text-align:center;line-height:1.1}
+.sel-box{border:1px solid rgba(0,212,255,0.35);border-radius:13px;padding:.9rem;margin-top:1rem;background:rgba(0,212,255,0.04)}
+.sel-box h3{font-family:'Syne',sans-serif;font-size:.95rem;margin-bottom:.6rem;color:var(--text)}
 .note{font-size:.78rem;color:var(--muted);margin-top:1rem;border-top:1px solid rgba(255,255,255,0.06);padding-top:.8rem}
 
 @media(max-width:840px){ .studio{grid-template-columns:1fr} }
@@ -137,32 +146,35 @@ input[type=range]{flex:1;accent-color:var(--accent)}
       </div>
 
       <div class="logo-box">
-        <label for="logo">Eigenes Logo (optional)</label>
-        <input type="file" id="logo" accept=".svg,.dxf,image/svg+xml">
-        <div class="logo-hint">SVG oder DXF — wird maßgenau platziert. Schrift &amp; Logo lassen sich kombinieren.</div>
-        <div id="logoCtrls" style="display:none">
-          <div class="field" style="margin-top:.9rem">
-            <label>Logo-Breite <span class="rval" id="lwVal">20 mm</span></label>
-            <div class="range-row"><input type="range" id="lw" min="4" max="60" step="0.5" value="20"></div>
-          </div>
-          <div class="field">
-            <label>Logo-Position (längs) <span class="rval" id="lyVal">0 mm</span></label>
-            <div class="range-row"><input type="range" id="ly" min="-30" max="30" step="0.5" value="0"></div>
-          </div>
-          <div class="field">
-            <label>Logo drehen <span class="rval" id="langVal">0°</span></label>
-            <div class="range-row"><input type="range" id="lang" min="-180" max="180" step="5" value="0"></div>
-          </div>
-          <button class="btn btn-ghost" id="logoClear" style="flex:0 0 auto;padding:.5rem .9rem;font-size:.82rem">✕ Logo entfernen</button>
+        <label>Cliparts (Bier-Motive)</label>
+        <div class="logo-hint">Anklicken legt das Motiv auf — danach in der Vorschau frei verschieben, drehen, skalieren.</div>
+        <div class="clip-grid" id="clipGrid"></div>
+        <div class="field" style="margin-top:1rem">
+          <label for="logo">Eigenes Logo (SVG / DXF)</label>
+          <input type="file" id="logo" accept=".svg,.dxf,image/svg+xml">
           <div class="logo-hint" id="logoStatus"></div>
         </div>
       </div>
 
-      <div class="btnrow">
+      <div class="sel-box" id="selBox" style="display:none">
+        <h3 id="selName">Ausgewähltes Element</h3>
+        <div class="logo-hint" style="margin-top:0">In der Vorschau ziehen zum Verschieben.</div>
+        <div class="field" style="margin-top:.8rem">
+          <label>Größe <span class="rval" id="selSizeVal">18 mm</span></label>
+          <div class="range-row"><input type="range" id="selSize" min="3" max="70" step="0.5" value="18"></div>
+        </div>
+        <div class="field">
+          <label>Drehen <span class="rval" id="selRotVal">0°</span></label>
+          <div class="range-row"><input type="range" id="selRot" min="-180" max="180" step="5" value="0"></div>
+        </div>
+        <button class="btn btn-ghost" id="selDel" style="flex:0 0 auto;padding:.5rem .9rem;font-size:.82rem">✕ Element entfernen</button>
+      </div>
+
+      <div class="btnrow" style="margin-top:1.1rem">
         <button class="btn btn-ghost admin-only" id="dlsvg">⬇ LightBurn-SVG</button>
         <button class="btn btn-primary" id="anfrage">Gravur anfragen</button>
       </div>
-      <div class="note">Maßgenau: Die SVG wird in echten Millimetern exportiert (viewBox in mm) und ist direkt in LightBurn nutzbar. Gravurfläche je Objekt fest begrenzt — die Vorschau verkleinert die Schrift automatisch, damit sie passt.</div>
+      <div class="note">Maßgenau: Die SVG wird in echten Millimetern exportiert (viewBox in mm) und ist direkt in LightBurn nutzbar. Text &amp; Motive lassen sich frei platzieren; die Schrift wird bei Bedarf verkleinert, damit sie passt.</div>
     </div>
   </div>
 
@@ -228,37 +240,60 @@ function getImg(src){
   im.src=src; imgCache[src]=im; return im;
 }
 
-// ---------- Logo-Upload (SVG / DXF) ----------
-let logo=null; // {viewBox, bw, bh, inner, img}
 function inkColor(o){ return o.img ? (o.previewInk||'#eef4f8') : '#e8fbff'; }
 
-function buildLogoImage(){
-  // renderbares SVG für die Canvas-Vorschau (Farben egal — wird zur Ink-Silhouette getönt)
-  const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${logo.viewBox}" width="${logo.bw}" height="${logo.bh}">${logo.inner}</svg>`;
+// ---------- Clipart-Bibliothek (Bier-Motive) — Geometrie ohne Farbe (Farbe via Wrapper) ----------
+const CLIPARTS = {
+  mug:    { name:'Krug',   vb:'0 0 100 100', inner:'<rect x="24" y="30" width="38" height="56" rx="6"/><path d="M62 44 h9 a13 13 0 0 1 13 13 v3 a13 13 0 0 1 -13 13 h-9 v-9 h7 a6 6 0 0 0 6 -6 v-1 a6 6 0 0 0 -6 -6 h-7 z"/><circle cx="31" cy="24" r="7"/><circle cx="43" cy="20" r="8"/><circle cx="55" cy="24" r="7"/>' },
+  glass:  { name:'Bier',   vb:'0 0 100 100', inner:'<path d="M32 22 h36 l-5 64 a6 6 0 0 1 -6 5 h-14 a6 6 0 0 1 -6 -5 z"/><circle cx="38" cy="18" r="7"/><circle cx="50" cy="13" r="8"/><circle cx="62" cy="18" r="7"/>' },
+  pils:   { name:'Pils',   vb:'0 0 100 100', inner:'<path d="M39 18 h22 l-6 70 h-10 z"/><circle cx="44" cy="14" r="6"/><circle cx="54" cy="11" r="7"/><circle cx="61" cy="15" r="5"/>' },
+  bottle: { name:'Flasche',vb:'0 0 100 100', inner:'<rect x="42" y="4" width="16" height="7" rx="2"/><path d="M43 8 h14 v12 q0 5 3 8 l4 4 q4 4 4 11 v42 a6 6 0 0 1 -6 6 h-24 a6 6 0 0 1 -6 -6 v-42 q0 -7 4 -11 l4 -4 q3 -3 3 -8 z"/>' },
+  cap:    { name:'Kronkorken', vb:'0 0 100 100', inner:'<path fill-rule="evenodd" d="M50 16 a34 34 0 1 0 0.01 0 z M50 27 a23 23 0 1 1 -0.01 0 z"/><circle cx="50" cy="50" r="7"/>' },
+  opener: { name:'Öffner', vb:'0 0 100 100', inner:'<rect x="18" y="44" width="48" height="13" rx="6.5"/><path fill-rule="evenodd" d="M60 37 a14 14 0 1 1 0 28 14 14 0 1 1 0-28 z m0 7 a7 7 0 1 0 0 14 7 7 0 1 0 0-14 z"/>' },
+  hops:   { name:'Hopfen', vb:'0 0 100 100', inner:'<path d="M50 14 q13 5 13 20 q0 24 -13 52 q-13 -28 -13 -52 q0 -15 13 -20 z"/><path fill="none" stroke-width="2.5" d="M50 22 v54 M40 36 q10 6 20 0 M40 50 q10 6 20 0"/>' },
+  wheat:  { name:'Weizen', vb:'0 0 100 100', inner:'<rect x="48" y="48" width="4" height="42" rx="2"/><ellipse cx="50" cy="16" rx="5" ry="9"/><ellipse cx="41" cy="26" rx="4.5" ry="8" transform="rotate(-30 41 26)"/><ellipse cx="59" cy="26" rx="4.5" ry="8" transform="rotate(30 59 26)"/><ellipse cx="40" cy="38" rx="4.5" ry="8" transform="rotate(-30 40 38)"/><ellipse cx="60" cy="38" rx="4.5" ry="8" transform="rotate(30 60 38)"/><ellipse cx="40" cy="50" rx="4.5" ry="8" transform="rotate(-30 40 50)"/><ellipse cx="60" cy="50" rx="4.5" ry="8" transform="rotate(30 60 50)"/>' },
+  pretzel:{ name:'Brezel', vb:'0 0 100 100', inner:'<path fill="none" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" d="M28 72 Q6 44 34 30 Q56 20 50 46 Q44 20 66 30 Q94 44 72 72 Q56 84 50 60 Q44 84 28 72 Z"/>' },
+  cheers: { name:'Prost',  vb:'0 0 100 100', inner:'<g transform="rotate(-13 36 54)"><rect x="20" y="38" width="26" height="40" rx="4"/><circle cx="24" cy="33" r="5"/><circle cx="33" cy="30" r="6"/><circle cx="42" cy="33" r="5"/></g><g transform="rotate(13 64 54)"><rect x="54" y="38" width="26" height="40" rx="4"/><circle cx="58" cy="33" r="5"/><circle cx="67" cy="30" r="6"/><circle cx="76" cy="33" r="5"/></g>' },
+  keg:    { name:'Fass',   vb:'0 0 100 100', inner:'<g fill="none" stroke-width="5" stroke-linejoin="round"><path d="M32 22 q18 -6 36 0 q7 28 0 56 q-18 6 -36 0 q-7 -28 0 -56 z"/><line x1="29" y1="40" x2="71" y2="40"/><line x1="29" y1="60" x2="71" y2="60"/></g>' },
+  heart:  { name:'Herz',   vb:'0 0 100 100', inner:'<path d="M50 84 C16 60 12 34 32 26 C44 21 50 33 50 38 C50 33 56 21 68 26 C88 34 84 60 50 84 Z"/>' },
+  star:   { name:'Stern',  vb:'0 0 100 100', inner:'<path d="M50 8 L61 38 L93 38 L67 58 L77 90 L50 70 L23 90 L33 58 L7 38 L39 38 Z"/>' }
+};
+
+// ---------- Elemente (Cliparts + hochgeladene Logos), frei platzierbar ----------
+let items=[];      // {id,label,viewBox,bw,bh,inner,colored,img,x,y,wmm,angle}
+let idc=0;
+let textPos={x:null,y:null}; // mm-Mittelpunkt des Textes (null=Zonen-Mitte)
+let selId=null;    // ausgewähltes Element-id (oder 'text' / null)
+
+function itemSVGString(it,color){
+  const body = it.colored ? it.inner : `<g fill="${color}" stroke="${color}" stroke-linejoin="round">${it.inner}</g>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${it.viewBox}" width="${it.bw}" height="${it.bh}">${body}</svg>`;
+}
+function makeItemImg(it){
   const im=new Image();
   im.onload=()=>{ im._ready=true; render(); };
-  im.onerror=()=>{ document.getElementById('logoStatus').textContent='⚠ Logo konnte nicht gelesen werden.'; };
-  im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
-  logo.img=im;
+  im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(itemSVGString(it,'#000'));
+  it.img=im;
 }
+function addItem(spec){
+  const o=OBJECTS[current], z=o.zone;
+  const it=Object.assign({ id:++idc, x:z.x+z.w/2, y:z.y+z.h/2, wmm:Math.min(18, z.w*0.7), angle:0 }, spec);
+  makeItemImg(it); items.push(it); select(it.id); render();
+}
+function addClipart(k){ const c=CLIPARTS[k]; addItem({ label:c.name, viewBox:c.vb, bw:100, bh:100, inner:c.inner, colored:false }); }
 
-function loadSVGLogo(text){
-  const doc=new DOMParser().parseFromString(text,'image/svg+xml');
-  const root=doc.querySelector('svg');
+// ---------- Logo-Upload (SVG / DXF) → wird zu einem Element ----------
+function parseSVG(text){
+  const root=new DOMParser().parseFromString(text,'image/svg+xml').querySelector('svg');
   if(!root) throw new Error('keine SVG-Wurzel');
-  let vbx=0,vby=0,bw,bh;
-  const vb=root.getAttribute('viewBox');
+  let vbx=0,vby=0,bw,bh; const vb=root.getAttribute('viewBox');
   if(vb){ const p=vb.trim().split(/[\s,]+/).map(Number); vbx=p[0];vby=p[1];bw=p[2];bh=p[3]; }
   else { bw=parseFloat(root.getAttribute('width'))||100; bh=parseFloat(root.getAttribute('height'))||100; }
-  logo={ viewBox:`${vbx} ${vby} ${bw} ${bh}`, bw, bh, inner:root.innerHTML, img:null };
-  buildLogoImage();
-  document.getElementById('logoStatus').textContent='✓ SVG geladen';
+  return { viewBox:`${vbx} ${vby} ${bw} ${bh}`, bw, bh, inner:root.innerHTML, colored:true };
 }
-
 // minimaler DXF-Parser: LINE, LWPOLYLINE, POLYLINE/VERTEX, CIRCLE, ARC
-function loadDXFLogo(text){
-  const raw=text.split(/\r\n|\r|\n/);
-  const pairs=[];
+function parseDXF(text){
+  const raw=text.split(/\r\n|\r|\n/); const pairs=[];
   for(let i=0;i+1<raw.length;i+=2) pairs.push([raw[i].trim(), raw[i+1]]);
   const ents=[]; let cur=null, poly=null, unsupported=false;
   const flush=()=>{ if(cur){ents.push(cur);cur=null;} };
@@ -278,12 +313,8 @@ function loadDXFLogo(text){
       continue;
     }
     if(!cur && !poly) continue;
-    const tgt=cur||poly;
-    const f=parseFloat(v);
-    if(cur&&cur.t==='vertex'){
-      if(code===10) cur.x=f; else if(code===20) cur.y=f;
-      continue;
-    }
+    const tgt=cur||poly; const f=parseFloat(v);
+    if(cur&&cur.t==='vertex'){ if(code===10) cur.x=f; else if(code===20) cur.y=f; continue; }
     if(code===10){ if(tgt.t==='poly'){tgt._x=f;} else tgt.x1=f; }
     else if(code===20){ if(tgt.t==='poly'){tgt.pts.push({x:tgt._x,y:f});} else tgt.y1=f; }
     else if(code===11){ tgt.x2=f; }
@@ -294,12 +325,8 @@ function loadDXFLogo(text){
     else if(code===70){ if(tgt.t==='poly' && (parseInt(v,10)&1)) tgt.closed=true; }
   }
   flush(); if(poly) ents.push(poly);
-  // collect vertices that belonged to POLYLINE (older style): attach to last poly
-  const polys=ents.filter(e=>e.t==='poly');
-  const verts=ents.filter(e=>e.t==='vertex');
+  const polys=ents.filter(e=>e.t==='poly'), verts=ents.filter(e=>e.t==='vertex');
   if(verts.length && polys.length){ const lp=polys[polys.length-1]; if(!lp.pts.length) verts.forEach(vx=>lp.pts.push({x:vx.x,y:vx.y})); }
-
-  // extents
   let minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9;
   const upd=(x,y)=>{ if(x<minX)minX=x; if(x>maxX)maxX=x; if(y<minY)minY=y; if(y>maxY)maxY=y; };
   for(const e of ents){
@@ -313,10 +340,7 @@ function loadDXFLogo(text){
   let inner='';
   for(const e of ents){
     if(e.t==='line'){ inner+=`<line x1="${FX(e.x1)}" y1="${FY(e.y1)}" x2="${FX(e.x2)}" y2="${FY(e.y2)}"/>`; }
-    else if(e.t==='poly' && e.pts.length){
-      const d='M'+e.pts.map(p=>`${FX(p.x)},${FY(p.y)}`).join(' L')+(e.closed?' Z':'');
-      inner+=`<path d="${d}"/>`;
-    }
+    else if(e.t==='poly' && e.pts.length){ inner+=`<path d="M${e.pts.map(p=>`${FX(p.x)},${FY(p.y)}`).join(' L')}${e.closed?' Z':''}"/>`; }
     else if(e.t==='circle'){ inner+=`<circle cx="${FX(e.x1)}" cy="${FY(e.y1)}" r="${e.r.toFixed(3)}"/>`; }
     else if(e.t==='arc'){
       const a1=e.a1*Math.PI/180, a2=e.a2*Math.PI/180;
@@ -327,59 +351,43 @@ function loadDXFLogo(text){
     }
   }
   inner=`<g fill="none" stroke="#000" stroke-width="${(bw*0.004).toFixed(3)}">${inner}</g>`;
-  logo={ viewBox:`0 0 ${bw.toFixed(3)} ${bh.toFixed(3)}`, bw, bh, inner, img:null };
-  buildLogoImage();
-  document.getElementById('logoStatus').textContent = unsupported
-    ? '✓ DXF geladen — einige komplexe Elemente (z. B. Splines) konnten nicht übernommen werden.'
-    : '✓ DXF geladen';
+  return { viewBox:`0 0 ${bw.toFixed(3)} ${bh.toFixed(3)}`, bw, bh, inner, colored:true, unsupported };
 }
-
 function handleLogoFile(file){
   const reader=new FileReader();
   reader.onload=()=>{
     try{
       const name=(file.name||'').toLowerCase();
-      if(name.endsWith('.dxf')) loadDXFLogo(reader.result);
-      else loadSVGLogo(reader.result);
-      document.getElementById('logoCtrls').style.display='block';
+      const spec = name.endsWith('.dxf') ? parseDXF(reader.result) : parseSVG(reader.result);
+      addItem(Object.assign({label:'Logo'}, spec));
+      document.getElementById('logoStatus').textContent = spec.unsupported
+        ? '✓ DXF geladen — einige komplexe Elemente (z. B. Splines) fehlen.'
+        : '✓ geladen — in der Vorschau platzieren.';
     }catch(err){ document.getElementById('logoStatus').textContent='⚠ '+err.message; }
   };
   reader.readAsText(file);
 }
 
-function drawLogo(s){
-  if(!logo || !logo.img || !logo.img._ready) return;
-  const o=OBJECTS[current], z=o.zone;
-  const Lw=parseFloat(document.getElementById('lw').value);
-  const Lh=Lw*(logo.bh/logo.bw);
-  const ly=parseFloat(document.getElementById('ly').value);
-  let cx=z.x+z.w/2, cy=z.y+z.h/2;
-  if(o.orient==='h') cx+=ly; else cy+=ly;
-  const wpx=Math.max(1,Lw*s.ppmm), hpx=Math.max(1,Lh*s.ppmm);
+function drawItem(it,s,o){
+  if(!it.img || !it.img._ready) return;
+  const hmm=it.wmm*(it.bh/it.bw);
+  const wpx=Math.max(1,it.wmm*s.ppmm), hpx=Math.max(1,hmm*s.ppmm);
   const oc=document.createElement('canvas'); oc.width=Math.ceil(wpx); oc.height=Math.ceil(hpx);
   const og=oc.getContext('2d');
-  og.drawImage(logo.img,0,0,oc.width,oc.height);
-  og.globalCompositeOperation='source-in';
-  og.fillStyle=inkColor(o); og.fillRect(0,0,oc.width,oc.height);
-  const lang=parseFloat(document.getElementById('lang').value);
+  og.drawImage(it.img,0,0,oc.width,oc.height);
+  og.globalCompositeOperation='source-in'; og.fillStyle=inkColor(o); og.fillRect(0,0,oc.width,oc.height);
   ctx.save();
-  ctx.translate(px(cx,s),py(cy,s));
-  ctx.rotate(lang*Math.PI/180);
+  ctx.translate(px(it.x,s),py(it.y,s)); ctx.rotate(it.angle*Math.PI/180);
   ctx.drawImage(oc,-wpx/2,-hpx/2);
   ctx.restore();
 }
-
-function logoExportSVG(){
-  if(!logo) return '';
-  const o=OBJECTS[current], z=o.zone;
-  const Lw=parseFloat(document.getElementById('lw').value);
-  const Lh=Lw*(logo.bh/logo.bw);
-  const ly=parseFloat(document.getElementById('ly').value);
-  let cx=z.x+z.w/2, cy=z.y+z.h/2;
-  if(o.orient==='h') cx+=ly; else cy+=ly;
-  const lang=parseFloat(document.getElementById('lang').value);
-  return `<g transform="translate(${cx.toFixed(2)},${cy.toFixed(2)}) rotate(${lang})"><svg x="${(-Lw/2).toFixed(2)}" y="${(-Lh/2).toFixed(2)}" width="${Lw.toFixed(2)}" height="${Lh.toFixed(2)}" viewBox="${logo.viewBox}" preserveAspectRatio="xMidYMid meet">${logo.inner}</svg></g>`;
+function itemExportSVG(it){
+  const hmm=it.wmm*(it.bh/it.bw);
+  const body = it.colored ? it.inner : `<g fill="#000" stroke="#000" stroke-linejoin="round">${it.inner}</g>`;
+  return `<g transform="translate(${it.x.toFixed(2)},${it.y.toFixed(2)}) rotate(${it.angle})"><svg x="${(-it.wmm/2).toFixed(2)}" y="${(-hmm/2).toFixed(2)}" width="${it.wmm.toFixed(2)}" height="${hmm.toFixed(2)}" viewBox="${it.viewBox}" preserveAspectRatio="xMidYMid meet">${body}</svg></g>`;
 }
+
+function textCenter(z){ return { x: textPos.x==null ? z.x+z.w/2 : textPos.x, y: textPos.y==null ? z.y+z.h/2 : textPos.y }; }
 
 // mm -> px helpers (depend on current scale object s)
 function px(mm,s){ return s.ox + mm*s.ppmm; }
@@ -438,9 +446,10 @@ function computeScale(o){
   return {ppmm, ox:(cw-o.wmm*ppmm)/2, oy:(ch-o.hmm*ppmm)/2, cw, ch};
 }
 
+let curS=null;
 function render(){
   const o=OBJECTS[current];
-  const s=computeScale(o);
+  const s=computeScale(o); curS=s;
   cv.width=Math.round(s.cw); cv.height=Math.round(s.ch);
   ctx.clearRect(0,0,cv.width,cv.height);
 
@@ -471,11 +480,11 @@ function render(){
 
   // text
   const L=layout();
-  const cx=z.x+z.w/2, cy=z.y+z.h/2;
+  const tc=textCenter(z);
   ctx.save();
-  ctx.translate(px(cx,s),py(cy,s));
+  ctx.translate(px(tc.x,s),py(tc.y,s));
   ctx.rotate(parseFloat(document.getElementById('tang').value)*Math.PI/180);
-  ctx.fillStyle = o.img ? (o.previewInk||'#eef4f8') : '#e8fbff';
+  ctx.fillStyle = inkColor(o);
   ctx.textAlign='center'; ctx.textBaseline='middle';
   const gapMM=L.capMM*0.55;
   const lineStepPx=(L.capMM+gapMM)*s.ppmm;
@@ -487,8 +496,19 @@ function render(){
   });
   ctx.restore();
 
-  // logo overlay
-  drawLogo(s);
+  // elements (cliparts + logos)
+  items.forEach(it=>drawItem(it,s,o));
+
+  // selection highlight
+  const sit=items.find(i=>i.id===selId);
+  if(sit){
+    const hw=sit.wmm/2, hh=(sit.wmm*(sit.bh/sit.bw))/2;
+    ctx.save();
+    ctx.translate(px(sit.x,s),py(sit.y,s)); ctx.rotate(sit.angle*Math.PI/180);
+    ctx.setLineDash([4,3]); ctx.lineWidth=1; ctx.strokeStyle='rgba(0,212,255,0.95)';
+    ctx.strokeRect(-hw*s.ppmm,-hh*s.ppmm,hw*2*s.ppmm,hh*2*s.ppmm);
+    ctx.restore();
+  }
 
   document.getElementById('dims').innerHTML=
     `Objekt: <b>${o.name}</b> · ${o.sub} &nbsp;|&nbsp; Gravurfläche: <b>${z.w} × ${z.h} mm</b> · Schrift: <b>${L.capMM.toFixed(1)} mm</b>`;
@@ -501,22 +521,23 @@ function escapeXML(s){ return String(s).replace(/[<>&"']/g,c=>({'<':'&lt;','>':'
 function renderSVG(){
   const o=OBJECTS[current], z=o.zone, L=layout(), f=L.f;
   const cr=capRatio(f.css,f.weight);
-  const cx=z.x+z.w/2, cy=z.y+z.h/2;
+  const tc=textCenter(z);
   const gapMM=L.capMM*0.55, total=L.lines.length;
   const tang=parseFloat(document.getElementById('tang').value);
   let eng='';
   L.lines.forEach((ln,i)=>{
     const off=(i-(total-1)/2)*(L.capMM+gapMM);
     const fs=(ln.capMM/cr).toFixed(2);
-    eng+=`<text transform="translate(${cx.toFixed(2)},${cy.toFixed(2)}) rotate(${tang})" x="0" y="${off.toFixed(2)}" font-family="${f.css}" font-weight="${f.weight}" font-size="${fs}" text-anchor="middle" dominant-baseline="central" fill="#000">${escapeXML(ln.str)}</text>`;
+    eng+=`<text transform="translate(${tc.x.toFixed(2)},${tc.y.toFixed(2)}) rotate(${tang})" x="0" y="${off.toFixed(2)}" font-family="${f.css}" font-weight="${f.weight}" font-size="${fs}" text-anchor="middle" dominant-baseline="central" fill="#000">${escapeXML(ln.str)}</text>`;
   });
+  const itemsSVG=items.map(itemExportSVG).join('');
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${o.wmm}mm" height="${o.hmm}mm" viewBox="0 0 ${o.wmm} ${o.hmm}">
   <g id="Kontur" fill="none" stroke="#cccccc" stroke-width="0.15">
     <rect x="0.1" y="0.1" width="${(o.wmm-0.2).toFixed(2)}" height="${(o.hmm-0.2).toFixed(2)}" rx="${o.radius}"/>
     <rect x="${z.x}" y="${z.y}" width="${z.w}" height="${z.h}" stroke="#9bd"/>
   </g>
-  <g id="Gravur">${eng}${logoExportSVG()}</g>
+  <g id="Gravur">${eng}${itemsSVG}</g>
 </svg>`;
 }
 function downloadSVG(){
@@ -533,15 +554,91 @@ function applyAngleDefault(){
   document.getElementById('tangVal').textContent=def+'°';
 }
 
-// ---------- picker ----------
+// ---------- Auswahl ----------
+function select(id){ selId=id; showSel(); render(); }
+function showSel(){
+  const box=document.getElementById('selBox');
+  const it=items.find(i=>i.id===selId);
+  if(it){
+    box.style.display='block';
+    document.getElementById('selName').textContent=it.label||'Element';
+    document.getElementById('selSize').value=it.wmm;
+    document.getElementById('selSizeVal').textContent=it.wmm.toFixed(1)+' mm';
+    document.getElementById('selRot').value=it.angle;
+    document.getElementById('selRotVal').textContent=it.angle+'°';
+  } else { box.style.display='none'; }
+}
+
+// ---------- Treffer-Test & Ziehen ----------
+function pointInRotRect(mx,my,cx,cy,hw,hh,angDeg){
+  const a=-angDeg*Math.PI/180, dx=mx-cx, dy=my-cy;
+  const lx=dx*Math.cos(a)-dy*Math.sin(a), ly=dx*Math.sin(a)+dy*Math.cos(a);
+  return Math.abs(lx)<=hw && Math.abs(ly)<=hh;
+}
+function toMM(e){
+  const r=cv.getBoundingClientRect();
+  const X=(e.clientX-r.left)*(cv.width/r.width), Y=(e.clientY-r.top)*(cv.height/r.height);
+  return { x:(X-curS.ox)/curS.ppmm, y:(Y-curS.oy)/curS.ppmm };
+}
+function hitTest(m){
+  for(let i=items.length-1;i>=0;i--){
+    const it=items[i], hw=it.wmm/2, hh=(it.wmm*(it.bh/it.bw))/2;
+    if(pointInRotRect(m.x,m.y,it.x,it.y,hw+1,hh+1,it.angle)) return {type:'item',item:it};
+  }
+  const L=layout();
+  if(L.lines.length){
+    const z=OBJECTS[current].zone, tc=textCenter(z);
+    const gap=L.capMM*0.55;
+    const tw=Math.max(...L.lines.map(l=>l.wmm))/2+1.5;
+    const th=(L.lines.length*L.capMM+(L.lines.length-1)*gap)/2+1.5;
+    const ang=parseFloat(document.getElementById('tang').value);
+    if(pointInRotRect(m.x,m.y,tc.x,tc.y,tw,th,ang)) return {type:'text'};
+  }
+  return null;
+}
+let drag=null;
+cv.addEventListener('pointerdown',e=>{
+  if(!curS) return;
+  const m=toMM(e), h=hitTest(m);
+  if(!h){ select(null); return; }
+  if(h.type==='item'){ select(h.item.id); drag={item:h.item, gx:m.x-h.item.x, gy:m.y-h.item.y}; }
+  else { select('text'); const tc=textCenter(OBJECTS[current].zone); drag={text:true, gx:m.x-tc.x, gy:m.y-tc.y}; }
+  cv.classList.add('grabbing'); try{cv.setPointerCapture(e.pointerId);}catch(_){}
+});
+cv.addEventListener('pointermove',e=>{
+  if(!drag) return;
+  const m=toMM(e);
+  if(drag.text){ textPos.x=m.x-drag.gx; textPos.y=m.y-drag.gy; }
+  else { drag.item.x=m.x-drag.gx; drag.item.y=m.y-drag.gy; }
+  render();
+});
+function endDrag(e){ if(drag){ drag=null; cv.classList.remove('grabbing'); try{cv.releasePointerCapture(e.pointerId);}catch(_){} } }
+cv.addEventListener('pointerup',endDrag);
+cv.addEventListener('pointercancel',endDrag);
+
+// ---------- picker & clipart-grid ----------
 function buildPicker(){
   const p=document.getElementById('picker'); p.innerHTML='';
   Object.entries(OBJECTS).forEach(([k,o])=>{
     const d=document.createElement('div');
     d.className='obj'+(k===current?' active':'');
     d.innerHTML=`${o.name}<small>${o.sub}</small>`;
-    d.onclick=()=>{ current=k; applyAngleDefault(); buildPicker(); render(); };
+    d.onclick=()=>{
+      current=k; const z=OBJECTS[k].zone;
+      textPos={x:null,y:null};
+      items.forEach(it=>{ it.x=z.x+z.w/2; it.y=z.y+z.h/2; });
+      applyAngleDefault(); buildPicker(); render();
+    };
     p.appendChild(d);
+  });
+}
+function buildClipGrid(){
+  const g=document.getElementById('clipGrid'); g.innerHTML='';
+  Object.entries(CLIPARTS).forEach(([k,c])=>{
+    const d=document.createElement('div'); d.className='clip';
+    d.innerHTML=`<svg viewBox="${c.vb}"><g fill="#dbeafe" stroke="#dbeafe" stroke-linejoin="round">${c.inner}</g></svg><span>${c.name}</span>`;
+    d.onclick=()=>addClipart(k);
+    g.appendChild(d);
   });
 }
 
@@ -554,16 +651,16 @@ function buildPicker(){
   if(param || saved){ document.querySelectorAll('.admin-only').forEach(el=>el.style.display='block'); }
 })();
 
-['l1','l2','cap','font','lw','ly','tang','lang'].forEach(id=>document.getElementById(id).addEventListener('input',render));
-document.getElementById('lw').addEventListener('input',()=>document.getElementById('lwVal').textContent=parseFloat(document.getElementById('lw').value).toFixed(1)+' mm');
-document.getElementById('ly').addEventListener('input',()=>document.getElementById('lyVal').textContent=parseFloat(document.getElementById('ly').value).toFixed(1)+' mm');
+['l1','l2','cap','font','tang'].forEach(id=>document.getElementById(id).addEventListener('input',render));
 document.getElementById('tang').addEventListener('input',()=>document.getElementById('tangVal').textContent=document.getElementById('tang').value+'°');
-document.getElementById('lang').addEventListener('input',()=>document.getElementById('langVal').textContent=document.getElementById('lang').value+'°');
+document.getElementById('selSize').addEventListener('input',()=>{ const it=items.find(i=>i.id===selId); if(it){ it.wmm=parseFloat(document.getElementById('selSize').value); document.getElementById('selSizeVal').textContent=it.wmm.toFixed(1)+' mm'; render(); } });
+document.getElementById('selRot').addEventListener('input',()=>{ const it=items.find(i=>i.id===selId); if(it){ it.angle=parseFloat(document.getElementById('selRot').value); document.getElementById('selRotVal').textContent=it.angle+'°'; render(); } });
+document.getElementById('selDel').onclick=()=>{ items=items.filter(i=>i.id!==selId); select(null); };
 document.getElementById('logo').addEventListener('change',e=>{ const f=e.target.files[0]; if(f) handleLogoFile(f); });
-document.getElementById('logoClear').onclick=()=>{ logo=null; document.getElementById('logo').value=''; document.getElementById('logoCtrls').style.display='none'; render(); };
 document.getElementById('dlsvg').onclick=downloadSVG;
 document.getElementById('anfrage').onclick=()=>{ alert('Anfrage-Versand wird im nächsten Schritt angebunden (Formspree + Foto-Upload), wie auf der Typenschild-Seite.'); };
 
+buildClipGrid();
 applyAngleDefault();
 buildPicker();
 // fonts may load slightly late → re-render once ready
