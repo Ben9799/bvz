@@ -77,7 +77,17 @@ input[type=range]{flex:1;accent-color:var(--accent)}
 .sec-title:first-of-type{margin-top:.2rem}
 .sec-title .ic{font-size:1.05rem;filter:saturate(.9)}
 .sec-title .cnt{margin-left:auto;font-size:.72rem;font-weight:700;color:var(--muted);background:rgba(255,255,255,0.05);border-radius:999px;padding:.12rem .55rem}
-.sub{font-size:.76rem;color:var(--muted);margin:-.3rem 0 .6rem}
+.sub{font-size:.76rem;color:var(--muted);margin:-.1rem 0 .7rem}
+.sub b{color:var(--accent2);font-weight:700}
+/* segmented tab control */
+.seg-tabs{display:flex;gap:.3rem;background:rgba(2,6,23,0.5);border:1px solid rgba(255,255,255,0.08);border-radius:13px;padding:.32rem;margin-bottom:1.1rem}
+.seg{flex:1;display:flex;align-items:center;justify-content:center;gap:.4rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.86rem;color:var(--muted2);padding:.62rem .4rem;border-radius:10px;cursor:pointer;transition:.15s;border:none;background:none}
+.seg:hover{color:var(--text)}
+.seg.active{background:linear-gradient(135deg,rgba(0,212,255,0.2),rgba(0,153,187,0.13));color:var(--text);box-shadow:0 1px 9px rgba(0,212,255,0.12)}
+.seg .ic{font-size:1rem}
+.seg-pane{display:none}
+.seg-pane.active{display:block;animation:segIn .18s ease}
+@keyframes segIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
 /* clipart picker */
 .clip-search{margin-bottom:.6rem}
 .cat-tabs{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.7rem}
@@ -135,47 +145,58 @@ input[type=range]{flex:1;accent-color:var(--accent)}
     <div class="panel">
       <h2>Gravur gestalten</h2>
 
-      <div class="sec-title"><span class="ic">✏️</span> Text</div>
-      <div class="row2">
-        <div class="field" style="margin-bottom:.7rem">
-          <label for="l1">Zeile 1</label>
-          <input type="text" id="l1" maxlength="40" value="Max Mustermann">
-        </div>
-        <div class="field" style="margin-bottom:.7rem">
-          <label for="l2">Zeile 2 (optional)</label>
-          <input type="text" id="l2" maxlength="40" value="Prost! 🍺">
-        </div>
+      <div class="seg-tabs" id="segTabs">
+        <button class="seg active" data-pane="text"><span class="ic">✏️</span> Text</button>
+        <button class="seg" data-pane="motive"><span class="ic">🍺</span> Motive</button>
+        <button class="seg" data-pane="logo"><span class="ic">📁</span> Logo</button>
       </div>
-      <div class="field">
-        <label for="font">Schriftart</label>
-        <select id="font">
-          <option value="DM Sans|600">DM Sans (modern)</option>
-          <option value="Syne|800">Syne (kräftig)</option>
-          <option value="Georgia|700">Georgia (Serif, edel)</option>
-          <option value="Courier New|700">Courier (technisch)</option>
-        </select>
-      </div>
-      <div class="row2">
-        <div class="field">
-          <label>Schrifthöhe <span class="rval" id="capVal">4.0 mm</span></label>
-          <div class="range-row"><input type="range" id="cap" min="2" max="10" step="0.5" value="4"></div>
+
+      <div class="seg-pane active" id="pane-text">
+        <div class="row2">
+          <div class="field" style="margin-bottom:.7rem">
+            <label for="l1">Zeile 1</label>
+            <input type="text" id="l1" maxlength="40" value="Max Mustermann">
+          </div>
+          <div class="field" style="margin-bottom:.7rem">
+            <label for="l2">Zeile 2 (optional)</label>
+            <input type="text" id="l2" maxlength="40" value="Prost!">
+          </div>
         </div>
         <div class="field">
-          <label>Text drehen <span class="rval" id="tangVal">0°</span></label>
-          <div class="range-row"><input type="range" id="tang" min="-180" max="180" step="5" value="0"></div>
+          <label for="font">Schriftart</label>
+          <select id="font">
+            <option value="DM Sans|600">DM Sans (modern)</option>
+            <option value="Syne|800">Syne (kräftig)</option>
+            <option value="Georgia|700">Georgia (Serif, edel)</option>
+            <option value="Courier New|700">Courier (technisch)</option>
+          </select>
+        </div>
+        <div class="row2">
+          <div class="field" style="margin-bottom:0">
+            <label>Schrifthöhe <span class="rval" id="capVal">4.0 mm</span></label>
+            <div class="range-row"><input type="range" id="cap" min="2" max="10" step="0.5" value="4"></div>
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label>Text drehen <span class="rval" id="tangVal">0°</span></label>
+            <div class="range-row"><input type="range" id="tang" min="-180" max="180" step="5" value="0"></div>
+          </div>
         </div>
       </div>
 
-      <div class="sec-title"><span class="ic">🍺</span> Motive <span class="cnt" id="clipCount"></span></div>
-      <div class="sub">Anklicken legt das Motiv auf — dann im Bild ziehen, an den Ecken skalieren, am Knopf drehen.</div>
-      <input type="text" id="clipSearch" class="clip-search" placeholder="🔍 Motiv suchen (z. B. Herz, Bier, Stern)…">
-      <div class="cat-tabs" id="catTabs"></div>
-      <div class="clip-grid" id="clipGrid"></div>
+      <div class="seg-pane" id="pane-motive">
+        <div class="sub"><b id="clipCount"></b> · anklicken, dann im Bild frei platzieren.</div>
+        <input type="text" id="clipSearch" class="clip-search" placeholder="Motiv suchen (z. B. Herz, Bier, Stern)…">
+        <div class="cat-tabs" id="catTabs"></div>
+        <div class="clip-grid" id="clipGrid"></div>
+      </div>
 
-      <div class="logo-box" style="margin-top:1rem">
-        <label for="logo">Eigenes Logo hochladen (SVG / DXF)</label>
-        <input type="file" id="logo" accept=".svg,.dxf,image/svg+xml">
-        <div class="logo-hint" id="logoStatus"></div>
+      <div class="seg-pane" id="pane-logo">
+        <div class="sub">Eigenes Logo als <b>SVG</b> oder <b>DXF</b> — wird maßgenau in die Gravurfläche gesetzt.</div>
+        <div class="logo-box">
+          <label for="logo">Datei wählen</label>
+          <input type="file" id="logo" accept=".svg,.dxf,image/svg+xml">
+          <div class="logo-hint" id="logoStatus"></div>
+        </div>
       </div>
 
       <div class="sel-box" id="selBox" style="display:none">
@@ -334,8 +355,10 @@ const CLIPARTS = {
     '<ellipse cx="40.5" cy="49" rx="4" ry="7.5" transform="rotate(-28 40.5 49)"/>'+
     '<ellipse cx="59.5" cy="49" rx="4" ry="7.5" transform="rotate(28 59.5 49)"/>' },
   pretzel:{ name:'Brezel', cat:'bier', vb:'0 0 100 100', inner:
-    '<path fill="none" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" d="M28 72 Q6 44 34 30 Q56 20 50 46 Q44 20 66 30 Q94 44 72 72 Q56 84 50 60 Q44 84 28 72 Z"/>'+
-    '<circle cx="50" cy="24" r="2"/><circle cx="33" cy="26" r="1.8"/><circle cx="67" cy="26" r="1.8"/><circle cx="24" cy="44" r="1.8"/><circle cx="76" cy="44" r="1.8"/>' },
+    '<path fill-rule="evenodd" d="M50 20 C60 8 82 10 86 28 C89 42 82 52 70 55 C84 60 88 82 62 87 C55 89 45 89 38 87 C12 82 16 60 30 55 C18 52 11 42 14 28 C18 10 40 8 50 20 Z'+
+    ' M25 38 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0 z'+
+    ' M57 38 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0 z'+
+    ' M38 66 a12 12 0 1 0 24 0 a12 12 0 1 0 -24 0 z"/>' },
   cheers: { name:'Prost', cat:'bier', vb:'0 0 100 100', inner:
     '<g transform="rotate(-12 35 56)">'+
     '<path d="M21 40 q-4 -2 -3 -6 q1 -4 5 -3 q1 -4 5 -3 q3 -3 7 0 q5 -1 6 4 q4 1 3 6 z"/>'+
@@ -432,9 +455,10 @@ const CLIPARTS = {
     '<ellipse cx="57" cy="36" rx="7.5" ry="9.5"/>'+
     '<ellipse cx="71" cy="46" rx="7.5" ry="9" transform="rotate(15 71 46)"/>' },
   key:    { name:'Schlüssel', cat:'symbole', vb:'0 0 100 100', inner:
-    '<path fill-rule="evenodd" d="M30 30 a19 19 0 1 0 0.1 0 z M30 30 a8 8 0 1 0 0.1 0 z"/>'+
-    '<rect x="46" y="26" width="44" height="8" rx="2"/>'+
-    '<rect x="74" y="34" width="6" height="10"/><rect x="84" y="34" width="6" height="14"/>' },
+    '<path fill-rule="evenodd" d="M34 24 a16 16 0 1 0 32 0 a16 16 0 1 0 -32 0 z M43 24 a7 7 0 1 0 14 0 a7 7 0 1 0 -14 0 z"/>'+
+    '<rect x="46" y="37" width="8" height="50" rx="2.5"/>'+
+    '<rect x="54" y="64" width="9" height="6" rx="1.5"/>'+
+    '<rect x="54" y="75" width="13" height="6" rx="1.5"/>' },
   gift:   { name:'Geschenk', cat:'symbole', vb:'0 0 100 100', inner:
     '<path d="M50 34 C40 18 22 22 28 33 C32 41 44 37 50 34 Z M50 34 C60 18 78 22 72 33 C68 41 56 37 50 34 Z"/>'+
     '<circle cx="50" cy="35" r="4.5"/>'+
@@ -934,8 +958,26 @@ function buildClipGrid(){
   if(param || saved){ document.querySelectorAll('.admin-only').forEach(el=>el.style.display='block'); }
 })();
 
-['l1','l2','cap','font','tang'].forEach(id=>document.getElementById(id).addEventListener('input',render));
+// Emoji / Symbole im Gravurtext blockieren (nur normaler Text gravierbar)
+const EMOJI_RE=/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{2300}-\u{23FF}\u{2190}-\u{21FF}\u{FE00}-\u{FE0F}\u{200D}\u{20E3}]/gu;
+['l1','l2','cap','font','tang'].forEach(id=>{
+  const el=document.getElementById(id);
+  el.addEventListener('input',()=>{
+    if(id==='l1'||id==='l2'){
+      const v=el.value, c=v.replace(EMOJI_RE,'');
+      if(c!==v){ const p=Math.max(0,el.selectionStart-(v.length-c.length)); el.value=c; try{el.setSelectionRange(p,p);}catch(_){} }
+    }
+    render();
+  });
+});
 document.getElementById('tang').addEventListener('input',()=>document.getElementById('tangVal').textContent=document.getElementById('tang').value+'°');
+// Segment-Tabs (Text / Motive / Logo)
+document.querySelectorAll('.seg').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.seg').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.seg-pane').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  document.getElementById('pane-'+b.dataset.pane).classList.add('active');
+}));
 document.getElementById('selSize').addEventListener('input',()=>{ const it=items.find(i=>i.id===selId); if(it){ it.wmm=parseFloat(document.getElementById('selSize').value); document.getElementById('selSizeVal').textContent=it.wmm.toFixed(1)+' mm'; render(); } });
 document.getElementById('selRot').addEventListener('input',()=>{ const it=items.find(i=>i.id===selId); if(it){ it.angle=parseFloat(document.getElementById('selRot').value); document.getElementById('selRotVal').textContent=it.angle+'°'; render(); } });
 document.getElementById('selDel').onclick=()=>{ items=items.filter(i=>i.id!==selId); select(null); };
