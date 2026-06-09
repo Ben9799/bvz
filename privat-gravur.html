@@ -244,19 +244,97 @@ function inkColor(o){ return o.img ? (o.previewInk||'#eef4f8') : '#e8fbff'; }
 
 // ---------- Clipart-Bibliothek (Bier-Motive) — Geometrie ohne Farbe (Farbe via Wrapper) ----------
 const CLIPARTS = {
-  mug:    { name:'Krug',   vb:'0 0 100 100', inner:'<rect x="24" y="30" width="38" height="56" rx="6"/><path d="M62 44 h9 a13 13 0 0 1 13 13 v3 a13 13 0 0 1 -13 13 h-9 v-9 h7 a6 6 0 0 0 6 -6 v-1 a6 6 0 0 0 -6 -6 h-7 z"/><circle cx="31" cy="24" r="7"/><circle cx="43" cy="20" r="8"/><circle cx="55" cy="24" r="7"/>' },
-  glass:  { name:'Bier',   vb:'0 0 100 100', inner:'<path d="M32 22 h36 l-5 64 a6 6 0 0 1 -6 5 h-14 a6 6 0 0 1 -6 -5 z"/><circle cx="38" cy="18" r="7"/><circle cx="50" cy="13" r="8"/><circle cx="62" cy="18" r="7"/>' },
-  pils:   { name:'Pils',   vb:'0 0 100 100', inner:'<path d="M39 18 h22 l-6 70 h-10 z"/><circle cx="44" cy="14" r="6"/><circle cx="54" cy="11" r="7"/><circle cx="61" cy="15" r="5"/>' },
-  bottle: { name:'Flasche',vb:'0 0 100 100', inner:'<rect x="42" y="4" width="16" height="7" rx="2"/><path d="M43 8 h14 v12 q0 5 3 8 l4 4 q4 4 4 11 v42 a6 6 0 0 1 -6 6 h-24 a6 6 0 0 1 -6 -6 v-42 q0 -7 4 -11 l4 -4 q3 -3 3 -8 z"/>' },
-  cap:    { name:'Kronkorken', vb:'0 0 100 100', inner:'<path fill-rule="evenodd" d="M50 16 a34 34 0 1 0 0.01 0 z M50 27 a23 23 0 1 1 -0.01 0 z"/><circle cx="50" cy="50" r="7"/>' },
-  opener: { name:'Öffner', vb:'0 0 100 100', inner:'<rect x="18" y="44" width="48" height="13" rx="6.5"/><path fill-rule="evenodd" d="M60 37 a14 14 0 1 1 0 28 14 14 0 1 1 0-28 z m0 7 a7 7 0 1 0 0 14 7 7 0 1 0 0-14 z"/>' },
-  hops:   { name:'Hopfen', vb:'0 0 100 100', inner:'<path d="M50 14 q13 5 13 20 q0 24 -13 52 q-13 -28 -13 -52 q0 -15 13 -20 z"/><path fill="none" stroke-width="2.5" d="M50 22 v54 M40 36 q10 6 20 0 M40 50 q10 6 20 0"/>' },
-  wheat:  { name:'Weizen', vb:'0 0 100 100', inner:'<rect x="48" y="48" width="4" height="42" rx="2"/><ellipse cx="50" cy="16" rx="5" ry="9"/><ellipse cx="41" cy="26" rx="4.5" ry="8" transform="rotate(-30 41 26)"/><ellipse cx="59" cy="26" rx="4.5" ry="8" transform="rotate(30 59 26)"/><ellipse cx="40" cy="38" rx="4.5" ry="8" transform="rotate(-30 40 38)"/><ellipse cx="60" cy="38" rx="4.5" ry="8" transform="rotate(30 60 38)"/><ellipse cx="40" cy="50" rx="4.5" ry="8" transform="rotate(-30 40 50)"/><ellipse cx="60" cy="50" rx="4.5" ry="8" transform="rotate(30 60 50)"/>' },
-  pretzel:{ name:'Brezel', vb:'0 0 100 100', inner:'<path fill="none" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" d="M28 72 Q6 44 34 30 Q56 20 50 46 Q44 20 66 30 Q94 44 72 72 Q56 84 50 60 Q44 84 28 72 Z"/>' },
-  cheers: { name:'Prost',  vb:'0 0 100 100', inner:'<g transform="rotate(-13 36 54)"><rect x="20" y="38" width="26" height="40" rx="4"/><circle cx="24" cy="33" r="5"/><circle cx="33" cy="30" r="6"/><circle cx="42" cy="33" r="5"/></g><g transform="rotate(13 64 54)"><rect x="54" y="38" width="26" height="40" rx="4"/><circle cx="58" cy="33" r="5"/><circle cx="67" cy="30" r="6"/><circle cx="76" cy="33" r="5"/></g>' },
-  keg:    { name:'Fass',   vb:'0 0 100 100', inner:'<g fill="none" stroke-width="5" stroke-linejoin="round"><path d="M32 22 q18 -6 36 0 q7 28 0 56 q-18 6 -36 0 q-7 -28 0 -56 z"/><line x1="29" y1="40" x2="71" y2="40"/><line x1="29" y1="60" x2="71" y2="60"/></g>' },
+  mug:    { name:'Krug',   vb:'0 0 100 100', inner:
+    '<path d="M24 33 q-6 -3 -5 -9 q1 -6 7 -6 q1 -7 9 -6 q3 -6 10 -3 q6 -5 11 0 q9 -2 10 6 q6 1 5 9 q-1 4 -6 4 z"/>'+
+    '<rect x="24" y="34" width="40" height="6.5" rx="2"/>'+
+    '<path fill-rule="evenodd" d="M24 42 h40 v40 a6 6 0 0 1 -6 6 h-28 a6 6 0 0 1 -6 -6 z'+
+    ' M30 50 a2.4 2.4 0 1 0 4.8 0 a2.4 2.4 0 1 0 -4.8 0 z'+
+    ' M42 48 a3 3 0 1 0 6 0 a3 3 0 1 0 -6 0 z'+
+    ' M52 53 a2.2 2.2 0 1 0 4.4 0 a2.2 2.2 0 1 0 -4.4 0 z'+
+    ' M37 84 l0 -0.1 z"/>'+
+    '<path d="M64 45 h5 a16 16 0 0 1 0 32 h-5 v-9 h4 a8 8 0 0 0 0 -16 h-4 z"/>' },
+  glass:  { name:'Bier',   vb:'0 0 100 100', inner:
+    '<path d="M33 24 q-6 -2 -5 -8 q1 -5 7 -5 q2 -6 9 -5 q4 -5 10 -2 q7 -2 9 4 q6 1 5 8 q-1 4 -6 4 z"/>'+
+    '<path fill-rule="evenodd" d="M32 25 h36 l-5 59 a5 5 0 0 1 -5 4 h-16 a5 5 0 0 1 -5 -4 z'+
+    ' M44 40 a2.6 2.6 0 1 0 5.2 0 a2.6 2.6 0 1 0 -5.2 0 z'+
+    ' M54 50 a3 3 0 1 0 6 0 a3 3 0 1 0 -6 0 z'+
+    ' M45 62 a2.3 2.3 0 1 0 4.6 0 a2.3 2.3 0 1 0 -4.6 0 z'+
+    ' M53 70 a2 2 0 1 0 4 0 a2 2 0 1 0 -4 0 z"/>' },
+  pils:   { name:'Pils',   vb:'0 0 100 100', inner:
+    '<path d="M39 20 q-5 -2 -4 -7 q1 -4 6 -4 q1 -5 7 -4 q3 -4 8 -1 q6 -1 7 4 q5 1 4 6 q-1 3 -5 3 z"/>'+
+    '<path fill-rule="evenodd" d="M40 21 h20 l-4 41 q-1 4 -4 5 l-1.5 16 h6 v4 h-22 v-4 h6 l-1.5 -16 q-3 -1 -4 -5 z'+
+    ' M47 36 a2.3 2.3 0 1 0 4.6 0 a2.3 2.3 0 1 0 -4.6 0 z'+
+    ' M48 50 a2 2 0 1 0 4 0 a2 2 0 1 0 -4 0 z"/>' },
+  bottle: { name:'Flasche',vb:'0 0 100 100', inner:
+    '<rect x="43" y="3" width="14" height="6" rx="1.5"/>'+
+    '<path fill-rule="evenodd" d="M44 8 h12 v7 q0 5 3 8 l3 3 q4 4 4 12 v45 a6 6 0 0 1 -6 6 h-20 a6 6 0 0 1 -6 -6 v-45 q0 -8 4 -12 l3 -3 q3 -3 3 -8 z'+
+    ' M38 52 h24 v22 h-24 z"/>'+
+    '<rect x="40" y="56" width="20" height="2.4" rx="1.2"/>'+
+    '<rect x="40" y="67" width="20" height="2.4" rx="1.2"/>' },
+  cap:    { name:'Kronkorken', vb:'0 0 100 100', inner:
+    '<path fill-rule="evenodd" d="M50 15 a35 35 0 1 0 0.1 0 z M50 26 a24 24 0 1 0 0.1 0 z'+
+    ' M79 50 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 z'+
+    ' M70.5 70.5 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 z'+
+    ' M48.1 79 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 z'+
+    ' M27.6 70.5 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 z'+
+    ' M19 48.1 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 z'+
+    ' M27.6 27.6 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 z'+
+    ' M48.1 19 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 z'+
+    ' M70.5 27.6 a1.9 1.9 0 1 0 3.8 0 a1.9 1.9 0 1 0 -3.8 0 z"/>'+
+    '<circle cx="50" cy="50" r="6"/>' },
+  opener: { name:'Öffner', vb:'0 0 100 100', inner:
+    '<path fill-rule="evenodd" d="M16 44 h48 v12 h-48 a6 6 0 0 1 0 -12 z'+
+    ' M21 50 a3 3 0 1 0 6 0 a3 3 0 1 0 -6 0 z"/>'+
+    '<path fill-rule="evenodd" d="M61 35 a15 15 0 1 0 0.1 0 z M61 44 a6 6 0 1 0 0.1 0 z"/>' },
+  hops:   { name:'Hopfen', vb:'0 0 100 100', inner:
+    '<g fill="none" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">'+
+    '<path d="M50 14 q14 6 14 22 q0 25 -14 50 q-14 -25 -14 -50 q0 -16 14 -22 z"/>'+
+    '<path d="M50 20 v62"/>'+
+    '<path d="M50 30 l-9 7 M50 30 l9 7 M50 44 l-10 7 M50 44 l10 7 M50 58 l-9 6 M50 58 l9 6 M50 70 l-7 5 M50 70 l7 5"/>'+
+    '</g>' },
+  wheat:  { name:'Weizen', vb:'0 0 100 100', inner:
+    '<rect x="48.5" y="46" width="3" height="46" rx="1.5"/>'+
+    '<g fill="none" stroke-width="2" stroke-linecap="round">'+
+    '<path d="M50 16 l0 -8 M44 24 l-7 -6 M56 24 l7 -6 M43 35 l-8 -6 M57 35 l8 -6 M43 47 l-8 -5 M57 47 l8 -5"/>'+
+    '</g>'+
+    '<ellipse cx="50" cy="16" rx="4.5" ry="8.5"/>'+
+    '<ellipse cx="41.5" cy="25" rx="4" ry="7.5" transform="rotate(-28 41.5 25)"/>'+
+    '<ellipse cx="58.5" cy="25" rx="4" ry="7.5" transform="rotate(28 58.5 25)"/>'+
+    '<ellipse cx="40.5" cy="37" rx="4" ry="7.5" transform="rotate(-28 40.5 37)"/>'+
+    '<ellipse cx="59.5" cy="37" rx="4" ry="7.5" transform="rotate(28 59.5 37)"/>'+
+    '<ellipse cx="40.5" cy="49" rx="4" ry="7.5" transform="rotate(-28 40.5 49)"/>'+
+    '<ellipse cx="59.5" cy="49" rx="4" ry="7.5" transform="rotate(28 59.5 49)"/>' },
+  pretzel:{ name:'Brezel', vb:'0 0 100 100', inner:
+    '<path fill="none" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" d="M28 72 Q6 44 34 30 Q56 20 50 46 Q44 20 66 30 Q94 44 72 72 Q56 84 50 60 Q44 84 28 72 Z"/>'+
+    '<circle cx="50" cy="24" r="2"/><circle cx="33" cy="26" r="1.8"/><circle cx="67" cy="26" r="1.8"/><circle cx="24" cy="44" r="1.8"/><circle cx="76" cy="44" r="1.8"/>' },
+  cheers: { name:'Prost',  vb:'0 0 100 100', inner:
+    '<g transform="rotate(-12 35 56)">'+
+    '<path d="M21 40 q-4 -2 -3 -6 q1 -4 5 -3 q1 -4 5 -3 q3 -3 7 0 q5 -1 6 4 q4 1 3 6 z"/>'+
+    '<rect x="20" y="41" width="26" height="38" rx="3"/>'+
+    '<path d="M46 47 h4 a9 9 0 0 1 0 18 h-4 v-5 h3 a4 4 0 0 0 0 -8 h-3 z"/></g>'+
+    '<g transform="rotate(12 65 56)">'+
+    '<path d="M54 40 q-4 -2 -3 -6 q1 -4 5 -3 q1 -4 5 -3 q3 -3 7 0 q5 -1 6 4 q4 1 3 6 z"/>'+
+    '<rect x="54" y="41" width="26" height="38" rx="3"/>'+
+    '<path d="M54 47 h-4 a9 9 0 0 0 0 18 h4 v-5 h-3 a4 4 0 0 1 0 -8 h3 z"/></g>'+
+    '<g fill="none" stroke-width="2.4" stroke-linecap="round"><path d="M50 30 v-7 M44 31 l-3 -6 M56 31 l3 -6"/></g>' },
+  keg:    { name:'Fass',   vb:'0 0 100 100', inner:
+    '<g fill="none" stroke-width="4.5" stroke-linejoin="round">'+
+    '<path d="M33 20 q17 -5 34 0 q7 30 0 60 q-17 5 -34 0 q-7 -30 0 -60 z"/>'+
+    '<path d="M30 36 q20 -4 40 0 M30 64 q20 4 40 0"/></g>'+
+    '<rect x="46" y="80" width="8" height="9" rx="1.5"/>'+
+    '<rect x="44" y="88" width="12" height="3.5" rx="1.5"/>' },
   heart:  { name:'Herz',   vb:'0 0 100 100', inner:'<path d="M50 84 C16 60 12 34 32 26 C44 21 50 33 50 38 C50 33 56 21 68 26 C88 34 84 60 50 84 Z"/>' },
-  star:   { name:'Stern',  vb:'0 0 100 100', inner:'<path d="M50 8 L61 38 L93 38 L67 58 L77 90 L50 70 L23 90 L33 58 L7 38 L39 38 Z"/>' }
+  star:   { name:'Stern',  vb:'0 0 100 100', inner:'<path d="M50 8 L61 38 L93 38 L67 58 L77 90 L50 70 L23 90 L33 58 L7 38 L39 38 Z"/>' },
+  moustache:{ name:'Schnurrbart', vb:'0 0 100 100', inner:
+    '<path d="M50 40 c-4 6 -12 9 -20 9 c-12 0 -20 -6 -24 -14 c-1 -2 2 -3 3 -1 c5 8 14 11 22 9 c7 -2 12 -7 15 -12 c1 -2 7 -2 8 0 c3 5 8 10 15 12 c8 2 17 -1 22 -9 c1 -2 4 -1 3 1 c-4 8 -12 14 -24 14 c-8 0 -16 -3 -20 -9 z"/>' },
+  crown:  { name:'Krone',  vb:'0 0 100 100', inner:
+    '<path fill-rule="evenodd" d="M16 72 l5 -34 14 16 15 -28 15 28 14 -16 5 34 z'+
+    ' M30 64 h40 v4 h-40 z"/>'+
+    '<circle cx="21" cy="36" r="4"/><circle cx="50" cy="24" r="4.5"/><circle cx="79" cy="36" r="4"/>' },
+  coaster:{ name:'Bierdeckel', vb:'0 0 100 100', inner:
+    '<path fill-rule="evenodd" d="M50 12 a38 38 0 1 0 0.1 0 z M50 20 a30 30 0 1 0 0.1 0 z"/>'+
+    '<path d="M43 40 h14 l-2 22 q0 3 -3 4 l-0.6 7 h3 v3 h-9 v-3 h3 l-0.6 -7 q-3 -1 -3 -4 z"/>'+
+    '<path d="M43 39 q-2 -3 1 -5 q1 -3 4 -2 q2 -3 5 0 q4 -1 5 3 q2 0 1 4 z"/>' }
 };
 
 // ---------- Elemente (Cliparts + hochgeladene Logos), frei platzierbar ----------
@@ -499,14 +577,25 @@ function render(){
   // elements (cliparts + logos)
   items.forEach(it=>drawItem(it,s,o));
 
-  // selection highlight
-  const sit=items.find(i=>i.id===selId);
-  if(sit){
-    const hw=sit.wmm/2, hh=(sit.wmm*(sit.bh/sit.bw))/2;
+  // selection highlight + handles (item OR text)
+  const g=selGeom();
+  if(g){
     ctx.save();
-    ctx.translate(px(sit.x,s),py(sit.y,s)); ctx.rotate(sit.angle*Math.PI/180);
+    ctx.translate(px(g.cx,s),py(g.cy,s)); ctx.rotate(g.angle*Math.PI/180);
     ctx.setLineDash([4,3]); ctx.lineWidth=1; ctx.strokeStyle='rgba(0,212,255,0.95)';
-    ctx.strokeRect(-hw*s.ppmm,-hh*s.ppmm,hw*2*s.ppmm,hh*2*s.ppmm);
+    ctx.strokeRect(-g.hw*s.ppmm,-g.hh*s.ppmm,g.hw*2*s.ppmm,g.hh*2*s.ppmm);
+    ctx.restore();
+    const H=handlePts(g,s);
+    ctx.save();
+    ctx.setLineDash([]);
+    ctx.strokeStyle='rgba(0,212,255,0.95)'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(H.topMid.x,H.topMid.y); ctx.lineTo(H.rot.x,H.rot.y); ctx.stroke();
+    ctx.fillStyle='#00d4ff';
+    ctx.beginPath(); ctx.arc(H.rot.x,H.rot.y,6,0,Math.PI*2); ctx.fill();
+    H.corners.forEach(c=>{
+      ctx.fillStyle='#ffffff'; ctx.strokeStyle='#00d4ff'; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.rect(c.x-5,c.y-5,10,10); ctx.fill(); ctx.stroke();
+    });
     ctx.restore();
   }
 
@@ -555,6 +644,7 @@ function applyAngleDefault(){
 }
 
 // ---------- Auswahl ----------
+const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
 function select(id){ selId=id; showSel(); render(); }
 function showSel(){
   const box=document.getElementById('selBox');
@@ -565,8 +655,41 @@ function showSel(){
     document.getElementById('selSize').value=it.wmm;
     document.getElementById('selSizeVal').textContent=it.wmm.toFixed(1)+' mm';
     document.getElementById('selRot').value=it.angle;
-    document.getElementById('selRotVal').textContent=it.angle+'°';
+    document.getElementById('selRotVal').textContent=Math.round(it.angle)+'°';
   } else { box.style.display='none'; }
+}
+function syncSelSliders(){
+  const it=items.find(i=>i.id===selId);
+  if(!it) return;
+  document.getElementById('selSize').value=it.wmm;
+  document.getElementById('selSizeVal').textContent=it.wmm.toFixed(1)+' mm';
+  document.getElementById('selRot').value=clamp(it.angle,-180,180);
+  document.getElementById('selRotVal').textContent=Math.round(it.angle)+'°';
+}
+// Auswahl-Geometrie (mm) — Element ODER Text
+function selGeom(){
+  if(selId==='text'){
+    const L=layout(); if(!L.lines.length) return null;
+    const z=OBJECTS[current].zone, tc=textCenter(z);
+    const gap=L.capMM*0.55;
+    const hw=Math.max(...L.lines.map(l=>l.wmm))/2+1.5;
+    const hh=(L.lines.length*L.capMM+(L.lines.length-1)*gap)/2+1.5;
+    const ang=parseFloat(document.getElementById('tang').value);
+    return {kind:'text',cx:tc.x,cy:tc.y,hw,hh,angle:ang};
+  }
+  const it=items.find(i=>i.id===selId);
+  if(!it) return null;
+  return {kind:'item',it,cx:it.x,cy:it.y,hw:it.wmm/2,hh:(it.wmm*(it.bh/it.bw))/2,angle:it.angle};
+}
+// Handle-Positionen in Canvas-px: 4 Ecken + Dreh-Knopf
+function handlePts(g,s){
+  const a=g.angle*Math.PI/180, ca=Math.cos(a), sa=Math.sin(a);
+  const toW=(lx,ly)=>({x:px(g.cx+lx*ca-ly*sa,s), y:py(g.cy+lx*sa+ly*ca,s)});
+  const corners=[toW(-g.hw,-g.hh),toW(g.hw,-g.hh),toW(g.hw,g.hh),toW(-g.hw,g.hh)];
+  const topMid=toW(0,-g.hh);
+  const rotOffPx=24;
+  const rot={x:topMid.x+sa*rotOffPx, y:topMid.y-ca*rotOffPx};
+  return {corners,topMid,rot};
 }
 
 // ---------- Treffer-Test & Ziehen ----------
@@ -575,11 +698,15 @@ function pointInRotRect(mx,my,cx,cy,hw,hh,angDeg){
   const lx=dx*Math.cos(a)-dy*Math.sin(a), ly=dx*Math.sin(a)+dy*Math.cos(a);
   return Math.abs(lx)<=hw && Math.abs(ly)<=hh;
 }
-function toMM(e){
+function toPx(e){
   const r=cv.getBoundingClientRect();
-  const X=(e.clientX-r.left)*(cv.width/r.width), Y=(e.clientY-r.top)*(cv.height/r.height);
-  return { x:(X-curS.ox)/curS.ppmm, y:(Y-curS.oy)/curS.ppmm };
+  return { x:(e.clientX-r.left)*(cv.width/r.width), y:(e.clientY-r.top)*(cv.height/r.height) };
 }
+function toMM(e){
+  const p=toPx(e);
+  return { x:(p.x-curS.ox)/curS.ppmm, y:(p.y-curS.oy)/curS.ppmm };
+}
+const distPx=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 function hitTest(m){
   for(let i=items.length-1;i>=0;i--){
     const it=items[i], hw=it.wmm/2, hh=(it.wmm*(it.bh/it.bw))/2;
@@ -597,19 +724,48 @@ function hitTest(m){
   return null;
 }
 let drag=null;
+function capEl(){ return document.getElementById('cap'); }
 cv.addEventListener('pointerdown',e=>{
   if(!curS) return;
-  const m=toMM(e), h=hitTest(m);
+  const p=toPx(e), m=toMM(e);
+  // 1) Handle der aktuellen Auswahl? (Drehen / Größe)
+  const g=selGeom();
+  if(g){
+    const H=handlePts(g,curS);
+    if(distPx(p,H.rot)<=13){ drag={mode:'rotate',g}; startGrab(e); return; }
+    for(const c of H.corners){
+      if(distPx(p,c)<=11){
+        const d0=Math.hypot(m.x-g.cx,m.y-g.cy);
+        const startW = g.kind==='item' ? g.it.wmm : parseFloat(capEl().value);
+        drag={mode:'resize',g,startDist:Math.max(d0,0.5),startW}; startGrab(e); return;
+      }
+    }
+  }
+  // 2) Auswählen / Verschieben
+  const h=hitTest(m);
   if(!h){ select(null); return; }
-  if(h.type==='item'){ select(h.item.id); drag={item:h.item, gx:m.x-h.item.x, gy:m.y-h.item.y}; }
-  else { select('text'); const tc=textCenter(OBJECTS[current].zone); drag={text:true, gx:m.x-tc.x, gy:m.y-tc.y}; }
-  cv.classList.add('grabbing'); try{cv.setPointerCapture(e.pointerId);}catch(_){}
+  if(h.type==='item'){ select(h.item.id); drag={mode:'move',item:h.item, gx:m.x-h.item.x, gy:m.y-h.item.y}; }
+  else { select('text'); const tc=textCenter(OBJECTS[current].zone); drag={mode:'move',text:true, gx:m.x-tc.x, gy:m.y-tc.y}; }
+  startGrab(e);
 });
+function startGrab(e){ cv.classList.add('grabbing'); try{cv.setPointerCapture(e.pointerId);}catch(_){} }
 cv.addEventListener('pointermove',e=>{
   if(!drag) return;
   const m=toMM(e);
-  if(drag.text){ textPos.x=m.x-drag.gx; textPos.y=m.y-drag.gy; }
-  else { drag.item.x=m.x-drag.gx; drag.item.y=m.y-drag.gy; }
+  if(drag.mode==='move'){
+    if(drag.text){ textPos.x=m.x-drag.gx; textPos.y=m.y-drag.gy; }
+    else { drag.item.x=m.x-drag.gx; drag.item.y=m.y-drag.gy; }
+  } else if(drag.mode==='rotate'){
+    let a=Math.atan2(m.y-drag.g.cy, m.x-drag.g.cx)*180/Math.PI+90;
+    while(a>180)a-=360; while(a<-180)a+=360;
+    if(drag.g.kind==='item'){ drag.g.it.angle=a; syncSelSliders(); }
+    else { const t=document.getElementById('tang'); t.value=Math.round(a); document.getElementById('tangVal').textContent=Math.round(a)+'°'; }
+  } else if(drag.mode==='resize'){
+    const d=Math.hypot(m.x-drag.g.cx,m.y-drag.g.cy);
+    const sc=d/drag.startDist;
+    if(drag.g.kind==='item'){ drag.g.it.wmm=clamp(drag.startW*sc,3,70); syncSelSliders(); }
+    else { const c=capEl(); const nv=clamp(drag.startW*sc,parseFloat(c.min),parseFloat(c.max)); c.value=nv; document.getElementById('capVal').textContent=nv.toFixed(1)+' mm'; }
+  }
   render();
 });
 function endDrag(e){ if(drag){ drag=null; cv.classList.remove('grabbing'); try{cv.releasePointerCapture(e.pointerId);}catch(_){} } }
