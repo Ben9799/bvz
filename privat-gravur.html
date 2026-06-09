@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Gravur-Studio (intern) | Wolf Lasermark</title>
+<link rel="icon" type="image/png" sizes="48x48" href="images/favicon-48.png">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#020617; --s1:#0b1120; --s2:#111827; --s3:#1e293b;
+  --border:rgba(0,212,255,0.12); --accent:#00d4ff; --accent2:#0099bb;
+  --text:#f1f5f9; --muted:#64748b; --muted2:#94a3b8;
+  --green:#22c55e; --red:#ef4444;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.6}
+a{color:inherit;text-decoration:none}
+.bg-mesh{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 50% at 15% 5%,rgba(0,212,255,0.06),transparent),
+  radial-gradient(ellipse 60% 60% at 85% 90%,rgba(30,64,175,0.08),transparent),
+  radial-gradient(ellipse 40% 40% at 50% 50%,rgba(0,40,60,0.3),transparent)}
+.wrap{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:0 1.2rem}
+header{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(2,6,23,0.72);border-bottom:1px solid var(--border)}
+.header-inner{max-width:1180px;margin:0 auto;padding:0.8rem 1.2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.brand{display:flex;align-items:center;gap:0.6rem;font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem}
+.brand img{width:34px;height:34px;border-radius:9px}
+.brand span{color:var(--accent)}
+.badge{font-size:.72rem;font-weight:700;color:var(--accent);border:1px solid var(--border);border-radius:999px;padding:.3rem .8rem}
+
+.hero{padding:2.2rem 0 1rem;text-align:center}
+.hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.6rem,4vw,2.4rem);letter-spacing:-.02em}
+.hero h1 span{color:var(--accent)}
+.hero p{color:var(--muted2);max-width:60ch;margin:.6rem auto 0;font-size:.98rem}
+
+/* OBJECT PICKER */
+.picker{display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;margin:1.4rem 0}
+.obj{cursor:pointer;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:.8rem 1.1rem;font-weight:700;font-size:.92rem;color:var(--muted2);transition:.2s;display:flex;flex-direction:column;gap:.15rem;min-width:200px;text-align:center}
+.obj small{font-weight:500;color:var(--muted);font-size:.78rem}
+.obj.active{border-color:var(--accent);color:var(--text);background:rgba(0,212,255,0.06)}
+
+/* STUDIO LAYOUT */
+.studio{display:grid;grid-template-columns:1.1fr .9fr;gap:1.4rem;align-items:start;margin-bottom:3rem}
+.stage{background:linear-gradient(180deg,rgba(17,24,39,0.55),rgba(11,17,32,0.55));border:1px solid var(--border);border-radius:20px;padding:1.4rem;display:flex;flex-direction:column;align-items:center;gap:.8rem}
+#cv{max-width:100%;height:auto;background:#0a0f1c;border-radius:12px}
+.dims{font-size:.82rem;color:var(--muted2);text-align:center}
+.dims b{color:var(--text)}
+.warn{font-size:.82rem;color:#fbbf24;min-height:1.1em;text-align:center}
+
+.panel{background:linear-gradient(180deg,rgba(17,24,39,0.55),rgba(11,17,32,0.55));border:1px solid var(--border);border-radius:20px;padding:1.4rem}
+.panel h2{font-family:'Syne',sans-serif;font-size:1.15rem;margin-bottom:1rem}
+.field{margin-bottom:1rem}
+label{display:block;font-size:.82rem;font-weight:600;color:var(--muted2);margin-bottom:.4rem}
+input[type=text],select{width:100%;background:rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.1);border-radius:11px;padding:.7rem .85rem;color:var(--text);font-family:inherit;font-size:.95rem}
+input[type=text]:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,212,255,0.12)}
+.range-row{display:flex;align-items:center;gap:.7rem}
+input[type=range]{flex:1;accent-color:var(--accent)}
+.rval{font-size:.84rem;color:var(--accent);font-weight:700;min-width:3.5em;text-align:right}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.btnrow{display:flex;gap:.7rem;margin-top:.4rem;flex-wrap:wrap}
+.btn{flex:1;border:none;border-radius:12px;padding:.85rem;font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;cursor:pointer;transition:.2s}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#021}
+.btn-primary:hover{filter:brightness(1.08)}
+.btn-ghost{background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--muted2)}
+.admin-only{display:none}
+.logo-box{border:1px dashed rgba(255,255,255,0.14);border-radius:13px;padding:.9rem;margin-bottom:1rem}
+.logo-box input[type=file]{width:100%;font-size:.85rem;color:var(--muted2);margin-top:.4rem}
+.logo-box input[type=file]::file-selector-button{background:rgba(0,212,255,0.1);border:1px solid var(--accent);color:var(--text);border-radius:9px;padding:.4rem .7rem;margin-right:.6rem;cursor:pointer;font-family:inherit}
+.logo-hint{font-size:.76rem;color:var(--muted);margin-top:.4rem}
+#logoStatus{color:var(--accent)}
+.note{font-size:.78rem;color:var(--muted);margin-top:1rem;border-top:1px solid rgba(255,255,255,0.06);padding-top:.8rem}
+
+@media(max-width:840px){ .studio{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<div class="bg-mesh"></div>
+
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="brand">
+      <picture><source srcset="images/wolf-lasermark-icon.webp" type="image/webp"><img src="images/wolf-lasermark-icon.png" alt="Wolf Lasermark"></picture>
+      <div>Wolf <span>Lasermark</span></div>
+    </a>
+    <span class="badge">🔒 Intern · Gravur-Studio (POC)</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section class="hero">
+    <h1>Personalisierte <span>Gravur</span> gestalten</h1>
+    <p>Objekt wählen, Wunschgravur eingeben — die Vorschau ist maßgenau in mm. Die druckfertige LightBurn-SVG bekommt nur Bence (Admin).</p>
+  </section>
+
+  <div class="picker" id="picker"></div>
+
+  <div class="studio">
+    <div class="stage">
+      <canvas id="cv" width="600" height="600"></canvas>
+      <div class="dims" id="dims"></div>
+      <div class="warn" id="warn"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Ihre Gravur</h2>
+      <div class="field">
+        <label for="l1">Zeile 1</label>
+        <input type="text" id="l1" maxlength="40" value="Max Mustermann">
+      </div>
+      <div class="field">
+        <label for="l2">Zeile 2 (optional)</label>
+        <input type="text" id="l2" maxlength="40" value="Prost! 🍺">
+      </div>
+      <div class="field">
+        <label for="font">Schriftart</label>
+        <select id="font">
+          <option value="DM Sans|600">DM Sans (modern)</option>
+          <option value="Syne|800">Syne (kräftig)</option>
+          <option value="Georgia|700">Georgia (Serif, edel)</option>
+          <option value="Courier New|700">Courier (technisch)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Schrifthöhe <span class="rval" id="capVal">4.0 mm</span></label>
+        <div class="range-row">
+          <input type="range" id="cap" min="2" max="10" step="0.5" value="4">
+        </div>
+      </div>
+      <div class="field">
+        <label>Text drehen <span class="rval" id="tangVal">0°</span></label>
+        <div class="range-row">
+          <input type="range" id="tang" min="-180" max="180" step="5" value="0">
+        </div>
+      </div>
+
+      <div class="logo-box">
+        <label for="logo">Eigenes Logo (optional)</label>
+        <input type="file" id="logo" accept=".svg,.dxf,image/svg+xml">
+        <div class="logo-hint">SVG oder DXF — wird maßgenau platziert. Schrift &amp; Logo lassen sich kombinieren.</div>
+        <div id="logoCtrls" style="display:none">
+          <div class="field" style="margin-top:.9rem">
+            <label>Logo-Breite <span class="rval" id="lwVal">20 mm</span></label>
+            <div class="range-row"><input type="range" id="lw" min="4" max="60" step="0.5" value="20"></div>
+          </div>
+          <div class="field">
+            <label>Logo-Position (längs) <span class="rval" id="lyVal">0 mm</span></label>
+            <div class="range-row"><input type="range" id="ly" min="-30" max="30" step="0.5" value="0"></div>
+          </div>
+          <div class="field">
+            <label>Logo drehen <span class="rval" id="langVal">0°</span></label>
+            <div class="range-row"><input type="range" id="lang" min="-180" max="180" step="5" value="0"></div>
+          </div>
+          <button class="btn btn-ghost" id="logoClear" style="flex:0 0 auto;padding:.5rem .9rem;font-size:.82rem">✕ Logo entfernen</button>
+          <div class="logo-hint" id="logoStatus"></div>
+        </div>
+      </div>
+
+      <div class="btnrow">
+        <button class="btn btn-ghost admin-only" id="dlsvg">⬇ LightBurn-SVG</button>
+        <button class="btn btn-primary" id="anfrage">Gravur anfragen</button>
+      </div>
+      <div class="note">Maßgenau: Die SVG wird in echten Millimetern exportiert (viewBox in mm) und ist direkt in LightBurn nutzbar. Gravurfläche je Objekt fest begrenzt — die Vorschau verkleinert die Schrift automatisch, damit sie passt.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ---------- OBJECT TEMPLATES (alle Maße in mm) ----------
+const OBJECTS = {
+  card: {
+    name:'Flaschenöffner-Karte', sub:'85 × 54 mm', wmm:85, hmm:54, radius:3.5, orient:'h',
+    zone:{x:6, y:28, w:73, h:22},   // gravierbare Fläche (mm)
+    draw(g,s){
+      // Kartenkontur
+      roundRect(g, 0,0, 85,54, 3.5, s);
+      g.lineWidth=0.4*s.ppmm; g.strokeStyle='rgba(148,163,184,0.55)'; g.stroke();
+      g.fillStyle='rgba(255,255,255,0.025)'; g.fill();
+      // Öffner-Ausschnitt oben mittig (No-Go-Bereich)
+      g.save();
+      roundRect(g, 29.5,7, 26,13, 3, s);
+      g.fillStyle='#020617'; g.fill();
+      g.lineWidth=0.3*s.ppmm; g.strokeStyle='rgba(148,163,184,0.35)'; g.stroke();
+      // kleine Kapsel-Nase im Ausschnitt
+      g.beginPath();
+      g.moveTo(px(40,s),py(7,s)); g.lineTo(px(44,s),py(13,s)); g.lineTo(px(40,s),py(20,s));
+      g.strokeStyle='rgba(148,163,184,0.35)'; g.stroke();
+      g.restore();
+    }
+  },
+  key: {
+    name:'Schlüsselanhänger-Öffner', sub:'22 × 80 mm', wmm:22, hmm:80, radius:5, orient:'v',
+    img:'images/oeffner-key.png', previewInk:'#eef4f8', stageBg:'#e9edf2',
+    zone:{x:3, y:24, w:15, h:34},
+    draw(g,s){
+      // Korpus (Schaft)
+      roundRect(g, 1,12, 20,66, 5, s);
+      g.lineWidth=0.4*s.ppmm; g.strokeStyle='rgba(148,163,184,0.55)'; g.stroke();
+      g.fillStyle='rgba(255,255,255,0.025)'; g.fill();
+      // Ring oben
+      g.beginPath(); g.arc(px(11,s),py(6,s), 5*s.ppmm, 0, Math.PI*2);
+      g.lineWidth=1.1*s.ppmm; g.strokeStyle='rgba(148,163,184,0.6)'; g.stroke();
+      // Öffner-Haken unten (No-Go)
+      g.save();
+      roundRect(g, 4,60, 14,16, 2, s);
+      g.fillStyle='#020617'; g.fill();
+      g.lineWidth=0.3*s.ppmm; g.strokeStyle='rgba(148,163,184,0.3)'; g.stroke();
+      g.restore();
+    }
+  }
+};
+
+let current='card';
+try{ const q=new URL(location.href).searchParams.get('obj'); if(q && OBJECTS[q]) current=q; }catch(e){}
+const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+const measCv=document.createElement('canvas'), measCtx=measCv.getContext('2d');
+const capRatioCache={};
+
+// ---------- Foto-Loader (für Objekte mit echtem Produktbild) ----------
+const imgCache={};
+function getImg(src){
+  if(imgCache[src]) return imgCache[src];
+  const im=new Image();
+  im.onload=()=>{ im._ready=true; render(); };
+  im.src=src; imgCache[src]=im; return im;
+}
+
+// ---------- Logo-Upload (SVG / DXF) ----------
+let logo=null; // {viewBox, bw, bh, inner, img}
+function inkColor(o){ return o.img ? (o.previewInk||'#eef4f8') : '#e8fbff'; }
+
+function buildLogoImage(){
+  // renderbares SVG für die Canvas-Vorschau (Farben egal — wird zur Ink-Silhouette getönt)
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${logo.viewBox}" width="${logo.bw}" height="${logo.bh}">${logo.inner}</svg>`;
+  const im=new Image();
+  im.onload=()=>{ im._ready=true; render(); };
+  im.onerror=()=>{ document.getElementById('logoStatus').textContent='⚠ Logo konnte nicht gelesen werden.'; };
+  im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+  logo.img=im;
+}
+
+function loadSVGLogo(text){
+  const doc=new DOMParser().parseFromString(text,'image/svg+xml');
+  const root=doc.querySelector('svg');
+  if(!root) throw new Error('keine SVG-Wurzel');
+  let vbx=0,vby=0,bw,bh;
+  const vb=root.getAttribute('viewBox');
+  if(vb){ const p=vb.trim().split(/[\s,]+/).map(Number); vbx=p[0];vby=p[1];bw=p[2];bh=p[3]; }
+  else { bw=parseFloat(root.getAttribute('width'))||100; bh=parseFloat(root.getAttribute('height'))||100; }
+  logo={ viewBox:`${vbx} ${vby} ${bw} ${bh}`, bw, bh, inner:root.innerHTML, img:null };
+  buildLogoImage();
+  document.getElementById('logoStatus').textContent='✓ SVG geladen';
+}
+
+// minimaler DXF-Parser: LINE, LWPOLYLINE, POLYLINE/VERTEX, CIRCLE, ARC
+function loadDXFLogo(text){
+  const raw=text.split(/\r\n|\r|\n/);
+  const pairs=[];
+  for(let i=0;i+1<raw.length;i+=2) pairs.push([raw[i].trim(), raw[i+1]]);
+  const ents=[]; let cur=null, poly=null, unsupported=false;
+  const flush=()=>{ if(cur){ents.push(cur);cur=null;} };
+  for(const [c,vRaw] of pairs){
+    const code=parseInt(c,10); const v=vRaw!==undefined?vRaw.trim():'';
+    if(code===0){
+      flush();
+      if(poly && v!=='VERTEX'){ ents.push(poly); poly=null; }
+      if(v==='LINE') cur={t:'line'};
+      else if(v==='CIRCLE') cur={t:'circle'};
+      else if(v==='ARC') cur={t:'arc'};
+      else if(v==='LWPOLYLINE') cur={t:'poly',pts:[],closed:false};
+      else if(v==='POLYLINE'){ poly={t:'poly',pts:[],closed:false}; }
+      else if(v==='VERTEX'){ cur={t:'vertex'}; }
+      else if(v==='SEQEND'){ if(poly){ents.push(poly);poly=null;} }
+      else if(['SPLINE','ELLIPSE','TEXT','MTEXT','HATCH','INSERT'].includes(v)){ unsupported=true; }
+      continue;
+    }
+    if(!cur && !poly) continue;
+    const tgt=cur||poly;
+    const f=parseFloat(v);
+    if(cur&&cur.t==='vertex'){
+      if(code===10) cur.x=f; else if(code===20) cur.y=f;
+      continue;
+    }
+    if(code===10){ if(tgt.t==='poly'){tgt._x=f;} else tgt.x1=f; }
+    else if(code===20){ if(tgt.t==='poly'){tgt.pts.push({x:tgt._x,y:f});} else tgt.y1=f; }
+    else if(code===11){ tgt.x2=f; }
+    else if(code===21){ tgt.y2=f; }
+    else if(code===40){ tgt.r=f; }
+    else if(code===50){ tgt.a1=f; }
+    else if(code===51){ tgt.a2=f; }
+    else if(code===70){ if(tgt.t==='poly' && (parseInt(v,10)&1)) tgt.closed=true; }
+  }
+  flush(); if(poly) ents.push(poly);
+  // collect vertices that belonged to POLYLINE (older style): attach to last poly
+  const polys=ents.filter(e=>e.t==='poly');
+  const verts=ents.filter(e=>e.t==='vertex');
+  if(verts.length && polys.length){ const lp=polys[polys.length-1]; if(!lp.pts.length) verts.forEach(vx=>lp.pts.push({x:vx.x,y:vx.y})); }
+
+  // extents
+  let minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9;
+  const upd=(x,y)=>{ if(x<minX)minX=x; if(x>maxX)maxX=x; if(y<minY)minY=y; if(y>maxY)maxY=y; };
+  for(const e of ents){
+    if(e.t==='line'){ upd(e.x1,e.y1); upd(e.x2,e.y2); }
+    else if(e.t==='poly'){ e.pts.forEach(p=>upd(p.x,p.y)); }
+    else if(e.t==='circle'||e.t==='arc'){ upd(e.x1-e.r,e.y1-e.r); upd(e.x1+e.r,e.y1+e.r); }
+  }
+  if(minX>maxX) throw new Error('keine zeichenbaren DXF-Elemente');
+  const bw=Math.max(maxX-minX,0.001), bh=Math.max(maxY-minY,0.001);
+  const FX=x=>(x-minX).toFixed(3), FY=y=>(maxY-y).toFixed(3); // flip y (DXF=y-up → SVG=y-down)
+  let inner='';
+  for(const e of ents){
+    if(e.t==='line'){ inner+=`<line x1="${FX(e.x1)}" y1="${FY(e.y1)}" x2="${FX(e.x2)}" y2="${FY(e.y2)}"/>`; }
+    else if(e.t==='poly' && e.pts.length){
+      const d='M'+e.pts.map(p=>`${FX(p.x)},${FY(p.y)}`).join(' L')+(e.closed?' Z':'');
+      inner+=`<path d="${d}"/>`;
+    }
+    else if(e.t==='circle'){ inner+=`<circle cx="${FX(e.x1)}" cy="${FY(e.y1)}" r="${e.r.toFixed(3)}"/>`; }
+    else if(e.t==='arc'){
+      const a1=e.a1*Math.PI/180, a2=e.a2*Math.PI/180;
+      const sx=e.x1+e.r*Math.cos(a1), sy=e.y1+e.r*Math.sin(a1);
+      const ex=e.x1+e.r*Math.cos(a2), ey=e.y1+e.r*Math.sin(a2);
+      let sweep=e.a2-e.a1; if(sweep<0) sweep+=360; const large=sweep>180?1:0;
+      inner+=`<path d="M${FX(sx)},${FY(sy)} A${e.r.toFixed(3)} ${e.r.toFixed(3)} 0 ${large} 0 ${FX(ex)},${FY(ey)}"/>`;
+    }
+  }
+  inner=`<g fill="none" stroke="#000" stroke-width="${(bw*0.004).toFixed(3)}">${inner}</g>`;
+  logo={ viewBox:`0 0 ${bw.toFixed(3)} ${bh.toFixed(3)}`, bw, bh, inner, img:null };
+  buildLogoImage();
+  document.getElementById('logoStatus').textContent = unsupported
+    ? '✓ DXF geladen — einige komplexe Elemente (z. B. Splines) konnten nicht übernommen werden.'
+    : '✓ DXF geladen';
+}
+
+function handleLogoFile(file){
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const name=(file.name||'').toLowerCase();
+      if(name.endsWith('.dxf')) loadDXFLogo(reader.result);
+      else loadSVGLogo(reader.result);
+      document.getElementById('logoCtrls').style.display='block';
+    }catch(err){ document.getElementById('logoStatus').textContent='⚠ '+err.message; }
+  };
+  reader.readAsText(file);
+}
+
+function drawLogo(s){
+  if(!logo || !logo.img || !logo.img._ready) return;
+  const o=OBJECTS[current], z=o.zone;
+  const Lw=parseFloat(document.getElementById('lw').value);
+  const Lh=Lw*(logo.bh/logo.bw);
+  const ly=parseFloat(document.getElementById('ly').value);
+  let cx=z.x+z.w/2, cy=z.y+z.h/2;
+  if(o.orient==='h') cx+=ly; else cy+=ly;
+  const wpx=Math.max(1,Lw*s.ppmm), hpx=Math.max(1,Lh*s.ppmm);
+  const oc=document.createElement('canvas'); oc.width=Math.ceil(wpx); oc.height=Math.ceil(hpx);
+  const og=oc.getContext('2d');
+  og.drawImage(logo.img,0,0,oc.width,oc.height);
+  og.globalCompositeOperation='source-in';
+  og.fillStyle=inkColor(o); og.fillRect(0,0,oc.width,oc.height);
+  const lang=parseFloat(document.getElementById('lang').value);
+  ctx.save();
+  ctx.translate(px(cx,s),py(cy,s));
+  ctx.rotate(lang*Math.PI/180);
+  ctx.drawImage(oc,-wpx/2,-hpx/2);
+  ctx.restore();
+}
+
+function logoExportSVG(){
+  if(!logo) return '';
+  const o=OBJECTS[current], z=o.zone;
+  const Lw=parseFloat(document.getElementById('lw').value);
+  const Lh=Lw*(logo.bh/logo.bw);
+  const ly=parseFloat(document.getElementById('ly').value);
+  let cx=z.x+z.w/2, cy=z.y+z.h/2;
+  if(o.orient==='h') cx+=ly; else cy+=ly;
+  const lang=parseFloat(document.getElementById('lang').value);
+  return `<g transform="translate(${cx.toFixed(2)},${cy.toFixed(2)}) rotate(${lang})"><svg x="${(-Lw/2).toFixed(2)}" y="${(-Lh/2).toFixed(2)}" width="${Lw.toFixed(2)}" height="${Lh.toFixed(2)}" viewBox="${logo.viewBox}" preserveAspectRatio="xMidYMid meet">${logo.inner}</svg></g>`;
+}
+
+// mm -> px helpers (depend on current scale object s)
+function px(mm,s){ return s.ox + mm*s.ppmm; }
+function py(mm,s){ return s.oy + mm*s.ppmm; }
+function roundRect(g,x,y,w,h,r,s){
+  const X=px(x,s),Y=py(y,s),W=w*s.ppmm,H=h*s.ppmm,R=r*s.ppmm;
+  g.beginPath();
+  g.moveTo(X+R,Y); g.arcTo(X+W,Y,X+W,Y+H,R); g.arcTo(X+W,Y+H,X,Y+H,R);
+  g.arcTo(X,Y+H,X,Y,R); g.arcTo(X,Y,X+W,Y,R); g.closePath();
+}
+function capRatio(css,weight){
+  const key=weight+'|'+css; if(capRatioCache[key]) return capRatioCache[key];
+  const c=document.createElement('canvas'); c.width=200;c.height=200; const g=c.getContext('2d');
+  g.fillStyle='#fff'; g.textAlign='center'; g.textBaseline='alphabetic'; g.font=`${weight} 100px "${css}"`;
+  g.fillText('H',100,150);
+  const p=g.getImageData(0,0,200,200).data; let y0=200,y1=0;
+  for(let y=0;y<200;y++)for(let x=0;x<200;x++){ if(p[(y*200+x)*4+3]>20){ if(y<y0)y0=y; if(y>y1)y1=y; } }
+  const r=(y1>y0)?(y1-y0)/100:0.7; capRatioCache[key]=r; return r;
+}
+function emWidthRatio(str,css,weight){ measCtx.font=`${weight} 100px "${css}"`; return measCtx.measureText(str||'').width/100; }
+
+function getFont(){ const [css,weight]=document.getElementById('font').value.split('|'); return {css,weight}; }
+
+// Compute laid-out text lines fitted into the engraving zone. Returns {lines:[{str,capMM,wmm}], capMM, fits}
+function layout(){
+  const o=OBJECTS[current], z=o.zone, f=getFont();
+  let l1=document.getElementById('l1').value.trim();
+  let l2=document.getElementById('l2').value.trim();
+  let capMM=parseFloat(document.getElementById('cap').value);
+  const strs=[l1,l2].filter(Boolean);
+  if(!strs.length) return {o,z,f,lines:[],capMM,fits:true};
+
+  // available primary axis = width for horizontal, height for vertical
+  const availLen = (o.orient==='h') ? z.w : z.h;
+  const availStack = (o.orient==='h') ? z.h : z.w; // perpendicular budget for stacked lines
+  const cr=capRatio(f.css,f.weight);
+  const gapMM=()=>capMM*0.55;
+
+  let fits=true;
+  // shrink capMM until all lines fit length-wise AND the stack fits
+  for(let i=0;i<200;i++){
+    const widest=Math.max(...strs.map(sx=>emWidthRatio(sx,f.css,f.weight)*(capMM/cr)));
+    const stackH=strs.length*capMM + (strs.length-1)*gapMM();
+    if(widest<=availLen && stackH<=availStack) break;
+    capMM-=0.1;
+    if(capMM<=1.2){ capMM=1.2; fits=false; break; }
+  }
+  const lines=strs.map(sx=>({str:sx, capMM, wmm:emWidthRatio(sx,f.css,f.weight)*(capMM/cr)}));
+  return {o,z,f,lines,capMM,fits};
+}
+
+function computeScale(o){
+  const maxW=520, maxH=460, pad=46;
+  const ppmm=Math.min((maxW-pad)/o.wmm,(maxH-pad)/o.hmm);
+  const cw=o.wmm*ppmm+pad, ch=o.hmm*ppmm+pad;
+  return {ppmm, ox:(cw-o.wmm*ppmm)/2, oy:(ch-o.hmm*ppmm)/2, cw, ch};
+}
+
+function render(){
+  const o=OBJECTS[current];
+  const s=computeScale(o);
+  cv.width=Math.round(s.cw); cv.height=Math.round(s.ch);
+  ctx.clearRect(0,0,cv.width,cv.height);
+
+  // light stage when a real product photo is used (so dark objects pop)
+  cv.style.background = o.img ? (o.stageBg||'#e9edf2') : '#0a0f1c';
+
+  // object: real photo (contain into mm-box) or vector outline
+  if(o.img){
+    const im=getImg(o.img);
+    if(im._ready){
+      const boxW=o.wmm*s.ppmm, boxH=o.hmm*s.ppmm, X=px(0,s), Y=py(0,s);
+      const ia=im.width/im.height, ba=o.wmm/o.hmm;
+      let dw,dh;
+      if(ia>ba){ dw=boxW; dh=boxW/ia; } else { dh=boxH; dw=boxH*ia; }
+      ctx.drawImage(im, X+(boxW-dw)/2, Y+(boxH-dh)/2, dw, dh);
+    }
+  } else {
+    o.draw(ctx,s);
+  }
+
+  // engraving zone frame (dashed)
+  const z=o.zone;
+  ctx.save();
+  ctx.setLineDash([5,4]); ctx.lineWidth=1;
+  ctx.strokeStyle = o.img ? 'rgba(0,120,160,0.55)' : 'rgba(0,212,255,0.5)';
+  ctx.strokeRect(px(z.x,s),py(z.y,s),z.w*s.ppmm,z.h*s.ppmm);
+  ctx.restore();
+
+  // text
+  const L=layout();
+  const cx=z.x+z.w/2, cy=z.y+z.h/2;
+  ctx.save();
+  ctx.translate(px(cx,s),py(cy,s));
+  ctx.rotate(parseFloat(document.getElementById('tang').value)*Math.PI/180);
+  ctx.fillStyle = o.img ? (o.previewInk||'#eef4f8') : '#e8fbff';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  const gapMM=L.capMM*0.55;
+  const lineStepPx=(L.capMM+gapMM)*s.ppmm;
+  const total=L.lines.length;
+  L.lines.forEach((ln,i)=>{
+    const offset=(i-(total-1)/2)*lineStepPx;
+    ctx.font=`${L.f.weight} ${(ln.capMM/capRatio(L.f.css,L.f.weight))*s.ppmm}px "${L.f.css}"`;
+    ctx.fillText(ln.str,0,offset);
+  });
+  ctx.restore();
+
+  // logo overlay
+  drawLogo(s);
+
+  document.getElementById('dims').innerHTML=
+    `Objekt: <b>${o.name}</b> · ${o.sub} &nbsp;|&nbsp; Gravurfläche: <b>${z.w} × ${z.h} mm</b> · Schrift: <b>${L.capMM.toFixed(1)} mm</b>`;
+  document.getElementById('warn').textContent = L.fits ? '' : '⚠ Text zu lang für die Fläche — bitte kürzen.';
+  document.getElementById('capVal').textContent=parseFloat(document.getElementById('cap').value).toFixed(1)+' mm';
+}
+
+// ---------- mm-accurate SVG (LightBurn) ----------
+function escapeXML(s){ return String(s).replace(/[<>&"']/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c])); }
+function renderSVG(){
+  const o=OBJECTS[current], z=o.zone, L=layout(), f=L.f;
+  const cr=capRatio(f.css,f.weight);
+  const cx=z.x+z.w/2, cy=z.y+z.h/2;
+  const gapMM=L.capMM*0.55, total=L.lines.length;
+  const tang=parseFloat(document.getElementById('tang').value);
+  let eng='';
+  L.lines.forEach((ln,i)=>{
+    const off=(i-(total-1)/2)*(L.capMM+gapMM);
+    const fs=(ln.capMM/cr).toFixed(2);
+    eng+=`<text transform="translate(${cx.toFixed(2)},${cy.toFixed(2)}) rotate(${tang})" x="0" y="${off.toFixed(2)}" font-family="${f.css}" font-weight="${f.weight}" font-size="${fs}" text-anchor="middle" dominant-baseline="central" fill="#000">${escapeXML(ln.str)}</text>`;
+  });
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="${o.wmm}mm" height="${o.hmm}mm" viewBox="0 0 ${o.wmm} ${o.hmm}">
+  <g id="Kontur" fill="none" stroke="#cccccc" stroke-width="0.15">
+    <rect x="0.1" y="0.1" width="${(o.wmm-0.2).toFixed(2)}" height="${(o.hmm-0.2).toFixed(2)}" rx="${o.radius}"/>
+    <rect x="${z.x}" y="${z.y}" width="${z.w}" height="${z.h}" stroke="#9bd"/>
+  </g>
+  <g id="Gravur">${eng}${logoExportSVG()}</g>
+</svg>`;
+}
+function downloadSVG(){
+  const blob=new Blob([renderSVG()],{type:'image/svg+xml'});
+  const a=document.createElement('a');
+  a.download=`wolf-${current}-lightburn.svg`; a.href=URL.createObjectURL(blob); a.click();
+}
+
+// default text angle: vertikale Objekte → -90° (Text läuft am Schaft entlang)
+function applyAngleDefault(){
+  const o=OBJECTS[current];
+  const def = o.orient==='v' ? -90 : 0;
+  const t=document.getElementById('tang'); t.value=def;
+  document.getElementById('tangVal').textContent=def+'°';
+}
+
+// ---------- picker ----------
+function buildPicker(){
+  const p=document.getElementById('picker'); p.innerHTML='';
+  Object.entries(OBJECTS).forEach(([k,o])=>{
+    const d=document.createElement('div');
+    d.className='obj'+(k===current?' active':'');
+    d.innerHTML=`${o.name}<small>${o.sub}</small>`;
+    d.onclick=()=>{ current=k; applyAngleDefault(); buildPicker(); render(); };
+    p.appendChild(d);
+  });
+}
+
+// ---------- admin gate (nur Bence) ----------
+(function(){
+  const url=new URL(location.href);
+  const param=(url.searchParams.get('admin')!==null || location.hash.indexOf('admin')>=0);
+  let saved=false;
+  try{ if(param) localStorage.setItem('wl_admin','1'); saved=(localStorage.getItem('wl_admin')==='1'); }catch(e){}
+  if(param || saved){ document.querySelectorAll('.admin-only').forEach(el=>el.style.display='block'); }
+})();
+
+['l1','l2','cap','font','lw','ly','tang','lang'].forEach(id=>document.getElementById(id).addEventListener('input',render));
+document.getElementById('lw').addEventListener('input',()=>document.getElementById('lwVal').textContent=parseFloat(document.getElementById('lw').value).toFixed(1)+' mm');
+document.getElementById('ly').addEventListener('input',()=>document.getElementById('lyVal').textContent=parseFloat(document.getElementById('ly').value).toFixed(1)+' mm');
+document.getElementById('tang').addEventListener('input',()=>document.getElementById('tangVal').textContent=document.getElementById('tang').value+'°');
+document.getElementById('lang').addEventListener('input',()=>document.getElementById('langVal').textContent=document.getElementById('lang').value+'°');
+document.getElementById('logo').addEventListener('change',e=>{ const f=e.target.files[0]; if(f) handleLogoFile(f); });
+document.getElementById('logoClear').onclick=()=>{ logo=null; document.getElementById('logo').value=''; document.getElementById('logoCtrls').style.display='none'; render(); };
+document.getElementById('dlsvg').onclick=downloadSVG;
+document.getElementById('anfrage').onclick=()=>{ alert('Anfrage-Versand wird im nächsten Schritt angebunden (Formspree + Foto-Upload), wie auf der Typenschild-Seite.'); };
+
+applyAngleDefault();
+buildPicker();
+// fonts may load slightly late → re-render once ready
+if(document.fonts && document.fonts.ready){ document.fonts.ready.then(render); }
+render();
+</script>
+</body>
+</html>
