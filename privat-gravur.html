@@ -6,8 +6,8 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Gravur-Studio (intern) | Wolf Lasermark</title>
 <link rel="icon" type="image/png" sizes="48x48" href="images/favicon-48.png">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&family=Great+Vibes&family=Pacifico&family=Caveat:wght@500;700&family=Sacramento&family=Satisfy&family=Permanent+Marker&family=Playfair+Display:wght@600;700&family=Bebas+Neue&family=Oswald:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&family=Great+Vibes&family=Pacifico&family=Caveat:wght@500;700&family=Sacramento&family=Satisfy&family=Permanent+Marker&family=Playfair+Display:wght@600;700&family=Bebas+Neue&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#020617; --s1:#0b1120; --s2:#111827; --s3:#1e293b;
@@ -366,24 +366,32 @@ let lineStyle=[newStyle()];
 let textAng=0;         // Winkel des Text-Blocks — entkoppelt vom Schieberegler, damit dieser die aktive Auswahl dreht
 let textCap=4;         // Schrifthöhe des Block-Texts — entkoppelt, damit der Höhe-Regler die aktive Auswahl ändert
 const MAX_ZEILEN=8;
-// Nur 3 Schriftarten: dünn / fett / handschriftlich — plus Schalter kursiv/fett/unterstrichen.
+// Echte Schriftarten in 3 Kategorien (je 2) — plus Schalter kursiv/fett/unterstrichen.
+// Der Fett-Schalter erhöht die Strichstärke; die Grundschriften sind absichtlich NICHT fett,
+// damit der Schalter sichtbar wirkt.
 const FONT_FAMS={
-  thin: {label:'Dünn',           css:'Arial',           weight:400},
-  bold: {label:'Fett',           css:'Arial',           weight:800},
-  hand: {label:'Handschrift',    css:'Snell Roundhand', weight:700}
+  arial:    {label:'Arial',       cat:'Schlank',     css:'Arial',         weight:400},
+  dmsans:   {label:'DM Sans',     cat:'Schlank',     css:'DM Sans',       weight:400},
+  oswald:   {label:'Oswald',      cat:'Kräftig',     css:'Oswald',        weight:600},
+  bebas:    {label:'Bebas Neue',  cat:'Kräftig',     css:'Bebas Neue',    weight:400},
+  pacifico: {label:'Pacifico',    cat:'Handschrift', css:'Pacifico',      weight:400},
+  caveat:   {label:'Caveat',      cat:'Handschrift', css:'Caveat',        weight:500}
 };
-function newStyle(){ return {fam:'thin', italic:false, bold:false, underline:false}; }
+const FONT_FAM_DEFAULT='arial';
+function newStyle(){ return {fam:'arial', italic:false, bold:false, underline:false}; }
 function getLines(){ return zeileVals.map(v=>v.trim()).filter(Boolean); }
 function fontOf(i){
   const st=lineStyle[i]||lineStyle[0]||newStyle();
-  const fam=FONT_FAMS[st.fam]||FONT_FAMS.thin;
-  return { css:fam.css, weight: st.bold?900:fam.weight, italic:!!st.italic, underline:!!st.underline };
+  const fam=FONT_FAMS[st.fam]||FONT_FAMS[FONT_FAM_DEFAULT];
+  return { css:fam.css, weight: st.bold?Math.min(900,fam.weight+300):fam.weight, italic:!!st.italic, underline:!!st.underline };
 }
 function blockEntries(){ return zeileVals.map((v,i)=>({str:v.trim(),oi:i})).filter(e=>e.str && lineGeom[e.oi]==null); }
 function blockStrs(){ return blockEntries().map(e=>e.str); }
 function buildZeilen(){
   const wrap=document.getElementById('zeilen'); wrap.innerHTML='';
-  const FAM_OPTS=Object.entries(FONT_FAMS).map(([k,v])=>`<option value="${k}">${v.label}</option>`).join('');
+  const FAM_CATS={};
+  Object.entries(FONT_FAMS).forEach(([k,v])=>{ (FAM_CATS[v.cat]=FAM_CATS[v.cat]||[]).push(`<option value="${k}">${v.label}</option>`); });
+  const FAM_OPTS=Object.entries(FAM_CATS).map(([cat,opts])=>`<optgroup label="${cat}">${opts.join('')}</optgroup>`).join('');
   zeileVals.forEach((val,idx)=>{
     const f=document.createElement('div'); f.className='field'; f.style.marginBottom='.55rem';
     const lbl=document.createElement('label'); lbl.textContent='Zeile '+(idx+1)+(idx>0?' (optional)':'');
