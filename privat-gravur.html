@@ -157,45 +157,7 @@ input[type=range]{flex:1;accent-color:var(--accent)}
         <div id="zeilen"></div>
         <button type="button" id="addZeile" class="tool-btn" style="width:100%;margin:.2rem 0 .5rem;justify-content:center">＋ Zeile hinzufügen</button>
         <button type="button" id="mergeZeilen" class="tool-btn" style="width:100%;margin:0 0 .9rem;justify-content:center">🔗 Alle Zeilen zusammenfügen</button>
-        <div class="field">
-          <label for="font">Standard-Schriftart <span style="color:var(--muted);font-weight:500">(gilt für Zeilen ohne eigene Wahl – je Zeile unten einstellbar)</span></label>
-          <select id="font">
-            <optgroup label="Klassisch (auch in LightBurn)">
-              <option value="Arial|400">Arial</option>
-              <option value="Arial|700">Arial Fett</option>
-              <option value="Times New Roman|400">Times New Roman</option>
-              <option value="Georgia|700">Georgia (Serif)</option>
-              <option value="Courier New|700">Courier (technisch)</option>
-              <option value="Impact|400">Impact</option>
-              <option value="Verdana|700">Verdana</option>
-            </optgroup>
-            <optgroup label="Handschrift (Apple / macOS)">
-              <option value="Snell Roundhand|700">Snell Roundhand</option>
-              <option value="Bradley Hand|700">Bradley Hand</option>
-              <option value="Noteworthy|700">Noteworthy</option>
-              <option value="Marker Felt|400">Marker Felt</option>
-              <option value="Apple Chancery|400">Apple Chancery</option>
-              <option value="Chalkboard SE|400">Chalkboard SE</option>
-              <option value="Zapfino|400">Zapfino</option>
-            </optgroup>
-            <optgroup label="Schreibschrift (Web)">
-              <option value="Dancing Script|700">Dancing Script</option>
-              <option value="Great Vibes|400">Great Vibes</option>
-              <option value="Pacifico|400">Pacifico</option>
-              <option value="Caveat|700">Caveat</option>
-              <option value="Sacramento|400">Sacramento</option>
-              <option value="Satisfy|400">Satisfy</option>
-              <option value="Permanent Marker|400">Permanent Marker</option>
-            </optgroup>
-            <optgroup label="Modern / Display">
-              <option value="DM Sans|600" selected>DM Sans (modern)</option>
-              <option value="Syne|800">Syne (kräftig)</option>
-              <option value="Playfair Display|700">Playfair Display</option>
-              <option value="Bebas Neue|400">Bebas Neue</option>
-              <option value="Oswald|600">Oswald</option>
-            </optgroup>
-          </select>
-        </div>
+        <p class="sub" style="margin:.2rem 0 .6rem;font-size:.82rem;color:var(--muted)">Schriftart &amp; Stil stellst du <b>je Zeile</b> direkt unter der Zeile ein.</p>
         <div class="row2">
           <div class="field" style="margin-bottom:0">
             <label>Schrifthöhe <span class="rval" id="capVal">4.0 mm</span></label>
@@ -372,25 +334,23 @@ function snapshotDesign(){
   return {
     zeileVals: zeileVals.slice(),
     lineGeom: lineGeom.map(g=> g?{...g}:null),
-    lineFonts: lineFonts.slice(),
+    lineStyle: lineStyle.map(s=>({...s})),
     items: items.map(it=>{ const c=Object.assign({},it); delete c.img; return c; }),
-    textPos: {...textPos}, textScaleX, textAng, textCap,
-    fontVal: document.getElementById('font').value
+    textPos: {...textPos}, textScaleX, textAng, textCap
   };
 }
 function restoreDesign(d){
   if(!d){
-    zeileVals=['Max Mustermann']; lineGeom=[null]; lineFonts=['']; items=[];
+    zeileVals=['Max Mustermann']; lineGeom=[null]; lineStyle=[newStyle()]; items=[];
     textPos={x:null,y:null}; textScaleX=1; textCap=4;
     applyAngleDefault();
     return;
   }
   zeileVals=d.zeileVals.slice();
   lineGeom=d.lineGeom.map(g=> g?{...g}:null);
-  lineFonts=d.lineFonts.slice();
+  lineStyle=(d.lineStyle||zeileVals.map(()=>newStyle())).map(s=>({...s}));
   items=d.items.map(it=>{ const c=Object.assign({},it); makeItemImg(c); return c; });
   textPos={...d.textPos}; textScaleX=d.textScaleX; textCap=d.textCap;
-  if(d.fontVal){ const fs=document.getElementById('font'); fs.value=d.fontVal; }
   textAng=d.textAng; setTangSlider(textAng);
 }
 let textPos={x:null,y:null}; // mm-Mittelpunkt des Textes (null=Zonen-Mitte)
@@ -401,19 +361,29 @@ let selId=null;    // ausgewähltes Element-id (oder 'text' / 'zone' / null)
 const EMOJI_RE2=/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{2300}-\u{23FF}\u{2190}-\u{21FF}\u{FE00}-\u{FE0F}\u{200D}\u{20E3}]/gu;
 let zeileVals=['Max Mustermann'];
 let lineGeom=[null];   // pro Zeile: null=im Block (gestapelt) | {x,y,angle,cap,scaleX}=frei platziert
-let lineFonts=[''];    // pro Zeile: ''=Standard (globale Auswahl) | "css|weight"
+// Pro Zeile EIGENER, KONKRETER Stil (keine Vererbung, kein globales Überschreiben → springt nicht mehr).
+let lineStyle=[newStyle()];
 let textAng=0;         // Winkel des Text-Blocks — entkoppelt vom Schieberegler, damit dieser die aktive Auswahl dreht
 let textCap=4;         // Schrifthöhe des Block-Texts — entkoppelt, damit der Höhe-Regler die aktive Auswahl ändert
 const MAX_ZEILEN=8;
+// Nur 3 Schriftarten: dünn / fett / handschriftlich — plus Schalter kursiv/fett/unterstrichen.
+const FONT_FAMS={
+  thin: {label:'Dünn',           css:'Arial',           weight:400},
+  bold: {label:'Fett',           css:'Arial',           weight:800},
+  hand: {label:'Handschrift',    css:'Snell Roundhand', weight:700}
+};
+function newStyle(){ return {fam:'thin', italic:false, bold:false, underline:false}; }
 function getLines(){ return zeileVals.map(v=>v.trim()).filter(Boolean); }
-function defFontVal(){ return document.getElementById('font').value; }
-function fontValOf(i){ return lineFonts[i] || defFontVal(); }
-function fontOf(i){ const [css,weight]=fontValOf(i).split('|'); return {css,weight}; }
+function fontOf(i){
+  const st=lineStyle[i]||lineStyle[0]||newStyle();
+  const fam=FONT_FAMS[st.fam]||FONT_FAMS.thin;
+  return { css:fam.css, weight: st.bold?900:fam.weight, italic:!!st.italic, underline:!!st.underline };
+}
 function blockEntries(){ return zeileVals.map((v,i)=>({str:v.trim(),oi:i})).filter(e=>e.str && lineGeom[e.oi]==null); }
 function blockStrs(){ return blockEntries().map(e=>e.str); }
 function buildZeilen(){
   const wrap=document.getElementById('zeilen'); wrap.innerHTML='';
-  const FONT_OPTS=document.getElementById('font').innerHTML;
+  const FAM_OPTS=Object.entries(FONT_FAMS).map(([k,v])=>`<option value="${k}">${v.label}</option>`).join('');
   zeileVals.forEach((val,idx)=>{
     const f=document.createElement('div'); f.className='field'; f.style.marginBottom='.55rem';
     const lbl=document.createElement('label'); lbl.textContent='Zeile '+(idx+1)+(idx>0?' (optional)':'');
@@ -436,15 +406,29 @@ function buildZeilen(){
     if(zeileVals.length>1){
       const del=document.createElement('button'); del.type='button'; del.className='tool-btn danger'; del.textContent='✕';
       del.style.flex='0 0 auto'; del.style.padding='.5rem .6rem'; del.title='Zeile entfernen';
-      del.onclick=()=>{ zeileVals.splice(idx,1); lineGeom.splice(idx,1); lineFonts.splice(idx,1); if(typeof selId==='string'&&selId.indexOf('line:')===0) selId=null; buildZeilen(); showSel(); render(); };
+      del.onclick=()=>{ zeileVals.splice(idx,1); lineGeom.splice(idx,1); lineStyle.splice(idx,1); if(typeof selId==='string'&&selId.indexOf('line:')===0) selId=null; buildZeilen(); showSel(); render(); };
       rowEl.appendChild(del);
     }
+    // Stil-Zeile: Schriftart (3) + Schalter Kursiv / Fett / Unterstrichen — wirkt NUR auf diese Zeile.
+    const st=lineStyle[idx]||(lineStyle[idx]=newStyle());
+    const styleRow=document.createElement('div');
+    styleRow.style.display='flex'; styleRow.style.gap='.4rem'; styleRow.style.alignItems='center'; styleRow.style.marginTop='.4rem';
     const fsel=document.createElement('select');
-    fsel.innerHTML=FONT_OPTS; fsel.value=fontValOf(idx);
-    fsel.style.marginTop='.4rem'; fsel.style.fontSize='.82rem'; fsel.style.padding='.5rem .6rem';
+    fsel.innerHTML=FAM_OPTS; fsel.value=st.fam;
+    fsel.style.flex='1'; fsel.style.fontSize='.82rem'; fsel.style.padding='.5rem .6rem';
     fsel.title='Schriftart dieser Zeile';
-    fsel.onchange=()=>{ lineFonts[idx]=fsel.value; render(); };
-    f.appendChild(lbl); f.appendChild(rowEl); f.appendChild(fsel); wrap.appendChild(f);
+    fsel.onchange=()=>{ st.fam=fsel.value; render(); };
+    styleRow.appendChild(fsel);
+    [['italic','𝘐','Kursiv'],['bold','B','Fett'],['underline','U','Unterstrichen']].forEach(([key,txt,tip])=>{
+      const b=document.createElement('button'); b.type='button';
+      b.className='tool-btn'+(st[key]?' active':''); b.textContent=txt; b.title=tip;
+      b.style.flex='0 0 auto'; b.style.padding='.5rem .7rem'; b.style.fontWeight='800';
+      if(key==='italic') b.style.fontStyle='italic';
+      if(key==='underline') b.style.textDecoration='underline';
+      b.onclick=()=>{ st[key]=!st[key]; b.classList.toggle('active',st[key]); render(); };
+      styleRow.appendChild(b);
+    });
+    f.appendChild(lbl); f.appendChild(rowEl); f.appendChild(styleRow); wrap.appendChild(f);
   });
   const addBtn=document.getElementById('addZeile');
   if(addBtn) addBtn.style.display = zeileVals.length>=MAX_ZEILEN ? 'none' : 'flex';
@@ -630,7 +614,6 @@ function capRatio(css,weight){
 }
 function emWidthRatio(str,css,weight){ measCtx.font=`${weight} 100px "${css}"`; return measCtx.measureText(str||'').width/100; }
 
-function getFont(){ const [css,weight]=document.getElementById('font').value.split('|'); return {css,weight}; }
 
 // Compute laid-out text lines fitted into the engraving zone. Returns {lines:[{str,capMM,wmm}], capMM, fits}
 function layout(){
@@ -715,8 +698,10 @@ function render(){
   const total=L.lines.length;
   L.lines.forEach((ln,i)=>{
     const offset=(i-(total-1)/2)*lineStepPx;
-    ctx.font=`${ln.f.weight} ${(ln.capMM/capRatio(ln.f.css,ln.f.weight))*s.ppmm}px "${ln.f.css}"`;
+    const sizePx=(ln.capMM/capRatio(ln.f.css,ln.f.weight))*s.ppmm;
+    ctx.font=`${ln.f.italic?'italic ':''}${ln.f.weight} ${sizePx}px "${ln.f.css}"`;
     ctx.fillText(ln.str,0,offset);
+    if(ln.f.underline){ const w=ctx.measureText(ln.str).width; ctx.fillRect(-w/2, offset+sizePx*0.42, w, Math.max(1,sizePx*0.06)); }
   });
   ctx.restore();
 
@@ -731,8 +716,10 @@ function render(){
       ctx.scale(lg.scaleX,1);
       ctx.fillStyle=inkColor(o);
       ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.font=`${ff.weight} ${(lg.cap/fcr)*s.ppmm}px "${ff.css}"`;
+      const sizePx=(lg.cap/fcr)*s.ppmm;
+      ctx.font=`${ff.italic?'italic ':''}${ff.weight} ${sizePx}px "${ff.css}"`;
       ctx.fillText(str,0,0);
+      if(ff.underline){ const w=ctx.measureText(str).width; ctx.fillRect(-w/2, sizePx*0.42, w, Math.max(1,sizePx*0.06)); }
       ctx.restore();
     });
   }
@@ -796,14 +783,16 @@ function renderSVG(){
     const off=(i-(total-1)/2)*(L.capMM+gapMM);
     const cr=capRatio(ln.f.css,ln.f.weight);
     const fs=(ln.capMM/cr).toFixed(2);
-    eng+=`<text transform="translate(${tc.x.toFixed(2)},${tc.y.toFixed(2)}) rotate(${tang}) scale(${textScaleX.toFixed(4)},1)" x="0" y="${off.toFixed(2)}" font-family="${ln.f.css}" font-weight="${ln.f.weight}" font-size="${fs}" text-anchor="middle" dominant-baseline="central" fill="#000">${escapeXML(ln.str)}</text>`;
+    const st=`${ln.f.italic?' font-style="italic"':''}${ln.f.underline?' text-decoration="underline"':''}`;
+    eng+=`<text transform="translate(${tc.x.toFixed(2)},${tc.y.toFixed(2)}) rotate(${tang}) scale(${textScaleX.toFixed(4)},1)" x="0" y="${off.toFixed(2)}" font-family="${ln.f.css}" font-weight="${ln.f.weight}"${st} font-size="${fs}" text-anchor="middle" dominant-baseline="central" fill="#000">${escapeXML(ln.str)}</text>`;
   });
   let freeEng='';
   zeileVals.forEach((v,i)=>{
     const str=v.trim(), lg=lineGeom[i]; if(!str||!lg) return;
     const ff=fontOf(i), cr=capRatio(ff.css,ff.weight);
     const fs=(lg.cap/cr).toFixed(2);
-    freeEng+=`<text transform="translate(${lg.x.toFixed(2)},${lg.y.toFixed(2)}) rotate(${lg.angle}) scale(${lg.scaleX.toFixed(4)},1)" x="0" y="0" font-family="${ff.css}" font-weight="${ff.weight}" font-size="${fs}" text-anchor="middle" dominant-baseline="central" fill="#000">${escapeXML(str)}</text>`;
+    const st=`${ff.italic?' font-style="italic"':''}${ff.underline?' text-decoration="underline"':''}`;
+    freeEng+=`<text transform="translate(${lg.x.toFixed(2)},${lg.y.toFixed(2)}) rotate(${lg.angle}) scale(${lg.scaleX.toFixed(4)},1)" x="0" y="0" font-family="${ff.css}" font-weight="${ff.weight}"${st} font-size="${fs}" text-anchor="middle" dominant-baseline="central" fill="#000">${escapeXML(str)}</text>`;
   });
   eng+=freeEng;
   const itemsSVG=items.map(itemExportSVG).join('');
@@ -1174,11 +1163,7 @@ document.getElementById('cap').addEventListener('input',()=>{
   else if(!items.find(i=>i.id===selId)){ textCap=v; }  // Elemente nutzen den Größe-Regler in der Auswahl-Box
   render();
 });
-// globale Schriftart = STANDARD: gilt nur für Zeilen ohne eigene Wahl;
-// individuell gesetzte Zeilen bleiben unverändert (kein Überschreiben mehr).
-document.getElementById('font').addEventListener('input',()=>{
-  buildZeilen(); render();
-});
+// Schriftart/Stil wird je Zeile direkt unter der Zeile gesetzt (buildZeilen) — kein globaler Regler mehr.
 // Drehen-Schieberegler dreht die AKTUELLE Auswahl (Block-Text / freie Zeile / Element)
 document.getElementById('tang').addEventListener('input',()=>{
   const v=parseFloat(document.getElementById('tang').value);
@@ -1209,7 +1194,7 @@ document.getElementById('anfrage').onclick=()=>{ alert('Anfrage-Versand wird im 
 // Zeile hinzufügen
 document.getElementById('addZeile').addEventListener('click',()=>{
   if(zeileVals.length>=MAX_ZEILEN) return;
-  zeileVals.push(''); lineGeom.push(null); lineFonts.push(''); buildZeilen(); render();
+  zeileVals.push(''); lineGeom.push(null); lineStyle.push(newStyle()); buildZeilen(); render();
   const inps=document.querySelectorAll('#zeilen .zeile-input');
   if(inps.length) inps[inps.length-1].focus();
 });
