@@ -112,6 +112,32 @@ input[type=range]{flex:1;accent-color:var(--accent)}
 .tool-btn.active{border-color:var(--accent);color:var(--text);background:rgba(0,212,255,0.14)}
 .note{font-size:.78rem;color:var(--muted);margin-top:1rem;border-top:1px solid rgba(255,255,255,0.06);padding-top:.8rem}
 
+/* Stage-Toolbar (Undo/Redo/Bild) */
+.stage-bar{display:flex;gap:.4rem;align-self:stretch;justify-content:center;flex-wrap:wrap}
+.stage-bar .tool-btn{flex:0 0 auto;padding:.45rem .7rem}
+.stage-bar .tool-btn:disabled{opacity:.35;cursor:default;border-color:rgba(255,255,255,0.12);color:var(--muted);background:rgba(255,255,255,0.04)}
+
+/* Vorlagen (Templates) */
+.tpl-row{display:flex;gap:.45rem;overflow-x:auto;padding:.1rem .1rem .5rem;margin-bottom:.7rem}
+.tpl-chip{flex:0 0 auto;cursor:pointer;font-family:inherit;font-size:.8rem;font-weight:600;color:var(--muted2);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:999px;padding:.45rem .85rem;white-space:nowrap;transition:.15s}
+.tpl-chip:hover{border-color:var(--accent);color:var(--text);background:rgba(0,212,255,0.08)}
+
+/* Preis-Anzeige */
+.price{display:flex;align-items:baseline;justify-content:space-between;gap:.6rem;background:rgba(0,212,255,0.06);border:1px solid var(--border);border-radius:13px;padding:.7rem .95rem;margin:.4rem 0 .2rem}
+.price .pl{font-size:.82rem;font-weight:600;color:var(--muted2)}
+.price .pv{font-family:'Syne',sans-serif;font-weight:800;font-size:1.25rem;color:var(--accent)}
+.price small{display:block;font-size:.68rem;font-weight:500;color:var(--muted);text-align:right;margin-top:.1rem}
+
+/* Onboarding-Overlay */
+.ob-back{position:fixed;inset:0;z-index:200;background:rgba(2,6,23,0.78);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:1.2rem}
+.ob-card{max-width:430px;width:100%;background:linear-gradient(180deg,var(--s2),var(--s1));border:1px solid var(--border);border-radius:20px;padding:1.6rem 1.5rem;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.ob-card h3{font-family:'Syne',sans-serif;font-size:1.25rem;margin-bottom:.2rem}
+.ob-card .ob-ic{font-size:2.4rem;line-height:1;margin-bottom:.5rem}
+.ob-steps{text-align:left;margin:1rem 0 1.3rem;display:flex;flex-direction:column;gap:.7rem}
+.ob-step{display:flex;gap:.7rem;align-items:flex-start;font-size:.9rem;color:var(--muted2)}
+.ob-step b{color:var(--text)}
+.ob-num{flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:rgba(0,212,255,0.14);border:1px solid var(--border);color:var(--accent);font-weight:800;font-size:.85rem;display:flex;align-items:center;justify-content:center}
+
 @media(max-width:840px){ .studio{grid-template-columns:1fr} }
 </style>
 </head>
@@ -142,6 +168,11 @@ input[type=range]{flex:1;accent-color:var(--accent)}
       <canvas id="cv" width="600" height="600"></canvas>
       <div class="dims" id="dims"></div>
       <div class="warn" id="warn"></div>
+      <div class="stage-bar">
+        <button class="tool-btn" id="undoBtn" title="Rückgängig (Strg+Z)">↶ Rückgängig</button>
+        <button class="tool-btn" id="redoBtn" title="Wiederholen (Strg+Y)">↷ Wiederholen</button>
+        <button class="tool-btn" id="saveImg" title="Vorschau als PNG speichern">🖼 Als Bild speichern</button>
+      </div>
     </div>
 
     <div class="panel">
@@ -154,6 +185,7 @@ input[type=range]{flex:1;accent-color:var(--accent)}
       </div>
 
       <div class="seg-pane active" id="pane-text">
+        <div class="tpl-row" id="tplRow"></div>
         <div id="zeilen"></div>
         <button type="button" id="addZeile" class="tool-btn" style="width:100%;margin:.2rem 0 .5rem;justify-content:center">＋ Zeile hinzufügen</button>
         <button type="button" id="mergeZeilen" class="tool-btn" style="width:100%;margin:0 0 .9rem;justify-content:center">🔗 Alle Zeilen zusammenfügen</button>
@@ -209,7 +241,11 @@ input[type=range]{flex:1;accent-color:var(--accent)}
 
       <button type="button" class="tool-btn admin-only" id="zoneBtn" style="width:100%;margin-top:1rem;justify-content:center">▦ Gravurbereich anpassen (Admin)</button>
       <div class="admin-only" id="zoneReadout" style="display:none;font:600 .8rem/1.4 monospace;color:#7fdfff;margin-top:.5rem;text-align:center"></div>
-      <div class="btnrow" style="margin-top:1.1rem">
+      <div class="price" id="priceBox">
+        <div><span class="pl">Preis (Richtwert)</span></div>
+        <div style="text-align:right"><span class="pv" id="priceVal">–</span><small id="priceBreak"></small></div>
+      </div>
+      <div class="btnrow" style="margin-top:.6rem">
         <button class="btn btn-ghost admin-only" id="dlsvg">⬇ LightBurn-SVG</button>
         <button class="btn btn-primary" id="anfrage">Gravur anfragen</button>
       </div>
@@ -218,6 +254,20 @@ input[type=range]{flex:1;accent-color:var(--accent)}
   </div>
 
   <p style="text-align:center;font-size:.72rem;color:#5b6b85;margin:1.8rem 0 .6rem">Motive: <a href="https://game-icons.net" target="_blank" rel="noopener" style="color:#7a8db0">game-icons.net</a> (CC BY 3.0)</p>
+</div>
+
+<div class="ob-back" id="obBack" style="display:none">
+  <div class="ob-card">
+    <div class="ob-ic">✨</div>
+    <h3>Willkommen im Gravur-Studio</h3>
+    <p class="sub" style="margin:.3rem 0 0">In 3 Schritten zu deiner persönlichen Gravur.</p>
+    <div class="ob-steps">
+      <div class="ob-step"><span class="ob-num">1</span><span><b>Objekt wählen</b> — z. B. Flaschenöffner oder Schlüsselhänger.</span></div>
+      <div class="ob-step"><span class="ob-num">2</span><span><b>Text &amp; Motive</b> gestalten — Schrift, Stil und Symbole je Zeile frei einstellen.</span></div>
+      <div class="ob-step"><span class="ob-num">3</span><span><b>Frei platzieren</b> — alles im Bild ziehen, drehen, größer/kleiner machen. Dann anfragen.</span></div>
+    </div>
+    <button class="btn btn-primary" id="obStart" style="width:100%">Los geht's</button>
+  </div>
 </div>
 
 <script>
@@ -563,7 +613,7 @@ function handleLogoFile(file){
     try{
       const name=(file.name||'').toLowerCase();
       const spec = name.endsWith('.dxf') ? parseDXF(reader.result) : parseSVG(reader.result);
-      addItem(Object.assign({label:'Logo'}, spec));
+      addItem(Object.assign({label:'Logo', _logo:true}, spec));
       document.getElementById('logoStatus').textContent = spec.unsupported
         ? '✓ DXF geladen — einige komplexe Elemente (z. B. Splines) fehlen.'
         : '✓ geladen — in der Vorschau platzieren.';
@@ -582,8 +632,17 @@ function drawItem(it,s,o){
   og.globalCompositeOperation='source-in'; og.fillStyle=inkColor(o); og.fillRect(0,0,oc.width,oc.height);
   ctx.save();
   ctx.translate(px(it.x,s),py(it.y,s)); ctx.rotate(it.angle*Math.PI/180);
+  setEngrave(ctx,s,o);
   ctx.drawImage(oc,-wpx/2,-hpx/2);
   ctx.restore();
+}
+// Gravur-Tiefe: weiche dunkle Schattenkante → die helle Lasermarkierung wirkt eingelassen (nur Foto-Objekte).
+function setEngrave(ctx,s,o){
+  if(!o.img) return;
+  ctx.shadowColor='rgba(0,0,0,0.5)';
+  ctx.shadowBlur=Math.max(0.8, s.ppmm*0.45);
+  ctx.shadowOffsetX=s.ppmm*0.22;
+  ctx.shadowOffsetY=s.ppmm*0.22;
 }
 function itemExportSVG(it){
   const hmm=it.hmm!=null?it.hmm:it.wmm*(it.bh/it.bw);
@@ -686,11 +745,13 @@ function render(){
 
   // engraving zone frame (dashed)
   const z=o.zone;
-  ctx.save();
-  ctx.setLineDash([5,4]); ctx.lineWidth=1;
-  ctx.strokeStyle = o.img ? 'rgba(0,120,160,0.55)' : 'rgba(0,212,255,0.5)';
-  ctx.strokeRect(px(z.x,s),py(z.y,s),z.w*s.ppmm,z.h*s.ppmm);
-  ctx.restore();
+  if(!exporting){
+    ctx.save();
+    ctx.setLineDash([5,4]); ctx.lineWidth=1;
+    ctx.strokeStyle = o.img ? 'rgba(0,120,160,0.55)' : 'rgba(0,212,255,0.5)';
+    ctx.strokeRect(px(z.x,s),py(z.y,s),z.w*s.ppmm,z.h*s.ppmm);
+    ctx.restore();
+  }
 
   // text
   const L=layout();
@@ -700,6 +761,7 @@ function render(){
   ctx.rotate(textAng*Math.PI/180);
   ctx.scale(textScaleX,1);
   ctx.fillStyle = inkColor(o);
+  setEngrave(ctx,s,o);
   ctx.textAlign='center'; ctx.textBaseline='middle';
   const gapMM=L.capMM*0.55;
   const lineStepPx=(L.capMM+gapMM)*s.ppmm;
@@ -723,6 +785,7 @@ function render(){
       ctx.rotate(lg.angle*Math.PI/180);
       ctx.scale(lg.scaleX,1);
       ctx.fillStyle=inkColor(o);
+      setEngrave(ctx,s,o);
       ctx.textAlign='center'; ctx.textBaseline='middle';
       const sizePx=(lg.cap/fcr)*s.ppmm;
       ctx.font=`${ff.italic?'italic ':''}${ff.weight} ${sizePx}px "${ff.css}"`;
@@ -735,8 +798,18 @@ function render(){
   // elements (cliparts + logos)
   items.forEach(it=>drawItem(it,s,o));
 
+  // leere Fläche → Platzhalter-Hinweis
+  if(!exporting && getLines().length===0 && items.length===0){
+    ctx.save();
+    ctx.fillStyle = o.img ? 'rgba(40,70,90,0.55)' : 'rgba(180,220,240,0.5)';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.font=`600 ${Math.max(11, s.ppmm*3)}px "DM Sans"`;
+    ctx.fillText('Schreib deinen Text…', px(z.x+z.w/2,s), py(z.y+z.h/2,s));
+    ctx.restore();
+  }
+
   // selection highlight + handles (item OR text)
-  const g=selGeom();
+  const g=exporting?null:selGeom();
   // Hilfslinien: erscheinen, wenn das gewählte Element mittig in der Gravurzone sitzt
   if(g && selId!=='zone'){
     const zcx=z.x+z.w/2, zcy=z.y+z.h/2, tol=0.35;
@@ -777,6 +850,7 @@ function render(){
     `Objekt: <b>${o.name}</b> · ${o.sub} &nbsp;|&nbsp; Gravurfläche: <b>${z.w} × ${z.h} mm</b> · Schrift: <b>${L.capMM.toFixed(1)} mm</b>`;
   document.getElementById('warn').textContent = L.fits ? '' : '⚠ Text zu lang für die Fläche — bitte kürzen.';
   document.getElementById('capVal').textContent=parseFloat(document.getElementById('cap').value).toFixed(1)+' mm';
+  if(!exporting){ updatePrice(); histSchedule(); }
 }
 
 // ---------- mm-accurate SVG (LightBurn) ----------
@@ -835,6 +909,118 @@ function setCapSlider(v){
   document.getElementById('capVal').textContent=parseFloat(c.value).toFixed(1)+' mm';
 }
 function selLineGeom(){ return (typeof selId==='string'&&selId.indexOf('line:')===0) ? lineGeom[+selId.slice(5)] : null; }
+
+// ---------- Preis-Kalkulation (Richtwerte — von Bence final zu bestätigen) ----------
+const PRICING={
+  base:{ card:9.90, key:7.90 },   // Grundpreis je Objekt
+  baseDefault:9.90,
+  perExtraLine:1.50,              // je zusätzliche Textzeile (1. Zeile inkl.)
+  perMotif:2.00,                  // je Motiv/Clipart
+  perLogo:3.00                    // je hochgeladenes Logo
+};
+function fmtEUR(v){ return v.toFixed(2).replace('.',',')+' €'; }
+function calcPrice(){
+  const base = PRICING.base[current]!=null ? PRICING.base[current] : PRICING.baseDefault;
+  const lines=getLines().length;
+  const extraLines=Math.max(0, lines-1);
+  const motifs=items.filter(it=>!it._logo).length;
+  const logos=items.filter(it=>it._logo).length;
+  const total=base + extraLines*PRICING.perExtraLine + motifs*PRICING.perMotif + logos*PRICING.perLogo;
+  return {base,extraLines,motifs,logos,total};
+}
+function updatePrice(){
+  const p=calcPrice();
+  const vEl=document.getElementById('priceVal'); if(!vEl) return;
+  vEl.textContent='ca. '+fmtEUR(p.total);
+  const parts=[];
+  if(p.extraLines) parts.push(p.extraLines+'× Zeile');
+  if(p.motifs) parts.push(p.motifs+'× Motiv');
+  if(p.logos) parts.push(p.logos+'× Logo');
+  document.getElementById('priceBreak').textContent = parts.length ? 'Basis + '+parts.join(' + ') : 'inkl. 1 Zeile';
+}
+
+// ---------- Vorlagen (Templates) — 1-Klick-Start, frei anpassbar ----------
+const TEMPLATES=[
+  { key:'name_datum', label:'👤 Name & Datum', apply(){
+      zeileVals=['Max Mustermann','01.01.2025'];
+      lineStyle=[{fam:'oswald',italic:false,bold:false,underline:false},{fam:'caveat',italic:true,bold:false,underline:false}];
+      lineGeom=[null,null]; items=[];
+    }},
+  { key:'spruch', label:'💬 Spruch', apply(){
+      zeileVals=['Alles Gute','zum Geburtstag'];
+      lineStyle=[{fam:'pacifico',italic:false,bold:false,underline:false},{fam:'dmsans',italic:false,bold:false,underline:false}];
+      lineGeom=[null,null]; items=[];
+    }},
+  { key:'schlicht', label:'✏️ Schlicht', apply(){
+      zeileVals=['Dein Text'];
+      lineStyle=[{fam:'arial',italic:false,bold:false,underline:false}];
+      lineGeom=[null]; items=[];
+    }},
+  { key:'mit_herz', label:'❤ Mit Herz', apply(){
+      zeileVals=['Für immer'];
+      lineStyle=[{fam:'caveat',italic:false,bold:false,underline:false}];
+      lineGeom=[null]; items=[];
+      const z=OBJECTS[current].zone;
+      if(CLIPARTS.heart){ addItem({label:CLIPARTS.heart.name, viewBox:CLIPARTS.heart.vb, inner:CLIPARTS.heart.inner, x:z.x+z.w/2, y:z.y+z.h*0.28, wmm:Math.min(14,z.w*0.4)}); }
+    }}
+];
+function buildTplRow(){
+  const row=document.getElementById('tplRow'); if(!row) return;
+  row.innerHTML='';
+  TEMPLATES.forEach(t=>{
+    const b=document.createElement('button'); b.type='button'; b.className='tpl-chip'; b.textContent=t.label;
+    b.onclick=()=>{ t.apply(); applyAngleDefault(); selId=null; buildZeilen(); showSel(); render(); histCommit(); };
+    row.appendChild(b);
+  });
+}
+
+// ---------- Undo / Redo (auf Basis von snapshotDesign) ----------
+let histUndo=[], histRedo=[], histLast=null, histTimer=null, histApplying=false;
+function histSig(){ return JSON.stringify(snapshotDesign()); }
+function histReset(){ histUndo=[]; histRedo=[]; histLast=histSig(); updateHistBtns(); }
+function histCommit(){
+  if(histApplying) return;
+  const sig=histSig();
+  if(sig===histLast) return;
+  if(histLast!=null){ histUndo.push(histLast); if(histUndo.length>60) histUndo.shift(); }
+  histLast=sig; histRedo.length=0;
+  updateHistBtns();
+}
+function histSchedule(){
+  if(histApplying || drag) return;
+  clearTimeout(histTimer);
+  histTimer=setTimeout(histCommit, 350);
+}
+function applyHistSig(sig){
+  histApplying=true;
+  restoreDesign(JSON.parse(sig));
+  selId=null; buildZeilen(); showSel(); render();
+  histApplying=false;
+}
+function undo(){ if(!histUndo.length) return; histRedo.push(histLast); histLast=histUndo.pop(); applyHistSig(histLast); updateHistBtns(); }
+function redo(){ if(!histRedo.length) return; histUndo.push(histLast); histLast=histRedo.pop(); applyHistSig(histLast); updateHistBtns(); }
+function updateHistBtns(){
+  const u=document.getElementById('undoBtn'), r=document.getElementById('redoBtn');
+  if(u) u.disabled=!histUndo.length;
+  if(r) r.disabled=!histRedo.length;
+}
+
+// ---------- Vorschau als Bild speichern (ohne UI-Overlays) ----------
+let exporting=false;
+function saveImage(){
+  exporting=true; render(); exporting=false;
+  let url; try{ url=cv.toDataURL('image/png'); }catch(e){ render(); alert('Bild konnte nicht erstellt werden.'); return; }
+  const a=document.createElement('a');
+  a.href=url; a.download='gravur-'+current+'.png'; document.body.appendChild(a); a.click(); a.remove();
+  render(); // UI-Overlays wieder einblenden
+}
+
+// ---------- Onboarding (einmalig) ----------
+function maybeOnboard(){
+  const back=document.getElementById('obBack'); if(!back) return;
+  try{ if(localStorage.getItem('wl_pg_onboard')==='1') return; }catch(e){}
+  back.style.display='flex';
+}
 
 // ---------- Auswahl ----------
 const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
@@ -1103,9 +1289,22 @@ cv.addEventListener('pointermove',e=>{
   }
   syncSelSliders(); render();
 });
-function endDrag(e){ if(drag){ drag=null; cv.classList.remove('grabbing'); try{cv.releasePointerCapture(e.pointerId);}catch(_){} } }
+function endDrag(e){ if(drag){ drag=null; cv.classList.remove('grabbing'); try{cv.releasePointerCapture(e.pointerId);}catch(_){} histSchedule(); } }
 cv.addEventListener('pointerup',endDrag);
 cv.addEventListener('pointercancel',endDrag);
+
+// Undo/Redo + Bild speichern
+document.getElementById('undoBtn').onclick=undo;
+document.getElementById('redoBtn').onclick=redo;
+document.getElementById('saveImg').onclick=saveImage;
+document.addEventListener('keydown',e=>{
+  const t=e.target, tag=(t&&t.tagName)||'';
+  if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT') return;
+  if((e.ctrlKey||e.metaKey) && !e.shiftKey && (e.key==='z'||e.key==='Z')){ e.preventDefault(); undo(); }
+  else if((e.ctrlKey||e.metaKey) && (e.key==='y'||e.key==='Y' || (e.shiftKey&&(e.key==='z'||e.key==='Z')))){ e.preventDefault(); redo(); }
+});
+// Onboarding schließen
+(function(){ const s=document.getElementById('obStart'); if(s) s.onclick=()=>{ try{localStorage.setItem('wl_pg_onboard','1');}catch(e){} document.getElementById('obBack').style.display='none'; }; })();
 
 // ---------- picker & clipart-grid ----------
 function buildPicker(){
@@ -1121,6 +1320,7 @@ function buildPicker(){
       selId=null;
       restoreDesign(designs[k]);           // Ziel-Entwurf laden (oder frisch)
       buildPicker(); buildZeilen(); showSel(); render();
+      histReset();                         // Undo-Verlauf pro Objekt
     };
     p.appendChild(d);
   });
@@ -1216,6 +1416,7 @@ document.getElementById('zoneBtn').addEventListener('click',()=>{
 });
 
 loadZones();
+buildTplRow();
 buildZeilen();
 buildCatTabs();
 buildClipGrid();
@@ -1224,6 +1425,9 @@ buildPicker();
 // fonts may load slightly late → re-render once ready
 if(document.fonts && document.fonts.ready){ document.fonts.ready.then(render); }
 render();
+histReset();
+updatePrice();
+maybeOnboard();
 </script>
 </body>
 </html>
