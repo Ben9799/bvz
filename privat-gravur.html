@@ -375,6 +375,7 @@ let zeileVals=['Max Mustermann'];
 let lineGeom=[null];   // pro Zeile: null=im Block (gestapelt) | {x,y,angle,cap,scaleX}=frei platziert
 let lineFonts=[''];    // pro Zeile: ''=Standard (globale Auswahl) | "css|weight"
 let textAng=0;         // Winkel des Text-Blocks — entkoppelt vom Schieberegler, damit dieser die aktive Auswahl dreht
+let textCap=4;         // Schrifthöhe des Block-Texts — entkoppelt, damit der Höhe-Regler die aktive Auswahl ändert
 const MAX_ZEILEN=8;
 function getLines(){ return zeileVals.map(v=>v.trim()).filter(Boolean); }
 function defFontVal(){ return document.getElementById('font').value; }
@@ -606,7 +607,7 @@ function getFont(){ const [css,weight]=document.getElementById('font').value.spl
 // Compute laid-out text lines fitted into the engraving zone. Returns {lines:[{str,capMM,wmm}], capMM, fits}
 function layout(){
   const o=OBJECTS[current], z=o.zone;
-  let capMM=parseFloat(document.getElementById('cap').value);
+  let capMM=textCap;
   const meas=blockEntries().map(e=>{ const f=fontOf(e.oi); return {str:e.str, oi:e.oi, f, cr:capRatio(f.css,f.weight)}; });
   if(!meas.length) return {o,z,lines:[],capMM,fits:true};
 
@@ -713,6 +714,15 @@ function render(){
 
   // selection highlight + handles (item OR text)
   const g=selGeom();
+  // Hilfslinien: erscheinen, wenn das gewählte Element mittig in der Gravurzone sitzt
+  if(g && selId!=='zone'){
+    const zcx=z.x+z.w/2, zcy=z.y+z.h/2, tol=0.35;
+    ctx.save();
+    ctx.setLineDash([6,4]); ctx.lineWidth=1; ctx.strokeStyle='rgba(255,90,170,0.95)';
+    if(Math.abs(g.cx-zcx)<=tol){ ctx.beginPath(); ctx.moveTo(px(zcx,s),py(z.y,s)); ctx.lineTo(px(zcx,s),py(z.y+z.h,s)); ctx.stroke(); }
+    if(Math.abs(g.cy-zcy)<=tol){ ctx.beginPath(); ctx.moveTo(px(z.x,s),py(zcy,s)); ctx.lineTo(px(z.x+z.w,s),py(zcy,s)); ctx.stroke(); }
+    ctx.restore();
+  }
   if(g){
     ctx.save();
     ctx.translate(px(g.cx,s),py(g.cy,s)); ctx.rotate(g.angle*Math.PI/180);
@@ -794,6 +804,12 @@ function setTangSlider(a){
   const t=document.getElementById('tang'); t.value=Math.round(a);
   document.getElementById('tangVal').textContent=Math.round(a)+'°';
 }
+function setCapSlider(v){
+  const c=document.getElementById('cap');
+  c.value=clamp(v, parseFloat(c.min), parseFloat(c.max));
+  document.getElementById('capVal').textContent=parseFloat(c.value).toFixed(1)+' mm';
+}
+function selLineGeom(){ return (typeof selId==='string'&&selId.indexOf('line:')===0) ? lineGeom[+selId.slice(5)] : null; }
 
 // ---------- Auswahl ----------
 const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
@@ -833,13 +849,16 @@ function showSel(){
     document.getElementById('selRot').value=it.angle;
     document.getElementById('selRotVal').textContent=Math.round(it.angle)+'°';
   } else { box.style.display='none'; }
-  // Drehen-Schieberegler auf den Winkel der aktuellen Auswahl stellen (sonst Block-Winkel)
+  // Schieberegler (Drehen + Höhe) auf die aktuelle Auswahl stellen (sonst Block-Werte)
   const g=selGeom();
   setTangSlider(g && selId && selId!=='zone' ? g.angle : textAng);
+  const lg0=selLineGeom();
+  setCapSlider(lg0 ? lg0.cap : textCap);
 }
 function syncSelSliders(){
   const g=selGeom();
   if(g && selId && selId!=='zone') setTangSlider(g.angle);
+  const lg0=selLineGeom(); if(lg0) setCapSlider(lg0.cap);
   const it=items.find(i=>i.id===selId);
   if(!it) return;
   document.getElementById('selSize').value=it.wmm;
@@ -896,7 +915,7 @@ function writeTextGeom(r){
   const denom=n+0.55*(n-1);
   const capEl2=document.getElementById('cap');
   const cap=clamp((2*(r.hh-1.2))/denom, parseFloat(capEl2.min), parseFloat(capEl2.max));
-  capEl2.value=cap; document.getElementById('capVal').textContent=cap.toFixed(1)+' mm';
+  textCap=cap; setCapSlider(cap);
   const natW=ents.length?Math.max(...ents.map(e=>{ const f=fontOf(e.oi), cr=capRatio(f.css,f.weight); return emWidthRatio(e.str,f.css,f.weight)*(cap/cr); })):1;
   textScaleX=clamp((r.hw-1.2)/Math.max(0.5,natW/2), 0.25, 6);
 }
@@ -1036,7 +1055,13 @@ cv.addEventListener('pointermove',e=>{
   if(!drag) return;
   const m=toMM(e), g0=drag.g0;
   if(drag.mode==='move'){
-    applySelGeom({...g0, cx:m.x-drag.gx, cy:m.y-drag.gy});
+    let cx=m.x-drag.gx, cy=m.y-drag.gy;
+    if(selId!=='zone'){ // an Zonen-Mitte einrasten (zeigt die Hilfslinie)
+      const z=OBJECTS[current].zone, zcx=z.x+z.w/2, zcy=z.y+z.h/2, snap=0.6;
+      if(Math.abs(cx-zcx)<snap) cx=zcx;
+      if(Math.abs(cy-zcy)<snap) cy=zcy;
+    }
+    applySelGeom({...g0, cx, cy});
   } else if(drag.mode==='rotate'){
     let a=Math.atan2(m.y-g0.cy, m.x-g0.cx)*180/Math.PI+90;
     while(a>180)a-=360; while(a<-180)a+=360;
@@ -1112,8 +1137,15 @@ function buildClipGrid(){
   if(param || saved){ document.querySelectorAll('.admin-only').forEach(el=>el.style.display='block'); }
 })();
 
-// Gravur-Parameter → bei Änderung neu rendern (Emoji-Filter sitzt in buildZeilen)
-document.getElementById('cap').addEventListener('input',render);
+// Höhe-Schieberegler ändert die AKTUELLE Auswahl (freie Zeile) bzw. den Block-Text
+document.getElementById('cap').addEventListener('input',()=>{
+  const v=parseFloat(document.getElementById('cap').value);
+  document.getElementById('capVal').textContent=v.toFixed(1)+' mm';
+  const lg=selLineGeom();
+  if(lg){ lg.cap=v; const g=selGeom(); if(g) applySelGeom(g); }
+  else if(!items.find(i=>i.id===selId)){ textCap=v; }  // Elemente nutzen den Größe-Regler in der Auswahl-Box
+  render();
+});
 // globale Schriftart = "alle Zeilen": setzt jede Zeile + Standard für neue Zeilen
 document.getElementById('font').addEventListener('input',()=>{
   const v=document.getElementById('font').value;
