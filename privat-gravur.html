@@ -6,9 +6,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Gravur-Studio (intern) | Wolf Lasermark</title>
 <link rel="icon" type="image/png" sizes="48x48" href="images/favicon-48.png">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&family=Great+Vibes&family=Pacifico&family=Caveat:wght@500;700&family=Sacramento&family=Satisfy&family=Permanent+Marker&family=Playfair+Display:wght@600;700&family=Bebas+Neue&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,700&display=swap" rel="stylesheet"><style>
 :root{
   --bg:#020617; --s1:#0b1120; --s2:#111827; --s3:#1e293b;
   --border:rgba(0,212,255,0.12); --accent:#00d4ff; --accent2:#0099bb;
@@ -2876,13 +2874,20 @@ const MAX_ZEILEN=8;
 // Echte Schriftarten in 3 Kategorien (je 2) — plus Schalter kursiv/fett/unterstrichen.
 // Der Fett-Schalter erhöht die Strichstärke; die Grundschriften sind absichtlich NICHT fett,
 // damit der Schalter sichtbar wirkt.
+// Nur Schriften, die LightBurn (macOS-Systemfonts) sicher kennt -> Vorschau == Download.
 const FONT_FAMS={
-  arial:    {label:'Arial',       cat:'Schlank',     css:'Arial',         weight:400},
-  dmsans:   {label:'DM Sans',     cat:'Schlank',     css:'DM Sans',       weight:400},
-  oswald:   {label:'Oswald',      cat:'Kräftig',     css:'Oswald',        weight:600},
-  bebas:    {label:'Bebas Neue',  cat:'Kräftig',     css:'Bebas Neue',    weight:400},
-  pacifico: {label:'Pacifico',    cat:'Handschrift', css:'Pacifico',      weight:400},
-  caveat:   {label:'Caveat',      cat:'Handschrift', css:'Caveat',        weight:500}
+  arial:       {label:'Arial',              cat:'Schlank',     css:'Arial',               weight:400},
+  dmsans:      {label:'Avenir',             cat:'Schlank',     css:'Avenir Next',         weight:400},
+  din:         {label:'DIN Alternate',      cat:'Schlank',     css:'DIN Alternate',       weight:400},
+  oswald:      {label:'DIN Condensed',      cat:'Kräftig',     css:'DIN Condensed',       weight:400},
+  bebas:       {label:'Impact',             cat:'Kräftig',     css:'Impact',              weight:400},
+  copperplate: {label:'Copperplate',        cat:'Kräftig',     css:'Copperplate',         weight:400},
+  didot:       {label:'Didot',              cat:'Elegant',     css:'Didot',               weight:400},
+  baskerville: {label:'Baskerville',        cat:'Elegant',     css:'Baskerville',         weight:400},
+  typewriter:  {label:'Typewriter',         cat:'Elegant',     css:'American Typewriter', weight:400},
+  pacifico:    {label:'Snell Roundhand',    cat:'Handschrift', css:'Snell Roundhand',     weight:400},
+  caveat:      {label:'Bradley Hand',       cat:'Handschrift', css:'Bradley Hand',        weight:400},
+  markerfelt:  {label:'Marker Felt',        cat:'Handschrift', css:'Marker Felt',         weight:400}
 };
 const FONT_FAM_DEFAULT='arial';
 function newStyle(){ return {fam:'arial', italic:false, bold:false, underline:false}; }
