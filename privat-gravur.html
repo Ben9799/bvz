@@ -262,8 +262,9 @@ input[type=range]{flex:1;accent-color:var(--accent)}
 // ---------- OBJECT TEMPLATES (alle Maße in mm) ----------
 const OBJECTS = {
   card: {
-    name:'Flaschenöffner-Karte', sub:'85 × 54 mm', wmm:85, hmm:54, radius:3.5, orient:'h',
-    zone:{x:6, y:28, w:73, h:22},   // gravierbare Fläche (mm)
+    name:'Flaschenöffner-Karte', sub:'54 × 78,9 mm', wmm:54, hmm:78.9, radius:3.5, orient:'h',
+    img:'images/oeffner-card.png', previewInk:'#eef4f8', stageBg:'#e9edf2',
+    zone:{x:7, y:38, w:40, h:36},   // gravierbare Fläche (mm) — unter dem Öffner-Ausschnitt
     draw(g,s){
       // Kartenkontur
       roundRect(g, 0,0, 85,54, 3.5, s);
@@ -282,9 +283,9 @@ const OBJECTS = {
     }
   },
   key: {
-    name:'Schlüsselanhänger-Öffner', sub:'22 × 80 mm', wmm:22, hmm:80, radius:5, orient:'v',
+    name:'Schlüsselanhänger-Öffner', sub:'22 × 68,7 mm', wmm:22, hmm:68.7, radius:5, orient:'v',
     img:'images/oeffner-key.png', previewInk:'#eef4f8', stageBg:'#e9edf2',
-    zone:{x:3, y:24, w:15, h:34},
+    zone:{x:5, y:19, w:12, h:39},
     draw(g,s){
       // Korpus (Schaft)
       roundRect(g, 1,12, 20,66, 5, s);
