@@ -158,7 +158,7 @@ input[type=range]{flex:1;accent-color:var(--accent)}
         <button type="button" id="addZeile" class="tool-btn" style="width:100%;margin:.2rem 0 .5rem;justify-content:center">＋ Zeile hinzufügen</button>
         <button type="button" id="mergeZeilen" class="tool-btn" style="width:100%;margin:0 0 .9rem;justify-content:center">🔗 Alle Zeilen zusammenfügen</button>
         <div class="field">
-          <label for="font">Schriftart – alle Zeilen <span style="color:var(--muted);font-weight:500">(je Zeile unten änderbar)</span></label>
+          <label for="font">Standard-Schriftart <span style="color:var(--muted);font-weight:500">(gilt für Zeilen ohne eigene Wahl – je Zeile unten einstellbar)</span></label>
           <select id="font">
             <optgroup label="Klassisch (auch in LightBurn)">
               <option value="Arial|400">Arial</option>
@@ -365,6 +365,34 @@ const CLIPARTS = {
 // ---------- Elemente (Cliparts + hochgeladene Logos), frei platzierbar ----------
 let items=[];      // {id,label,viewBox,bw,bh,inner,colored,img,x,y,wmm,hmm,angle}
 let idc=0;
+// Jedes Objekt (Flaschenöffner, Schlüsselhänger …) hat seinen EIGENEN Entwurf —
+// beim Wechsel wird der aktuelle gesichert und der Ziel-Entwurf geladen (keine Vermischung).
+const designs={};
+function snapshotDesign(){
+  return {
+    zeileVals: zeileVals.slice(),
+    lineGeom: lineGeom.map(g=> g?{...g}:null),
+    lineFonts: lineFonts.slice(),
+    items: items.map(it=>{ const c=Object.assign({},it); delete c.img; return c; }),
+    textPos: {...textPos}, textScaleX, textAng, textCap,
+    fontVal: document.getElementById('font').value
+  };
+}
+function restoreDesign(d){
+  if(!d){
+    zeileVals=['Max Mustermann']; lineGeom=[null]; lineFonts=['']; items=[];
+    textPos={x:null,y:null}; textScaleX=1; textCap=4;
+    applyAngleDefault();
+    return;
+  }
+  zeileVals=d.zeileVals.slice();
+  lineGeom=d.lineGeom.map(g=> g?{...g}:null);
+  lineFonts=d.lineFonts.slice();
+  items=d.items.map(it=>{ const c=Object.assign({},it); makeItemImg(c); return c; });
+  textPos={...d.textPos}; textScaleX=d.textScaleX; textCap=d.textCap;
+  if(d.fontVal){ const fs=document.getElementById('font'); fs.value=d.fontVal; }
+  textAng=d.textAng; setTangSlider(textAng);
+}
 let textPos={x:null,y:null}; // mm-Mittelpunkt des Textes (null=Zonen-Mitte)
 let textScaleX=1;  // horizontale Streckung des Textes (1=natürlich)
 let selId=null;    // ausgewähltes Element-id (oder 'text' / 'zone' / null)
@@ -1090,12 +1118,12 @@ function buildPicker(){
     d.className='obj'+(k===current?' active':'');
     d.innerHTML=`${o.name}<small>${o.sub}</small>`;
     d.onclick=()=>{
-      current=k; const z=OBJECTS[k].zone;
-      textPos={x:null,y:null};
-      lineGeom=zeileVals.map(()=>null);
-      if(typeof selId==='string' && selId.indexOf('line:')===0) selId=null;
-      items.forEach(it=>{ it.x=z.x+z.w/2; it.y=z.y+z.h/2; });
-      applyAngleDefault(); buildPicker(); buildZeilen(); showSel(); render();
+      if(k===current) return;
+      designs[current]=snapshotDesign();   // aktuellen Entwurf sichern
+      current=k;
+      selId=null;
+      restoreDesign(designs[k]);           // Ziel-Entwurf laden (oder frisch)
+      buildPicker(); buildZeilen(); showSel(); render();
     };
     p.appendChild(d);
   });
@@ -1146,10 +1174,9 @@ document.getElementById('cap').addEventListener('input',()=>{
   else if(!items.find(i=>i.id===selId)){ textCap=v; }  // Elemente nutzen den Größe-Regler in der Auswahl-Box
   render();
 });
-// globale Schriftart = "alle Zeilen": setzt jede Zeile + Standard für neue Zeilen
+// globale Schriftart = STANDARD: gilt nur für Zeilen ohne eigene Wahl;
+// individuell gesetzte Zeilen bleiben unverändert (kein Überschreiben mehr).
 document.getElementById('font').addEventListener('input',()=>{
-  const v=document.getElementById('font').value;
-  lineFonts=zeileVals.map(()=>v);
   buildZeilen(); render();
 });
 // Drehen-Schieberegler dreht die AKTUELLE Auswahl (Block-Text / freie Zeile / Element)
@@ -1182,7 +1209,7 @@ document.getElementById('anfrage').onclick=()=>{ alert('Anfrage-Versand wird im 
 // Zeile hinzufügen
 document.getElementById('addZeile').addEventListener('click',()=>{
   if(zeileVals.length>=MAX_ZEILEN) return;
-  zeileVals.push(''); lineGeom.push(null); lineFonts.push(defFontVal()); buildZeilen(); render();
+  zeileVals.push(''); lineGeom.push(null); lineFonts.push(''); buildZeilen(); render();
   const inps=document.querySelectorAll('#zeilen .zeile-input');
   if(inps.length) inps[inps.length-1].focus();
 });
