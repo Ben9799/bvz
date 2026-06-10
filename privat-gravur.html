@@ -145,7 +145,37 @@ input[type=range]{flex:1;accent-color:var(--accent)}
 .ob-step b{color:var(--text)}
 .ob-num{flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:rgba(0,212,255,0.14);border:1px solid var(--border);color:var(--accent);font-weight:800;font-size:.85rem;display:flex;align-items:center;justify-content:center}
 
-@media(max-width:840px){ .studio{grid-template-columns:1fr} }
+/* === Accordion (legördülő szekciók) === */
+.acc{border:1px solid rgba(255,255,255,0.08);border-radius:14px;background:rgba(2,6,23,0.32);margin-bottom:1rem;overflow:hidden;transition:border-color .2s,background .2s}
+.acc[open]{border-color:var(--border);background:rgba(2,6,23,0.5)}
+.acc>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:.55rem;padding:.9rem 1rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.92rem;color:var(--text);user-select:none;transition:background .15s}
+.acc>summary::-webkit-details-marker{display:none}
+.acc>summary:hover{background:rgba(255,255,255,0.03)}
+.acc>summary .ic{font-size:1.08rem}
+.acc>summary .hint{font-weight:500;font-size:.73rem;color:var(--muted)}
+.acc>summary .chev{margin-left:auto;transition:transform .22s ease;color:var(--muted2);font-size:.8rem}
+.acc[open]>summary .chev{transform:rotate(180deg)}
+.acc[open]>summary{border-bottom:1px solid rgba(255,255,255,0.06)}
+.acc-body{padding:1rem}
+.acc-body>.filt{margin-bottom:.4rem}
+.acc-body>.tpl-row{margin-bottom:0;border-top:none;padding-top:.2rem}
+
+/* === Feldgruppe (sichtbarer Hauptblock) === */
+.field-group{margin-bottom:1rem}
+.group-head{display:flex;align-items:center;gap:.5rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;color:var(--text);margin:.2rem 0 .85rem}
+.group-head .ic{font-size:1.1rem}
+.group-head .hint{margin-left:auto;font-weight:500;font-size:.72rem;color:var(--muted)}
+
+/* === Summary / Checkout-Block === */
+.summary{margin-top:1.3rem;border-top:1px solid rgba(255,255,255,0.09);padding-top:1.1rem}
+
+/* === Panel-Kopf mit Untertitel === */
+.panel-head{margin-bottom:1.2rem}
+.panel-head h2{margin-bottom:.15rem}
+.panel-head .psub{font-size:.8rem;color:var(--muted);line-height:1.4}
+
+@media(min-width:841px){ .stage{position:sticky;top:84px} }
+@media(max-width:840px){ .studio{grid-template-columns:1fr} .stage{position:static} }
 </style>
 </head>
 <body>
@@ -183,7 +213,10 @@ input[type=range]{flex:1;accent-color:var(--accent)}
     </div>
 
     <div class="panel">
-      <h2>Gravur gestalten</h2>
+      <div class="panel-head">
+        <h2>Gravur gestalten</h2>
+        <div class="psub">Wähle einen Bereich, gestalte ihn — alles bleibt übersichtlich.</div>
+      </div>
 
       <div class="seg-tabs" id="segTabs">
         <button class="seg active" data-pane="text"><span class="ic">✏️</span> Text</button>
@@ -193,28 +226,42 @@ input[type=range]{flex:1;accent-color:var(--accent)}
       </div>
 
       <div class="seg-pane active" id="pane-text">
-        <div class="filt">
-          <div class="cat-tabs" id="allTab"></div>
-          <div class="filt-lbl">Anlass</div>
-          <div class="cat-tabs" id="occTabs"></div>
-          <div class="filt-lbl">Für wen?</div>
-          <div class="cat-tabs" id="recTabs"></div>
-        </div>
-        <div class="tpl-row" id="tplRow"></div>
-        <div id="zeilen"></div>
-        <button type="button" id="addZeile" class="tool-btn" style="width:100%;margin:.2rem 0 .5rem;justify-content:center">＋ Zeile hinzufügen</button>
-        <button type="button" id="mergeZeilen" class="tool-btn" style="width:100%;margin:0 0 .9rem;justify-content:center">🔗 Alle Zeilen zusammenfügen</button>
-        <p class="sub" style="margin:.2rem 0 .6rem;font-size:.82rem;color:var(--muted)">Schriftart &amp; Stil stellst du <b>je Zeile</b> direkt unter der Zeile ein.</p>
-        <div class="row2">
-          <div class="field" style="margin-bottom:0">
-            <label>Schrifthöhe <span class="rval" id="capVal">4.0 mm</span></label>
-            <div class="range-row"><input type="range" id="cap" min="2" max="10" step="0.5" value="4"></div>
+        <details class="acc" id="accVorlagen">
+          <summary><span class="ic">✨</span> Vorlagen &amp; Sprüche <span class="hint">fertige Designs</span><span class="chev">▾</span></summary>
+          <div class="acc-body">
+            <div class="filt">
+              <div class="cat-tabs" id="allTab"></div>
+              <div class="filt-lbl">Anlass</div>
+              <div class="cat-tabs" id="occTabs"></div>
+              <div class="filt-lbl">Für wen?</div>
+              <div class="cat-tabs" id="recTabs"></div>
+            </div>
+            <div class="tpl-row" id="tplRow"></div>
           </div>
-          <div class="field" style="margin-bottom:0">
-            <label>Drehen (Auswahl) <span class="rval" id="tangVal">0°</span></label>
-            <div class="range-row"><input type="range" id="tang" min="-180" max="180" step="5" value="0"></div>
-          </div>
+        </details>
+
+        <div class="field-group">
+          <div class="group-head"><span class="ic">✏️</span> Dein Text <span class="hint">Stil je Zeile</span></div>
+          <div id="zeilen"></div>
+          <button type="button" id="addZeile" class="tool-btn" style="width:100%;margin:.2rem 0 .5rem;justify-content:center">＋ Zeile hinzufügen</button>
+          <button type="button" id="mergeZeilen" class="tool-btn" style="width:100%;margin:0;justify-content:center">🔗 Alle Zeilen zusammenfügen</button>
         </div>
+
+        <details class="acc">
+          <summary><span class="ic">⚙️</span> Feineinstellung <span class="hint">Höhe &amp; Drehung</span><span class="chev">▾</span></summary>
+          <div class="acc-body">
+            <div class="row2">
+              <div class="field" style="margin-bottom:0">
+                <label>Schrifthöhe <span class="rval" id="capVal">4.0 mm</span></label>
+                <div class="range-row"><input type="range" id="cap" min="2" max="10" step="0.5" value="4"></div>
+              </div>
+              <div class="field" style="margin-bottom:0">
+                <label>Drehen (Auswahl) <span class="rval" id="tangVal">0°</span></label>
+                <div class="range-row"><input type="range" id="tang" min="-180" max="180" step="5" value="0"></div>
+              </div>
+            </div>
+          </div>
+        </details>
       </div>
 
       <div class="seg-pane" id="pane-motive">
@@ -267,15 +314,17 @@ input[type=range]{flex:1;accent-color:var(--accent)}
 
       <button type="button" class="tool-btn admin-only" id="zoneBtn" style="width:100%;margin-top:1rem;justify-content:center">▦ Gravurbereich anpassen (Admin)</button>
       <div class="admin-only" id="zoneReadout" style="display:none;font:600 .8rem/1.4 monospace;color:#7fdfff;margin-top:.5rem;text-align:center"></div>
-      <div class="price" id="priceBox">
-        <div><span class="pl">Preis (Richtwert)</span></div>
-        <div style="text-align:right"><span class="pv" id="priceVal">–</span><small id="priceBreak"></small></div>
+      <div class="summary">
+        <div class="price" id="priceBox">
+          <div><span class="pl">Preis (Richtwert)</span></div>
+          <div style="text-align:right"><span class="pv" id="priceVal">–</span><small id="priceBreak"></small></div>
+        </div>
+        <div class="btnrow" style="margin-top:.7rem">
+          <button class="btn btn-ghost admin-only" id="dlsvg">⬇ LightBurn-SVG</button>
+          <button class="btn btn-primary" id="anfrage">Gravur anfragen</button>
+        </div>
+        <div class="note">Maßgenau: Die SVG wird in echten Millimetern exportiert (viewBox in mm) und ist direkt in LightBurn nutzbar. Text &amp; Motive lassen sich frei platzieren; die Schrift wird bei Bedarf verkleinert, damit sie passt.</div>
       </div>
-      <div class="btnrow" style="margin-top:.6rem">
-        <button class="btn btn-ghost admin-only" id="dlsvg">⬇ LightBurn-SVG</button>
-        <button class="btn btn-primary" id="anfrage">Gravur anfragen</button>
-      </div>
-      <div class="note">Maßgenau: Die SVG wird in echten Millimetern exportiert (viewBox in mm) und ist direkt in LightBurn nutzbar. Text &amp; Motive lassen sich frei platzieren; die Schrift wird bei Bedarf verkleinert, damit sie passt.</div>
     </div>
   </div>
 
