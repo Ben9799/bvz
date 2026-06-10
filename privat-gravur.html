@@ -262,9 +262,9 @@ input[type=range]{flex:1;accent-color:var(--accent)}
 // ---------- OBJECT TEMPLATES (alle Maße in mm) ----------
 const OBJECTS = {
   card: {
-    name:'Flaschenöffner-Karte', sub:'54 × 78,9 mm', wmm:54, hmm:78.9, radius:3.5, orient:'h',
-    img:'images/oeffner-card.png', previewInk:'#eef4f8', stageBg:'#e9edf2',
-    zone:{x:7, y:38, w:40, h:36},   // gravierbare Fläche (mm) — unter dem Öffner-Ausschnitt
+    name:'Flaschenöffner-Karte', sub:'54 × 85 mm', wmm:54, hmm:85, radius:3.5, orient:'h',
+    img:'images/oeffner-card.png', previewInk:'#eef4f8', stageBg:'#e9edf2', fill:true,
+    zone:{x:7, y:38, w:40, h:42},   // gravierbare Fläche (mm) — unter dem Öffner-Ausschnitt
     draw(g,s){
       // Kartenkontur
       roundRect(g, 0,0, 85,54, 3.5, s);
@@ -283,9 +283,9 @@ const OBJECTS = {
     }
   },
   key: {
-    name:'Schlüsselanhänger-Öffner', sub:'22 × 68,7 mm', wmm:22, hmm:68.7, radius:5, orient:'v',
-    img:'images/oeffner-key.png', previewInk:'#eef4f8', stageBg:'#e9edf2',
-    zone:{x:5, y:19, w:12, h:39},
+    name:'Schlüsselanhänger-Öffner', sub:'Gravur 12 × 65 mm', wmm:25.4, hmm:83.4, radius:5, orient:'v',
+    img:'images/oeffner-key.png', previewInk:'#eef4f8', stageBg:'#e9edf2', fill:true,
+    zone:{x:7.5, y:20, w:10, h:50},   // nur der flache Korpus (ohne Ring/Haken)
     draw(g,s){
       // Korpus (Schaft)
       roundRect(g, 1,12, 20,66, 5, s);
@@ -614,10 +614,15 @@ function render(){
     const im=getImg(o.img);
     if(im._ready){
       const boxW=o.wmm*s.ppmm, boxH=o.hmm*s.ppmm, X=px(0,s), Y=py(0,s);
-      const ia=im.width/im.height, ba=o.wmm/o.hmm;
-      let dw,dh;
-      if(ia>ba){ dw=boxW; dh=boxW/ia; } else { dh=boxH; dw=boxH*ia; }
-      ctx.drawImage(im, X+(boxW-dw)/2, Y+(boxH-dh)/2, dw, dh);
+      if(o.fill){
+        // Foto exakt in die mm-Box strecken → Gravurzone deckt sich 1:1 mit dem Produkt
+        ctx.drawImage(im, X, Y, boxW, boxH);
+      } else {
+        const ia=im.width/im.height, ba=o.wmm/o.hmm;
+        let dw,dh;
+        if(ia>ba){ dw=boxW; dh=boxW/ia; } else { dh=boxH; dw=boxH*ia; }
+        ctx.drawImage(im, X+(boxW-dw)/2, Y+(boxH-dh)/2, dw, dh);
+      }
     }
   } else {
     o.draw(ctx,s);
