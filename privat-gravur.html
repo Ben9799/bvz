@@ -120,8 +120,12 @@ input[type=range]{flex:1;accent-color:var(--accent)}
 .stage-bar .tool-btn{flex:0 0 auto;padding:.45rem .7rem}
 .stage-bar .tool-btn:disabled{opacity:.35;cursor:default;border-color:rgba(255,255,255,0.12);color:var(--muted);background:rgba(255,255,255,0.04)}
 
-/* Vorlagen (Templates) */
-.tpl-row{display:flex;gap:.45rem;overflow-x:auto;padding:.1rem .1rem .5rem;margin-bottom:.7rem}
+/* Vorlagen (Templates) + Filter */
+.filt{margin-bottom:.8rem}
+.filt-lbl{font-size:.68rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:.65rem 0 .4rem}
+.filt .cat-tabs{margin-bottom:0}
+.tpl-row{display:flex;flex-wrap:wrap;gap:.45rem;max-height:184px;overflow-y:auto;padding:.15rem .15rem .5rem 0;margin-bottom:.7rem;border-top:1px solid rgba(255,255,255,0.06);padding-top:.7rem}
+.tpl-row::-webkit-scrollbar{width:7px}.tpl-row::-webkit-scrollbar-thumb{background:rgba(0,212,255,0.25);border-radius:4px}
 .tpl-chip{flex:0 0 auto;cursor:pointer;font-family:inherit;font-size:.8rem;font-weight:600;color:var(--muted2);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:999px;padding:.45rem .85rem;white-space:nowrap;transition:.15s}
 .tpl-chip:hover{border-color:var(--accent);color:var(--text);background:rgba(0,212,255,0.08)}
 
@@ -189,8 +193,13 @@ input[type=range]{flex:1;accent-color:var(--accent)}
       </div>
 
       <div class="seg-pane active" id="pane-text">
-        <div class="sub" style="margin:0 0 .4rem">Für wen ist das Geschenk?</div>
-        <div class="cat-tabs" id="recTabs"></div>
+        <div class="filt">
+          <div class="cat-tabs" id="allTab"></div>
+          <div class="filt-lbl">Anlass</div>
+          <div class="cat-tabs" id="occTabs"></div>
+          <div class="filt-lbl">Für wen?</div>
+          <div class="cat-tabs" id="recTabs"></div>
+        </div>
         <div class="tpl-row" id="tplRow"></div>
         <div id="zeilen"></div>
         <button type="button" id="addZeile" class="tool-btn" style="width:100%;margin:.2rem 0 .5rem;justify-content:center">＋ Zeile hinzufügen</button>
@@ -3281,8 +3290,19 @@ function tplClip(key, xr, yr, wr){
     x:z.x+z.w*xr, y:z.y+z.h*yr, wmm:Math.max(4, Math.min(z.w,z.h)*wr) });
 }
 // Empfänger-Kategorien — die Sprüche werden danach sortiert (Geschenk für wen?).
+// Zwei Filter-Achsen: Anlass (wofür wird verschenkt) und Empfänger (für wen).
+const OCCASIONS=[
+  ['geburtstag','🎂 Geburtstag'],
+  ['hochzeit','💍 Hochzeit'],
+  ['abschluss','🎓 Abschluss'],
+  ['valentin','❤️ Valentinstag'],
+  ['weihnachten','🎄 Weihnachten'],
+  ['jubilaeum','🏅 Jubiläum'],
+  ['geburt','👶 Geburt & Taufe'],
+  ['ruhestand','🎉 Ruhestand'],
+  ['einzug','🏡 Einzug']
+];
 const RECIPIENTS=[
-  ['alle','✨ Alle'],
   ['liebe','❤ Liebe'],
   ['familie','👪 Familie'],
   ['freund','🤝 Freund/in'],
@@ -3305,7 +3325,7 @@ function tplText(zeilen, styles, clip){
 const TEMPLATES=[
   // ── Klassiker (immer sichtbar) ──
   {key:'name_datum',recipient:'alle',label:'👤 Name & Datum',apply:tplText(['Max Mustermann','01.01.2025'],[S('oswald'),S('caveat',{i:1})])},
-  {key:'spruch',recipient:'alle',label:'💬 Spruch',apply:tplText(['Alles Gute','zum Geburtstag'],[S('pacifico'),S('dmsans')])},
+  {key:'spruch',recipient:'alle',occasion:'geburtstag',label:'💬 Spruch',apply:tplText(['Alles Gute','zum Geburtstag'],[S('pacifico'),S('dmsans')])},
   {key:'schlicht',recipient:'alle',label:'✏️ Schlicht',apply:tplText(['Dein Text'],[S('arial')])},
   // ── Liebe / Partner ──
   {key:'liebe_immer',recipient:'liebe',label:'❤ Für immer',apply:tplText(['Für immer','dein'],[S('caveat'),S('pacifico')],()=>tplClip('heart',0.5,0.24,0.30))},
@@ -3326,7 +3346,7 @@ const TEMPLATES=[
   // ── Kollege/in ──
   {key:'ko_danke',recipient:'kollege',label:'💼 Danke',apply:tplText(['Danke','für die Zusammenarbeit'],[S('oswald'),S('dmsans')])},
   {key:'ko_bester',recipient:'kollege',label:'⭐ Bester Kollege',apply:tplText(['Bester','Kollege'],[S('oswald',{b:1}),S('oswald',{b:1})],()=>tplClip('star',0.5,0.82,0.30))},
-  {key:'ko_ruhe',recipient:'kollege',label:'🎉 Ruhestand',apply:tplText(['Frohen','Ruhestand!'],[S('pacifico'),S('dmsans')])},
+  {key:'ko_ruhe',recipient:'kollege',occasion:'ruhestand',label:'🎉 Ruhestand',apply:tplText(['Frohen','Ruhestand!'],[S('pacifico'),S('dmsans')])},
   // ── Lehrer/in ──
   {key:'le_danke',recipient:'lehrer',label:'🎓 Danke Lehrer/in',apply:tplText(['Danke,','liebe(r) Lehrer/in'],[S('caveat'),S('dmsans')])},
   {key:'le_beste',recipient:'lehrer',label:'⭐ Beste Lehrerin',apply:tplText(['Beste','Lehrerin'],[S('oswald',{b:1}),S('oswald',{b:1})],()=>tplClip('star',0.5,0.82,0.30))},
@@ -3335,23 +3355,64 @@ const TEMPLATES=[
   {key:'sp_bier4',recipient:'spass',label:'🍺 Kein Bier vor Vier',apply:tplText(['Kein Bier','vor Vier'],[S('bebas'),S('bebas')],()=>tplClip('mug',0.5,0.82,0.30))},
   {key:'sp_denken',recipient:'spass',label:'🤔 Erst denken',apply:tplText(['Erst denken,','dann trinken'],[S('oswald'),S('caveat',{i:1})])},
   {key:'sp_prost',recipient:'spass',label:'🥨 Prost & Mahlzeit',apply:tplText(['Prost!','Mahlzeit'],[S('bebas'),S('pacifico')],()=>tplClip('pretzel',0.5,0.82,0.30))},
-  {key:'sp_chef',recipient:'spass',label:'😎 Chef vom Dienst',apply:tplText(['Chef vom','Dienst'],[S('oswald',{b:1}),S('oswald',{b:1})],()=>tplClip('crown',0.5,0.20,0.26))}
+  {key:'sp_chef',recipient:'spass',label:'😎 Chef vom Dienst',apply:tplText(['Chef vom','Dienst'],[S('oswald',{b:1}),S('oswald',{b:1})],()=>tplClip('crown',0.5,0.20,0.26))},
+  // ── Anlass: Geburtstag ──
+  {key:'ge_glueck',occasion:'geburtstag',label:'🎂 Herzlichen Glückwunsch',apply:tplText(['Herzlichen','Glückwunsch'],[S('oswald',{b:1}),S('caveat',{i:1})])},
+  {key:'ge_happy',occasion:'geburtstag',label:'🎉 Happy Birthday',apply:tplText(['Happy','Birthday'],[S('bebas'),S('pacifico')],()=>tplClip('star',0.5,0.82,0.28))},
+  {key:'ge_zahl',occasion:'geburtstag',label:'🔢 Zum 30.',apply:tplText(['Zum 30.','Geburtstag'],[S('bebas'),S('caveat',{i:1})])},
+  // ── Anlass: Hochzeit ──
+  {key:'ho_married',occasion:'hochzeit',recipient:'liebe',label:'💍 Just Married',apply:tplText(['Just','Married'],[S('pacifico'),S('bebas')],()=>tplClip('ring',0.5,0.82,0.26))},
+  {key:'ho_ewig',occasion:'hochzeit',recipient:'liebe',label:'∞ Für immer & ewig',apply:tplText(['Für immer','& ewig'],[S('caveat'),S('pacifico')],()=>tplClip('hearts',0.5,0.82,0.30))},
+  {key:'ho_mrmrs',occasion:'hochzeit',recipient:'liebe',label:'💐 Mr. & Mrs.',apply:tplText(['Mr. &','Mrs.'],[S('oswald',{b:1}),S('caveat',{i:1})],()=>tplClip('ring',0.5,0.20,0.24))},
+  {key:'ho_jawort',occasion:'hochzeit',recipient:'liebe',label:'💒 Wir sagen Ja!',apply:tplText(['Wir sagen','Ja!'],[S('pacifico'),S('bebas')],()=>tplClip('heart',0.5,0.20,0.24))},
+  // ── Anlass: Abschluss (Abi/Studium/Schule) ──
+  {key:'ab_geschafft',occasion:'abschluss',label:'🎓 Geschafft!',apply:tplText(['Geschafft!'],[S('bebas')],()=>tplClip('trophy',0.5,0.78,0.34))},
+  {key:'ab_abi',occasion:'abschluss',label:'📜 Abi 2025',apply:tplText(['Abi','2025'],[S('bebas'),S('oswald',{b:1})],()=>tplClip('laurel',0.5,0.82,0.34))},
+  {key:'ab_wege',occasion:'abschluss',label:'🌟 Neue Wege',apply:tplText(['Auf zu neuen','Wegen'],[S('caveat'),S('dmsans')],()=>tplClip('star',0.5,0.82,0.28))},
+  {key:'ab_endlich',occasion:'abschluss',label:'🏆 Endlich geschafft',apply:tplText(['Endlich','geschafft'],[S('oswald',{b:1}),S('caveat',{i:1})],()=>tplClip('medal',0.5,0.20,0.26))},
+  // ── Anlass: Valentinstag ──
+  {key:'va_glueck',occasion:'valentin',recipient:'liebe',label:'❤️ Mein Glück',apply:tplText(['Du bist','mein Glück'],[S('pacifico'),S('caveat',{i:1})],()=>tplClip('heart',0.5,0.82,0.30))},
+  {key:'va_fuerdich',occasion:'valentin',recipient:'liebe',label:'💝 Für dich',apply:tplText(['Für dich'],[S('pacifico')],()=>tplClip('hearts',0.5,0.78,0.34))},
+  // ── Anlass: Weihnachten ──
+  {key:'we_frohe',occasion:'weihnachten',label:'🎄 Frohe Weihnachten',apply:tplText(['Frohe','Weihnachten'],[S('oswald',{b:1}),S('caveat',{i:1})],()=>tplClip('tree',0.5,0.82,0.30))},
+  {key:'we_merry',occasion:'weihnachten',label:'❄️ Merry Christmas',apply:tplText(['Merry','Christmas'],[S('bebas'),S('pacifico')],()=>tplClip('star',0.5,0.20,0.24))},
+  {key:'we_fest',occasion:'weihnachten',label:'✨ Frohes Fest',apply:tplText(['Frohes','Fest'],[S('pacifico'),S('dmsans')])},
+  // ── Anlass: Jubiläum ──
+  {key:'ju_jahre',occasion:'jubilaeum',recipient:'liebe',label:'💞 25 Jahre',apply:tplText(['25 Jahre','Liebe'],[S('oswald',{b:1}),S('caveat',{i:1})],()=>tplClip('heart',0.5,0.82,0.28))},
+  {key:'ju_weiter',occasion:'jubilaeum',label:'🥂 Auf viele Jahre',apply:tplText(['Auf viele','weitere Jahre'],[S('caveat'),S('dmsans')],()=>tplClip('cheers',0.5,0.82,0.32))},
+  // ── Anlass: Geburt & Taufe ──
+  {key:'gt_willkommen',occasion:'geburt',label:'👶 Willkommen',apply:tplText(['Willkommen','kleiner Schatz'],[S('pacifico'),S('caveat',{i:1})],()=>tplClip('heart',0.5,0.82,0.28))},
+  {key:'gt_taufe',occasion:'geburt',label:'🕊️ Zur Taufe',apply:tplText(['Zur','Taufe'],[S('caveat'),S('oswald',{b:1})],()=>tplClip('star',0.5,0.82,0.26))},
+  {key:'gt_hallo',occasion:'geburt',label:'🌍 Hallo Welt',apply:tplText(['Hallo','Welt'],[S('bebas'),S('pacifico')],()=>tplClip('star',0.5,0.20,0.24))},
+  // ── Anlass: Ruhestand ──
+  {key:'ru_rente',occasion:'ruhestand',label:'🌴 Endlich Rente!',apply:tplText(['Endlich','Rente!'],[S('bebas'),S('pacifico')],()=>tplClip('trophy',0.5,0.20,0.26))},
+  {key:'ru_freiheit',occasion:'ruhestand',label:'☀️ Genieß die Freiheit',apply:tplText(['Genieß die','Freiheit'],[S('caveat'),S('dmsans')],()=>tplClip('sun',0.5,0.82,0.30))},
+  // ── Anlass: Einzug / neues Zuhause ──
+  {key:'ei_zuhause',occasion:'einzug',label:'🏡 Neues Zuhause',apply:tplText(['Zum neuen','Zuhause'],[S('oswald',{b:1}),S('caveat',{i:1})],()=>tplClip('heart',0.5,0.82,0.26))},
+  {key:'ei_home',occasion:'einzug',label:'🔑 Home sweet Home',apply:tplText(['Home sweet','Home'],[S('bebas'),S('caveat',{i:1})],()=>tplClip('heart',0.5,0.20,0.24))}
 ];
-let activeRecipient='alle';
-function buildRecipientTabs(){
-  const t=document.getElementById('recTabs'); if(!t) return; t.innerHTML='';
-  RECIPIENTS.forEach(([key,lbl])=>{
-    const b=document.createElement('div');
-    b.className='cat-tab'+(key===activeRecipient?' active':'');
-    b.textContent=lbl;
-    b.onclick=()=>{ activeRecipient=key; buildRecipientTabs(); buildTplRow(); };
-    t.appendChild(b);
-  });
+// EIN aktiver Filter (Anlass ODER Empfänger ODER 'alle') — ein Klick filtert die Sprüche.
+let activeFilter='alle';
+function filtChip(container,key,lbl){
+  const b=document.createElement('div');
+  b.className='cat-tab'+(key===activeFilter?' active':'');
+  b.textContent=lbl;
+  b.onclick=()=>{ activeFilter=key; buildFilterTabs(); buildTplRow(); };
+  container.appendChild(b);
+}
+function buildFilterTabs(){
+  const a=document.getElementById('allTab'), o=document.getElementById('occTabs'), r=document.getElementById('recTabs');
+  if(!a||!o||!r) return;
+  a.innerHTML=''; o.innerHTML=''; r.innerHTML='';
+  filtChip(a,'alle','✨ Alle anzeigen');
+  OCCASIONS.forEach(([k,l])=>filtChip(o,k,l));
+  RECIPIENTS.forEach(([k,l])=>filtChip(r,k,l));
 }
 function buildTplRow(){
   const row=document.getElementById('tplRow'); if(!row) return;
   row.innerHTML='';
-  TEMPLATES.filter(t=>activeRecipient==='alle'||t.recipient===activeRecipient).forEach(t=>{
+  const list=TEMPLATES.filter(t=>activeFilter==='alle'||t.recipient===activeFilter||t.occasion===activeFilter);
+  list.forEach(t=>{
     const b=document.createElement('button'); b.type='button'; b.className='tpl-chip'; b.textContent=t.label;
     b.onclick=()=>{ t.apply(); applyAngleDefault(); selId=null; buildZeilen(); showSel(); render(); histCommit(); };
     row.appendChild(b);
@@ -3839,7 +3900,7 @@ document.getElementById('zoneBtn').addEventListener('click',()=>{
 });
 
 loadZones();
-buildRecipientTabs();
+buildFilterTabs();
 buildTplRow();
 buildZeilen();
 buildCatTabs();
