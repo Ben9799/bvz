@@ -104,6 +104,8 @@ input[type=range]{flex:1;accent-color:var(--accent)}
 .clip-empty{grid-column:1/-1;font-size:.82rem;color:var(--muted);padding:1rem .4rem;text-align:center}
 .sel-box{border:1px solid rgba(0,212,255,0.35);border-radius:14px;padding:1rem;margin-top:1.1rem;background:rgba(0,212,255,0.05)}
 .sel-box h3{font-family:'Syne',sans-serif;font-size:.98rem;margin-bottom:.2rem;color:var(--text);display:flex;align-items:center;gap:.4rem}
+.sel-hint{margin-top:1rem;border:1px solid rgba(0,212,255,0.28);border-radius:12px;padding:.7rem .85rem;background:rgba(0,212,255,0.06);font-size:.8rem;line-height:1.45;color:var(--muted2)}
+.sel-hint .ic{margin-right:.25rem}.sel-hint b{color:var(--text);font-weight:700}
 .tool-row{display:grid;grid-template-columns:repeat(2,1fr);gap:.45rem;margin-top:.8rem}
 .tool-btn{display:flex;align-items:center;justify-content:center;gap:.35rem;font-family:inherit;font-size:.8rem;font-weight:600;padding:.5rem;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--muted2);cursor:pointer;transition:.15s}
 .tool-btn:hover{border-color:var(--accent);color:var(--text);background:rgba(0,212,255,0.08)}
@@ -197,11 +199,16 @@ input[type=range]{flex:1;accent-color:var(--accent)}
 .rail .seg.active{background:linear-gradient(135deg,rgba(0,212,255,0.22),rgba(0,153,187,0.14));color:var(--text);border-color:var(--accent);box-shadow:0 8px 26px rgba(0,212,255,0.22)}
 
 @media(min-width:841px){
-  .stage{align-items:center;padding-right:104px}
+  /* Icon-Leiste rechts; Flyout links davon. Bei offenem Fenster reserviert die Bühne
+     rechts Platz, damit das Fenster NIE über die Vorschau ragt. */
+  .stage{align-items:center;padding-right:104px;transition:padding-right .2s ease}
+  .studio:has(.panel.open) .stage{padding-right:498px}
   .rail{position:absolute;top:1.1rem;right:1.1rem;z-index:8}
-  .panel{position:absolute;top:1.1rem;right:6.1rem;width:368px;max-height:calc(100% - 2.2rem);overflow-y:auto;z-index:7;display:none;transform:translateX(12px);opacity:0;transition:transform .2s ease,opacity .2s ease}
+  .panel{position:absolute;top:1.1rem;right:6.1rem;width:376px;max-height:calc(100% - 2.2rem);overflow-y:auto;z-index:7;display:none;transform:translateX(12px);opacity:0;transition:transform .2s ease,opacity .2s ease}
   .panel.open{display:block;transform:none;opacity:1}
   .panel::-webkit-scrollbar{width:7px}.panel::-webkit-scrollbar-thumb{background:rgba(0,212,255,0.25);border-radius:4px}
+  /* Längere Liste sichtbarer → weniger Scrollen */
+  .clip-grid{max-height:440px;grid-template-columns:repeat(auto-fill,minmax(72px,1fr))}
 }
 @media(max-width:840px){
   .stage{min-height:auto;padding-right:1.4rem}
@@ -337,25 +344,8 @@ input[type=range]{flex:1;accent-color:var(--accent)}
         <div class="code-msg" id="codeMsg"></div>
       </div>
 
-      <div class="sel-box" id="selBox" style="display:none">
-        <h3><span>🎯</span> <span id="selName">Element</span></h3>
-        <div class="logo-hint" style="margin-top:0">Ziehen = verschieben · Ecken = proportional · Seiten-Griffe = breiter/höher ziehen · Knopf oben = drehen</div>
-        <div class="row2" style="margin-top:.7rem">
-          <div class="field" style="margin-bottom:0">
-            <label>Größe <span class="rval" id="selSizeVal">18 mm</span></label>
-            <div class="range-row"><input type="range" id="selSize" min="3" max="70" step="0.5" value="18"></div>
-          </div>
-          <div class="field" style="margin-bottom:0">
-            <label>Drehen <span class="rval" id="selRotVal">0°</span></label>
-            <div class="range-row"><input type="range" id="selRot" min="-180" max="180" step="5" value="0"></div>
-          </div>
-        </div>
-        <div class="tool-row">
-          <button class="tool-btn" id="selCenter">⊕ Zentrieren</button>
-          <button class="tool-btn" id="selDup">⧉ Duplizieren</button>
-          <button class="tool-btn" id="selFront">⬆ Nach vorne</button>
-          <button class="tool-btn danger" id="selDel">✕ Entfernen</button>
-        </div>
+      <div class="sel-hint" id="selHint" style="display:none">
+        <span class="ic">🎯</span> <b id="selName">Element</b> ausgewählt — direkt im Bild bearbeiten: Ecken-Symbole zum <b>Verschieben</b>, <b>Drehen</b>, <b>Größe</b> &amp; <b>Löschen</b>.
       </div>
 
       <button type="button" class="tool-btn admin-only" id="zoneBtn" style="width:100%;margin-top:1rem;justify-content:center">▦ Gravurbereich anpassen (Admin)</button>
@@ -3313,25 +3303,11 @@ function render(){
     ctx.setLineDash([4,3]); ctx.lineWidth=1; ctx.strokeStyle='rgba(0,212,255,0.95)';
     ctx.strokeRect(-g.hw*s.ppmm,-g.hh*s.ppmm,g.hw*2*s.ppmm,g.hh*2*s.ppmm);
     ctx.restore();
-    const H=handlePts(g,s);
-    ctx.save();
-    ctx.setLineDash([]);
-    ctx.strokeStyle='rgba(0,212,255,0.95)'; ctx.lineWidth=1.5;
-    ctx.beginPath(); ctx.moveTo(H.topMid.x,H.topMid.y); ctx.lineTo(H.rot.x,H.rot.y); ctx.stroke();
-    ctx.fillStyle='#00d4ff';
-    ctx.beginPath(); ctx.arc(H.rot.x,H.rot.y,6,0,Math.PI*2); ctx.fill();
-    // Seiten-Griffe (strecken) — kleine Rauten
-    H.edges.forEach(c=>{
-      ctx.fillStyle='#00d4ff'; ctx.strokeStyle='#ffffff'; ctx.lineWidth=1.2;
-      ctx.save(); ctx.translate(c.x,c.y); ctx.rotate(Math.PI/4);
-      ctx.beginPath(); ctx.rect(-4,-4,8,8); ctx.fill(); ctx.stroke(); ctx.restore();
-    });
-    // Ecken (proportional) — weiße Quadrate
-    H.corners.forEach(c=>{
-      ctx.fillStyle='#ffffff'; ctx.strokeStyle='#00d4ff'; ctx.lineWidth=1.5;
-      ctx.beginPath(); ctx.rect(c.x-5,c.y-5,10,10); ctx.fill(); ctx.stroke();
-    });
-    ctx.restore();
+    // laserliebe-Stil: Symbol-Knöpfe an den 4 Ecken (+ Mini-Leiste oben)
+    if(selId!=='zone'){
+      const B=selButtons(g,s);
+      B.all.forEach(b=>drawSelBtn(ctx,b));
+    }
   }
 
   document.getElementById('dims').innerHTML=
@@ -3669,17 +3645,14 @@ function mergeAllLines(){
   buildZeilen(); showSel(); render();
 }
 function showSel(){
-  const box=document.getElementById('selBox');
+  const hint=document.getElementById('selHint');
   const it=items.find(i=>i.id===selId);
-  if(it){
-    box.style.display='block';
-    const _pnl=document.getElementById('panel'); if(_pnl)_pnl.classList.add('open');
-    document.getElementById('selName').textContent=it.label||'Element';
-    document.getElementById('selSize').value=it.wmm;
-    document.getElementById('selSizeVal').textContent=it.wmm.toFixed(1)+' mm';
-    document.getElementById('selRot').value=it.angle;
-    document.getElementById('selRotVal').textContent=Math.round(it.angle)+'°';
-  } else { box.style.display='none'; }
+  const hasSel = selId && selId!=='zone' && (it || selId==='text' || (typeof selId==='string'&&selId.indexOf('line:')===0));
+  if(hint){
+    hint.style.display = hasSel ? 'block' : 'none';
+    if(hasSel){ const nm=document.getElementById('selName'); if(nm) nm.textContent = it ? (it.label||'Element') : 'Text'; }
+  }
+  if(hasSel){ const _pnl=document.getElementById('panel'); if(_pnl)_pnl.classList.add('open'); }
   // Schieberegler (Drehen + Höhe) auf die aktuelle Auswahl stellen (sonst Block-Werte)
   const g=selGeom();
   setTangSlider(g && selId && selId!=='zone' ? g.angle : textAng);
@@ -3690,12 +3663,6 @@ function syncSelSliders(){
   const g=selGeom();
   if(g && selId && selId!=='zone') setTangSlider(g.angle);
   const lg0=selLineGeom(); if(lg0) setCapSlider(lg0.cap);
-  const it=items.find(i=>i.id===selId);
-  if(!it) return;
-  document.getElementById('selSize').value=it.wmm;
-  document.getElementById('selSizeVal').textContent=it.wmm.toFixed(1)+' mm';
-  document.getElementById('selRot').value=clamp(it.angle,-180,180);
-  document.getElementById('selRotVal').textContent=Math.round(it.angle)+'°';
 }
 // Auswahl-Geometrie (mm) — Element ODER Text ODER Gravurbereich (zone)
 function textNatHalfW(L){ return L.lines.length?Math.max(...L.lines.map(l=>l.wmm))/2:0.5; }
@@ -3800,6 +3767,90 @@ function handlePts(g,s){
   return {corners,edges,topMid,rot};
 }
 
+// ---------- On-Canvas Symbol-Knöpfe (laserliebe-Stil) ----------
+function selButtons(g,s){
+  const H=handlePts(g,s);
+  const TL=H.corners[0], TR=H.corners[1], BR=H.corners[2], BL=H.corners[3];
+  const corners=[
+    {x:TL.x,y:TL.y,action:'move',icon:'move'},
+    {x:TR.x,y:TR.y,action:'rotate',icon:'rotate'},
+    {x:BR.x,y:BR.y,action:'resize',icon:'resize'},
+    {x:BL.x,y:BL.y,action:'delete',icon:'trash'}
+  ];
+  // Mini-Leiste oben (nur für Grafik/Logo-Elemente sinnvoll)
+  const top=[];
+  const it=items.find(i=>i.id===selId);
+  if(it){
+    const acts=[{action:'duplicate',icon:'dup'},{action:'center',icon:'center'},{action:'front',icon:'front'}];
+    const gap=34, ty=H.topMid.y-36, sx=H.topMid.x-(acts.length-1)*gap/2;
+    acts.forEach((a,i)=>top.push({x:sx+i*gap,y:ty,action:a.action,icon:a.icon}));
+  }
+  return {corners,top,all:[...corners,...top]};
+}
+function rrPath(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+function drawSelBtn(ctx,b){
+  const R=14, danger=b.icon==='trash';
+  ctx.save();
+  ctx.shadowColor='rgba(0,0,0,0.35)'; ctx.shadowBlur=6; ctx.shadowOffsetY=1;
+  ctx.fillStyle='#ffffff';
+  rrPath(ctx,b.x-R,b.y-R,R*2,R*2,7); ctx.fill();
+  ctx.shadowColor='transparent';
+  ctx.lineWidth=1.4; ctx.strokeStyle=danger?'rgba(229,72,77,0.6)':'rgba(0,153,187,0.5)';
+  rrPath(ctx,b.x-R,b.y-R,R*2,R*2,7); ctx.stroke();
+  drawHandleIcon(ctx,b.x,b.y,b.icon,danger?'#e5484d':'#0b1120');
+  ctx.restore();
+}
+function drawHandleIcon(ctx,cx,cy,name,col){
+  ctx.save();
+  ctx.translate(cx,cy);
+  ctx.strokeStyle=col; ctx.fillStyle=col; ctx.lineWidth=1.6; ctx.lineCap='round'; ctx.lineJoin='round';
+  const arrow=(x1,y1,x2,y2)=>{ // Linie mit Pfeilspitze an (x2,y2)
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    const a=Math.atan2(y2-y1,x2-x1), h=3.2;
+    ctx.beginPath(); ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-h*Math.cos(a-0.5),y2-h*Math.sin(a-0.5));
+    ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-h*Math.cos(a+0.5),y2-h*Math.sin(a+0.5));
+    ctx.stroke();
+  };
+  if(name==='move'){ arrow(0,0,0,-6.5); arrow(0,0,0,6.5); arrow(0,0,-6.5,0); arrow(0,0,6.5,0); }
+  else if(name==='rotate'){
+    ctx.beginPath(); ctx.arc(0,0,5.5,Math.PI*0.65,Math.PI*2.15); ctx.stroke();
+    const ex=5.5*Math.cos(Math.PI*0.65), ey=5.5*Math.sin(Math.PI*0.65);
+    ctx.beginPath(); ctx.moveTo(ex,ey); ctx.lineTo(ex-3.4,ey-0.6); ctx.moveTo(ex,ey); ctx.lineTo(ex+0.4,ey-3.6); ctx.stroke();
+  }
+  else if(name==='resize'){ arrow(0,0,-6,-6); arrow(0,0,6,6); }
+  else if(name==='trash'){
+    ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(-5.5,-3.5); ctx.lineTo(5.5,-3.5); ctx.stroke(); // Deckel
+    ctx.beginPath(); ctx.moveTo(-2,-3.5); ctx.lineTo(-2,-5); ctx.lineTo(2,-5); ctx.lineTo(2,-3.5); ctx.stroke(); // Griff
+    ctx.beginPath(); ctx.moveTo(-4,-3.5); ctx.lineTo(-3.2,6); ctx.lineTo(3.2,6); ctx.lineTo(4,-3.5); ctx.stroke(); // Körper
+    ctx.beginPath(); ctx.moveTo(-1.3,-1); ctx.lineTo(-1,4); ctx.moveTo(1.3,-1); ctx.lineTo(1,4); ctx.stroke();
+  }
+  else if(name==='dup'){
+    ctx.lineWidth=1.4;
+    rrPath(ctx,-6,-2,8,8,1.6); ctx.stroke();
+    ctx.fillStyle='#ffffff'; rrPath(ctx,-2,-6,8,8,1.6); ctx.fill(); ctx.strokeStyle=col; rrPath(ctx,-2,-6,8,8,1.6); ctx.stroke();
+  }
+  else if(name==='center'){
+    ctx.lineWidth=1.4;
+    ctx.beginPath(); ctx.rect(-5,-5,10,10); ctx.stroke();
+    arrow(0,-7,0,-3.5); arrow(0,7,0,3.5); arrow(-7,0,-3.5,0); arrow(7,0,3.5,0);
+  }
+  else if(name==='front'){ arrow(0,5,0,-5.5); ctx.beginPath(); ctx.moveTo(-4.5,4.5); ctx.lineTo(4.5,4.5); ctx.stroke(); }
+  ctx.restore();
+}
+
+// ---------- Element-Aktionen (von den Canvas-Knöpfen) ----------
+function selDelete(){
+  if(typeof selId==='string' && selId.indexOf('line:')===0){ const i=+selId.slice(5); zeileVals[i]=''; lineGeom[i]=null; buildZeilen(); applyText(); select(null); return; }
+  if(selId==='text'){ select(null); return; }
+  items=items.filter(i=>i.id!==selId); select(null);
+}
+function selDuplicate(){ const it=items.find(i=>i.id===selId); if(it){ addItem({ label:it.label, viewBox:it.viewBox, bw:it.bw, bh:it.bh, inner:it.inner, colored:it.colored, x:it.x+5, y:it.y+5, wmm:it.wmm, angle:it.angle }); } }
+function selCenterFn(){ const z=OBJECTS[current].zone; const it=items.find(i=>i.id===selId); if(it){ it.x=z.x+z.w/2; it.y=z.y+z.h/2; render(); return; } if(typeof selId==='string'&&selId.indexOf('line:')===0){ const lg=lineGeom[+selId.slice(5)]; if(lg){ lg.x=z.x+z.w/2; lg.y=z.y+z.h/2; render(); } } }
+function selBringFront(){ const i=items.findIndex(x=>x.id===selId); if(i>=0){ const [it]=items.splice(i,1); items.push(it); render(); } }
+
 // ---------- Treffer-Test & Ziehen ----------
 function pointInRotRect(mx,my,cx,cy,hw,hh,angDeg){
   const a=-angDeg*Math.PI/180, dx=mx-cx, dy=my-cy;
@@ -3848,16 +3899,20 @@ function localOf(m,g0){
 cv.addEventListener('pointerdown',e=>{
   if(!curS) return;
   const p=toPx(e), m=toMM(e);
-  // 1) Handle der aktuellen Auswahl? (Drehen / proportional / strecken)
+  // 1) Symbol-Knopf der aktuellen Auswahl? (Ecken + Mini-Leiste)
   const g=selGeom();
-  if(g){
-    const H=handlePts(g,curS);
-    if(distPx(p,H.rot)<=14){ drag={mode:'rotate',g0:snapGeom(g)}; startGrab(e); return; }
-    for(const c of H.corners){
-      if(distPx(p,c)<=12){ const d0=Math.hypot(m.x-g.cx,m.y-g.cy); drag={mode:'resize',g0:snapGeom(g),startDist:Math.max(d0,0.5)}; startGrab(e); return; }
-    }
-    for(const c of H.edges){
-      if(distPx(p,c)<=12){ drag={mode:'stretch',g0:snapGeom(g),dirX:c.dirX,dirY:c.dirY}; startGrab(e); return; }
+  if(g && selId!=='zone'){
+    const B=selButtons(g,curS);
+    for(const b of B.all){
+      if(distPx(p,b)<=16){
+        if(b.action==='rotate'){ drag={mode:'rotate',g0:snapGeom(g)}; startGrab(e); return; }
+        if(b.action==='resize'){ const d0=Math.hypot(m.x-g.cx,m.y-g.cy); drag={mode:'resize',g0:snapGeom(g),startDist:Math.max(d0,0.5)}; startGrab(e); return; }
+        if(b.action==='move'){ drag={mode:'move',g0:snapGeom(g),gx:m.x-g.cx,gy:m.y-g.cy}; startGrab(e); return; }
+        if(b.action==='delete'){ selDelete(); return; }
+        if(b.action==='duplicate'){ selDuplicate(); return; }
+        if(b.action==='center'){ selCenterFn(); return; }
+        if(b.action==='front'){ selBringFront(); return; }
+      }
     }
   }
   // 2) Auswählen / Verschieben
@@ -3922,6 +3977,7 @@ document.addEventListener('keydown',e=>{
   if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT') return;
   if((e.ctrlKey||e.metaKey) && !e.shiftKey && (e.key==='z'||e.key==='Z')){ e.preventDefault(); undo(); }
   else if((e.ctrlKey||e.metaKey) && (e.key==='y'||e.key==='Y' || (e.shiftKey&&(e.key==='z'||e.key==='Z')))){ e.preventDefault(); redo(); }
+  else if((e.key==='Delete'||e.key==='Backspace') && selId && selId!=='zone'){ e.preventDefault(); selDelete(); }
 });
 // Onboarding schließen
 (function(){ const s=document.getElementById('obStart'); if(s) s.onclick=()=>{ try{localStorage.setItem('wl_pg_onboard','1');}catch(e){} document.getElementById('obBack').style.display='none'; }; })();
@@ -4061,12 +4117,6 @@ document.querySelectorAll('.seg').forEach(b=>b.addEventListener('click',()=>{
 }));
 const _panelClose=document.getElementById('panelClose');
 if(_panelClose)_panelClose.addEventListener('click',()=>{ const p=document.getElementById('panel'); if(p)p.classList.remove('open'); });
-document.getElementById('selSize').addEventListener('input',()=>{ const it=items.find(i=>i.id===selId); if(it){ it.wmm=parseFloat(document.getElementById('selSize').value); document.getElementById('selSizeVal').textContent=it.wmm.toFixed(1)+' mm'; render(); } });
-document.getElementById('selRot').addEventListener('input',()=>{ const it=items.find(i=>i.id===selId); if(it){ it.angle=parseFloat(document.getElementById('selRot').value); document.getElementById('selRotVal').textContent=it.angle+'°'; setTangSlider(it.angle); render(); } });
-document.getElementById('selDel').onclick=()=>{ items=items.filter(i=>i.id!==selId); select(null); };
-document.getElementById('selCenter').onclick=()=>{ const it=items.find(i=>i.id===selId); if(it){ const z=OBJECTS[current].zone; it.x=z.x+z.w/2; it.y=z.y+z.h/2; render(); } };
-document.getElementById('selFront').onclick=()=>{ const i=items.findIndex(x=>x.id===selId); if(i>=0){ const [it]=items.splice(i,1); items.push(it); render(); } };
-document.getElementById('selDup').onclick=()=>{ const it=items.find(i=>i.id===selId); if(it){ addItem({ label:it.label, viewBox:it.viewBox, bw:it.bw, bh:it.bh, inner:it.inner, colored:it.colored, x:it.x+5, y:it.y+5, wmm:it.wmm, angle:it.angle }); } };
 document.getElementById('clipSearch').addEventListener('input',e=>{ clipQuery=e.target.value; buildClipGrid(); });
 document.getElementById('logo').addEventListener('change',e=>{ const f=e.target.files[0]; if(f) handleLogoFile(f); });
 document.getElementById('qrBtn').onclick=addQR;
