@@ -225,18 +225,13 @@ input[type=range]{flex:1;accent-color:var(--accent)}
       </div>
 
       <div class="seg-pane" id="pane-code">
-        <div class="sub">QR- oder Spotify-Code erstellen — wird als saubere <b>Vektor-Gravur</b> eingefügt (ideal für LightBurn) und ist frei platzierbar.</div>
+        <div class="sub">QR-Code aus Text oder Link — wird als saubere <b>Vektor-Gravur</b> eingefügt (ideal für LightBurn) und ist frei platzierbar.</div>
         <div class="field" style="margin-bottom:.5rem">
-          <label>QR-Code — Text oder Link</label>
+          <label>Text oder Link <span style="color:var(--muted)">(auch Spotify)</span></label>
           <input type="text" id="qrInput" maxlength="300" placeholder="z. B. https://wolf-lasermark.de">
         </div>
-        <button type="button" class="tool-btn" id="qrBtn" style="width:100%;justify-content:center;margin-bottom:1.2rem">🔳 QR-Code einfügen</button>
-        <div class="field" style="margin-bottom:.5rem">
-          <label>Spotify-Code — Song-Link</label>
-          <input type="text" id="spotInput" maxlength="300" placeholder="https://open.spotify.com/track/…">
-        </div>
-        <button type="button" class="tool-btn" id="spotBtn" style="width:100%;justify-content:center">🎵 Spotify-Code einfügen</button>
-        <p class="sub" style="margin-top:.6rem">Song in Spotify öffnen → <b>Teilen → Link kopieren</b> und hier einfügen. Eingescannt öffnet der Code den Song direkt zum Abspielen.</p>
+        <button type="button" class="tool-btn" id="qrBtn" style="width:100%;justify-content:center">🔳 QR-Code einfügen</button>
+        <p class="sub" style="margin-top:.6rem">Tipp: Auch einen <b>Spotify-Song-Link</b> einfügen (in Spotify → Teilen → Link kopieren) — eingescannt öffnet der Code den Song direkt zum Abspielen.</p>
         <div class="code-msg" id="codeMsg"></div>
       </div>
 
@@ -3758,13 +3753,7 @@ function codeMsg(txt, ok){
   const el=document.getElementById('codeMsg'); if(!el) return;
   el.textContent=txt||''; el.className='code-msg'+(txt?(ok?' ok':' err'):'');
 }
-function addQR(){
-  const v=(document.getElementById('qrInput').value||'').trim();
-  if(!v){ codeMsg('Bitte Text oder Link eingeben.', false); return; }
-  try{ addItem(qrToSpec(v,'QR-Code')); codeMsg('QR-Code eingefügt — jetzt frei platzieren.', true); histCommit(); }
-  catch(e){ codeMsg('QR-Code konnte nicht erstellt werden (Text zu lang?).', false); }
-}
-// Spotify-Link → saubere open.spotify.com-URL → QR (eingescannt öffnet & spielt den Song).
+// Spotify-Link → saubere open.spotify.com-URL (entfernt ?si=…, spotify:-URI, intl-xx) — sonst null.
 function normSpotify(v){
   v=(v||'').trim(); if(!v) return null;
   let m=v.match(/spotify:(track|album|playlist|artist|episode|show):([A-Za-z0-9]+)/);
@@ -3774,12 +3763,15 @@ function normSpotify(v){
   if(/^https?:\/\/(open\.)?spotify\.com/i.test(v)) return v.split('?')[0];
   return null;
 }
-function addSpotify(){
-  const raw=(document.getElementById('spotInput').value||'').trim();
-  const url=normSpotify(raw);
-  if(!url){ codeMsg('Bitte einen gültigen Spotify-Link einfügen (open.spotify.com/…).', false); return; }
-  try{ addItem(qrToSpec(url,'Spotify-Code')); codeMsg('Spotify-Code eingefügt — eingescannt öffnet er den Song.', true); histCommit(); }
-  catch(e){ codeMsg('Spotify-Code konnte nicht erstellt werden.', false); }
+function addQR(){
+  let v=(document.getElementById('qrInput').value||'').trim();
+  if(!v){ codeMsg('Bitte Text oder Link eingeben.', false); return; }
+  const sp=normSpotify(v); if(sp) v=sp;   // Spotify-Link automatisch säubern
+  try{
+    addItem(qrToSpec(v, sp?'Spotify-Code':'QR-Code'));
+    codeMsg(sp ? 'Spotify-QR eingefügt — eingescannt öffnet er den Song.' : 'QR-Code eingefügt — jetzt frei platzieren.', true);
+    histCommit();
+  }catch(e){ codeMsg('QR-Code konnte nicht erstellt werden (Text zu lang?).', false); }
 }
 
 // ---------- admin gate (nur Bence) ----------
@@ -3826,9 +3818,7 @@ document.getElementById('selDup').onclick=()=>{ const it=items.find(i=>i.id===se
 document.getElementById('clipSearch').addEventListener('input',e=>{ clipQuery=e.target.value; buildClipGrid(); });
 document.getElementById('logo').addEventListener('change',e=>{ const f=e.target.files[0]; if(f) handleLogoFile(f); });
 document.getElementById('qrBtn').onclick=addQR;
-document.getElementById('spotBtn').onclick=addSpotify;
 document.getElementById('qrInput').addEventListener('keydown',e=>{ if(e.key==='Enter') addQR(); });
-document.getElementById('spotInput').addEventListener('keydown',e=>{ if(e.key==='Enter') addSpotify(); });
 document.getElementById('dlsvg').onclick=downloadSVG;
 document.getElementById('anfrage').onclick=()=>{ alert('Anfrage-Versand wird im nächsten Schritt angebunden (Formspree + Foto-Upload), wie auf der Typenschild-Seite.'); };
 
