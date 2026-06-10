@@ -960,8 +960,9 @@ const TEMPLATES=[
       zeileVals=['Für immer'];
       lineStyle=[{fam:'caveat',italic:false,bold:false,underline:false}];
       lineGeom=[null]; items=[];
-      const z=OBJECTS[current].zone;
-      if(CLIPARTS.heart){ addItem({label:CLIPARTS.heart.name, viewBox:CLIPARTS.heart.vb, inner:CLIPARTS.heart.inner, x:z.x+z.w/2, y:z.y+z.h*0.28, wmm:Math.min(14,z.w*0.4)}); }
+      const z=OBJECTS[current].zone, hc=CLIPARTS.heart;
+      if(hc){ const p=hc.vb.trim().split(/[\s,]+/).map(Number);
+        addItem({label:hc.name, viewBox:hc.vb, bw:p[2]||100, bh:p[3]||100, inner:hc.inner, colored:false, x:z.x+z.w/2, y:z.y+z.h*0.28, wmm:Math.min(14,z.w*0.4)}); }
     }}
 ];
 function buildTplRow(){
