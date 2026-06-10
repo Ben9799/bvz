@@ -158,7 +158,7 @@ input[type=range]{flex:1;accent-color:var(--accent)}
         <button type="button" id="addZeile" class="tool-btn" style="width:100%;margin:.2rem 0 .5rem;justify-content:center">＋ Zeile hinzufügen</button>
         <button type="button" id="mergeZeilen" class="tool-btn" style="width:100%;margin:0 0 .9rem;justify-content:center">🔗 Alle Zeilen zusammenfügen</button>
         <div class="field">
-          <label for="font">Schriftart</label>
+          <label for="font">Schriftart – alle Zeilen <span style="color:var(--muted);font-weight:500">(je Zeile unten änderbar)</span></label>
           <select id="font">
             <optgroup label="Klassisch (auch in LightBurn)">
               <option value="Arial|400">Arial</option>
@@ -202,7 +202,7 @@ input[type=range]{flex:1;accent-color:var(--accent)}
             <div class="range-row"><input type="range" id="cap" min="2" max="10" step="0.5" value="4"></div>
           </div>
           <div class="field" style="margin-bottom:0">
-            <label>Text drehen <span class="rval" id="tangVal">0°</span></label>
+            <label>Drehen (Auswahl) <span class="rval" id="tangVal">0°</span></label>
             <div class="range-row"><input type="range" id="tang" min="-180" max="180" step="5" value="0"></div>
           </div>
         </div>
@@ -373,11 +373,18 @@ let selId=null;    // ausgewähltes Element-id (oder 'text' / 'zone' / null)
 const EMOJI_RE2=/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{2300}-\u{23FF}\u{2190}-\u{21FF}\u{FE00}-\u{FE0F}\u{200D}\u{20E3}]/gu;
 let zeileVals=['Max Mustermann'];
 let lineGeom=[null];   // pro Zeile: null=im Block (gestapelt) | {x,y,angle,cap,scaleX}=frei platziert
+let lineFonts=[''];    // pro Zeile: ''=Standard (globale Auswahl) | "css|weight"
+let textAng=0;         // Winkel des Text-Blocks — entkoppelt vom Schieberegler, damit dieser die aktive Auswahl dreht
 const MAX_ZEILEN=8;
 function getLines(){ return zeileVals.map(v=>v.trim()).filter(Boolean); }
-function blockStrs(){ return zeileVals.filter((v,i)=>v.trim() && lineGeom[i]==null).map(v=>v.trim()); }
+function defFontVal(){ return document.getElementById('font').value; }
+function fontValOf(i){ return lineFonts[i] || defFontVal(); }
+function fontOf(i){ const [css,weight]=fontValOf(i).split('|'); return {css,weight}; }
+function blockEntries(){ return zeileVals.map((v,i)=>({str:v.trim(),oi:i})).filter(e=>e.str && lineGeom[e.oi]==null); }
+function blockStrs(){ return blockEntries().map(e=>e.str); }
 function buildZeilen(){
   const wrap=document.getElementById('zeilen'); wrap.innerHTML='';
+  const FONT_OPTS=document.getElementById('font').innerHTML;
   zeileVals.forEach((val,idx)=>{
     const f=document.createElement('div'); f.className='field'; f.style.marginBottom='.55rem';
     const lbl=document.createElement('label'); lbl.textContent='Zeile '+(idx+1)+(idx>0?' (optional)':'');
@@ -400,10 +407,15 @@ function buildZeilen(){
     if(zeileVals.length>1){
       const del=document.createElement('button'); del.type='button'; del.className='tool-btn danger'; del.textContent='✕';
       del.style.flex='0 0 auto'; del.style.padding='.5rem .6rem'; del.title='Zeile entfernen';
-      del.onclick=()=>{ zeileVals.splice(idx,1); lineGeom.splice(idx,1); if(typeof selId==='string'&&selId.indexOf('line:')===0) selId=null; buildZeilen(); showSel(); render(); };
+      del.onclick=()=>{ zeileVals.splice(idx,1); lineGeom.splice(idx,1); lineFonts.splice(idx,1); if(typeof selId==='string'&&selId.indexOf('line:')===0) selId=null; buildZeilen(); showSel(); render(); };
       rowEl.appendChild(del);
     }
-    f.appendChild(lbl); f.appendChild(rowEl); wrap.appendChild(f);
+    const fsel=document.createElement('select');
+    fsel.innerHTML=FONT_OPTS; fsel.value=fontValOf(idx);
+    fsel.style.marginTop='.4rem'; fsel.style.fontSize='.82rem'; fsel.style.padding='.5rem .6rem';
+    fsel.title='Schriftart dieser Zeile';
+    fsel.onchange=()=>{ lineFonts[idx]=fsel.value; render(); };
+    f.appendChild(lbl); f.appendChild(rowEl); f.appendChild(fsel); wrap.appendChild(f);
   });
   const addBtn=document.getElementById('addZeile');
   if(addBtn) addBtn.style.display = zeileVals.length>=MAX_ZEILEN ? 'none' : 'flex';
@@ -415,9 +427,35 @@ function itemSVGString(it,color){
 }
 function makeItemImg(it){
   const im=new Image();
-  im.onload=()=>{ im._ready=true; render(); };
+  im.onload=()=>{ im._ready=true; if(!it._trimmed) trimItem(it); render(); };
   im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(itemSVGString(it,'#000'));
   it.img=im;
+}
+// Bounding-Box auf den tatsächlich gezeichneten Inhalt zuschneiden → Auswahl-Rahmen = Icon-Form,
+// nicht der leere viewBox-Kasten (sonst lässt sich ein Icon nicht ganz in die Ecke ziehen).
+function trimItem(it){
+  it._trimmed=true;
+  const im=it.img; if(!im||!im.width||!im.height) return;
+  const sc=Math.min(1,300/Math.max(im.width,im.height));
+  const cw=Math.max(2,Math.round(im.width*sc)), ch=Math.max(2,Math.round(im.height*sc));
+  const oc=document.createElement('canvas'); oc.width=cw; oc.height=ch;
+  const og=oc.getContext('2d'); og.drawImage(im,0,0,cw,ch);
+  let d; try{ d=og.getImageData(0,0,cw,ch).data; }catch(e){ return; }
+  let x0=cw,y0=ch,x1=-1,y1=-1;
+  for(let y=0;y<ch;y++)for(let x=0;x<cw;x++){ if(d[(y*cw+x)*4+3]>16){ if(x<x0)x0=x; if(x>x1)x1=x; if(y<y0)y0=y; if(y>y1)y1=y; } }
+  if(x1<x0||y1<y0) return; // leer
+  const fx0=x0/cw, fy0=y0/ch, fx1=(x1+1)/cw, fy1=(y1+1)/ch;
+  if(fx0<0.01 && fy0<0.01 && fx1>0.99 && fy1>0.99) return; // schon eng
+  const vb=String(it.viewBox).trim().split(/[\s,]+/).map(Number);
+  const vx=vb[0]||0, vy=vb[1]||0, vw=vb[2]||100, vh=vb[3]||100;
+  const oldHmm=it.hmm!=null?it.hmm:it.wmm*(it.bh/it.bw);
+  it.x += ((fx0+fx1)/2-0.5)*it.wmm;   // Inhalt visuell am Ort lassen
+  it.y += ((fy0+fy1)/2-0.5)*oldHmm;
+  it.viewBox=`${vx+fx0*vw} ${vy+fy0*vh} ${(fx1-fx0)*vw} ${(fy1-fy0)*vh}`;
+  it.bw=(fx1-fx0)*vw; it.bh=(fy1-fy0)*vh;
+  it.wmm=it.wmm*(fx1-fx0); it.hmm=oldHmm*(fy1-fy0);
+  if(selId===it.id) syncSelSliders();
+  makeItemImg(it); // mit zugeschnittenem viewBox neu erzeugen (kein Re-Trim: _trimmed=true)
 }
 function addItem(spec){
   const o=OBJECTS[current], z=o.zone;
@@ -567,29 +605,27 @@ function getFont(){ const [css,weight]=document.getElementById('font').value.spl
 
 // Compute laid-out text lines fitted into the engraving zone. Returns {lines:[{str,capMM,wmm}], capMM, fits}
 function layout(){
-  const o=OBJECTS[current], z=o.zone, f=getFont();
+  const o=OBJECTS[current], z=o.zone;
   let capMM=parseFloat(document.getElementById('cap').value);
-  const entries=zeileVals.map((v,i)=>({oi:i,str:v.trim()})).filter(e=>e.str && lineGeom[e.oi]==null);
-  const strs=entries.map(e=>e.str);
-  if(!strs.length) return {o,z,f,lines:[],capMM,fits:true};
+  const meas=blockEntries().map(e=>{ const f=fontOf(e.oi); return {str:e.str, oi:e.oi, f, cr:capRatio(f.css,f.weight)}; });
+  if(!meas.length) return {o,z,lines:[],capMM,fits:true};
 
   // available primary axis = width for horizontal, height for vertical
   const availLen = (o.orient==='h') ? z.w : z.h;
   const availStack = (o.orient==='h') ? z.h : z.w; // perpendicular budget for stacked lines
-  const cr=capRatio(f.css,f.weight);
   const gapMM=()=>capMM*0.55;
 
   let fits=true;
-  // shrink capMM until all lines fit length-wise AND the stack fits
+  // shrink capMM until all lines fit length-wise AND the stack fits (each line uses its own font)
   for(let i=0;i<200;i++){
-    const widest=Math.max(...strs.map(sx=>emWidthRatio(sx,f.css,f.weight)*(capMM/cr)));
-    const stackH=strs.length*capMM + (strs.length-1)*gapMM();
+    const widest=Math.max(...meas.map(m=>emWidthRatio(m.str,m.f.css,m.f.weight)*(capMM/m.cr)));
+    const stackH=meas.length*capMM + (meas.length-1)*gapMM();
     if(widest<=availLen && stackH<=availStack) break;
     capMM-=0.1;
     if(capMM<=1.2){ capMM=1.2; fits=false; break; }
   }
-  const lines=entries.map(e=>({str:e.str, oi:e.oi, capMM, wmm:emWidthRatio(e.str,f.css,f.weight)*(capMM/cr)}));
-  return {o,z,f,lines,capMM,fits};
+  const lines=meas.map(m=>({str:m.str, oi:m.oi, f:m.f, capMM, wmm:emWidthRatio(m.str,m.f.css,m.f.weight)*(capMM/m.cr)}));
+  return {o,z,lines,capMM,fits};
 }
 
 function computeScale(o){
@@ -641,7 +677,7 @@ function render(){
   const tc=textCenter(z);
   ctx.save();
   ctx.translate(px(tc.x,s),py(tc.y,s));
-  ctx.rotate(parseFloat(document.getElementById('tang').value)*Math.PI/180);
+  ctx.rotate(textAng*Math.PI/180);
   ctx.scale(textScaleX,1);
   ctx.fillStyle = inkColor(o);
   ctx.textAlign='center'; ctx.textBaseline='middle';
@@ -650,16 +686,16 @@ function render(){
   const total=L.lines.length;
   L.lines.forEach((ln,i)=>{
     const offset=(i-(total-1)/2)*lineStepPx;
-    ctx.font=`${L.f.weight} ${(ln.capMM/capRatio(L.f.css,L.f.weight))*s.ppmm}px "${L.f.css}"`;
+    ctx.font=`${ln.f.weight} ${(ln.capMM/capRatio(ln.f.css,ln.f.weight))*s.ppmm}px "${ln.f.css}"`;
     ctx.fillText(ln.str,0,offset);
   });
   ctx.restore();
 
-  // frei platzierte Zeilen (außerhalb des Blocks)
+  // frei platzierte Zeilen (außerhalb des Blocks) — je Zeile eigene Schrift
   {
-    const ff=getFont(), fcr=capRatio(ff.css,ff.weight);
     zeileVals.forEach((v,i)=>{
       const str=v.trim(), lg=lineGeom[i]; if(!str||!lg) return;
+      const ff=fontOf(i), fcr=capRatio(ff.css,ff.weight);
       ctx.save();
       ctx.translate(px(lg.x,s),py(lg.y,s));
       ctx.rotate(lg.angle*Math.PI/180);
@@ -713,22 +749,23 @@ function render(){
 // ---------- mm-accurate SVG (LightBurn) ----------
 function escapeXML(s){ return String(s).replace(/[<>&"']/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c])); }
 function renderSVG(){
-  const o=OBJECTS[current], z=o.zone, L=layout(), f=L.f;
-  const cr=capRatio(f.css,f.weight);
+  const o=OBJECTS[current], z=o.zone, L=layout();
   const tc=textCenter(z);
   const gapMM=L.capMM*0.55, total=L.lines.length;
-  const tang=parseFloat(document.getElementById('tang').value);
+  const tang=textAng;
   let eng='';
   L.lines.forEach((ln,i)=>{
     const off=(i-(total-1)/2)*(L.capMM+gapMM);
+    const cr=capRatio(ln.f.css,ln.f.weight);
     const fs=(ln.capMM/cr).toFixed(2);
-    eng+=`<text transform="translate(${tc.x.toFixed(2)},${tc.y.toFixed(2)}) rotate(${tang}) scale(${textScaleX.toFixed(4)},1)" x="0" y="${off.toFixed(2)}" font-family="${f.css}" font-weight="${f.weight}" font-size="${fs}" text-anchor="middle" dominant-baseline="central" fill="#000">${escapeXML(ln.str)}</text>`;
+    eng+=`<text transform="translate(${tc.x.toFixed(2)},${tc.y.toFixed(2)}) rotate(${tang}) scale(${textScaleX.toFixed(4)},1)" x="0" y="${off.toFixed(2)}" font-family="${ln.f.css}" font-weight="${ln.f.weight}" font-size="${fs}" text-anchor="middle" dominant-baseline="central" fill="#000">${escapeXML(ln.str)}</text>`;
   });
   let freeEng='';
   zeileVals.forEach((v,i)=>{
     const str=v.trim(), lg=lineGeom[i]; if(!str||!lg) return;
+    const ff=fontOf(i), cr=capRatio(ff.css,ff.weight);
     const fs=(lg.cap/cr).toFixed(2);
-    freeEng+=`<text transform="translate(${lg.x.toFixed(2)},${lg.y.toFixed(2)}) rotate(${lg.angle}) scale(${lg.scaleX.toFixed(4)},1)" x="0" y="0" font-family="${f.css}" font-weight="${f.weight}" font-size="${fs}" text-anchor="middle" dominant-baseline="central" fill="#000">${escapeXML(str)}</text>`;
+    freeEng+=`<text transform="translate(${lg.x.toFixed(2)},${lg.y.toFixed(2)}) rotate(${lg.angle}) scale(${lg.scaleX.toFixed(4)},1)" x="0" y="0" font-family="${ff.css}" font-weight="${ff.weight}" font-size="${fs}" text-anchor="middle" dominant-baseline="central" fill="#000">${escapeXML(str)}</text>`;
   });
   eng+=freeEng;
   const itemsSVG=items.map(itemExportSVG).join('');
@@ -750,9 +787,12 @@ function downloadSVG(){
 // default text angle: vertikale Objekte → -90° (Text läuft am Schaft entlang)
 function applyAngleDefault(){
   const o=OBJECTS[current];
-  const def = o.orient==='v' ? -90 : 0;
-  const t=document.getElementById('tang'); t.value=def;
-  document.getElementById('tangVal').textContent=def+'°';
+  textAng = o.orient==='v' ? -90 : 0;
+  setTangSlider(textAng);
+}
+function setTangSlider(a){
+  const t=document.getElementById('tang'); t.value=Math.round(a);
+  document.getElementById('tangVal').textContent=Math.round(a)+'°';
 }
 
 // ---------- Auswahl ----------
@@ -763,12 +803,11 @@ function detachLine(idx){
   const str=zeileVals[idx]?zeileVals[idx].trim():''; if(!str) return;
   const L=layout(); // Block-Layout VOR dem Lösen (idx ist noch im Block)
   const o=OBJECTS[current], z=o.zone, tc=textCenter(z);
-  const tang=parseFloat(document.getElementById('tang').value);
   const gap=L.capMM*0.55, step=L.capMM+gap, total=L.lines.length;
   const bi=L.lines.findIndex(ln=>ln.oi===idx);
   const off=(bi-(total-1)/2)*step;
-  const a=tang*Math.PI/180;
-  lineGeom[idx]={ x:tc.x - Math.sin(a)*off, y:tc.y + Math.cos(a)*off, angle:tang, cap:L.capMM, scaleX:textScaleX };
+  const a=textAng*Math.PI/180;
+  lineGeom[idx]={ x:tc.x - Math.sin(a)*off, y:tc.y + Math.cos(a)*off, angle:textAng, cap:L.capMM, scaleX:textScaleX };
   selId='line:'+idx;
   const g=selGeom(); if(g) applySelGeom(g); // in den Rahmen einklemmen
   buildZeilen(); showSel(); render();
@@ -794,8 +833,13 @@ function showSel(){
     document.getElementById('selRot').value=it.angle;
     document.getElementById('selRotVal').textContent=Math.round(it.angle)+'°';
   } else { box.style.display='none'; }
+  // Drehen-Schieberegler auf den Winkel der aktuellen Auswahl stellen (sonst Block-Winkel)
+  const g=selGeom();
+  setTangSlider(g && selId && selId!=='zone' ? g.angle : textAng);
 }
 function syncSelSliders(){
+  const g=selGeom();
+  if(g && selId && selId!=='zone') setTangSlider(g.angle);
   const it=items.find(i=>i.id===selId);
   if(!it) return;
   document.getElementById('selSize').value=it.wmm;
@@ -813,13 +857,12 @@ function selGeom(){
     const gap=L.capMM*0.55;
     const hw=textNatHalfW(L)*textScaleX+1.2;
     const hh=(L.lines.length*L.capMM+(L.lines.length-1)*gap)/2+1.2;
-    const ang=parseFloat(document.getElementById('tang').value);
-    return {kind:'text',cx:tc.x,cy:tc.y,hw,hh,angle:ang};
+    return {kind:'text',cx:tc.x,cy:tc.y,hw,hh,angle:textAng};
   }
   if(typeof selId==='string' && selId.indexOf('line:')===0){
     const i=+selId.slice(5), lg=lineGeom[i], str=zeileVals[i]?zeileVals[i].trim():'';
     if(!lg||!str) return null;
-    const f=getFont(), cr=capRatio(f.css,f.weight);
+    const f=fontOf(i), cr=capRatio(f.css,f.weight);
     const natW=emWidthRatio(str,f.css,f.weight)*(lg.cap/cr);
     return {kind:'line',cx:lg.x,cy:lg.y,hw:natW*lg.scaleX/2+1.2,hh:lg.cap/2+1.2,angle:lg.angle};
   }
@@ -848,14 +891,13 @@ function fitAndClamp(ng,b){
 }
 function writeTextGeom(r){
   textPos.x=r.cx; textPos.y=r.cy;
-  const t=document.getElementById('tang'); t.value=Math.round(r.angle); document.getElementById('tangVal').textContent=Math.round(r.angle)+'°';
-  const lines=blockStrs(); const n=Math.max(1,lines.length);
+  textAng=r.angle; setTangSlider(r.angle);
+  const ents=blockEntries(); const n=Math.max(1,ents.length);
   const denom=n+0.55*(n-1);
   const capEl2=document.getElementById('cap');
   const cap=clamp((2*(r.hh-1.2))/denom, parseFloat(capEl2.min), parseFloat(capEl2.max));
   capEl2.value=cap; document.getElementById('capVal').textContent=cap.toFixed(1)+' mm';
-  const f=getFont(), cr=capRatio(f.css,f.weight);
-  const natW=lines.length?Math.max(...lines.map(s=>emWidthRatio(s,f.css,f.weight)*(cap/cr))):1;
+  const natW=ents.length?Math.max(...ents.map(e=>{ const f=fontOf(e.oi), cr=capRatio(f.css,f.weight); return emWidthRatio(e.str,f.css,f.weight)*(cap/cr); })):1;
   textScaleX=clamp((r.hw-1.2)/Math.max(0.5,natW/2), 0.25, 6);
 }
 // Gravurbereich-Overrides (Admin) pro Objekt persistieren
@@ -888,7 +930,7 @@ function applySelGeom(ng){
     if(lg){
       lg.x=r.cx; lg.y=r.cy; lg.angle=r.angle;
       lg.cap=clamp(2*(r.hh-1.2),1.5,16);
-      const f=getFont(), cr=capRatio(f.css,f.weight);
+      const f=fontOf(i), cr=capRatio(f.css,f.weight);
       const natW=emWidthRatio(zeileVals[i].trim(),f.css,f.weight)*(lg.cap/cr);
       lg.scaleX=clamp((r.hw-1.2)/Math.max(0.5,natW/2),0.25,6);
     }
@@ -929,9 +971,9 @@ function hitTest(m){
     if(pointInRotRect(m.x,m.y,it.x,it.y,it.wmm/2+1,hmm/2+1,it.angle)) return {type:'item',item:it};
   }
   {
-    const f=getFont(), cr=capRatio(f.css,f.weight);
     for(let i=zeileVals.length-1;i>=0;i--){
       const str=zeileVals[i]?zeileVals[i].trim():'', lg=lineGeom[i]; if(!str||!lg) continue;
+      const f=fontOf(i), cr=capRatio(f.css,f.weight);
       const natW=emWidthRatio(str,f.css,f.weight)*(lg.cap/cr);
       if(pointInRotRect(m.x,m.y,lg.x,lg.y,natW*lg.scaleX/2+1.5,lg.cap/2+1.5,lg.angle)) return {type:'line',i};
     }
@@ -942,8 +984,7 @@ function hitTest(m){
     const gap=L.capMM*0.55;
     const tw=textNatHalfW(L)*textScaleX+1.5;
     const th=(L.lines.length*L.capMM+(L.lines.length-1)*gap)/2+1.5;
-    const ang=parseFloat(document.getElementById('tang').value);
-    if(pointInRotRect(m.x,m.y,tc.x,tc.y,tw,th,ang)) return {type:'text'};
+    if(pointInRotRect(m.x,m.y,tc.x,tc.y,tw,th,textAng)) return {type:'text'};
   }
   return null;
 }
@@ -1072,8 +1113,22 @@ function buildClipGrid(){
 })();
 
 // Gravur-Parameter → bei Änderung neu rendern (Emoji-Filter sitzt in buildZeilen)
-['cap','font'].forEach(id=>document.getElementById(id).addEventListener('input',render));
-document.getElementById('tang').addEventListener('input',()=>{ document.getElementById('tangVal').textContent=document.getElementById('tang').value+'°'; render(); });
+document.getElementById('cap').addEventListener('input',render);
+// globale Schriftart = "alle Zeilen": setzt jede Zeile + Standard für neue Zeilen
+document.getElementById('font').addEventListener('input',()=>{
+  const v=document.getElementById('font').value;
+  lineFonts=zeileVals.map(()=>v);
+  buildZeilen(); render();
+});
+// Drehen-Schieberegler dreht die AKTUELLE Auswahl (Block-Text / freie Zeile / Element)
+document.getElementById('tang').addEventListener('input',()=>{
+  const v=parseFloat(document.getElementById('tang').value);
+  document.getElementById('tangVal').textContent=v+'°';
+  if(selId==='zone'){ /* Zone wird nicht gedreht */ }
+  else if(selId){ const g=selGeom(); if(g) applySelGeom({...g, angle:v}); }
+  else { textAng=v; }
+  syncSelSliders(); render();
+});
 // Segment-Tabs (Text / Motive / Logo)
 document.querySelectorAll('.seg').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('.seg').forEach(x=>x.classList.remove('active'));
@@ -1082,7 +1137,7 @@ document.querySelectorAll('.seg').forEach(b=>b.addEventListener('click',()=>{
   document.getElementById('pane-'+b.dataset.pane).classList.add('active');
 }));
 document.getElementById('selSize').addEventListener('input',()=>{ const it=items.find(i=>i.id===selId); if(it){ it.wmm=parseFloat(document.getElementById('selSize').value); document.getElementById('selSizeVal').textContent=it.wmm.toFixed(1)+' mm'; render(); } });
-document.getElementById('selRot').addEventListener('input',()=>{ const it=items.find(i=>i.id===selId); if(it){ it.angle=parseFloat(document.getElementById('selRot').value); document.getElementById('selRotVal').textContent=it.angle+'°'; render(); } });
+document.getElementById('selRot').addEventListener('input',()=>{ const it=items.find(i=>i.id===selId); if(it){ it.angle=parseFloat(document.getElementById('selRot').value); document.getElementById('selRotVal').textContent=it.angle+'°'; setTangSlider(it.angle); render(); } });
 document.getElementById('selDel').onclick=()=>{ items=items.filter(i=>i.id!==selId); select(null); };
 document.getElementById('selCenter').onclick=()=>{ const it=items.find(i=>i.id===selId); if(it){ const z=OBJECTS[current].zone; it.x=z.x+z.w/2; it.y=z.y+z.h/2; render(); } };
 document.getElementById('selFront').onclick=()=>{ const i=items.findIndex(x=>x.id===selId); if(i>=0){ const [it]=items.splice(i,1); items.push(it); render(); } };
@@ -1095,7 +1150,7 @@ document.getElementById('anfrage').onclick=()=>{ alert('Anfrage-Versand wird im 
 // Zeile hinzufügen
 document.getElementById('addZeile').addEventListener('click',()=>{
   if(zeileVals.length>=MAX_ZEILEN) return;
-  zeileVals.push(''); lineGeom.push(null); buildZeilen(); render();
+  zeileVals.push(''); lineGeom.push(null); lineFonts.push(defFontVal()); buildZeilen(); render();
   const inps=document.querySelectorAll('#zeilen .zeile-input');
   if(inps.length) inps[inps.length-1].focus();
 });
