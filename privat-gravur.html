@@ -254,8 +254,8 @@ input[type=range]{flex:1;accent-color:var(--accent)}
     </div>
 
     <div class="rail" id="rail">
-      <button class="seg active" data-pane="text"><span class="ic">✏️</span><small>Text</small></button>
-      <button class="seg" data-pane="vorlagen"><span class="ic">✨</span><small>Vorlagen</small></button>
+      <button class="seg active" data-pane="vorlagen"><span class="ic">✨</span><small>Vorlagen</small></button>
+      <button class="seg" data-pane="text"><span class="ic">✏️</span><small>Text</small></button>
       <button class="seg" data-pane="motive"><span class="ic">🎨</span><small>Grafik</small></button>
       <button class="seg" data-pane="logo"><span class="ic">🖼️</span><small>Logo</small></button>
       <button class="seg" data-pane="code"><span class="ic">🔳</span><small>Code</small></button>
@@ -264,38 +264,13 @@ input[type=range]{flex:1;accent-color:var(--accent)}
     <div class="panel" id="panel">
       <div class="panel-head">
         <div class="panel-head-txt">
-          <h2 id="panelTitle">Text</h2>
-          <div class="psub" id="panelSub">Tippe deinen Wunschtext — Stil je Zeile einstellbar.</div>
+          <h2 id="panelTitle">Vorlagen &amp; Sprüche</h2>
+          <div class="psub" id="panelSub">Fertige Sprüche nach Anlass &amp; Empfänger.</div>
         </div>
         <button type="button" class="panel-close" id="panelClose" aria-label="Fenster schließen" title="Schließen">✕</button>
       </div>
 
-      <div class="seg-pane active" id="pane-text">
-        <div class="field-group">
-          <div class="group-head"><span class="ic">✏️</span> Dein Text <span class="hint">Stil je Zeile</span></div>
-          <div id="zeilen"></div>
-          <button type="button" id="addZeile" class="tool-btn" style="width:100%;margin:.2rem 0 .5rem;justify-content:center">＋ Zeile hinzufügen</button>
-          <button type="button" id="mergeZeilen" class="tool-btn" style="width:100%;margin:0;justify-content:center">🔗 Alle Zeilen zusammenfügen</button>
-        </div>
-
-        <details class="acc">
-          <summary><span class="ic">⚙️</span> Feineinstellung <span class="hint">Höhe &amp; Drehung</span><span class="chev">▾</span></summary>
-          <div class="acc-body">
-            <div class="row2">
-              <div class="field" style="margin-bottom:0">
-                <label>Schrifthöhe <span class="rval" id="capVal">4.0 mm</span></label>
-                <div class="range-row"><input type="range" id="cap" min="2" max="10" step="0.5" value="4"></div>
-              </div>
-              <div class="field" style="margin-bottom:0">
-                <label>Drehen (Auswahl) <span class="rval" id="tangVal">0°</span></label>
-                <div class="range-row"><input type="range" id="tang" min="-180" max="180" step="5" value="0"></div>
-              </div>
-            </div>
-          </div>
-        </details>
-      </div>
-
-      <div class="seg-pane" id="pane-vorlagen">
+      <div class="seg-pane active" id="pane-vorlagen">
         <div class="sub">Wofür ist das Geschenk? Bereich aufklappen &amp; Kategorie wählen — passende Sprüche erscheinen darunter.</div>
         <div class="cat-tabs" id="allTab" style="margin-bottom:.6rem"></div>
         <details class="acc" id="accPerson">
@@ -318,6 +293,31 @@ input[type=range]{flex:1;accent-color:var(--accent)}
           </div>
           <div class="tpl-row" id="tplRow"></div>
         </div>
+      </div>
+
+      <div class="seg-pane" id="pane-text">
+        <div class="field-group">
+          <div class="group-head"><span class="ic">✏️</span> Dein Text <span class="hint">Stil je Zeile</span></div>
+          <div id="zeilen"></div>
+          <button type="button" id="addZeile" class="tool-btn" style="width:100%;margin:.2rem 0 .5rem;justify-content:center">＋ Zeile hinzufügen</button>
+          <button type="button" id="mergeZeilen" class="tool-btn" style="width:100%;margin:0;justify-content:center">🔗 Alle Zeilen zusammenfügen</button>
+        </div>
+
+        <details class="acc">
+          <summary><span class="ic">⚙️</span> Feineinstellung <span class="hint">Höhe &amp; Drehung</span><span class="chev">▾</span></summary>
+          <div class="acc-body">
+            <div class="row2">
+              <div class="field" style="margin-bottom:0">
+                <label>Schrifthöhe <span class="rval" id="capVal">4.0 mm</span></label>
+                <div class="range-row"><input type="range" id="cap" min="2" max="10" step="0.5" value="4"></div>
+              </div>
+              <div class="field" style="margin-bottom:0">
+                <label>Drehen (Auswahl) <span class="rval" id="tangVal">0°</span></label>
+                <div class="range-row"><input type="range" id="tang" min="-180" max="180" step="5" value="0"></div>
+              </div>
+            </div>
+          </div>
+        </details>
       </div>
 
       <div class="seg-pane" id="pane-motive">
@@ -3687,7 +3687,11 @@ function showSel(){
     hint.style.display = hasSel ? 'block' : 'none';
     if(hasSel){ const nm=document.getElementById('selName'); if(nm) nm.textContent = it ? (it.label||'Element') : 'Text'; }
   }
-  if(hasSel){ const _pnl=document.getElementById('panel'); if(_pnl)_pnl.classList.add('open'); }
+  if(hasSel){
+    // Bei Text-/Zeilen-Auswahl direkt das Text-Panel öffnen (zum Bearbeiten), sonst nur Panel aufklappen.
+    if((selId==='text' || (typeof selId==='string'&&selId.indexOf('line:')===0)) && typeof openPane==='function') openPane('text');
+    else { const _pnl=document.getElementById('panel'); if(_pnl)_pnl.classList.add('open'); }
+  }
   // Schieberegler (Drehen + Höhe) auf die aktuelle Auswahl stellen (sonst Block-Werte)
   const g=selGeom();
   setTangSlider(g && selId && selId!=='zone' ? g.angle : textAng);
@@ -3816,7 +3820,9 @@ function selButtons(g,s){
   const top=[];
   const it=items.find(i=>i.id===selId);
   if(it){
-    const acts=[{action:'duplicate',icon:'dup'},{action:'center',icon:'center'},{action:'front',icon:'front'}];
+    const acts=[{action:'duplicate',icon:'dup'},{action:'center',icon:'center'}];
+    // "Nach vorne" nur sinnvoll, wenn mehrere Elemente überlappen können.
+    if(items.length>1) acts.push({action:'front',icon:'front'});
     const gap=34, ty=H.topMid.y-36, sx=H.topMid.x-(acts.length-1)*gap/2;
     acts.forEach((a,i)=>top.push({x:sx+i*gap,y:ty,action:a.action,icon:a.icon}));
   }
