@@ -185,30 +185,30 @@ input[type=range]{flex:1;accent-color:var(--accent)}
 .panel-head h2{margin-bottom:.15rem}
 .panel-head .psub{font-size:.8rem;color:var(--muted);line-height:1.4}
 
-/* === Editor als kompaktes Overlay im Vorschau-Fenster === */
-.panel-head{display:flex;align-items:flex-start;gap:.6rem}
-.panel-toggle{flex:0 0 auto;width:30px;height:30px;border-radius:9px;border:1px solid var(--border);background:rgba(0,212,255,0.09);color:var(--accent);font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.18s}
-.panel-toggle:hover{background:rgba(0,212,255,0.18)}
-.panel-toggle .pt-ic{display:block;transition:transform .22s ease;transform:rotate(90deg)}
-.panel.collapsed .panel-toggle .pt-ic{transform:rotate(0deg)}
-.panel-head-txt{min-width:0}
-.panel.collapsed .panel-head-txt .psub{display:none}
-.panel.collapsed>*:not(.panel-head){display:none}
-.panel.collapsed{padding-bottom:1.2rem}
+/* === Editor: Icon-Leiste rechts + Flyout-Fenster (laserliebe-Stil) === */
+.panel-head{display:flex;align-items:center;gap:.6rem}
+.panel-head-txt{min-width:0;flex:1}
+.panel-close{flex:0 0 auto;width:30px;height:30px;border-radius:9px;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:var(--muted2);font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.18s}
+.panel-close:hover{color:var(--text);background:rgba(0,212,255,0.12);border-color:var(--accent)}
+.rail{display:flex;flex-direction:column;gap:.55rem}
+.rail .seg{flex:0 0 auto;width:66px;height:66px;flex-direction:column;gap:.18rem;border-radius:16px;background:rgba(2,6,23,0.72);backdrop-filter:blur(8px);border:1px solid var(--border);color:var(--muted2);font-size:.6rem;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.4);padding:.3rem}
+.rail .seg .ic{font-size:1.35rem}
+.rail .seg:hover{color:var(--text);border-color:var(--accent)}
+.rail .seg.active{background:linear-gradient(135deg,rgba(0,212,255,0.22),rgba(0,153,187,0.14));color:var(--text);border-color:var(--accent);box-shadow:0 8px 26px rgba(0,212,255,0.22)}
 
 @media(min-width:841px){
-  .stage{align-items:center;padding-right:404px}
-  .panel{position:absolute;top:1.1rem;right:1.1rem;width:372px;max-height:calc(100% - 2.2rem);overflow-y:auto;z-index:6}
-  .panel.collapsed{width:auto;max-height:none;overflow:visible}
-  .studio:has(.panel.collapsed) .stage{padding-right:1.4rem}
+  .stage{align-items:center;padding-right:104px}
+  .rail{position:absolute;top:1.1rem;right:1.1rem;z-index:8}
+  .panel{position:absolute;top:1.1rem;right:6.1rem;width:368px;max-height:calc(100% - 2.2rem);overflow-y:auto;z-index:7;display:none;transform:translateX(12px);opacity:0;transition:transform .2s ease,opacity .2s ease}
+  .panel.open{display:block;transform:none;opacity:1}
   .panel::-webkit-scrollbar{width:7px}.panel::-webkit-scrollbar-thumb{background:rgba(0,212,255,0.25);border-radius:4px}
 }
 @media(max-width:840px){
   .stage{min-height:auto;padding-right:1.4rem}
-  .panel{position:static;width:auto;margin-top:1.2rem;backdrop-filter:none;background:linear-gradient(180deg,rgba(17,24,39,0.55),rgba(11,17,32,0.55))}
-  .panel.collapsed>*:not(.panel-head){display:block}
-  .panel.collapsed .panel-head-txt .psub{display:block}
-  .panel-toggle{display:none}
+  .rail{flex-direction:row;flex-wrap:wrap;justify-content:center;margin-top:1.2rem}
+  .rail .seg{width:74px;height:58px}
+  .panel{position:static;width:auto;margin-top:.9rem;display:block;backdrop-filter:none;background:linear-gradient(180deg,rgba(17,24,39,0.55),rgba(11,17,32,0.55))}
+  .panel-close{display:none}
 }
 </style>
 </head>
@@ -246,20 +246,20 @@ input[type=range]{flex:1;accent-color:var(--accent)}
       </div>
     </div>
 
-    <div class="panel">
-      <div class="panel-head">
-        <button type="button" class="panel-toggle" aria-label="Editor ein-/ausklappen" title="Ein-/ausklappen" onclick="this.closest('.panel').classList.toggle('collapsed')"><span class="pt-ic">▸</span></button>
-        <div class="panel-head-txt">
-          <h2>Gravur gestalten</h2>
-          <div class="psub">Wähle einen Bereich, gestalte ihn — alles bleibt übersichtlich.</div>
-        </div>
-      </div>
+    <div class="rail" id="rail">
+      <button class="seg active" data-pane="text"><span class="ic">✏️</span><small>Text</small></button>
+      <button class="seg" data-pane="motive"><span class="ic">🎨</span><small>Grafik</small></button>
+      <button class="seg" data-pane="logo"><span class="ic">🖼️</span><small>Logo</small></button>
+      <button class="seg" data-pane="code"><span class="ic">🔳</span><small>Code</small></button>
+    </div>
 
-      <div class="seg-tabs" id="segTabs">
-        <button class="seg active" data-pane="text"><span class="ic">✏️</span> Text</button>
-        <button class="seg" data-pane="motive"><span class="ic">🍺</span> Motive</button>
-        <button class="seg" data-pane="logo"><span class="ic">📁</span> Logo</button>
-        <button class="seg" data-pane="code"><span class="ic">🔳</span> Code</button>
+    <div class="panel" id="panel">
+      <div class="panel-head">
+        <div class="panel-head-txt">
+          <h2 id="panelTitle">Text</h2>
+          <div class="psub" id="panelSub">Tippe deinen Wunschtext — Stil je Zeile einstellbar.</div>
+        </div>
+        <button type="button" class="panel-close" id="panelClose" aria-label="Fenster schließen" title="Schließen">✕</button>
       </div>
 
       <div class="seg-pane active" id="pane-text">
@@ -3673,6 +3673,7 @@ function showSel(){
   const it=items.find(i=>i.id===selId);
   if(it){
     box.style.display='block';
+    const _pnl=document.getElementById('panel'); if(_pnl)_pnl.classList.add('open');
     document.getElementById('selName').textContent=it.label||'Element';
     document.getElementById('selSize').value=it.wmm;
     document.getElementById('selSizeVal').textContent=it.wmm.toFixed(1)+' mm';
@@ -4038,12 +4039,28 @@ document.getElementById('tang').addEventListener('input',()=>{
   syncSelSliders(); render();
 });
 // Segment-Tabs (Text / Motive / Logo)
-document.querySelectorAll('.seg').forEach(b=>b.addEventListener('click',()=>{
-  document.querySelectorAll('.seg').forEach(x=>x.classList.remove('active'));
+const PANE_META={
+  text:{t:'Text',s:'Tippe deinen Wunschtext — Stil je Zeile einstellbar.'},
+  motive:{t:'Grafiken',s:'Motiv anklicken, dann frei im Bild platzieren.'},
+  logo:{t:'Logo / Bild',s:'Eigenes Logo als SVG oder DXF — maßgenau.'},
+  code:{t:'QR-Code',s:'QR aus Text oder Link — als Vektor-Gravur.'}
+};
+function openPane(pane){
+  document.querySelectorAll('.seg').forEach(x=>x.classList.toggle('active',x.dataset.pane===pane));
   document.querySelectorAll('.seg-pane').forEach(x=>x.classList.remove('active'));
-  b.classList.add('active');
-  document.getElementById('pane-'+b.dataset.pane).classList.add('active');
+  const p=document.getElementById('pane-'+pane); if(p)p.classList.add('active');
+  const m=PANE_META[pane]; if(m){ const t=document.getElementById('panelTitle'),s=document.getElementById('panelSub'); if(t)t.textContent=m.t; if(s)s.textContent=m.s; }
+  const panel=document.getElementById('panel'); if(panel)panel.classList.add('open');
+}
+document.querySelectorAll('.seg').forEach(b=>b.addEventListener('click',()=>{
+  const panel=document.getElementById('panel');
+  if(b.classList.contains('active') && panel && panel.classList.contains('open') && window.matchMedia('(min-width:841px)').matches){
+    panel.classList.remove('open'); return;
+  }
+  openPane(b.dataset.pane);
 }));
+const _panelClose=document.getElementById('panelClose');
+if(_panelClose)_panelClose.addEventListener('click',()=>{ const p=document.getElementById('panel'); if(p)p.classList.remove('open'); });
 document.getElementById('selSize').addEventListener('input',()=>{ const it=items.find(i=>i.id===selId); if(it){ it.wmm=parseFloat(document.getElementById('selSize').value); document.getElementById('selSizeVal').textContent=it.wmm.toFixed(1)+' mm'; render(); } });
 document.getElementById('selRot').addEventListener('input',()=>{ const it=items.find(i=>i.id===selId); if(it){ it.angle=parseFloat(document.getElementById('selRot').value); document.getElementById('selRotVal').textContent=it.angle+'°'; setTangSlider(it.angle); render(); } });
 document.getElementById('selDel').onclick=()=>{ items=items.filter(i=>i.id!==selId); select(null); };
