@@ -244,6 +244,7 @@ input[type=range]{flex:1;accent-color:var(--accent)}
       </div>
 
       <button type="button" class="tool-btn admin-only" id="zoneBtn" style="width:100%;margin-top:1rem;justify-content:center">▦ Gravurbereich anpassen (Admin)</button>
+      <div class="admin-only" id="zoneReadout" style="display:none;font:600 .8rem/1.4 monospace;color:#7fdfff;margin-top:.5rem;text-align:center"></div>
       <div class="btnrow" style="margin-top:1.1rem">
         <button class="btn btn-ghost admin-only" id="dlsvg">⬇ LightBurn-SVG</button>
         <button class="btn btn-primary" id="anfrage">Gravur anfragen</button>
@@ -924,7 +925,13 @@ function persistZone(){
     const z=OBJECTS[current].zone;
     all[current]={x:+z.x.toFixed(2),y:+z.y.toFixed(2),w:+z.w.toFixed(2),h:+z.h.toFixed(2)};
     localStorage.setItem('wl_zones',JSON.stringify(all));
+    showZoneReadout();
   }catch(e){}
+}
+function showZoneReadout(){
+  const el=document.getElementById('zoneReadout'); if(!el) return;
+  const z=OBJECTS[current].zone;
+  el.textContent=`zone:{x:${+z.x.toFixed(1)}, y:${+z.y.toFixed(1)}, w:${+z.w.toFixed(1)}, h:${+z.h.toFixed(1)}}`;
 }
 function loadZones(){
   try{
@@ -1006,7 +1013,18 @@ cv.addEventListener('pointerdown',e=>{
   }
   // 2) Auswählen / Verschieben
   const h=hitTest(m);
-  if(!h){ if(selId!=='zone') select(null); return; }
+  if(!h){
+    // Zone verschieben, wenn Zone ausgewählt und Klick innerhalb der Zone
+    if(selId==='zone'){
+      const zg=selGeom();
+      if(zg && pointInRotRect(m.x,m.y,zg.cx,zg.cy,zg.hw,zg.hh,0)){
+        drag={mode:'move', g0:snapGeom(zg), gx:m.x-zg.cx, gy:m.y-zg.cy};
+        startGrab(e); return;
+      }
+      return;
+    }
+    select(null); return;
+  }
   if(h.type==='item'){ select(h.item.id); }
   else { select('text'); }
   const sg=selGeom();
@@ -1124,6 +1142,8 @@ document.getElementById('addZeile').addEventListener('click',()=>{
 document.getElementById('zoneBtn').addEventListener('click',()=>{
   select(selId==='zone'?null:'zone');
   document.getElementById('zoneBtn').classList.toggle('active', selId==='zone');
+  const ro=document.getElementById('zoneReadout');
+  if(ro){ if(selId==='zone'){ ro.style.display='block'; showZoneReadout(); } else { ro.style.display='none'; } }
 });
 
 loadZones();
