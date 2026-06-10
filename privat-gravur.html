@@ -296,16 +296,20 @@ input[type=range]{flex:1;accent-color:var(--accent)}
       </div>
 
       <div class="seg-pane" id="pane-vorlagen">
-        <div class="sub">Wähle Anlass &amp; Empfänger — wir zeigen passende Sprüche zum direkten Übernehmen.</div>
-        <div class="filt-card">
-          <div class="filt">
-            <div class="cat-tabs" id="allTab"></div>
-            <div class="filt-lbl">Anlass</div>
-            <div class="cat-tabs" id="occTabs"></div>
-            <div class="filt-lbl">Für wen?</div>
+        <div class="sub">Wofür ist das Geschenk? Bereich aufklappen &amp; Kategorie wählen — passende Sprüche erscheinen darunter.</div>
+        <div class="cat-tabs" id="allTab" style="margin-bottom:.6rem"></div>
+        <details class="acc" id="accPerson">
+          <summary><span class="ic">🎁</span> Für eine Person <span class="hint">Empfänger wählen</span><span class="chev">▾</span></summary>
+          <div class="acc-body">
             <div class="cat-tabs" id="recTabs"></div>
           </div>
-        </div>
+        </details>
+        <details class="acc" id="accEvent">
+          <summary><span class="ic">📅</span> Für ein Ereignis <span class="hint">Anlass wählen</span><span class="chev">▾</span></summary>
+          <div class="acc-body">
+            <div class="cat-tabs" id="occTabs"></div>
+          </div>
+        </details>
         <div class="tpl-result">
           <div class="tpl-result-head">
             <span class="trh-ic">💬</span>
@@ -3427,12 +3431,14 @@ function updatePrice(){
 // ---------- Vorlagen (Templates) — 1-Klick-Start, frei anpassbar ----------
 // Clipart in eine Vorlage setzen — IMMER mit bw/bh aus der viewBox, sonst wird hmm=NaN
 // und das Element ist nicht mehr greif-/skalierbar (siehe Mit-Herz-Bug).
+let _tplClipY=null;
 function tplClip(key, xr, yr, wr){
   const c=CLIPARTS[key]; if(!c) return;
   const p=c.vb.trim().split(/[\s,]+/).map(Number);
   const z=OBJECTS[current].zone;
   addItem({ label:c.name, viewBox:c.vb, bw:p[2]||100, bh:p[3]||100, inner:c.inner, colored:false,
     x:z.x+z.w*xr, y:z.y+z.h*yr, wmm:Math.max(4, Math.min(z.w,z.h)*wr) });
+  _tplClipY=yr;
 }
 // Empfänger-Kategorien — die Sprüche werden danach sortiert (Geschenk für wen?).
 // Zwei Filter-Achsen: Anlass (wofür wird verschenkt) und Empfänger (für wen).
@@ -3460,7 +3466,15 @@ function tplText(zeilen, styles, clip){
     lineStyle=styles.map(s=>({...s}));
     lineGeom=zeilen.map(()=>null);
     items=[];
+    textPos={x:null,y:null}; textScaleX=1;
+    _tplClipY=null;
     if(clip) clip();
+    // Text aus dem Clip-Bereich herausrücken, damit sich Symbol & Text nicht überlappen.
+    if(_tplClipY!=null){
+      const z=OBJECTS[current].zone;
+      if(_tplClipY<0.45) textPos={x:null, y:z.y+z.h*0.62};      // Symbol oben → Text nach unten
+      else if(_tplClipY>0.55) textPos={x:null, y:z.y+z.h*0.40};  // Symbol unten → Text nach oben
+    }
   };
 }
 const TEMPLATES=[
