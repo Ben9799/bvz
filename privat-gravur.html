@@ -7,6 +7,7 @@
 <title>Gravur-Studio (intern) | Wolf Lasermark</title>
 <link rel="icon" type="image/png" sizes="48x48" href="images/favicon-48.png">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&family=Great+Vibes&family=Pacifico&family=Caveat:wght@500;700&family=Sacramento&family=Satisfy&family=Permanent+Marker&family=Playfair+Display:wght@600;700&family=Bebas+Neue&family=Oswald:wght@500;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#020617; --s1:#0b1120; --s2:#111827; --s3:#1e293b;
@@ -152,23 +153,45 @@ input[type=range]{flex:1;accent-color:var(--accent)}
       </div>
 
       <div class="seg-pane active" id="pane-text">
-        <div class="row2">
-          <div class="field" style="margin-bottom:.7rem">
-            <label for="l1">Zeile 1</label>
-            <input type="text" id="l1" maxlength="40" value="Max Mustermann">
-          </div>
-          <div class="field" style="margin-bottom:.7rem">
-            <label for="l2">Zeile 2 (optional)</label>
-            <input type="text" id="l2" maxlength="40" value="Prost!">
-          </div>
-        </div>
+        <div id="zeilen"></div>
+        <button type="button" id="addZeile" class="tool-btn" style="width:100%;margin:.2rem 0 .9rem;justify-content:center">＋ Zeile hinzufügen</button>
         <div class="field">
           <label for="font">Schriftart</label>
           <select id="font">
-            <option value="DM Sans|600">DM Sans (modern)</option>
-            <option value="Syne|800">Syne (kräftig)</option>
-            <option value="Georgia|700">Georgia (Serif, edel)</option>
-            <option value="Courier New|700">Courier (technisch)</option>
+            <optgroup label="Klassisch (auch in LightBurn)">
+              <option value="Arial|400">Arial</option>
+              <option value="Arial|700">Arial Fett</option>
+              <option value="Times New Roman|400">Times New Roman</option>
+              <option value="Georgia|700">Georgia (Serif)</option>
+              <option value="Courier New|700">Courier (technisch)</option>
+              <option value="Impact|400">Impact</option>
+              <option value="Verdana|700">Verdana</option>
+            </optgroup>
+            <optgroup label="Handschrift (Apple / macOS)">
+              <option value="Snell Roundhand|700">Snell Roundhand</option>
+              <option value="Bradley Hand|700">Bradley Hand</option>
+              <option value="Noteworthy|700">Noteworthy</option>
+              <option value="Marker Felt|400">Marker Felt</option>
+              <option value="Apple Chancery|400">Apple Chancery</option>
+              <option value="Chalkboard SE|400">Chalkboard SE</option>
+              <option value="Zapfino|400">Zapfino</option>
+            </optgroup>
+            <optgroup label="Schreibschrift (Web)">
+              <option value="Dancing Script|700">Dancing Script</option>
+              <option value="Great Vibes|400">Great Vibes</option>
+              <option value="Pacifico|400">Pacifico</option>
+              <option value="Caveat|700">Caveat</option>
+              <option value="Sacramento|400">Sacramento</option>
+              <option value="Satisfy|400">Satisfy</option>
+              <option value="Permanent Marker|400">Permanent Marker</option>
+            </optgroup>
+            <optgroup label="Modern / Display">
+              <option value="DM Sans|600" selected>DM Sans (modern)</option>
+              <option value="Syne|800">Syne (kräftig)</option>
+              <option value="Playfair Display|700">Playfair Display</option>
+              <option value="Bebas Neue|400">Bebas Neue</option>
+              <option value="Oswald|600">Oswald</option>
+            </optgroup>
           </select>
         </div>
         <div class="row2">
@@ -201,7 +224,7 @@ input[type=range]{flex:1;accent-color:var(--accent)}
 
       <div class="sel-box" id="selBox" style="display:none">
         <h3><span>🎯</span> <span id="selName">Element</span></h3>
-        <div class="logo-hint" style="margin-top:0">Im Bild ziehen · Ecken = Größe · Knopf oben = drehen</div>
+        <div class="logo-hint" style="margin-top:0">Ziehen = verschieben · Ecken = proportional · Seiten-Griffe = breiter/höher ziehen · Knopf oben = drehen</div>
         <div class="row2" style="margin-top:.7rem">
           <div class="field" style="margin-bottom:0">
             <label>Größe <span class="rval" id="selSizeVal">18 mm</span></label>
@@ -220,6 +243,7 @@ input[type=range]{flex:1;accent-color:var(--accent)}
         </div>
       </div>
 
+      <button type="button" class="tool-btn admin-only" id="zoneBtn" style="width:100%;margin-top:1rem;justify-content:center">▦ Gravurbereich anpassen (Admin)</button>
       <div class="btnrow" style="margin-top:1.1rem">
         <button class="btn btn-ghost admin-only" id="dlsvg">⬇ LightBurn-SVG</button>
         <button class="btn btn-primary" id="anfrage">Gravur anfragen</button>
@@ -355,10 +379,8 @@ const CLIPARTS = {
     '<ellipse cx="40.5" cy="49" rx="4" ry="7.5" transform="rotate(-28 40.5 49)"/>'+
     '<ellipse cx="59.5" cy="49" rx="4" ry="7.5" transform="rotate(28 59.5 49)"/>' },
   pretzel:{ name:'Brezel', cat:'bier', vb:'0 0 100 100', inner:
-    '<path fill-rule="evenodd" d="M50 20 C60 8 82 10 86 28 C89 42 82 52 70 55 C84 60 88 82 62 87 C55 89 45 89 38 87 C12 82 16 60 30 55 C18 52 11 42 14 28 C18 10 40 8 50 20 Z'+
-    ' M25 38 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0 z'+
-    ' M57 38 a9 9 0 1 0 18 0 a9 9 0 1 0 -18 0 z'+
-    ' M38 66 a12 12 0 1 0 24 0 a12 12 0 1 0 -24 0 z"/>' },
+    '<g fill="none" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">'+
+    '<path d="M40 18 C24 14 14 30 24 42 C32 52 46 50 50 40 C54 50 68 52 76 42 C86 30 76 14 60 18 C48 21 50 34 50 40 C50 50 36 56 28 64 C14 76 22 90 40 86 C50 83 50 70 50 64 C50 70 50 83 60 86 C78 90 86 76 72 64 C64 56 50 50 50 40"/></g>' },
   cheers: { name:'Prost', cat:'bier', vb:'0 0 100 100', inner:
     '<g transform="rotate(-12 35 56)">'+
     '<path d="M21 40 q-4 -2 -3 -6 q1 -4 5 -3 q1 -4 5 -3 q3 -3 7 0 q5 -1 6 4 q4 1 3 6 z"/>'+
@@ -471,10 +493,42 @@ const CLIPARTS = {
 };
 
 // ---------- Elemente (Cliparts + hochgeladene Logos), frei platzierbar ----------
-let items=[];      // {id,label,viewBox,bw,bh,inner,colored,img,x,y,wmm,angle}
+let items=[];      // {id,label,viewBox,bw,bh,inner,colored,img,x,y,wmm,hmm,angle}
 let idc=0;
 let textPos={x:null,y:null}; // mm-Mittelpunkt des Textes (null=Zonen-Mitte)
-let selId=null;    // ausgewähltes Element-id (oder 'text' / null)
+let textScaleX=1;  // horizontale Streckung des Textes (1=natürlich)
+let selId=null;    // ausgewähltes Element-id (oder 'text' / 'zone' / null)
+
+// ---------- Text-Zeilen (dynamisch: 1..n) ----------
+const EMOJI_RE2=/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{2300}-\u{23FF}\u{2190}-\u{21FF}\u{FE00}-\u{FE0F}\u{200D}\u{20E3}]/gu;
+let zeileVals=['Max Mustermann'];
+const MAX_ZEILEN=8;
+function getLines(){ return zeileVals.map(v=>v.trim()).filter(Boolean); }
+function buildZeilen(){
+  const wrap=document.getElementById('zeilen'); wrap.innerHTML='';
+  zeileVals.forEach((val,idx)=>{
+    const f=document.createElement('div'); f.className='field'; f.style.marginBottom='.55rem';
+    const lbl=document.createElement('label'); lbl.textContent='Zeile '+(idx+1)+(idx>0?' (optional)':'');
+    const rowEl=document.createElement('div'); rowEl.style.display='flex'; rowEl.style.gap='.4rem'; rowEl.style.alignItems='center';
+    const inp=document.createElement('input'); inp.type='text'; inp.maxLength=40; inp.value=val;
+    inp.className='zeile-input'; inp.style.flex='1';
+    inp.addEventListener('input',()=>{
+      let v=inp.value; const c=v.replace(EMOJI_RE2,'');
+      if(c!==v){ const p=Math.max(0,inp.selectionStart-(v.length-c.length)); inp.value=c; try{inp.setSelectionRange(p,p);}catch(_){} }
+      zeileVals[idx]=inp.value; render();
+    });
+    rowEl.appendChild(inp);
+    if(zeileVals.length>1){
+      const del=document.createElement('button'); del.type='button'; del.className='tool-btn danger'; del.textContent='✕';
+      del.style.flex='0 0 auto'; del.style.padding='.5rem .6rem'; del.title='Zeile entfernen';
+      del.onclick=()=>{ zeileVals.splice(idx,1); buildZeilen(); render(); };
+      rowEl.appendChild(del);
+    }
+    f.appendChild(lbl); f.appendChild(rowEl); wrap.appendChild(f);
+  });
+  const addBtn=document.getElementById('addZeile');
+  if(addBtn) addBtn.style.display = zeileVals.length>=MAX_ZEILEN ? 'none' : 'flex';
+}
 
 function itemSVGString(it,color){
   const body = it.colored ? it.inner : `<g fill="${color}" stroke="${color}" stroke-linejoin="round">${it.inner}</g>`;
@@ -489,6 +543,7 @@ function makeItemImg(it){
 function addItem(spec){
   const o=OBJECTS[current], z=o.zone;
   const it=Object.assign({ id:++idc, x:z.x+z.w/2, y:z.y+z.h/2, wmm:Math.min(18, z.w*0.7), angle:0 }, spec);
+  if(it.hmm==null) it.hmm=it.wmm*(it.bh/it.bw);  // independent height (allows free stretch)
   makeItemImg(it); items.push(it); select(it.id); render();
 }
 function addClipart(k){ const c=CLIPARTS[k]; addItem({ label:c.name, viewBox:c.vb, bw:100, bh:100, inner:c.inner, colored:false }); }
@@ -581,7 +636,7 @@ function handleLogoFile(file){
 
 function drawItem(it,s,o){
   if(!it.img || !it.img._ready) return;
-  const hmm=it.wmm*(it.bh/it.bw);
+  const hmm=it.hmm!=null?it.hmm:it.wmm*(it.bh/it.bw);
   const wpx=Math.max(1,it.wmm*s.ppmm), hpx=Math.max(1,hmm*s.ppmm);
   const oc=document.createElement('canvas'); oc.width=Math.ceil(wpx); oc.height=Math.ceil(hpx);
   const og=oc.getContext('2d');
@@ -593,9 +648,18 @@ function drawItem(it,s,o){
   ctx.restore();
 }
 function itemExportSVG(it){
-  const hmm=it.wmm*(it.bh/it.bw);
+  const hmm=it.hmm!=null?it.hmm:it.wmm*(it.bh/it.bw);
   const body = it.colored ? it.inner : `<g fill="#000" stroke="#000" stroke-linejoin="round">${it.inner}</g>`;
-  return `<g transform="translate(${it.x.toFixed(2)},${it.y.toFixed(2)}) rotate(${it.angle})"><svg x="${(-it.wmm/2).toFixed(2)}" y="${(-hmm/2).toFixed(2)}" width="${it.wmm.toFixed(2)}" height="${hmm.toFixed(2)}" viewBox="${it.viewBox}" preserveAspectRatio="xMidYMid meet">${body}</svg></g>`;
+  // Flatten to a single transform (no nested <svg>/preserveAspectRatio — LightBurn mishandles that,
+  // which moved the icon/logo and skewed the angle). This maps the viewBox box exactly onto the
+  // mm placement so the export matches the preview 1:1.
+  const vb=String(it.viewBox).trim().split(/[\s,]+/).map(Number);
+  const vx=vb[0]||0, vy=vb[1]||0, vw=vb[2]||100, vh=vb[3]||100;
+  const sx=it.wmm/vw, sy=hmm/vh;
+  const t=`translate(${it.x.toFixed(3)},${it.y.toFixed(3)}) rotate(${(it.angle||0).toFixed(2)}) `
+        + `translate(${(-it.wmm/2).toFixed(3)},${(-hmm/2).toFixed(3)}) scale(${sx.toFixed(5)},${sy.toFixed(5)}) `
+        + `translate(${(-vx).toFixed(3)},${(-vy).toFixed(3)})`;
+  return `<g transform="${t}">${body}</g>`;
 }
 
 function textCenter(z){ return { x: textPos.x==null ? z.x+z.w/2 : textPos.x, y: textPos.y==null ? z.y+z.h/2 : textPos.y }; }
@@ -625,10 +689,8 @@ function getFont(){ const [css,weight]=document.getElementById('font').value.spl
 // Compute laid-out text lines fitted into the engraving zone. Returns {lines:[{str,capMM,wmm}], capMM, fits}
 function layout(){
   const o=OBJECTS[current], z=o.zone, f=getFont();
-  let l1=document.getElementById('l1').value.trim();
-  let l2=document.getElementById('l2').value.trim();
   let capMM=parseFloat(document.getElementById('cap').value);
-  const strs=[l1,l2].filter(Boolean);
+  const strs=getLines();
   if(!strs.length) return {o,z,f,lines:[],capMM,fits:true};
 
   // available primary axis = width for horizontal, height for vertical
@@ -695,6 +757,7 @@ function render(){
   ctx.save();
   ctx.translate(px(tc.x,s),py(tc.y,s));
   ctx.rotate(parseFloat(document.getElementById('tang').value)*Math.PI/180);
+  ctx.scale(textScaleX,1);
   ctx.fillStyle = inkColor(o);
   ctx.textAlign='center'; ctx.textBaseline='middle';
   const gapMM=L.capMM*0.55;
@@ -725,6 +788,13 @@ function render(){
     ctx.beginPath(); ctx.moveTo(H.topMid.x,H.topMid.y); ctx.lineTo(H.rot.x,H.rot.y); ctx.stroke();
     ctx.fillStyle='#00d4ff';
     ctx.beginPath(); ctx.arc(H.rot.x,H.rot.y,6,0,Math.PI*2); ctx.fill();
+    // Seiten-Griffe (strecken) — kleine Rauten
+    H.edges.forEach(c=>{
+      ctx.fillStyle='#00d4ff'; ctx.strokeStyle='#ffffff'; ctx.lineWidth=1.2;
+      ctx.save(); ctx.translate(c.x,c.y); ctx.rotate(Math.PI/4);
+      ctx.beginPath(); ctx.rect(-4,-4,8,8); ctx.fill(); ctx.stroke(); ctx.restore();
+    });
+    // Ecken (proportional) — weiße Quadrate
     H.corners.forEach(c=>{
       ctx.fillStyle='#ffffff'; ctx.strokeStyle='#00d4ff'; ctx.lineWidth=1.5;
       ctx.beginPath(); ctx.rect(c.x-5,c.y-5,10,10); ctx.fill(); ctx.stroke();
@@ -750,7 +820,7 @@ function renderSVG(){
   L.lines.forEach((ln,i)=>{
     const off=(i-(total-1)/2)*(L.capMM+gapMM);
     const fs=(ln.capMM/cr).toFixed(2);
-    eng+=`<text transform="translate(${tc.x.toFixed(2)},${tc.y.toFixed(2)}) rotate(${tang})" x="0" y="${off.toFixed(2)}" font-family="${f.css}" font-weight="${f.weight}" font-size="${fs}" text-anchor="middle" dominant-baseline="central" fill="#000">${escapeXML(ln.str)}</text>`;
+    eng+=`<text transform="translate(${tc.x.toFixed(2)},${tc.y.toFixed(2)}) rotate(${tang}) scale(${textScaleX.toFixed(4)},1)" x="0" y="${off.toFixed(2)}" font-family="${f.css}" font-weight="${f.weight}" font-size="${fs}" text-anchor="middle" dominant-baseline="central" fill="#000">${escapeXML(ln.str)}</text>`;
   });
   const itemsSVG=items.map(itemExportSVG).join('');
   return `<?xml version="1.0" encoding="UTF-8"?>
@@ -799,30 +869,86 @@ function syncSelSliders(){
   document.getElementById('selRot').value=clamp(it.angle,-180,180);
   document.getElementById('selRotVal').textContent=Math.round(it.angle)+'°';
 }
-// Auswahl-Geometrie (mm) — Element ODER Text
+// Auswahl-Geometrie (mm) — Element ODER Text ODER Gravurbereich (zone)
+function textNatHalfW(L){ return L.lines.length?Math.max(...L.lines.map(l=>l.wmm))/2:0.5; }
 function selGeom(){
+  if(selId==='zone'){ const z=OBJECTS[current].zone; return {kind:'zone',cx:z.x+z.w/2,cy:z.y+z.h/2,hw:z.w/2,hh:z.h/2,angle:0}; }
   if(selId==='text'){
     const L=layout(); if(!L.lines.length) return null;
     const z=OBJECTS[current].zone, tc=textCenter(z);
     const gap=L.capMM*0.55;
-    const hw=Math.max(...L.lines.map(l=>l.wmm))/2+1.5;
-    const hh=(L.lines.length*L.capMM+(L.lines.length-1)*gap)/2+1.5;
+    const hw=textNatHalfW(L)*textScaleX+1.2;
+    const hh=(L.lines.length*L.capMM+(L.lines.length-1)*gap)/2+1.2;
     const ang=parseFloat(document.getElementById('tang').value);
     return {kind:'text',cx:tc.x,cy:tc.y,hw,hh,angle:ang};
   }
   const it=items.find(i=>i.id===selId);
   if(!it) return null;
-  return {kind:'item',it,cx:it.x,cy:it.y,hw:it.wmm/2,hh:(it.wmm*(it.bh/it.bw))/2,angle:it.angle};
+  const hmm=it.hmm!=null?it.hmm:it.wmm*(it.bh/it.bw);
+  return {kind:'item',it,cx:it.x,cy:it.y,hw:it.wmm/2,hh:hmm/2,angle:it.angle};
 }
-// Handle-Positionen in Canvas-px: 4 Ecken + Dreh-Knopf
+
+// ---------- Bounds + Clamp (alles bleibt im gestrichelten Rahmen) ----------
+function boundsForSel(){
+  if(selId==='zone'){ const o=OBJECTS[current]; return {x0:0.5,y0:0.5,x1:o.wmm-0.5,y1:o.hmm-0.5}; }
+  const z=OBJECTS[current].zone; return {x0:z.x,y0:z.y,x1:z.x+z.w,y1:z.y+z.h};
+}
+function fitAndClamp(ng,b){
+  const a=ng.angle*Math.PI/180, ca=Math.abs(Math.cos(a)), sa=Math.abs(Math.sin(a));
+  let hw=ng.hw, hh=ng.hh;
+  let ehw=hw*ca+hh*sa, ehh=hw*sa+hh*ca;
+  const bw=(b.x1-b.x0)/2, bh=(b.y1-b.y0)/2;
+  let f=1; if(ehw>bw) f=Math.min(f,bw/ehw); if(ehh>bh) f=Math.min(f,bh/ehh);
+  if(f<1){ hw*=f; hh*=f; ehw*=f; ehh*=f; }
+  let cx=ng.cx, cy=ng.cy, lo, hi;
+  lo=b.x0+ehw; hi=b.x1-ehw; cx = lo>hi?(b.x0+b.x1)/2:Math.max(lo,Math.min(hi,cx));
+  lo=b.y0+ehh; hi=b.y1-ehh; cy = lo>hi?(b.y0+b.y1)/2:Math.max(lo,Math.min(hi,cy));
+  return {cx,cy,hw,hh,angle:ng.angle};
+}
+function writeTextGeom(r){
+  textPos.x=r.cx; textPos.y=r.cy;
+  const t=document.getElementById('tang'); t.value=Math.round(r.angle); document.getElementById('tangVal').textContent=Math.round(r.angle)+'°';
+  const lines=getLines(); const n=Math.max(1,lines.length);
+  const denom=n+0.55*(n-1);
+  const capEl2=document.getElementById('cap');
+  const cap=clamp((2*(r.hh-1.2))/denom, parseFloat(capEl2.min), parseFloat(capEl2.max));
+  capEl2.value=cap; document.getElementById('capVal').textContent=cap.toFixed(1)+' mm';
+  const f=getFont(), cr=capRatio(f.css,f.weight);
+  const natW=lines.length?Math.max(...lines.map(s=>emWidthRatio(s,f.css,f.weight)*(cap/cr))):1;
+  textScaleX=clamp((r.hw-1.2)/Math.max(0.5,natW/2), 0.25, 6);
+}
+// Gravurbereich-Overrides (Admin) pro Objekt persistieren
+function persistZone(){
+  try{
+    const all=JSON.parse(localStorage.getItem('wl_zones')||'{}');
+    const z=OBJECTS[current].zone;
+    all[current]={x:+z.x.toFixed(2),y:+z.y.toFixed(2),w:+z.w.toFixed(2),h:+z.h.toFixed(2)};
+    localStorage.setItem('wl_zones',JSON.stringify(all));
+  }catch(e){}
+}
+function loadZones(){
+  try{
+    const all=JSON.parse(localStorage.getItem('wl_zones')||'{}');
+    Object.entries(all).forEach(([k,z])=>{ if(OBJECTS[k]&&z) OBJECTS[k].zone={x:z.x,y:z.y,w:z.w,h:z.h}; });
+  }catch(e){}
+}
+function applySelGeom(ng){
+  const r=fitAndClamp(ng, boundsForSel());
+  if(selId==='zone'){ const z=OBJECTS[current].zone; z.w=r.hw*2; z.h=r.hh*2; z.x=r.cx-r.hw; z.y=r.cy-r.hh; persistZone(); }
+  else if(selId==='text'){ writeTextGeom(r); }
+  else { const it=items.find(i=>i.id===selId); if(it){ it.x=r.cx; it.y=r.cy; it.wmm=Math.max(1.5,r.hw*2); it.hmm=Math.max(1.5,r.hh*2); it.angle=r.angle; } }
+}
+// Handle-Positionen in Canvas-px: 4 Ecken (proportional) + 4 Seiten-Griffe (strecken) + Dreh-Knopf
 function handlePts(g,s){
   const a=g.angle*Math.PI/180, ca=Math.cos(a), sa=Math.sin(a);
   const toW=(lx,ly)=>({x:px(g.cx+lx*ca-ly*sa,s), y:py(g.cy+lx*sa+ly*ca,s)});
-  const corners=[toW(-g.hw,-g.hh),toW(g.hw,-g.hh),toW(g.hw,g.hh),toW(-g.hw,g.hh)];
+  const mk=(dx,dy)=>{ const p=toW(dx*g.hw,dy*g.hh); p.dirX=dx; p.dirY=dy; return p; };
+  const corners=[mk(-1,-1),mk(1,-1),mk(1,1),mk(-1,1)];
+  const edges=[mk(0,-1),mk(1,0),mk(0,1),mk(-1,0)];
   const topMid=toW(0,-g.hh);
   const rotOffPx=24;
   const rot={x:topMid.x+sa*rotOffPx, y:topMid.y-ca*rotOffPx};
-  return {corners,topMid,rot};
+  return {corners,edges,topMid,rot};
 }
 
 // ---------- Treffer-Test & Ziehen ----------
@@ -842,14 +968,14 @@ function toMM(e){
 const distPx=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 function hitTest(m){
   for(let i=items.length-1;i>=0;i--){
-    const it=items[i], hw=it.wmm/2, hh=(it.wmm*(it.bh/it.bw))/2;
-    if(pointInRotRect(m.x,m.y,it.x,it.y,hw+1,hh+1,it.angle)) return {type:'item',item:it};
+    const it=items[i], hmm=it.hmm!=null?it.hmm:it.wmm*(it.bh/it.bw);
+    if(pointInRotRect(m.x,m.y,it.x,it.y,it.wmm/2+1,hmm/2+1,it.angle)) return {type:'item',item:it};
   }
   const L=layout();
   if(L.lines.length){
     const z=OBJECTS[current].zone, tc=textCenter(z);
     const gap=L.capMM*0.55;
-    const tw=Math.max(...L.lines.map(l=>l.wmm))/2+1.5;
+    const tw=textNatHalfW(L)*textScaleX+1.5;
     const th=(L.lines.length*L.capMM+(L.lines.length-1)*gap)/2+1.5;
     const ang=parseFloat(document.getElementById('tang').value);
     if(pointInRotRect(m.x,m.y,tc.x,tc.y,tw,th,ang)) return {type:'text'};
@@ -857,49 +983,57 @@ function hitTest(m){
   return null;
 }
 let drag=null;
-function capEl(){ return document.getElementById('cap'); }
+const snapGeom=g=>({cx:g.cx,cy:g.cy,hw:g.hw,hh:g.hh,angle:g.angle});
+// Punkt → lokale Koordinaten relativ zum (gedrehten) Auswahl-Mittelpunkt
+function localOf(m,g0){
+  const a=-g0.angle*Math.PI/180, dx=m.x-g0.cx, dy=m.y-g0.cy;
+  return { lx:dx*Math.cos(a)-dy*Math.sin(a), ly:dx*Math.sin(a)+dy*Math.cos(a) };
+}
 cv.addEventListener('pointerdown',e=>{
   if(!curS) return;
   const p=toPx(e), m=toMM(e);
-  // 1) Handle der aktuellen Auswahl? (Drehen / Größe)
+  // 1) Handle der aktuellen Auswahl? (Drehen / proportional / strecken)
   const g=selGeom();
   if(g){
     const H=handlePts(g,curS);
-    if(distPx(p,H.rot)<=13){ drag={mode:'rotate',g}; startGrab(e); return; }
+    if(distPx(p,H.rot)<=14){ drag={mode:'rotate',g0:snapGeom(g)}; startGrab(e); return; }
     for(const c of H.corners){
-      if(distPx(p,c)<=11){
-        const d0=Math.hypot(m.x-g.cx,m.y-g.cy);
-        const startW = g.kind==='item' ? g.it.wmm : parseFloat(capEl().value);
-        drag={mode:'resize',g,startDist:Math.max(d0,0.5),startW}; startGrab(e); return;
-      }
+      if(distPx(p,c)<=12){ const d0=Math.hypot(m.x-g.cx,m.y-g.cy); drag={mode:'resize',g0:snapGeom(g),startDist:Math.max(d0,0.5)}; startGrab(e); return; }
+    }
+    for(const c of H.edges){
+      if(distPx(p,c)<=12){ drag={mode:'stretch',g0:snapGeom(g),dirX:c.dirX,dirY:c.dirY}; startGrab(e); return; }
     }
   }
   // 2) Auswählen / Verschieben
   const h=hitTest(m);
-  if(!h){ select(null); return; }
-  if(h.type==='item'){ select(h.item.id); drag={mode:'move',item:h.item, gx:m.x-h.item.x, gy:m.y-h.item.y}; }
-  else { select('text'); const tc=textCenter(OBJECTS[current].zone); drag={mode:'move',text:true, gx:m.x-tc.x, gy:m.y-tc.y}; }
+  if(!h){ if(selId!=='zone') select(null); return; }
+  if(h.type==='item'){ select(h.item.id); }
+  else { select('text'); }
+  const sg=selGeom();
+  drag={mode:'move', g0:snapGeom(sg), gx:m.x-sg.cx, gy:m.y-sg.cy};
   startGrab(e);
 });
 function startGrab(e){ cv.classList.add('grabbing'); try{cv.setPointerCapture(e.pointerId);}catch(_){} }
 cv.addEventListener('pointermove',e=>{
   if(!drag) return;
-  const m=toMM(e);
+  const m=toMM(e), g0=drag.g0;
   if(drag.mode==='move'){
-    if(drag.text){ textPos.x=m.x-drag.gx; textPos.y=m.y-drag.gy; }
-    else { drag.item.x=m.x-drag.gx; drag.item.y=m.y-drag.gy; }
+    applySelGeom({...g0, cx:m.x-drag.gx, cy:m.y-drag.gy});
   } else if(drag.mode==='rotate'){
-    let a=Math.atan2(m.y-drag.g.cy, m.x-drag.g.cx)*180/Math.PI+90;
+    let a=Math.atan2(m.y-g0.cy, m.x-g0.cx)*180/Math.PI+90;
     while(a>180)a-=360; while(a<-180)a+=360;
-    if(drag.g.kind==='item'){ drag.g.it.angle=a; syncSelSliders(); }
-    else { const t=document.getElementById('tang'); t.value=Math.round(a); document.getElementById('tangVal').textContent=Math.round(a)+'°'; }
+    applySelGeom({...g0, angle:a});
   } else if(drag.mode==='resize'){
-    const d=Math.hypot(m.x-drag.g.cx,m.y-drag.g.cy);
-    const sc=d/drag.startDist;
-    if(drag.g.kind==='item'){ drag.g.it.wmm=clamp(drag.startW*sc,3,70); syncSelSliders(); }
-    else { const c=capEl(); const nv=clamp(drag.startW*sc,parseFloat(c.min),parseFloat(c.max)); c.value=nv; document.getElementById('capVal').textContent=nv.toFixed(1)+' mm'; }
+    const f=Math.max(0.05, Math.hypot(m.x-g0.cx,m.y-g0.cy)/drag.startDist);
+    applySelGeom({...g0, hw:g0.hw*f, hh:g0.hh*f});
+  } else if(drag.mode==='stretch'){
+    const L=localOf(m,g0);
+    const ng={...g0};
+    if(drag.dirX!==0) ng.hw=Math.max(0.75,Math.abs(L.lx));
+    if(drag.dirY!==0) ng.hh=Math.max(0.75,Math.abs(L.ly));
+    applySelGeom(ng);
   }
-  render();
+  syncSelSliders(); render();
 });
 function endDrag(e){ if(drag){ drag=null; cv.classList.remove('grabbing'); try{cv.releasePointerCapture(e.pointerId);}catch(_){} } }
 cv.addEventListener('pointerup',endDrag);
@@ -958,19 +1092,9 @@ function buildClipGrid(){
   if(param || saved){ document.querySelectorAll('.admin-only').forEach(el=>el.style.display='block'); }
 })();
 
-// Emoji / Symbole im Gravurtext blockieren (nur normaler Text gravierbar)
-const EMOJI_RE=/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{2300}-\u{23FF}\u{2190}-\u{21FF}\u{FE00}-\u{FE0F}\u{200D}\u{20E3}]/gu;
-['l1','l2','cap','font','tang'].forEach(id=>{
-  const el=document.getElementById(id);
-  el.addEventListener('input',()=>{
-    if(id==='l1'||id==='l2'){
-      const v=el.value, c=v.replace(EMOJI_RE,'');
-      if(c!==v){ const p=Math.max(0,el.selectionStart-(v.length-c.length)); el.value=c; try{el.setSelectionRange(p,p);}catch(_){} }
-    }
-    render();
-  });
-});
-document.getElementById('tang').addEventListener('input',()=>document.getElementById('tangVal').textContent=document.getElementById('tang').value+'°');
+// Gravur-Parameter → bei Änderung neu rendern (Emoji-Filter sitzt in buildZeilen)
+['cap','font'].forEach(id=>document.getElementById(id).addEventListener('input',render));
+document.getElementById('tang').addEventListener('input',()=>{ document.getElementById('tangVal').textContent=document.getElementById('tang').value+'°'; render(); });
 // Segment-Tabs (Text / Motive / Logo)
 document.querySelectorAll('.seg').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('.seg').forEach(x=>x.classList.remove('active'));
@@ -989,6 +1113,21 @@ document.getElementById('logo').addEventListener('change',e=>{ const f=e.target.
 document.getElementById('dlsvg').onclick=downloadSVG;
 document.getElementById('anfrage').onclick=()=>{ alert('Anfrage-Versand wird im nächsten Schritt angebunden (Formspree + Foto-Upload), wie auf der Typenschild-Seite.'); };
 
+// Zeile hinzufügen
+document.getElementById('addZeile').addEventListener('click',()=>{
+  if(zeileVals.length>=MAX_ZEILEN) return;
+  zeileVals.push(''); buildZeilen(); render();
+  const inps=document.querySelectorAll('#zeilen .zeile-input');
+  if(inps.length) inps[inps.length-1].focus();
+});
+// Admin: Gravurbereich markieren (Rahmen auswählen → mit Griffen anpassen)
+document.getElementById('zoneBtn').addEventListener('click',()=>{
+  select(selId==='zone'?null:'zone');
+  document.getElementById('zoneBtn').classList.toggle('active', selId==='zone');
+});
+
+loadZones();
+buildZeilen();
 buildCatTabs();
 buildClipGrid();
 applyAngleDefault();
