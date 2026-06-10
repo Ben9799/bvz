@@ -109,6 +109,7 @@ input[type=range]{flex:1;accent-color:var(--accent)}
 .tool-btn{display:flex;align-items:center;justify-content:center;gap:.35rem;font-family:inherit;font-size:.8rem;font-weight:600;padding:.5rem;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--muted2);cursor:pointer;transition:.15s}
 .tool-btn:hover{border-color:var(--accent);color:var(--text);background:rgba(0,212,255,0.08)}
 .tool-btn.danger:hover{border-color:var(--red);color:#fff;background:rgba(239,68,68,0.18)}
+.tool-btn.active{border-color:var(--accent);color:var(--text);background:rgba(0,212,255,0.14)}
 .note{font-size:.78rem;color:var(--muted);margin-top:1rem;border-top:1px solid rgba(255,255,255,0.06);padding-top:.8rem}
 
 @media(max-width:840px){ .studio{grid-template-columns:1fr} }
@@ -154,7 +155,8 @@ input[type=range]{flex:1;accent-color:var(--accent)}
 
       <div class="seg-pane active" id="pane-text">
         <div id="zeilen"></div>
-        <button type="button" id="addZeile" class="tool-btn" style="width:100%;margin:.2rem 0 .9rem;justify-content:center">＋ Zeile hinzufügen</button>
+        <button type="button" id="addZeile" class="tool-btn" style="width:100%;margin:.2rem 0 .5rem;justify-content:center">＋ Zeile hinzufügen</button>
+        <button type="button" id="mergeZeilen" class="tool-btn" style="width:100%;margin:0 0 .9rem;justify-content:center">🔗 Alle Zeilen zusammenfügen</button>
         <div class="field">
           <label for="font">Schriftart</label>
           <select id="font">
@@ -369,8 +371,10 @@ let selId=null;    // ausgewähltes Element-id (oder 'text' / 'zone' / null)
 // ---------- Text-Zeilen (dynamisch: 1..n) ----------
 const EMOJI_RE2=/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{2300}-\u{23FF}\u{2190}-\u{21FF}\u{FE00}-\u{FE0F}\u{200D}\u{20E3}]/gu;
 let zeileVals=['Max Mustermann'];
+let lineGeom=[null];   // pro Zeile: null=im Block (gestapelt) | {x,y,angle,cap,scaleX}=frei platziert
 const MAX_ZEILEN=8;
 function getLines(){ return zeileVals.map(v=>v.trim()).filter(Boolean); }
+function blockStrs(){ return zeileVals.filter((v,i)=>v.trim() && lineGeom[i]==null).map(v=>v.trim()); }
 function buildZeilen(){
   const wrap=document.getElementById('zeilen'); wrap.innerHTML='';
   zeileVals.forEach((val,idx)=>{
@@ -385,10 +389,17 @@ function buildZeilen(){
       zeileVals[idx]=inp.value; render();
     });
     rowEl.appendChild(inp);
+    const free=lineGeom[idx]!=null;
+    const mv=document.createElement('button'); mv.type='button'; mv.className='tool-btn'+(free?' active':'');
+    mv.textContent = free ? '⤢' : '⤡';
+    mv.title = free ? 'Wieder in den Block einreihen' : 'Diese Zeile frei bewegen';
+    mv.style.flex='0 0 auto'; mv.style.padding='.5rem .6rem';
+    mv.onclick=()=> free ? attachLine(idx) : detachLine(idx);
+    rowEl.appendChild(mv);
     if(zeileVals.length>1){
       const del=document.createElement('button'); del.type='button'; del.className='tool-btn danger'; del.textContent='✕';
       del.style.flex='0 0 auto'; del.style.padding='.5rem .6rem'; del.title='Zeile entfernen';
-      del.onclick=()=>{ zeileVals.splice(idx,1); buildZeilen(); render(); };
+      del.onclick=()=>{ zeileVals.splice(idx,1); lineGeom.splice(idx,1); if(typeof selId==='string'&&selId.indexOf('line:')===0) selId=null; buildZeilen(); showSel(); render(); };
       rowEl.appendChild(del);
     }
     f.appendChild(lbl); f.appendChild(rowEl); wrap.appendChild(f);
@@ -557,7 +568,8 @@ function getFont(){ const [css,weight]=document.getElementById('font').value.spl
 function layout(){
   const o=OBJECTS[current], z=o.zone, f=getFont();
   let capMM=parseFloat(document.getElementById('cap').value);
-  const strs=getLines();
+  const entries=zeileVals.map((v,i)=>({oi:i,str:v.trim()})).filter(e=>e.str && lineGeom[e.oi]==null);
+  const strs=entries.map(e=>e.str);
   if(!strs.length) return {o,z,f,lines:[],capMM,fits:true};
 
   // available primary axis = width for horizontal, height for vertical
@@ -575,7 +587,7 @@ function layout(){
     capMM-=0.1;
     if(capMM<=1.2){ capMM=1.2; fits=false; break; }
   }
-  const lines=strs.map(sx=>({str:sx, capMM, wmm:emWidthRatio(sx,f.css,f.weight)*(capMM/cr)}));
+  const lines=entries.map(e=>({str:e.str, oi:e.oi, capMM, wmm:emWidthRatio(e.str,f.css,f.weight)*(capMM/cr)}));
   return {o,z,f,lines,capMM,fits};
 }
 
@@ -637,6 +649,23 @@ function render(){
   });
   ctx.restore();
 
+  // frei platzierte Zeilen (außerhalb des Blocks)
+  {
+    const ff=getFont(), fcr=capRatio(ff.css,ff.weight);
+    zeileVals.forEach((v,i)=>{
+      const str=v.trim(), lg=lineGeom[i]; if(!str||!lg) return;
+      ctx.save();
+      ctx.translate(px(lg.x,s),py(lg.y,s));
+      ctx.rotate(lg.angle*Math.PI/180);
+      ctx.scale(lg.scaleX,1);
+      ctx.fillStyle=inkColor(o);
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.font=`${ff.weight} ${(lg.cap/fcr)*s.ppmm}px "${ff.css}"`;
+      ctx.fillText(str,0,0);
+      ctx.restore();
+    });
+  }
+
   // elements (cliparts + logos)
   items.forEach(it=>drawItem(it,s,o));
 
@@ -689,6 +718,13 @@ function renderSVG(){
     const fs=(ln.capMM/cr).toFixed(2);
     eng+=`<text transform="translate(${tc.x.toFixed(2)},${tc.y.toFixed(2)}) rotate(${tang}) scale(${textScaleX.toFixed(4)},1)" x="0" y="${off.toFixed(2)}" font-family="${f.css}" font-weight="${f.weight}" font-size="${fs}" text-anchor="middle" dominant-baseline="central" fill="#000">${escapeXML(ln.str)}</text>`;
   });
+  let freeEng='';
+  zeileVals.forEach((v,i)=>{
+    const str=v.trim(), lg=lineGeom[i]; if(!str||!lg) return;
+    const fs=(lg.cap/cr).toFixed(2);
+    freeEng+=`<text transform="translate(${lg.x.toFixed(2)},${lg.y.toFixed(2)}) rotate(${lg.angle}) scale(${lg.scaleX.toFixed(4)},1)" x="0" y="0" font-family="${f.css}" font-weight="${f.weight}" font-size="${fs}" text-anchor="middle" dominant-baseline="central" fill="#000">${escapeXML(str)}</text>`;
+  });
+  eng+=freeEng;
   const itemsSVG=items.map(itemExportSVG).join('');
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${o.wmm}mm" height="${o.hmm}mm" viewBox="0 0 ${o.wmm} ${o.hmm}">
@@ -716,6 +752,31 @@ function applyAngleDefault(){
 // ---------- Auswahl ----------
 const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
 function select(id){ selId=id; showSel(); render(); }
+// Zeile aus dem Block lösen → frei platzierbar (an aktueller Block-Position)
+function detachLine(idx){
+  const str=zeileVals[idx]?zeileVals[idx].trim():''; if(!str) return;
+  const L=layout(); // Block-Layout VOR dem Lösen (idx ist noch im Block)
+  const o=OBJECTS[current], z=o.zone, tc=textCenter(z);
+  const tang=parseFloat(document.getElementById('tang').value);
+  const gap=L.capMM*0.55, step=L.capMM+gap, total=L.lines.length;
+  const bi=L.lines.findIndex(ln=>ln.oi===idx);
+  const off=(bi-(total-1)/2)*step;
+  const a=tang*Math.PI/180;
+  lineGeom[idx]={ x:tc.x - Math.sin(a)*off, y:tc.y + Math.cos(a)*off, angle:tang, cap:L.capMM, scaleX:textScaleX };
+  selId='line:'+idx;
+  const g=selGeom(); if(g) applySelGeom(g); // in den Rahmen einklemmen
+  buildZeilen(); showSel(); render();
+}
+function attachLine(idx){
+  lineGeom[idx]=null;
+  if(selId==='line:'+idx) selId=null;
+  buildZeilen(); showSel(); render();
+}
+function mergeAllLines(){
+  lineGeom=zeileVals.map(()=>null);
+  if(typeof selId==='string' && selId.indexOf('line:')===0) selId=null;
+  buildZeilen(); showSel(); render();
+}
 function showSel(){
   const box=document.getElementById('selBox');
   const it=items.find(i=>i.id===selId);
@@ -749,6 +810,13 @@ function selGeom(){
     const ang=parseFloat(document.getElementById('tang').value);
     return {kind:'text',cx:tc.x,cy:tc.y,hw,hh,angle:ang};
   }
+  if(typeof selId==='string' && selId.indexOf('line:')===0){
+    const i=+selId.slice(5), lg=lineGeom[i], str=zeileVals[i]?zeileVals[i].trim():'';
+    if(!lg||!str) return null;
+    const f=getFont(), cr=capRatio(f.css,f.weight);
+    const natW=emWidthRatio(str,f.css,f.weight)*(lg.cap/cr);
+    return {kind:'line',cx:lg.x,cy:lg.y,hw:natW*lg.scaleX/2+1.2,hh:lg.cap/2+1.2,angle:lg.angle};
+  }
   const it=items.find(i=>i.id===selId);
   if(!it) return null;
   const hmm=it.hmm!=null?it.hmm:it.wmm*(it.bh/it.bw);
@@ -775,7 +843,7 @@ function fitAndClamp(ng,b){
 function writeTextGeom(r){
   textPos.x=r.cx; textPos.y=r.cy;
   const t=document.getElementById('tang'); t.value=Math.round(r.angle); document.getElementById('tangVal').textContent=Math.round(r.angle)+'°';
-  const lines=getLines(); const n=Math.max(1,lines.length);
+  const lines=blockStrs(); const n=Math.max(1,lines.length);
   const denom=n+0.55*(n-1);
   const capEl2=document.getElementById('cap');
   const cap=clamp((2*(r.hh-1.2))/denom, parseFloat(capEl2.min), parseFloat(capEl2.max));
@@ -809,6 +877,16 @@ function applySelGeom(ng){
   const r=fitAndClamp(ng, boundsForSel());
   if(selId==='zone'){ const z=OBJECTS[current].zone; z.w=r.hw*2; z.h=r.hh*2; z.x=r.cx-r.hw; z.y=r.cy-r.hh; persistZone(); }
   else if(selId==='text'){ writeTextGeom(r); }
+  else if(typeof selId==='string' && selId.indexOf('line:')===0){
+    const i=+selId.slice(5), lg=lineGeom[i];
+    if(lg){
+      lg.x=r.cx; lg.y=r.cy; lg.angle=r.angle;
+      lg.cap=clamp(2*(r.hh-1.2),1.5,16);
+      const f=getFont(), cr=capRatio(f.css,f.weight);
+      const natW=emWidthRatio(zeileVals[i].trim(),f.css,f.weight)*(lg.cap/cr);
+      lg.scaleX=clamp((r.hw-1.2)/Math.max(0.5,natW/2),0.25,6);
+    }
+  }
   else { const it=items.find(i=>i.id===selId); if(it){ it.x=r.cx; it.y=r.cy; it.wmm=Math.max(1.5,r.hw*2); it.hmm=Math.max(1.5,r.hh*2); it.angle=r.angle; } }
 }
 // Handle-Positionen in Canvas-px: 4 Ecken (proportional) + 4 Seiten-Griffe (strecken) + Dreh-Knopf
@@ -843,6 +921,14 @@ function hitTest(m){
   for(let i=items.length-1;i>=0;i--){
     const it=items[i], hmm=it.hmm!=null?it.hmm:it.wmm*(it.bh/it.bw);
     if(pointInRotRect(m.x,m.y,it.x,it.y,it.wmm/2+1,hmm/2+1,it.angle)) return {type:'item',item:it};
+  }
+  {
+    const f=getFont(), cr=capRatio(f.css,f.weight);
+    for(let i=zeileVals.length-1;i>=0;i--){
+      const str=zeileVals[i]?zeileVals[i].trim():'', lg=lineGeom[i]; if(!str||!lg) continue;
+      const natW=emWidthRatio(str,f.css,f.weight)*(lg.cap/cr);
+      if(pointInRotRect(m.x,m.y,lg.x,lg.y,natW*lg.scaleX/2+1.5,lg.cap/2+1.5,lg.angle)) return {type:'line',i};
+    }
   }
   const L=layout();
   if(L.lines.length){
@@ -892,6 +978,7 @@ cv.addEventListener('pointerdown',e=>{
     select(null); return;
   }
   if(h.type==='item'){ select(h.item.id); }
+  else if(h.type==='line'){ select('line:'+h.i); }
   else { select('text'); }
   const sg=selGeom();
   drag={mode:'move', g0:snapGeom(sg), gx:m.x-sg.cx, gy:m.y-sg.cy};
@@ -933,8 +1020,10 @@ function buildPicker(){
     d.onclick=()=>{
       current=k; const z=OBJECTS[k].zone;
       textPos={x:null,y:null};
+      lineGeom=zeileVals.map(()=>null);
+      if(typeof selId==='string' && selId.indexOf('line:')===0) selId=null;
       items.forEach(it=>{ it.x=z.x+z.w/2; it.y=z.y+z.h/2; });
-      applyAngleDefault(); buildPicker(); render();
+      applyAngleDefault(); buildPicker(); buildZeilen(); showSel(); render();
     };
     p.appendChild(d);
   });
@@ -1000,10 +1089,11 @@ document.getElementById('anfrage').onclick=()=>{ alert('Anfrage-Versand wird im 
 // Zeile hinzufügen
 document.getElementById('addZeile').addEventListener('click',()=>{
   if(zeileVals.length>=MAX_ZEILEN) return;
-  zeileVals.push(''); buildZeilen(); render();
+  zeileVals.push(''); lineGeom.push(null); buildZeilen(); render();
   const inps=document.querySelectorAll('#zeilen .zeile-input');
   if(inps.length) inps[inps.length-1].focus();
 });
+document.getElementById('mergeZeilen').addEventListener('click',mergeAllLines);
 // Admin: Gravurbereich markieren (Rahmen auswählen → mit Griffen anpassen)
 document.getElementById('zoneBtn').addEventListener('click',()=>{
   select(selId==='zone'?null:'zone');
