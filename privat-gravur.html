@@ -255,6 +255,7 @@ input[type=range]{flex:1;accent-color:var(--accent)}
 
     <div class="rail" id="rail">
       <button class="seg active" data-pane="text"><span class="ic">✏️</span><small>Text</small></button>
+      <button class="seg" data-pane="vorlagen"><span class="ic">✨</span><small>Vorlagen</small></button>
       <button class="seg" data-pane="motive"><span class="ic">🎨</span><small>Grafik</small></button>
       <button class="seg" data-pane="logo"><span class="ic">🖼️</span><small>Logo</small></button>
       <button class="seg" data-pane="code"><span class="ic">🔳</span><small>Code</small></button>
@@ -270,29 +271,6 @@ input[type=range]{flex:1;accent-color:var(--accent)}
       </div>
 
       <div class="seg-pane active" id="pane-text">
-        <details class="acc" id="accVorlagen">
-          <summary><span class="ic">✨</span> Vorlagen &amp; Sprüche <span class="hint">fertige Designs</span><span class="chev">▾</span></summary>
-          <div class="acc-body">
-            <div class="filt-card">
-              <div class="filt">
-                <div class="cat-tabs" id="allTab"></div>
-                <div class="filt-lbl">Anlass</div>
-                <div class="cat-tabs" id="occTabs"></div>
-                <div class="filt-lbl">Für wen?</div>
-                <div class="cat-tabs" id="recTabs"></div>
-              </div>
-            </div>
-            <div class="tpl-result">
-              <div class="tpl-result-head">
-                <span class="trh-ic">💬</span>
-                <span class="trh-lbl" id="tplResultLbl">Passende Sprüche</span>
-                <span class="trh-count" id="tplResultCount"></span>
-              </div>
-              <div class="tpl-row" id="tplRow"></div>
-            </div>
-          </div>
-        </details>
-
         <div class="field-group">
           <div class="group-head"><span class="ic">✏️</span> Dein Text <span class="hint">Stil je Zeile</span></div>
           <div id="zeilen"></div>
@@ -315,6 +293,27 @@ input[type=range]{flex:1;accent-color:var(--accent)}
             </div>
           </div>
         </details>
+      </div>
+
+      <div class="seg-pane" id="pane-vorlagen">
+        <div class="sub">Wähle Anlass &amp; Empfänger — wir zeigen passende Sprüche zum direkten Übernehmen.</div>
+        <div class="filt-card">
+          <div class="filt">
+            <div class="cat-tabs" id="allTab"></div>
+            <div class="filt-lbl">Anlass</div>
+            <div class="cat-tabs" id="occTabs"></div>
+            <div class="filt-lbl">Für wen?</div>
+            <div class="cat-tabs" id="recTabs"></div>
+          </div>
+        </div>
+        <div class="tpl-result">
+          <div class="tpl-result-head">
+            <span class="trh-ic">💬</span>
+            <span class="trh-lbl" id="tplResultLbl">Passende Sprüche</span>
+            <span class="trh-count" id="tplResultCount"></span>
+          </div>
+          <div class="tpl-row" id="tplRow"></div>
+        </div>
       </div>
 
       <div class="seg-pane" id="pane-motive">
@@ -2939,7 +2938,7 @@ function buildZeilen(){
     mv.style.flex='0 0 auto'; mv.style.padding='.5rem .6rem';
     mv.onclick=()=> free ? attachLine(idx) : detachLine(idx);
     rowEl.appendChild(mv);
-    if(zeileVals.length>1){
+    {
       const del=document.createElement('button'); del.type='button'; del.className='tool-btn danger'; del.textContent='✕';
       del.style.flex='0 0 auto'; del.style.padding='.5rem .6rem'; del.title='Zeile entfernen';
       del.onclick=()=>{ zeileVals.splice(idx,1); lineGeom.splice(idx,1); lineStyle.splice(idx,1); if(typeof selId==='string'&&selId.indexOf('line:')===0) selId=null; buildZeilen(); showSel(); render(); };
@@ -3186,7 +3185,7 @@ function layout(){
 }
 
 function computeScale(o){
-  const maxW=520, maxH=460, pad=46;
+  const maxW=600, maxH=560, pad=46;
   const ppmm=Math.min((maxW-pad)/o.wmm,(maxH-pad)/o.hmm);
   const cw=o.wmm*ppmm+pad, ch=o.hmm*ppmm+pad;
   return {ppmm, ox:(cw-o.wmm*ppmm)/2, oy:(ch-o.hmm*ppmm)/2, cw, ch};
@@ -3307,6 +3306,28 @@ function render(){
     if(selId!=='zone'){
       const B=selButtons(g,s);
       B.all.forEach(b=>drawSelBtn(ctx,b));
+    }
+    // Dreh-Anzeige: Winkel-Badge + Einrast-Hilfslinien bei 0/90/180/270°
+    if(drag && drag.mode==='rotate'){
+      const cx=px(g.cx,s), cy=py(g.cy,s), snapped=rotSnap!==null;
+      if(snapped){
+        ctx.save();
+        ctx.translate(cx,cy); ctx.rotate(g.angle*Math.PI/180);
+        ctx.setLineDash([5,4]); ctx.lineWidth=1.5; ctx.strokeStyle='rgba(34,197,94,0.9)';
+        const ext=Math.max(g.hw,g.hh)*s.ppmm+30;
+        ctx.beginPath(); ctx.moveTo(0,-ext); ctx.lineTo(0,ext); ctx.moveTo(-ext,0); ctx.lineTo(ext,0); ctx.stroke();
+        ctx.restore();
+      }
+      const deg=((Math.round(g.angle)%360)+360)%360, txt=deg+'°';
+      ctx.save();
+      ctx.font='700 13px "DM Sans", system-ui, sans-serif';
+      const tw=ctx.measureText(txt).width, bw=tw+18, bh=24, bx=cx-bw/2, by=cy-bh/2;
+      ctx.fillStyle=snapped?'rgba(34,197,94,0.96)':'rgba(2,6,23,0.9)';
+      ctx.strokeStyle=snapped?'rgba(134,239,172,0.95)':'rgba(0,212,255,0.65)';
+      rrPath(ctx,bx,by,bw,bh,7); ctx.fill(); ctx.lineWidth=1.5; ctx.stroke();
+      ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(txt,cx,cy+1);
+      ctx.restore();
     }
   }
 
@@ -3890,6 +3911,7 @@ function hitTest(m){
   return null;
 }
 let drag=null;
+let rotSnap=null;   // beim Drehen: null oder eingerasteter Winkel 0/90/180/270 für die Anzeige
 const snapGeom=g=>({cx:g.cx,cy:g.cy,hw:g.hw,hh:g.hh,angle:g.angle});
 // Punkt → lokale Koordinaten relativ zum (gedrehten) Auswahl-Mittelpunkt
 function localOf(m,g0){
@@ -3951,6 +3973,10 @@ cv.addEventListener('pointermove',e=>{
   } else if(drag.mode==='rotate'){
     let a=Math.atan2(m.y-g0.cy, m.x-g0.cx)*180/Math.PI+90;
     while(a>180)a-=360; while(a<-180)a+=360;
+    rotSnap=null;
+    for(const c of [0,90,180,-90,-180]){
+      if(Math.abs(a-c)<=6){ a=(c===-180?180:c); rotSnap=((Math.round(a)%360)+360)%360; break; }
+    }
     applySelGeom({...g0, angle:a});
   } else if(drag.mode==='resize'){
     const f=Math.max(0.05, Math.hypot(m.x-g0.cx,m.y-g0.cy)/drag.startDist);
@@ -3964,7 +3990,7 @@ cv.addEventListener('pointermove',e=>{
   }
   syncSelSliders(); render();
 });
-function endDrag(e){ if(drag){ drag=null; cv.classList.remove('grabbing'); try{cv.releasePointerCapture(e.pointerId);}catch(_){} histSchedule(); } }
+function endDrag(e){ if(drag){ drag=null; rotSnap=null; cv.classList.remove('grabbing'); try{cv.releasePointerCapture(e.pointerId);}catch(_){} histSchedule(); render(); } }
 cv.addEventListener('pointerup',endDrag);
 cv.addEventListener('pointercancel',endDrag);
 
@@ -4097,6 +4123,7 @@ document.getElementById('tang').addEventListener('input',()=>{
 // Segment-Tabs (Text / Motive / Logo)
 const PANE_META={
   text:{t:'Text',s:'Tippe deinen Wunschtext — Stil je Zeile einstellbar.'},
+  vorlagen:{t:'Vorlagen & Sprüche',s:'Fertige Sprüche nach Anlass & Empfänger.'},
   motive:{t:'Grafiken',s:'Motiv anklicken, dann frei im Bild platzieren.'},
   logo:{t:'Logo / Bild',s:'Eigenes Logo als SVG oder DXF — maßgenau.'},
   code:{t:'QR-Code',s:'QR aus Text oder Link — als Vektor-Gravur.'}
