@@ -44,7 +44,8 @@ header{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rg
 .studio{position:relative;margin-bottom:3rem}
 .studio>*{min-width:0}
 .stage{position:relative;background:linear-gradient(180deg,rgba(17,24,39,0.55),rgba(11,17,32,0.55));border:1px solid var(--border);border-radius:20px;padding:1.4rem;min-height:74vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.8rem}
-#cv{max-width:100%;height:auto;background:#0a0f1c;border-radius:12px}
+.cv-wrap{width:100%;max-width:100%;overflow:auto;display:flex;justify-content:center;align-items:flex-start;border-radius:12px}
+#cv{max-width:100%;height:auto;background:#0a0f1c;border-radius:12px;flex:0 0 auto}
 .dims{font-size:.82rem;color:var(--muted2);text-align:center}
 .dims b{color:var(--text)}
 .warn{font-size:.82rem;color:#fbbf24;min-height:1.1em;text-align:center}
@@ -119,6 +120,17 @@ input[type=range]{flex:1;accent-color:var(--accent)}
 .stage-bar{display:flex;gap:.4rem;align-self:stretch;justify-content:center;flex-wrap:wrap}
 .stage-bar .tool-btn{flex:0 0 auto;padding:.45rem .7rem}
 .stage-bar .tool-btn:disabled{opacity:.35;cursor:default;border-color:rgba(255,255,255,0.12);color:var(--muted);background:rgba(255,255,255,0.04)}
+
+/* Meine Designs (gespeicherte Entwürfe) */
+.saved-block{margin-top:1.1rem;border-top:1px solid rgba(255,255,255,0.06);padding-top:.9rem}
+.saved-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.55rem}
+.saved-card{position:relative;border:1px solid var(--border);border-radius:11px;overflow:hidden;cursor:pointer;background:rgba(2,6,23,0.5);transition:border-color .15s}
+.saved-card:hover{border-color:var(--accent)}
+.saved-card img{width:100%;display:block;aspect-ratio:1/1;object-fit:contain;background:#0a0f1c}
+.saved-card .nm{font-size:.74rem;padding:.36rem .42rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.saved-card .del{position:absolute;top:5px;right:5px;width:23px;height:23px;border-radius:7px;border:none;background:rgba(2,6,23,0.82);color:#fbbf24;cursor:pointer;font-size:.82rem;line-height:1;display:flex;align-items:center;justify-content:center}
+.saved-card .del:hover{background:rgba(220,38,38,0.85);color:#fff}
+.saved-empty{font-size:.78rem;color:var(--muted);padding:.3rem 0}
 
 /* Vorlagen (Templates) + Filter */
 .filt{margin-bottom:.8rem}
@@ -243,12 +255,15 @@ input[type=range]{flex:1;accent-color:var(--accent)}
 
   <div class="studio">
     <div class="stage">
-      <canvas id="cv" width="600" height="600"></canvas>
+      <div class="cv-wrap" id="cvWrap"><canvas id="cv" width="600" height="600"></canvas></div>
       <div class="dims" id="dims"></div>
       <div class="warn" id="warn"></div>
       <div class="stage-bar">
         <button class="tool-btn" id="undoBtn" title="Rückgängig (Strg+Z)">↶ Rückgängig</button>
         <button class="tool-btn" id="redoBtn" title="Wiederholen (Strg+Y)">↷ Wiederholen</button>
+        <button class="tool-btn" id="zoomOut" title="Verkleinern">➖</button>
+        <button class="tool-btn" id="zoomLbl" title="Zoom zurücksetzen">100%</button>
+        <button class="tool-btn" id="zoomIn" title="Vergrößern">➕</button>
         <button class="tool-btn" id="saveImg" title="Vorschau als PNG speichern">🖼 Als Bild speichern</button>
       </div>
     </div>
@@ -293,6 +308,12 @@ input[type=range]{flex:1;accent-color:var(--accent)}
           </div>
           <div class="tpl-row" id="tplRow"></div>
         </div>
+        <div class="saved-block">
+          <div class="tpl-result-head"><span class="trh-ic">💾</span><span class="trh-lbl">Meine Designs</span></div>
+          <div class="sub" style="margin:.3rem 0 .55rem">Speichere deinen Entwurf und lade ihn jederzeit wieder.</div>
+          <button type="button" id="saveDesignBtn" class="tool-btn" style="width:100%;justify-content:center;margin-bottom:.55rem">💾 Aktuelles Design speichern</button>
+          <div class="saved-grid" id="savedGrid"></div>
+        </div>
       </div>
 
       <div class="seg-pane" id="pane-text">
@@ -304,7 +325,7 @@ input[type=range]{flex:1;accent-color:var(--accent)}
         </div>
 
         <details class="acc">
-          <summary><span class="ic">⚙️</span> Feineinstellung <span class="hint">Höhe &amp; Drehung</span><span class="chev">▾</span></summary>
+          <summary><span class="ic">⚙️</span> Feineinstellung <span class="hint">Höhe · Drehung · Krümmung</span><span class="chev">▾</span></summary>
           <div class="acc-body">
             <div class="row2">
               <div class="field" style="margin-bottom:0">
@@ -315,6 +336,20 @@ input[type=range]{flex:1;accent-color:var(--accent)}
                 <label>Drehen (Auswahl) <span class="rval" id="tangVal">0°</span></label>
                 <div class="range-row"><input type="range" id="tang" min="-180" max="180" step="5" value="0"></div>
               </div>
+            </div>
+            <div class="row2" style="margin-top:.55rem">
+              <div class="field" style="margin-bottom:0">
+                <label>Krümmung <span class="rval" id="curveVal">0</span></label>
+                <div class="range-row"><input type="range" id="curve" min="-100" max="100" step="5" value="0"></div>
+              </div>
+              <div class="field" style="margin-bottom:0">
+                <label>Laufweite <span class="rval" id="lspVal">0</span></label>
+                <div class="range-row"><input type="range" id="lsp" min="-5" max="40" step="1" value="0"></div>
+              </div>
+            </div>
+            <div class="field" style="margin-bottom:0;margin-top:.55rem">
+              <label>Zeilenabstand <span class="rval" id="lhVal">0.55</span></label>
+              <div class="range-row"><input type="range" id="lh" min="0.1" max="1.5" step="0.05" value="0.55"></div>
             </div>
           </div>
         </details>
@@ -328,11 +363,15 @@ input[type=range]{flex:1;accent-color:var(--accent)}
       </div>
 
       <div class="seg-pane" id="pane-logo">
-        <div class="sub">Eigenes Logo als <b>SVG</b> oder <b>DXF</b> — wird maßgenau in die Gravurfläche gesetzt.</div>
+        <div class="sub">Eigenes Logo als <b>SVG</b>, <b>DXF</b> oder Bild (<b>PNG/JPG</b>) — wird maßgenau gesetzt. Bilder werden automatisch in laser-taugliches Schwarz-Weiß umgewandelt.</div>
         <div class="logo-box">
           <label for="logo">Datei wählen</label>
-          <input type="file" id="logo" accept=".svg,.dxf,image/svg+xml">
+          <input type="file" id="logo" accept=".svg,.dxf,.png,.jpg,.jpeg,.webp,image/svg+xml,image/png,image/jpeg,image/webp">
           <div class="logo-hint" id="logoStatus"></div>
+        </div>
+        <div class="field" id="bwField" style="display:none;margin-top:.8rem">
+          <label>Schwarz-Weiß-Schwelle <span id="bwVal" style="color:var(--muted)">128</span></label>
+          <div class="range-row"><input type="range" id="bwThresh" min="40" max="220" step="5" value="128"></div>
         </div>
       </div>
 
@@ -353,6 +392,19 @@ input[type=range]{flex:1;accent-color:var(--accent)}
 
       <button type="button" class="tool-btn admin-only" id="zoneBtn" style="width:100%;margin-top:1rem;justify-content:center">▦ Gravurbereich anpassen (Admin)</button>
       <div class="admin-only" id="zoneReadout" style="display:none;font:600 .8rem/1.4 monospace;color:#7fdfff;margin-top:.5rem;text-align:center"></div>
+      <details class="acc admin-only" id="serieBox" style="margin-top:1rem">
+        <summary><span class="ic">📋</span> Serie / Namensliste (B2B) <span class="hint">aktuelles Design × N</span><span class="chev">▾</span></summary>
+        <div class="acc-body">
+          <div class="sub" style="margin-bottom:.5rem">Aktuelles Design als Vorlage: jede Zeile = ein Teil. Die <b>ausgewählte Textzeile</b> (sonst Zeile 1) wird je Name ersetzt. Export = eine gekachelte LightBurn-SVG.</div>
+          <textarea id="serieList" rows="6" placeholder="Anna Müller&#10;Max Bauer&#10;Lena Schmidt&#10;…" style="width:100%;background:rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.1);border-radius:11px;padding:.7rem .85rem;color:var(--text);font-family:inherit;font-size:.92rem;resize:vertical"></textarea>
+          <div style="display:flex;gap:.5rem;margin-top:.55rem">
+            <label for="serieFile" class="tool-btn" style="flex:1;justify-content:center;cursor:pointer">📁 CSV/TXT laden</label>
+            <input type="file" id="serieFile" accept=".csv,.txt,text/csv,text/plain" style="display:none">
+            <button type="button" class="tool-btn" id="serieExport" style="flex:1;justify-content:center">⬇ Serie als SVG</button>
+          </div>
+          <div class="logo-hint" id="serieStatus" style="margin-top:.5rem"></div>
+        </div>
+      </details>
       <div class="summary">
         <div class="price" id="priceBox">
           <div><span class="pl">Preis (Richtwert)</span></div>
@@ -2860,13 +2912,14 @@ function snapshotDesign(){
     lineGeom: lineGeom.map(g=> g?{...g}:null),
     lineStyle: lineStyle.map(s=>({...s})),
     items: items.map(it=>{ const c=Object.assign({},it); delete c.img; return c; }),
-    textPos: {...textPos}, textScaleX, textAng, textCap
+    textPos: {...textPos}, textScaleX, textAng, textCap, textCurve, textLsp, textLh
   };
 }
 function restoreDesign(d){
   if(!d){
     zeileVals=['Max Mustermann']; lineGeom=[null]; lineStyle=[newStyle()]; items=[];
     textPos={x:null,y:null}; textScaleX=1; textCap=4;
+    textCurve=0; textLsp=0; textLh=0.55;
     applyAngleDefault();
     return;
   }
@@ -2875,6 +2928,7 @@ function restoreDesign(d){
   lineStyle=(d.lineStyle||zeileVals.map(()=>newStyle())).map(s=>({...s}));
   items=d.items.map(it=>{ const c=Object.assign({},it); makeItemImg(c); return c; });
   textPos={...d.textPos}; textScaleX=d.textScaleX; textCap=d.textCap;
+  textCurve=d.textCurve||0; textLsp=d.textLsp||0; textLh=(d.textLh!=null?d.textLh:0.55);
   textAng=d.textAng; setTangSlider(textAng);
 }
 let textPos={x:null,y:null}; // mm-Mittelpunkt des Textes (null=Zonen-Mitte)
@@ -2889,6 +2943,10 @@ let lineGeom=[null];   // pro Zeile: null=im Block (gestapelt) | {x,y,angle,cap,
 let lineStyle=[newStyle()];
 let textAng=0;         // Winkel des Text-Blocks — entkoppelt vom Schieberegler, damit dieser die aktive Auswahl dreht
 let textCap=4;         // Schrifthöhe des Block-Texts — entkoppelt, damit der Höhe-Regler die aktive Auswahl ändert
+let textCurve=0;       // Krümmung des Block-Texts (-100..100, 0=gerade)
+let textLsp=0;         // Laufweite/Buchstabenabstand des Blocks (em-Bruchteil)
+let textLh=0.55;       // Zeilenabstand-Faktor (Lücke = capMM*textLh)
+const THETA_MAX=Math.PI*0.9; // max. Bogenwinkel bei Krümmung 100
 const MAX_ZEILEN=8;
 // Echte Schriftarten in 3 Kategorien (je 2) — plus Schalter kursiv/fett/unterstrichen.
 // Der Fett-Schalter erhöht die Strichstärke; die Grundschriften sind absichtlich NICHT fett,
@@ -2979,9 +3037,42 @@ function itemSVGString(it,color){
 }
 function makeItemImg(it){
   const im=new Image();
+  if(it.raster){
+    im.onload=()=>{ im._ready=true; render(); };
+    im.src=it.src; it.img=im; return;
+  }
   im.onload=()=>{ im._ready=true; if(!it._trimmed) trimItem(it); render(); };
   im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(itemSVGString(it,'#000'));
   it.img=im;
+}
+// Raster-Upload (PNG/JPG/WEBP) → automatische Schwarz-Weiß-Umwandlung (laser-tauglich):
+// dunkle Pixel = Gravur (schwarz, deckend), helle = transparent. Zuschnitt auf Inhalt.
+function processRasterBW(img, threshold){
+  let w=img.naturalWidth||img.width, h=img.naturalHeight||img.height;
+  const MAX=1400, sc=Math.min(1, MAX/Math.max(w,h)); w=Math.max(1,Math.round(w*sc)); h=Math.max(1,Math.round(h*sc));
+  const c=document.createElement('canvas'); c.width=w; c.height=h;
+  const g=c.getContext('2d'); g.drawImage(img,0,0,w,h);
+  let d; try{ d=g.getImageData(0,0,w,h); }catch(e){ return {src:c.toDataURL('image/png'), w, h}; }
+  const a=d.data; let x0=w,y0=h,x1=-1,y1=-1;
+  for(let i=0;i<a.length;i+=4){
+    const lum=0.299*a[i]+0.587*a[i+1]+0.114*a[i+2];
+    if(a[i+3]>10 && lum<threshold){
+      a[i]=a[i+1]=a[i+2]=0; a[i+3]=255;
+      const p=i>>2, x=p%w, y=(p/w)|0;
+      if(x<x0)x0=x; if(x>x1)x1=x; if(y<y0)y0=y; if(y>y1)y1=y;
+    } else { a[i+3]=0; }
+  }
+  g.putImageData(d,0,0);
+  if(x1<x0||y1<y0) return {src:c.toDataURL('image/png'), w, h, empty:true};
+  const cw=x1-x0+1, ch=y1-y0+1;
+  const c2=document.createElement('canvas'); c2.width=cw; c2.height=ch;
+  c2.getContext('2d').drawImage(c, x0,y0,cw,ch, 0,0,cw,ch);
+  return {src:c2.toDataURL('image/png'), w:cw, h:ch};
+}
+function reprocessRaster(it, threshold){
+  const im=new Image();
+  im.onload=()=>{ const r=processRasterBW(im, threshold); it.src=r.src; it.bw=r.w; it.bh=r.h; it.hmm=it.wmm*(r.h/r.w); it.bwThresh=threshold; makeItemImg(it); render(); };
+  im.src=it._rasterSrc;
 }
 // Bounding-Box auf den tatsächlich gezeichneten Inhalt zuschneiden → Auswahl-Rahmen = Icon-Form,
 // nicht der leere viewBox-Kasten (sonst lässt sich ein Icon nicht ganz in die Ecke ziehen).
@@ -3088,17 +3179,36 @@ function parseDXF(text){
   inner=`<g fill="none" stroke="#000" stroke-width="${(bw*0.004).toFixed(3)}">${inner}</g>`;
   return { viewBox:`0 0 ${bw.toFixed(3)} ${bh.toFixed(3)}`, bw, bh, inner, colored:true, unsupported };
 }
+const RASTER_RE=/\.(png|jpe?g|webp|gif|bmp)$/i;
 function handleLogoFile(file){
+  const name=(file.name||'').toLowerCase();
+  const status=document.getElementById('logoStatus');
+  const isRaster = RASTER_RE.test(name) || /^image\/(png|jpeg|webp|gif|bmp)$/.test(file.type||'');
   const reader=new FileReader();
+  if(isRaster){
+    reader.onload=()=>{
+      const img=new Image();
+      img.onload=()=>{
+        const th=128, r=processRasterBW(img, th);
+        if(r.empty){ status.textContent='⚠ Bild zu hell — bitte Schwelle erhöhen oder kontrastreicheres Bild.'; }
+        const o=OBJECTS[current], z=o.zone;
+        addItem({ label:'Logo', _logo:true, raster:true, _trimmed:true, src:r.src, _rasterSrc:reader.result, bw:r.w, bh:r.h, bwThresh:th, colored:false });
+        status.textContent='✓ Bild geladen & in Schwarz-Weiß umgewandelt — Schwelle unten anpassbar.';
+      };
+      img.onerror=()=>{ status.textContent='⚠ Bild konnte nicht gelesen werden.'; };
+      img.src=reader.result;
+    };
+    reader.readAsDataURL(file);
+    return;
+  }
   reader.onload=()=>{
     try{
-      const name=(file.name||'').toLowerCase();
       const spec = name.endsWith('.dxf') ? parseDXF(reader.result) : parseSVG(reader.result);
       addItem(Object.assign({label:'Logo', _logo:true}, spec));
-      document.getElementById('logoStatus').textContent = spec.unsupported
+      status.textContent = spec.unsupported
         ? '✓ DXF geladen — einige komplexe Elemente (z. B. Splines) fehlen.'
         : '✓ geladen — in der Vorschau platzieren.';
-    }catch(err){ document.getElementById('logoStatus').textContent='⚠ '+err.message; }
+    }catch(err){ status.textContent='⚠ '+err.message; }
   };
   reader.readAsText(file);
 }
@@ -3114,6 +3224,7 @@ function drawItem(it,s,o){
   ctx.save();
   ctx.translate(px(it.x,s),py(it.y,s)); ctx.rotate(it.angle*Math.PI/180);
   setEngrave(ctx,s,o);
+  if(it.flipX||it.flipY) ctx.scale(it.flipX?-1:1, it.flipY?-1:1);
   ctx.drawImage(oc,-wpx/2,-hpx/2);
   ctx.restore();
 }
@@ -3127,6 +3238,11 @@ function setEngrave(ctx,s,o){
 }
 function itemExportSVG(it){
   const hmm=it.hmm!=null?it.hmm:it.wmm*(it.bh/it.bw);
+  if(it.raster){
+    const fx=it.flipX?-1:1, fy=it.flipY?-1:1;
+    const t=`translate(${it.x.toFixed(3)},${it.y.toFixed(3)}) rotate(${(it.angle||0).toFixed(2)}) scale(${fx},${fy}) translate(${(-it.wmm/2).toFixed(3)},${(-hmm/2).toFixed(3)})`;
+    return `<g transform="${t}"><image x="0" y="0" width="${it.wmm.toFixed(3)}" height="${hmm.toFixed(3)}" preserveAspectRatio="none" xlink:href="${it.src}" href="${it.src}"/></g>`;
+  }
   const body = it.colored ? it.inner : `<g fill="#000" stroke="#000" stroke-linejoin="round">${it.inner}</g>`;
   // Flatten to a single transform (no nested <svg>/preserveAspectRatio — LightBurn mishandles that,
   // which moved the icon/logo and skewed the angle). This maps the viewBox box exactly onto the
@@ -3134,7 +3250,9 @@ function itemExportSVG(it){
   const vb=String(it.viewBox).trim().split(/[\s,]+/).map(Number);
   const vx=vb[0]||0, vy=vb[1]||0, vw=vb[2]||100, vh=vb[3]||100;
   const sx=it.wmm/vw, sy=hmm/vh;
+  const fx=it.flipX?-1:1, fy=it.flipY?-1:1;
   const t=`translate(${it.x.toFixed(3)},${it.y.toFixed(3)}) rotate(${(it.angle||0).toFixed(2)}) `
+        + `scale(${fx},${fy}) `
         + `translate(${(-it.wmm/2).toFixed(3)},${(-hmm/2).toFixed(3)}) scale(${sx.toFixed(5)},${sy.toFixed(5)}) `
         + `translate(${(-vx).toFixed(3)},${(-vy).toFixed(3)})`;
   return `<g transform="${t}">${body}</g>`;
@@ -3161,6 +3279,69 @@ function capRatio(css,weight){
   const r=(y1>y0)?(y1-y0)/100:0.7; capRatioCache[key]=r; return r;
 }
 function emWidthRatio(str,css,weight){ measCtx.font=`${weight} 100px "${css}"`; return measCtx.measureText(str||'').width/100; }
+// Gesamtbreite einer Zeile inkl. Laufweite (em-Bruchteil), in mm bei Schriftgröße fsMM
+function lineWidthMM(str,css,weight,fsMM,lspEm){
+  const chars=Array.from(str||''); if(!chars.length) return 0;
+  measCtx.font=`${weight} 100px "${css}"`;
+  let sum=0; chars.forEach(c=>{ sum+=measCtx.measureText(c).width/100*fsMM; });
+  return sum+(chars.length-1)*(lspEm||0)*fsMM;
+}
+// Bogen-Höhenzuwachs (Sagitta) einer gekrümmten Zeile in mm — für Auswahlrahmen/Anpassung
+function curveSagittaMM(widthMM,bend){
+  if(!bend) return 0; const theta=Math.abs(bend/100*THETA_MAX); const R=widthMM/theta;
+  return R*(1-Math.cos(theta/2));
+}
+// Zeichnet EINE Textzeile (gerade ODER gekrümmt) inkl. Laufweite. ctx ist bereits auf die Text-Mitte
+// transformiert (translate/rotate/scale). yOff = vertikaler Versatz der Zeile (px). bend in %, lspEm em-Bruchteil.
+function drawTextLine(ctx,str,sizePx,font,yOff,bend,lspEm,underline){
+  ctx.save();
+  ctx.font=`${font.italic?'italic ':''}${font.weight} ${sizePx}px "${font.css}"`;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  const chars=Array.from(str||''); const lsp=(lspEm||0)*sizePx;
+  if(!bend && !lsp){
+    ctx.fillText(str,0,yOff);
+    if(underline){ const w=ctx.measureText(str).width; ctx.fillRect(-w/2, yOff+sizePx*0.42, w, Math.max(1,sizePx*0.06)); }
+    ctx.restore(); return;
+  }
+  const adv=chars.map(c=>ctx.measureText(c).width);
+  const W=adv.reduce((a,b)=>a+b,0)+(chars.length-1)*lsp;
+  if(!bend){
+    let x=-W/2;
+    chars.forEach((c,k)=>{ ctx.fillText(c, x+adv[k]/2, yOff); x+=adv[k]+lsp; });
+    if(underline) ctx.fillRect(-W/2, yOff+sizePx*0.42, W, Math.max(1,sizePx*0.06));
+  } else {
+    const sgn=Math.sign(bend), theta=bend/100*THETA_MAX, R=W/Math.abs(theta);
+    ctx.translate(0, yOff + R*sgn);
+    let acc=0;
+    chars.forEach((c,k)=>{
+      const phi=((acc+adv[k]/2)/W-0.5)*theta;
+      ctx.save(); ctx.rotate(phi); ctx.translate(0,-R*sgn); ctx.fillText(c,0,0); ctx.restore();
+      acc+=adv[k]+lsp;
+    });
+  }
+  ctx.restore();
+}
+// SVG-Markup einer Zeile (gerade ODER gekrümmt). fsMM=Schriftgröße in mm. transform wird vom Aufrufer gesetzt;
+// hier nur der innere Versatz (yOff) + Krümmung. Gibt <text>… bzw. mehrere <text>… zurück.
+function svgTextLine(str,fsMM,css,weight,styleAttr,yOff,bend,lspEm){
+  const chars=Array.from(str||''); if(!chars.length) return '';
+  const lspMM=(lspEm||0)*fsMM;
+  if(!bend){
+    const ls=lspMM?` letter-spacing="${lspMM.toFixed(3)}"`:'';
+    return `<text x="0" y="${yOff.toFixed(2)}" font-family="${css}" font-weight="${weight}"${styleAttr}${ls} font-size="${fsMM.toFixed(2)}" text-anchor="middle" dominant-baseline="central" fill="#000">${escapeXML(str)}</text>`;
+  }
+  measCtx.font=`${weight} 100px "${css}"`;
+  const adv=chars.map(c=>measCtx.measureText(c).width/100*fsMM);
+  const W=adv.reduce((a,b)=>a+b,0)+(chars.length-1)*lspMM;
+  const sgn=Math.sign(bend), theta=bend/100*THETA_MAX, R=W/Math.abs(theta);
+  let acc=0, out='';
+  chars.forEach((c,k)=>{
+    const phi=((acc+adv[k]/2)/W-0.5)*theta, phd=phi*180/Math.PI;
+    out+=`<text transform="translate(0,${(yOff+R*sgn).toFixed(3)}) rotate(${phd.toFixed(3)}) translate(0,${(-R*sgn).toFixed(3)})" x="0" y="0" font-family="${css}" font-weight="${weight}"${styleAttr} font-size="${fsMM.toFixed(2)}" text-anchor="middle" dominant-baseline="central" fill="#000">${escapeXML(c)}</text>`;
+    acc+=adv[k]+lspMM;
+  });
+  return out;
+}
 
 
 // Compute laid-out text lines fitted into the engraving zone. Returns {lines:[{str,capMM,wmm}], capMM, fits}
@@ -3173,18 +3354,19 @@ function layout(){
   // available primary axis = width for horizontal, height for vertical
   const availLen = (o.orient==='h') ? z.w : z.h;
   const availStack = (o.orient==='h') ? z.h : z.w; // perpendicular budget for stacked lines
-  const gapMM=()=>capMM*0.55;
+  const gapMM=()=>capMM*textLh;
+  const lineW=(m)=>lineWidthMM(m.str,m.f.css,m.f.weight,capMM/m.cr,textLsp);
 
   let fits=true;
   // shrink capMM until all lines fit length-wise AND the stack fits (each line uses its own font)
   for(let i=0;i<200;i++){
-    const widest=Math.max(...meas.map(m=>emWidthRatio(m.str,m.f.css,m.f.weight)*(capMM/m.cr)));
-    const stackH=meas.length*capMM + (meas.length-1)*gapMM();
+    const widest=Math.max(...meas.map(lineW));
+    const stackH=meas.length*capMM + (meas.length-1)*gapMM() + 2*curveSagittaMM(widest,textCurve);
     if(widest<=availLen && stackH<=availStack) break;
     capMM-=0.1;
     if(capMM<=1.2){ capMM=1.2; fits=false; break; }
   }
-  const lines=meas.map(m=>({str:m.str, oi:m.oi, f:m.f, capMM, wmm:emWidthRatio(m.str,m.f.css,m.f.weight)*(capMM/m.cr)}));
+  const lines=meas.map(m=>({str:m.str, oi:m.oi, f:m.f, capMM, wmm:lineW(m)}));
   return {o,z,lines,capMM,fits};
 }
 
@@ -3196,6 +3378,19 @@ function computeScale(o){
 }
 
 let curS=null;
+let zoomF=1;
+function applyZoom(){
+  if(!curS) return;
+  if(Math.abs(zoomF-1)<0.001){
+    cv.style.width=''; cv.style.height=''; cv.style.maxWidth='';
+  } else {
+    cv.style.maxWidth='none';
+    cv.style.width=(curS.cw*zoomF)+'px';
+    cv.style.height=(curS.ch*zoomF)+'px';
+  }
+  const zl=document.getElementById('zoomLbl'); if(zl) zl.textContent=Math.round(zoomF*100)+'%';
+}
+function setZoom(z){ zoomF=Math.max(0.5,Math.min(4,z)); applyZoom(); }
 function render(){
   const o=OBJECTS[current];
   const s=computeScale(o); curS=s;
@@ -3244,15 +3439,13 @@ function render(){
   ctx.fillStyle = inkColor(o);
   setEngrave(ctx,s,o);
   ctx.textAlign='center'; ctx.textBaseline='middle';
-  const gapMM=L.capMM*0.55;
+  const gapMM=L.capMM*textLh;
   const lineStepPx=(L.capMM+gapMM)*s.ppmm;
   const total=L.lines.length;
   L.lines.forEach((ln,i)=>{
     const offset=(i-(total-1)/2)*lineStepPx;
     const sizePx=(ln.capMM/capRatio(ln.f.css,ln.f.weight))*s.ppmm;
-    ctx.font=`${ln.f.italic?'italic ':''}${ln.f.weight} ${sizePx}px "${ln.f.css}"`;
-    ctx.fillText(ln.str,0,offset);
-    if(ln.f.underline){ const w=ctx.measureText(ln.str).width; ctx.fillRect(-w/2, offset+sizePx*0.42, w, Math.max(1,sizePx*0.06)); }
+    drawTextLine(ctx,ln.str,sizePx,ln.f,offset,textCurve,textLsp,ln.f.underline);
   });
   ctx.restore();
 
@@ -3269,9 +3462,7 @@ function render(){
       setEngrave(ctx,s,o);
       ctx.textAlign='center'; ctx.textBaseline='middle';
       const sizePx=(lg.cap/fcr)*s.ppmm;
-      ctx.font=`${ff.italic?'italic ':''}${ff.weight} ${sizePx}px "${ff.css}"`;
-      ctx.fillText(str,0,0);
-      if(ff.underline){ const w=ctx.measureText(str).width; ctx.fillRect(-w/2, sizePx*0.42, w, Math.max(1,sizePx*0.06)); }
+      drawTextLine(ctx,str,sizePx,ff,0,lg.curve||0,lg.lsp||0,ff.underline);
       ctx.restore();
     });
   }
@@ -3340,46 +3531,109 @@ function render(){
   document.getElementById('warn').textContent = L.fits ? '' : '⚠ Text zu lang für die Fläche — bitte kürzen.';
   document.getElementById('capVal').textContent=parseFloat(document.getElementById('cap').value).toFixed(1)+' mm';
   if(!exporting){ updatePrice(); histSchedule(); }
+  applyZoom();
 }
 
 // ---------- mm-accurate SVG (LightBurn) ----------
 function escapeXML(s){ return String(s).replace(/[<>&"']/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c])); }
-function renderSVG(){
+// Kontur + Gravur als Gruppen-Inhalt (ohne <svg>-Wrapper) — wiederverwendbar für Serien-Export.
+function renderSVGGroups(){
   const o=OBJECTS[current], z=o.zone, L=layout();
   const tc=textCenter(z);
-  const gapMM=L.capMM*0.55, total=L.lines.length;
+  const gapMM=L.capMM*textLh, total=L.lines.length;
   const tang=textAng;
   let eng='';
   L.lines.forEach((ln,i)=>{
     const off=(i-(total-1)/2)*(L.capMM+gapMM);
     const cr=capRatio(ln.f.css,ln.f.weight);
-    const fs=(ln.capMM/cr).toFixed(2);
-    const st=`${ln.f.italic?' font-style="italic"':''}${ln.f.underline?' text-decoration="underline"':''}`;
-    eng+=`<text transform="translate(${tc.x.toFixed(2)},${tc.y.toFixed(2)}) rotate(${tang}) scale(${textScaleX.toFixed(4)},1)" x="0" y="${off.toFixed(2)}" font-family="${ln.f.css}" font-weight="${ln.f.weight}"${st} font-size="${fs}" text-anchor="middle" dominant-baseline="central" fill="#000">${escapeXML(ln.str)}</text>`;
+    const fs=(ln.capMM/cr);
+    const st=`${ln.f.italic?' font-style="italic"':''}${(ln.f.underline&&!textCurve)?' text-decoration="underline"':''}`;
+    const inner=svgTextLine(ln.str,fs,ln.f.css,ln.f.weight,st,off,textCurve,textLsp);
+    eng+=`<g transform="translate(${tc.x.toFixed(2)},${tc.y.toFixed(2)}) rotate(${tang}) scale(${textScaleX.toFixed(4)},1)">${inner}</g>`;
   });
   let freeEng='';
   zeileVals.forEach((v,i)=>{
     const str=v.trim(), lg=lineGeom[i]; if(!str||!lg) return;
     const ff=fontOf(i), cr=capRatio(ff.css,ff.weight);
-    const fs=(lg.cap/cr).toFixed(2);
-    const st=`${ff.italic?' font-style="italic"':''}${ff.underline?' text-decoration="underline"':''}`;
-    freeEng+=`<text transform="translate(${lg.x.toFixed(2)},${lg.y.toFixed(2)}) rotate(${lg.angle}) scale(${lg.scaleX.toFixed(4)},1)" x="0" y="0" font-family="${ff.css}" font-weight="${ff.weight}"${st} font-size="${fs}" text-anchor="middle" dominant-baseline="central" fill="#000">${escapeXML(str)}</text>`;
+    const fs=(lg.cap/cr);
+    const bend=lg.curve||0;
+    const st=`${ff.italic?' font-style="italic"':''}${(ff.underline&&!bend)?' text-decoration="underline"':''}`;
+    const inner=svgTextLine(str,fs,ff.css,ff.weight,st,0,bend,lg.lsp||0);
+    freeEng+=`<g transform="translate(${lg.x.toFixed(2)},${lg.y.toFixed(2)}) rotate(${lg.angle}) scale(${lg.scaleX.toFixed(4)},1)">${inner}</g>`;
   });
   eng+=freeEng;
   const itemsSVG=items.map(itemExportSVG).join('');
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="${o.wmm}mm" height="${o.hmm}mm" viewBox="0 0 ${o.wmm} ${o.hmm}">
-  <g id="Kontur" fill="none" stroke="#cccccc" stroke-width="0.15">
+  return `  <g id="Kontur" fill="none" stroke="#cccccc" stroke-width="0.15">
     <rect x="0.1" y="0.1" width="${(o.wmm-0.2).toFixed(2)}" height="${(o.hmm-0.2).toFixed(2)}" rx="${o.radius}"/>
     <rect x="${z.x}" y="${z.y}" width="${z.w}" height="${z.h}" stroke="#9bd"/>
   </g>
-  <g id="Gravur">${eng}${itemsSVG}</g>
+  <g id="Gravur">${eng}${itemsSVG}</g>`;
+}
+function renderSVG(){
+  const o=OBJECTS[current];
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${o.wmm}mm" height="${o.hmm}mm" viewBox="0 0 ${o.wmm} ${o.hmm}">
+${renderSVGGroups()}
 </svg>`;
 }
 function downloadSVG(){
   const blob=new Blob([renderSVG()],{type:'image/svg+xml'});
   const a=document.createElement('a');
   a.download=`wolf-${current}-lightburn.svg`; a.href=URL.createObjectURL(blob); a.click();
+}
+// ---------- B2B-Serie: eine Namensliste → eine gekachelte LightBurn-SVG (ein Teil pro Name) ----------
+function parseNameList(text){
+  return String(text||'').split(/\r\n|\r|\n/)
+    .map(s=>s.replace(/^[;,\t ]+|[;,\t ]+$/g,'').trim())
+    .filter(Boolean);
+}
+function seriesLineIndex(){
+  const m=(typeof selId==='string'&&selId.indexOf('line:')===0)?parseInt(selId.slice(5),10):null;
+  if(m!=null && !isNaN(m) && zeileVals[m]!=null) return m;
+  return 0;
+}
+function buildSeriesSVG(names, lineIdx){
+  const o=OBJECTS[current];
+  const cols=Math.max(1, Math.min(5, Math.ceil(Math.sqrt(names.length))));
+  const gap=8, cw=o.wmm+gap, ch=o.hmm+gap;
+  const savedZ=zeileVals.slice(), wasExporting=exporting;
+  exporting=true;
+  let tiles='';
+  names.forEach((nm,i)=>{
+    zeileVals=savedZ.slice(); zeileVals[lineIdx]=nm;
+    const col=i%cols, row=(i/cols|0);
+    tiles+=`<g transform="translate(${(col*cw).toFixed(2)},${(row*ch).toFixed(2)})">\n${renderSVGGroups()}\n</g>`;
+  });
+  zeileVals=savedZ; exporting=wasExporting;
+  const rows=Math.ceil(names.length/cols);
+  const W=cols*cw-gap, H=rows*ch-gap;
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${W.toFixed(2)}mm" height="${H.toFixed(2)}mm" viewBox="0 0 ${W.toFixed(2)} ${H.toFixed(2)}">
+${tiles}
+</svg>`;
+}
+function exportSeries(){
+  const ta=document.getElementById('serieList');
+  const names=parseNameList(ta?ta.value:'');
+  const status=document.getElementById('serieStatus');
+  if(!names.length){ if(status) status.textContent='⚠ Bitte mindestens einen Namen eingeben (ein Name pro Zeile).'; return; }
+  if(names.length>200){ if(status) status.textContent='⚠ Maximal 200 Namen pro Serie.'; return; }
+  const idx=seriesLineIndex();
+  const svg=buildSeriesSVG(names, idx);
+  const blob=new Blob([svg],{type:'image/svg+xml'});
+  const a=document.createElement('a');
+  a.download=`wolf-${current}-serie-${names.length}.svg`; a.href=URL.createObjectURL(blob); a.click();
+  if(status) status.textContent=`✓ ${names.length} Teile exportiert (Zeile ${idx+1} ersetzt) — in LightBurn öffnen.`;
+}
+function handleSerieFile(file){
+  const reader=new FileReader();
+  reader.onload=()=>{
+    const txt=String(reader.result||'');
+    const names=parseNameList(txt).map(l=>l.split(/[;,\t]/)[0].trim()).filter(Boolean);
+    const ta=document.getElementById('serieList'); if(ta) ta.value=names.join('\n');
+    const status=document.getElementById('serieStatus'); if(status) status.textContent=`✓ ${names.length} Namen aus Datei geladen.`;
+  };
+  reader.readAsText(file);
 }
 
 // default text angle: vertikale Objekte → -90° (Text läuft am Schaft entlang)
@@ -3467,6 +3721,7 @@ function tplText(zeilen, styles, clip){
     lineGeom=zeilen.map(()=>null);
     items=[];
     textPos={x:null,y:null}; textScaleX=1;
+    textCurve=0; textLsp=0; textLh=0.55;
     _tplClipY=null;
     if(clip) clip();
     // Text aus dem Clip-Bereich herausrücken, damit sich Symbol & Text nicht überlappen.
@@ -3660,11 +3915,11 @@ function detachLine(idx){
   const str=zeileVals[idx]?zeileVals[idx].trim():''; if(!str) return;
   const L=layout(); // Block-Layout VOR dem Lösen (idx ist noch im Block)
   const o=OBJECTS[current], z=o.zone, tc=textCenter(z);
-  const gap=L.capMM*0.55, step=L.capMM+gap, total=L.lines.length;
+  const gap=L.capMM*textLh, step=L.capMM+gap, total=L.lines.length;
   const bi=L.lines.findIndex(ln=>ln.oi===idx);
   const off=(bi-(total-1)/2)*step;
   const a=textAng*Math.PI/180;
-  lineGeom[idx]={ x:tc.x - Math.sin(a)*off, y:tc.y + Math.cos(a)*off, angle:textAng, cap:L.capMM, scaleX:textScaleX };
+  lineGeom[idx]={ x:tc.x - Math.sin(a)*off, y:tc.y + Math.cos(a)*off, angle:textAng, cap:L.capMM, scaleX:textScaleX, curve:textCurve, lsp:textLsp };
   selId='line:'+idx;
   const g=selGeom(); if(g) applySelGeom(g); // in den Rahmen einklemmen
   buildZeilen(); showSel(); render();
@@ -3697,11 +3952,30 @@ function showSel(){
   setTangSlider(g && selId && selId!=='zone' ? g.angle : textAng);
   const lg0=selLineGeom();
   setCapSlider(lg0 ? lg0.cap : textCap);
+  setFineSliders();
+  const bwF=document.getElementById('bwField');
+  if(bwF){
+    if(it && it.raster){
+      bwF.style.display='block';
+      const t=it.bwThresh||128;
+      const bt=document.getElementById('bwThresh'); if(bt) bt.value=t;
+      const bv=document.getElementById('bwVal'); if(bv) bv.textContent=t;
+    } else bwF.style.display='none';
+  }
+}
+function setFineSliders(){
+  const lg=selLineGeom();
+  const curveV = lg ? (lg.curve||0) : textCurve;
+  const lspV = Math.round((lg ? (lg.lsp||0) : textLsp)*100);
+  const c=document.getElementById('curve'); if(c){ c.value=curveV; document.getElementById('curveVal').textContent=curveV; }
+  const l=document.getElementById('lsp'); if(l){ l.value=lspV; document.getElementById('lspVal').textContent=lspV; }
+  const h=document.getElementById('lh'); if(h){ h.value=textLh; document.getElementById('lhVal').textContent=(+textLh).toFixed(2); }
 }
 function syncSelSliders(){
   const g=selGeom();
   if(g && selId && selId!=='zone') setTangSlider(g.angle);
   const lg0=selLineGeom(); if(lg0) setCapSlider(lg0.cap);
+  setFineSliders();
 }
 // Auswahl-Geometrie (mm) — Element ODER Text ODER Gravurbereich (zone)
 function textNatHalfW(L){ return L.lines.length?Math.max(...L.lines.map(l=>l.wmm))/2:0.5; }
@@ -3710,17 +3984,19 @@ function selGeom(){
   if(selId==='text'){
     const L=layout(); if(!L.lines.length) return null;
     const z=OBJECTS[current].zone, tc=textCenter(z);
-    const gap=L.capMM*0.55;
+    const gap=L.capMM*textLh;
     const hw=textNatHalfW(L)*textScaleX+1.2;
-    const hh=(L.lines.length*L.capMM+(L.lines.length-1)*gap)/2+1.2;
+    const sag=curveSagittaMM(textNatHalfW(L)*2*textScaleX, textCurve);
+    const hh=(L.lines.length*L.capMM+(L.lines.length-1)*gap)/2+sag+1.2;
     return {kind:'text',cx:tc.x,cy:tc.y,hw,hh,angle:textAng};
   }
   if(typeof selId==='string' && selId.indexOf('line:')===0){
     const i=+selId.slice(5), lg=lineGeom[i], str=zeileVals[i]?zeileVals[i].trim():'';
     if(!lg||!str) return null;
     const f=fontOf(i), cr=capRatio(f.css,f.weight);
-    const natW=emWidthRatio(str,f.css,f.weight)*(lg.cap/cr);
-    return {kind:'line',cx:lg.x,cy:lg.y,hw:natW*lg.scaleX/2+1.2,hh:lg.cap/2+1.2,angle:lg.angle};
+    const natW=lineWidthMM(str,f.css,f.weight,lg.cap/cr,lg.lsp||0);
+    const sag=curveSagittaMM(natW*lg.scaleX, lg.curve||0);
+    return {kind:'line',cx:lg.x,cy:lg.y,hw:natW*lg.scaleX/2+1.2,hh:lg.cap/2+sag+1.2,angle:lg.angle};
   }
   const it=items.find(i=>i.id===selId);
   if(!it) return null;
@@ -3820,7 +4096,7 @@ function selButtons(g,s){
   const top=[];
   const it=items.find(i=>i.id===selId);
   if(it){
-    const acts=[{action:'duplicate',icon:'dup'},{action:'center',icon:'center'}];
+    const acts=[{action:'duplicate',icon:'dup'},{action:'center',icon:'center'},{action:'flipH',icon:'flipH'},{action:'flipV',icon:'flipV'}];
     // "Nach vorne" nur sinnvoll, wenn mehrere Elemente überlappen können.
     if(items.length>1) acts.push({action:'front',icon:'front'});
     const gap=34, ty=H.topMid.y-36, sx=H.topMid.x-(acts.length-1)*gap/2;
@@ -3879,6 +4155,16 @@ function drawHandleIcon(ctx,cx,cy,name,col){
     arrow(0,-7,0,-3.5); arrow(0,7,0,3.5); arrow(-7,0,-3.5,0); arrow(7,0,3.5,0);
   }
   else if(name==='front'){ arrow(0,5,0,-5.5); ctx.beginPath(); ctx.moveTo(-4.5,4.5); ctx.lineTo(4.5,4.5); ctx.stroke(); }
+  else if(name==='flipH'){
+    ctx.lineWidth=1.4;
+    ctx.setLineDash([2,2]); ctx.beginPath(); ctx.moveTo(0,-6.5); ctx.lineTo(0,6.5); ctx.stroke(); ctx.setLineDash([]);
+    arrow(-1.5,0,-6,0); arrow(1.5,0,6,0);
+  }
+  else if(name==='flipV'){
+    ctx.lineWidth=1.4;
+    ctx.setLineDash([2,2]); ctx.beginPath(); ctx.moveTo(-6.5,0); ctx.lineTo(6.5,0); ctx.stroke(); ctx.setLineDash([]);
+    arrow(0,-1.5,0,-6); arrow(0,1.5,0,6);
+  }
   ctx.restore();
 }
 
@@ -3954,6 +4240,8 @@ cv.addEventListener('pointerdown',e=>{
         if(b.action==='duplicate'){ selDuplicate(); return; }
         if(b.action==='center'){ selCenterFn(); return; }
         if(b.action==='front'){ selBringFront(); return; }
+        if(b.action==='flipH'){ const it=items.find(i=>i.id===selId); if(it){ it.flipX=!it.flipX; histCommit(); render(); } return; }
+        if(b.action==='flipV'){ const it=items.find(i=>i.id===selId); if(it){ it.flipY=!it.flipY; histCommit(); render(); } return; }
       }
     }
   }
@@ -4018,6 +4306,9 @@ cv.addEventListener('pointercancel',endDrag);
 document.getElementById('undoBtn').onclick=undo;
 document.getElementById('redoBtn').onclick=redo;
 document.getElementById('saveImg').onclick=saveImage;
+document.getElementById('zoomIn').onclick=()=>setZoom(zoomF*1.25);
+document.getElementById('zoomOut').onclick=()=>setZoom(zoomF/1.25);
+document.getElementById('zoomLbl').onclick=()=>setZoom(1);
 document.addEventListener('keydown',e=>{
   const t=e.target, tag=(t&&t.tagName)||'';
   if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT') return;
@@ -4045,6 +4336,50 @@ function buildPicker(){
       histReset();                         // Undo-Verlauf pro Objekt
     };
     p.appendChild(d);
+  });
+}
+
+// ---------- Gespeicherte Designs (Meine Designs) ----------
+const SAVED_KEY='wl_pg_saved';
+function loadSavedDesigns(){ try{ const a=JSON.parse(localStorage.getItem(SAVED_KEY)||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+function storeSavedDesigns(a){ try{ localStorage.setItem(SAVED_KEY,JSON.stringify(a)); return true; }catch(e){ return false; } }
+function designThumb(){
+  const w=160, h=Math.max(1,Math.round(cv.height/cv.width*w));
+  const tc=document.createElement('canvas'); tc.width=w; tc.height=h;
+  const tx=tc.getContext('2d'); tx.fillStyle=getComputedStyle(cv).backgroundColor||'#0a0f1c';
+  tx.fillRect(0,0,w,h); tx.drawImage(cv,0,0,w,h);
+  try{ return tc.toDataURL('image/jpeg',0.72); }catch(e){ return ''; }
+}
+function saveCurrentDesign(){
+  const name=(prompt('Name für dieses Design:','Mein Design')||'').trim();
+  if(!name) return;
+  const arr=loadSavedDesigns();
+  const entry={ id:'d'+Date.now()+'-'+Math.random().toString(36).slice(2,7), name, obj:current, ts:Date.now(), design:snapshotDesign(), thumb:designThumb() };
+  const i=arr.findIndex(e=>e.name.toLowerCase()===name.toLowerCase());
+  if(i>=0) arr[i]=entry; else arr.push(entry);
+  if(!storeSavedDesigns(arr)){ alert('Speicher voll — bitte ein älteres Design löschen.'); return; }
+  renderSavedDesigns();
+}
+function applySavedDesign(id){
+  const e=loadSavedDesigns().find(x=>x.id===id); if(!e) return;
+  selId=null;
+  if(e.obj && e.obj!==current && OBJECTS[e.obj]){ designs[current]=snapshotDesign(); current=e.obj; }
+  restoreDesign(e.design);
+  buildPicker(); buildZeilen(); showSel(); render(); histReset();
+}
+function deleteSavedDesign(id){
+  if(!confirm('Dieses Design löschen?')) return;
+  storeSavedDesigns(loadSavedDesigns().filter(x=>x.id!==id)); renderSavedDesigns();
+}
+function renderSavedDesigns(){
+  const g=document.getElementById('savedGrid'); if(!g) return;
+  const arr=loadSavedDesigns(); g.innerHTML='';
+  if(!arr.length){ g.innerHTML='<div class="saved-empty">Noch keine gespeicherten Designs.</div>'; return; }
+  arr.slice().reverse().forEach(e=>{
+    const c=document.createElement('div'); c.className='saved-card'; c.title=e.name;
+    c.innerHTML=`${e.thumb?`<img src="${e.thumb}" alt="">`:''}<div class="nm">${escapeXML(e.name)}</div><button type="button" class="del" title="Löschen">✕</button>`;
+    c.onclick=ev=>{ if(ev.target.classList.contains('del')){ ev.stopPropagation(); deleteSavedDesign(e.id); } else { applySavedDesign(e.id); } };
+    g.appendChild(c);
   });
 }
 const CLIP_CATS=[['alle','Alle'],['hochzeit','💍 Hochzeit'],['mama','💐 Mama & Familie'],['bier','Bier & Wirtshaus'],['natur','Natur & Bayern'],['papa','Papa & Hobby'],['symbole','Symbole']];
@@ -4140,12 +4475,45 @@ document.getElementById('tang').addEventListener('input',()=>{
   else { textAng=v; }
   syncSelSliders(); render();
 });
+// Krümmung: wirkt auf die aktive Zeile (frei) bzw. den Block-Text
+document.getElementById('curve').addEventListener('input',()=>{
+  const v=parseInt(document.getElementById('curve').value,10);
+  document.getElementById('curveVal').textContent=v;
+  const lg=selLineGeom();
+  if(lg) lg.curve=v;
+  else if(!items.find(i=>i.id===selId)) textCurve=v;
+  render();
+});
+// Laufweite (Buchstabenabstand): Schiebereglerwert v → em-Bruchteil v/100
+document.getElementById('lsp').addEventListener('input',()=>{
+  const v=parseInt(document.getElementById('lsp').value,10);
+  document.getElementById('lspVal').textContent=v;
+  const lg=selLineGeom();
+  if(lg) lg.lsp=v/100;
+  else if(!items.find(i=>i.id===selId)) textLsp=v/100;
+  render();
+});
+// Zeilenabstand (nur Block-Text)
+document.getElementById('lh').addEventListener('input',()=>{
+  const v=parseFloat(document.getElementById('lh').value);
+  document.getElementById('lhVal').textContent=v.toFixed(2);
+  textLh=v; render();
+});
+// Schwarz-Weiß-Schwelle für hochgeladene Bilder (wirkt auf das ausgewählte Raster-Element)
+(function(){
+  const bt=document.getElementById('bwThresh'); if(!bt) return;
+  bt.addEventListener('input',()=>{ document.getElementById('bwVal').textContent=bt.value; });
+  bt.addEventListener('change',()=>{
+    const it=items.find(i=>i.id===selId);
+    if(it && it.raster){ reprocessRaster(it, parseInt(bt.value,10)); if(typeof histCommit==='function') histCommit(); }
+  });
+})();
 // Segment-Tabs (Text / Motive / Logo)
 const PANE_META={
   text:{t:'Text',s:'Tippe deinen Wunschtext — Stil je Zeile einstellbar.'},
   vorlagen:{t:'Vorlagen & Sprüche',s:'Fertige Sprüche nach Anlass & Empfänger.'},
   motive:{t:'Grafiken',s:'Motiv anklicken, dann frei im Bild platzieren.'},
-  logo:{t:'Logo / Bild',s:'Eigenes Logo als SVG oder DXF — maßgenau.'},
+  logo:{t:'Logo / Bild',s:'Logo als SVG/DXF oder Bild (PNG/JPG) — auto Schwarz-Weiß.'},
   code:{t:'QR-Code',s:'QR aus Text oder Link — als Vektor-Gravur.'}
 };
 function openPane(pane){
@@ -4169,6 +4537,10 @@ document.getElementById('logo').addEventListener('change',e=>{ const f=e.target.
 document.getElementById('qrBtn').onclick=addQR;
 document.getElementById('qrInput').addEventListener('keydown',e=>{ if(e.key==='Enter') addQR(); });
 document.getElementById('dlsvg').onclick=downloadSVG;
+(function(){
+  const ex=document.getElementById('serieExport'); if(ex) ex.onclick=exportSeries;
+  const fi=document.getElementById('serieFile'); if(fi) fi.addEventListener('change',e=>{ const f=e.target.files[0]; if(f) handleSerieFile(f); e.target.value=''; });
+})();
 document.getElementById('anfrage').onclick=()=>{ alert('Anfrage-Versand wird im nächsten Schritt angebunden (Formspree + Foto-Upload), wie auf der Typenschild-Seite.'); };
 
 // Zeile hinzufügen
@@ -4195,6 +4567,8 @@ buildCatTabs();
 buildClipGrid();
 applyAngleDefault();
 buildPicker();
+renderSavedDesigns();
+(function(){ const b=document.getElementById('saveDesignBtn'); if(b) b.onclick=saveCurrentDesign; })();
 // fonts may load slightly late → re-render once ready
 if(document.fonts && document.fonts.ready){ document.fonts.ready.then(render); }
 render();
