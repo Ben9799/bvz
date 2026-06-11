@@ -4181,12 +4181,12 @@ function boundsForSel(){
   if(selId==='zone'){ const o=OBJECTS[current]; return {x0:0.5,y0:0.5,x1:o.wmm-0.5,y1:o.hmm-0.5}; }
   const z=OBJECTS[current].zone; return {x0:z.x,y0:z.y,x1:z.x+z.w,y1:z.y+z.h};
 }
-function fitAndClamp(ng,b){
+function fitAndClamp(ng,b,noScale){
   const a=ng.angle*Math.PI/180, ca=Math.abs(Math.cos(a)), sa=Math.abs(Math.sin(a));
   let hw=ng.hw, hh=ng.hh;
   let ehw=hw*ca+hh*sa, ehh=hw*sa+hh*ca;
   const bw=(b.x1-b.x0)/2, bh=(b.y1-b.y0)/2;
-  let f=1; if(ehw>bw) f=Math.min(f,bw/ehw); if(ehh>bh) f=Math.min(f,bh/ehh);
+  let f=1; if(!noScale){ if(ehw>bw) f=Math.min(f,bw/ehw); if(ehh>bh) f=Math.min(f,bh/ehh); }
   if(f<1){ hw*=f; hh*=f; ehw*=f; ehh*=f; }
   let cx=ng.cx, cy=ng.cy, lo, hi;
   lo=b.x0+ehw; hi=b.x1-ehw; cx = lo>hi?(b.x0+b.x1)/2:Math.max(lo,Math.min(hi,cx));
@@ -4227,24 +4227,36 @@ function loadZones(){
     Object.entries(all).forEach(([k,z])=>{ if(OBJECTS[k]&&z) OBJECTS[k].zone={x:z.x,y:z.y,w:z.w,h:z.h}; });
   }catch(e){}
 }
-function applySelGeom(ng){
-  const r=fitAndClamp(ng, boundsForSel());
-  if(selId==='zone'){ const z=OBJECTS[current].zone; z.w=r.hw*2; z.h=r.hh*2; z.x=r.cx-r.hw; z.y=r.cy-r.hh; persistZone(); }
-  else if(selId==='text'){ writeTextGeom(r); }
+// posOnly=true → NUR Position/Drehung schreiben, Größe NIE ändern (Verschieben/Drehen darf
+// die Schriftgröße nicht verändern — sonst „springt" der gekrümmte Text beim Bewegen).
+function applySelGeom(ng, posOnly){
+  const r=fitAndClamp(ng, boundsForSel(), posOnly);
+  if(selId==='zone'){
+    const z=OBJECTS[current].zone;
+    if(posOnly){ z.x=r.cx-z.w/2; z.y=r.cy-z.h/2; }
+    else { z.w=r.hw*2; z.h=r.hh*2; z.x=r.cx-r.hw; z.y=r.cy-r.hh; }
+    persistZone();
+  }
+  else if(selId==='text'){
+    if(posOnly){ textPos.x=r.cx; textPos.y=r.cy; textAng=r.angle; setTangSlider(r.angle); }
+    else writeTextGeom(r);
+  }
   else if(typeof selId==='string' && selId.indexOf('line:')===0){
     const i=+selId.slice(5), lg=lineGeom[i];
     if(lg){
       lg.x=r.cx; lg.y=r.cy; lg.angle=r.angle;
-      const f=fontOf(i), cr=capRatio(f.css,f.weight), str=zeileVals[i].trim();
-      const natW0=lineWidthMM(str,f.css,f.weight,lg.cap/cr,lg.lsp||0);
-      const sag=curveSagittaMM(natW0, lg.curve||0); // Krümmungs-Anteil herausrechnen, sonst wächst cap beim Verschieben
-      lg.cap=clamp(2*(r.hh-1.2-sag/2),1.5,16);
-      const natW=lineWidthMM(str,f.css,f.weight,lg.cap/cr,lg.lsp||0);
-      const halfW=curveHalfWidthMM(natW, lg.curve||0);
-      lg.scaleX=clamp((r.hw-1.2)/Math.max(0.5,halfW),0.25,6);
+      if(!posOnly){
+        const f=fontOf(i), cr=capRatio(f.css,f.weight), str=zeileVals[i].trim();
+        const natW0=lineWidthMM(str,f.css,f.weight,lg.cap/cr,lg.lsp||0);
+        const sag=curveSagittaMM(natW0, lg.curve||0); // Krümmungs-Anteil herausrechnen, sonst wächst cap beim Verschieben
+        lg.cap=clamp(2*(r.hh-1.2-sag/2),1.5,16);
+        const natW=lineWidthMM(str,f.css,f.weight,lg.cap/cr,lg.lsp||0);
+        const halfW=curveHalfWidthMM(natW, lg.curve||0);
+        lg.scaleX=clamp((r.hw-1.2)/Math.max(0.5,halfW),0.25,6);
+      }
     }
   }
-  else { const it=items.find(i=>i.id===selId); if(it){ it.x=r.cx; it.y=r.cy; it.wmm=Math.max(1.5,r.hw*2); it.hmm=Math.max(1.5,r.hh*2); it.angle=r.angle; } }
+  else { const it=items.find(i=>i.id===selId); if(it){ it.x=r.cx; it.y=r.cy; it.angle=r.angle; if(!posOnly){ it.wmm=Math.max(1.5,r.hw*2); it.hmm=Math.max(1.5,r.hh*2); } } }
 }
 // Handle-Positionen in Canvas-px: 4 Ecken (proportional) + 4 Seiten-Griffe (strecken) + Dreh-Knopf
 function handlePts(g,s){
@@ -4454,7 +4466,7 @@ cv.addEventListener('pointermove',e=>{
       if(Math.abs(cx-zcx)<snap) cx=zcx;
       if(Math.abs(cy-zcy)<snap) cy=zcy;
     }
-    applySelGeom({...g0, cx, cy});
+    applySelGeom({...g0, cx, cy}, true);
   } else if(drag.mode==='rotate'){
     let a=Math.atan2(m.y-g0.cy, m.x-g0.cx)*180/Math.PI+90;
     while(a>180)a-=360; while(a<-180)a+=360;
@@ -4462,7 +4474,7 @@ cv.addEventListener('pointermove',e=>{
     for(const c of [0,90,180,-90,-180]){
       if(Math.abs(a-c)<=6){ a=(c===-180?180:c); rotSnap=((Math.round(a)%360)+360)%360; break; }
     }
-    applySelGeom({...g0, angle:a});
+    applySelGeom({...g0, angle:a}, true);
   } else if(drag.mode==='resize'){
     const f=Math.max(0.05, Math.hypot(m.x-g0.cx,m.y-g0.cy)/drag.startDist);
     applySelGeom({...g0, hw:g0.hw*f, hh:g0.hh*f});
