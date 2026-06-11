@@ -3423,6 +3423,13 @@ function curveSagittaMM(widthMM,bend){
   if(!bend) return 0; const theta=Math.abs(bend/100*THETA_MAX); const R=widthMM/theta;
   return R*(1-Math.cos(theta/2));
 }
+// Horizontale Halbbreite einer gekrümmten Zeile (Bogenlänge widthMM) — für den Auswahlrahmen.
+// Bei starker Krümmung (Vollkreis) ist die echte Breite ~2R, NICHT die gestreckte Textbreite.
+function curveHalfWidthMM(widthMM,bend){
+  if(!bend) return widthMM/2;
+  const theta=Math.abs(bend/100*THETA_MAX); const R=widthMM/theta;
+  return R*Math.sin(Math.min(theta/2, Math.PI/2));
+}
 // Zeichnet EINE Textzeile (gerade ODER gekrümmt) inkl. Laufweite. ctx ist bereits auf die Text-Mitte
 // transformiert (translate/rotate/scale). yOff = vertikaler Versatz der Zeile (px). bend in %, lspEm em-Bruchteil.
 function drawTextLine(ctx,str,sizePx,font,yOff,bend,lspEm,underline){
@@ -3443,7 +3450,8 @@ function drawTextLine(ctx,str,sizePx,font,yOff,bend,lspEm,underline){
     if(underline) ctx.fillRect(-W/2, yOff+sizePx*0.42, W, Math.max(1,sizePx*0.06));
   } else {
     const sgn=Math.sign(bend), theta=bend/100*THETA_MAX, R=W/Math.abs(theta);
-    ctx.translate(0, yOff + R*sgn);
+    const sag=R*(1-Math.cos(Math.abs(theta)/2)); // Bogen vertikal um yOff zentrieren (sonst hängt er nach unten raus)
+    ctx.translate(0, yOff + R*sgn - sgn*sag/2);
     let acc=0;
     chars.forEach((c,k)=>{
       const phi=((acc+adv[k]/2)/W-0.5)*theta;
@@ -3466,10 +3474,11 @@ function svgTextLine(str,fsMM,css,weight,styleAttr,yOff,bend,lspEm){
   const adv=chars.map(c=>measCtx.measureText(c).width/100*fsMM);
   const W=adv.reduce((a,b)=>a+b,0)+(chars.length-1)*lspMM;
   const sgn=Math.sign(bend), theta=bend/100*THETA_MAX, R=W/Math.abs(theta);
+  const sag=R*(1-Math.cos(Math.abs(theta)/2)); // Bogen vertikal um yOff zentrieren (gleich wie Canvas)
   let acc=0, out='';
   chars.forEach((c,k)=>{
     const phi=((acc+adv[k]/2)/W-0.5)*theta, phd=phi*180/Math.PI;
-    out+=`<text transform="translate(0,${(yOff+R*sgn).toFixed(3)}) rotate(${phd.toFixed(3)}) translate(0,${(-R*sgn).toFixed(3)})" x="0" y="0" font-family="${css}" font-weight="${weight}"${styleAttr} font-size="${fsMM.toFixed(2)}" text-anchor="middle" dominant-baseline="central" fill="#000">${escapeXML(c)}</text>`;
+    out+=`<text transform="translate(0,${(yOff+R*sgn-sgn*sag/2).toFixed(3)}) rotate(${phd.toFixed(3)}) translate(0,${(-R*sgn).toFixed(3)})" x="0" y="0" font-family="${css}" font-weight="${weight}"${styleAttr} font-size="${fsMM.toFixed(2)}" text-anchor="middle" dominant-baseline="central" fill="#000">${escapeXML(c)}</text>`;
     acc+=adv[k]+lspMM;
   });
   return out;
@@ -4146,9 +4155,10 @@ function selGeom(){
     const L=layout(); if(!L.lines.length) return null;
     const z=OBJECTS[current].zone, tc=textCenter(z);
     const gap=L.capMM*textLh;
-    const hw=textNatHalfW(L)*textScaleX+1.2;
-    const sag=curveSagittaMM(textNatHalfW(L)*2*textScaleX, textCurve);
-    const hh=(L.lines.length*L.capMM+(L.lines.length-1)*gap)/2+sag+1.2;
+    const natWb=textNatHalfW(L)*2;
+    const hw=curveHalfWidthMM(natWb, textCurve)*textScaleX+1.2;
+    const sag=curveSagittaMM(natWb, textCurve);
+    const hh=(L.lines.length*L.capMM+(L.lines.length-1)*gap)/2+sag/2+1.2;
     return {kind:'text',cx:tc.x,cy:tc.y,hw,hh,angle:textAng};
   }
   if(typeof selId==='string' && selId.indexOf('line:')===0){
@@ -4156,8 +4166,9 @@ function selGeom(){
     if(!lg||!str) return null;
     const f=fontOf(i), cr=capRatio(f.css,f.weight);
     const natW=lineWidthMM(str,f.css,f.weight,lg.cap/cr,lg.lsp||0);
-    const sag=curveSagittaMM(natW*lg.scaleX, lg.curve||0);
-    return {kind:'line',cx:lg.x,cy:lg.y,hw:natW*lg.scaleX/2+1.2,hh:lg.cap/2+sag+1.2,angle:lg.angle};
+    const sag=curveSagittaMM(natW, lg.curve||0);
+    const hw=curveHalfWidthMM(natW, lg.curve||0)*lg.scaleX+1.2;
+    return {kind:'line',cx:lg.x,cy:lg.y,hw,hh:lg.cap/2+sag/2+1.2,angle:lg.angle};
   }
   const it=items.find(i=>i.id===selId);
   if(!it) return null;
@@ -4188,10 +4199,12 @@ function writeTextGeom(r){
   const ents=blockEntries(); const n=Math.max(1,ents.length);
   const denom=n+0.55*(n-1);
   const capEl2=document.getElementById('cap');
-  const cap=clamp((2*(r.hh-1.2))/denom, parseFloat(capEl2.min), parseFloat(capEl2.max));
+  const L2=layout(); const sag=curveSagittaMM(textNatHalfW(L2)*2, textCurve); // Krümmungs-Anteil aus hh herausrechnen, sonst wächst cap beim Verschieben
+  const cap=clamp((2*(r.hh-1.2-sag/2))/denom, parseFloat(capEl2.min), parseFloat(capEl2.max));
   textCap=cap; setCapSlider(cap);
   const natW=ents.length?Math.max(...ents.map(e=>{ const f=fontOf(e.oi), cr=capRatio(f.css,f.weight); return emWidthRatio(e.str,f.css,f.weight)*(cap/cr); })):1;
-  textScaleX=clamp((r.hw-1.2)/Math.max(0.5,natW/2), 0.25, 6);
+  const halfW=curveHalfWidthMM(natW, textCurve);
+  textScaleX=clamp((r.hw-1.2)/Math.max(0.5,halfW), 0.25, 6);
 }
 // Gravurbereich-Overrides (Admin) pro Objekt persistieren
 function persistZone(){
@@ -4222,10 +4235,13 @@ function applySelGeom(ng){
     const i=+selId.slice(5), lg=lineGeom[i];
     if(lg){
       lg.x=r.cx; lg.y=r.cy; lg.angle=r.angle;
-      lg.cap=clamp(2*(r.hh-1.2),1.5,16);
-      const f=fontOf(i), cr=capRatio(f.css,f.weight);
-      const natW=emWidthRatio(zeileVals[i].trim(),f.css,f.weight)*(lg.cap/cr);
-      lg.scaleX=clamp((r.hw-1.2)/Math.max(0.5,natW/2),0.25,6);
+      const f=fontOf(i), cr=capRatio(f.css,f.weight), str=zeileVals[i].trim();
+      const natW0=lineWidthMM(str,f.css,f.weight,lg.cap/cr,lg.lsp||0);
+      const sag=curveSagittaMM(natW0, lg.curve||0); // Krümmungs-Anteil herausrechnen, sonst wächst cap beim Verschieben
+      lg.cap=clamp(2*(r.hh-1.2-sag/2),1.5,16);
+      const natW=lineWidthMM(str,f.css,f.weight,lg.cap/cr,lg.lsp||0);
+      const halfW=curveHalfWidthMM(natW, lg.curve||0);
+      lg.scaleX=clamp((r.hw-1.2)/Math.max(0.5,halfW),0.25,6);
     }
   }
   else { const it=items.find(i=>i.id===selId); if(it){ it.x=r.cx; it.y=r.cy; it.wmm=Math.max(1.5,r.hw*2); it.hmm=Math.max(1.5,r.hh*2); it.angle=r.angle; } }
