@@ -313,18 +313,24 @@ body{background:linear-gradient(180deg,#050b18 0%,#020617 100%)}
    - Preis als schmale fixe Leiste im Vorschau-Bereich
    - stabilere Textregler / klarere Slider-Zonen
    ========================================================= */
-.example-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin:.75rem 0 1rem}
-.example-card{appearance:none;text-align:left;border:1px solid rgba(148,163,184,.16);background:rgba(255,255,255,.032);color:var(--text);border-radius:16px;padding:.72rem;cursor:pointer;font-family:inherit;transition:transform .15s,border-color .15s,background .15s}
-.example-card:hover{transform:translateY(-2px);border-color:rgba(0,212,255,.45);background:rgba(0,212,255,.07)}
-.example-card strong{display:block;font-family:'Syne',sans-serif;font-size:.88rem;margin:.55rem 0 .12rem}.example-card small{display:block;color:var(--muted2);font-size:.72rem;line-height:1.35}
-.example-img{position:relative;display:block;aspect-ratio:1/1;border-radius:14px;background:radial-gradient(circle at 50% 42%,rgba(255,255,255,.92),rgba(226,232,240,.68));border:1px solid rgba(255,255,255,.12);overflow:hidden;box-shadow:inset 0 0 0 1px rgba(2,6,23,.05)}
-.ex-product{position:absolute;inset:18% 22%;border-radius:28px;background:linear-gradient(135deg,#cbd5e1,#f8fafc);box-shadow:0 16px 35px rgba(15,23,42,.20)}
-.ex-tag{position:absolute;inset:15% 25% 14% 25%;border-radius:22px 22px 30px 30px;background:linear-gradient(135deg,#dbeafe,#f8fafc);box-shadow:0 16px 35px rgba(15,23,42,.20)}
-.ex-tag:before{content:'';position:absolute;left:50%;top:11%;width:18px;height:18px;border-radius:50%;transform:translateX(-50%);background:#0f172a;opacity:.18}.ex-product:before{content:'';position:absolute;left:50%;top:13%;width:20px;height:20px;border-radius:50%;transform:translateX(-50%);background:#0f172a;opacity:.14}
-.ex-text{position:absolute;left:12%;right:12%;text-align:center;color:#111827}.ex-title{top:42%;font-family:'Syne',sans-serif;font-weight:800;font-size:1.35rem;letter-spacing:.06em}.ex-sub{top:58%;font-weight:700;font-size:.72rem;opacity:.75}.example-img-2 .ex-title{top:45%}.example-img-2 .ex-sub{top:59%}
+/* Beispiele: kategorisierte, blätterbare Karten */
+.ex-pager{display:flex;align-items:center;gap:.4rem;margin:.4rem 0 .35rem}
+.ex-track{display:flex;gap:.55rem;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding:.15rem .1rem .35rem;flex:1;-webkit-overflow-scrolling:touch}
+.ex-track::-webkit-scrollbar{height:6px}.ex-track::-webkit-scrollbar-thumb{background:rgba(0,212,255,.25);border-radius:4px}
+.ex-card{scroll-snap-align:start;flex:0 0 118px;width:118px;border:1px solid var(--border);border-radius:13px;overflow:hidden;cursor:pointer;background:rgba(2,6,23,.5);transition:transform .12s,border-color .12s}
+.ex-card:hover{transform:translateY(-2px);border-color:var(--accent)}
+.ex-card .th{width:100%;aspect-ratio:1/1;display:block;background:#0a0f1c}
+.ex-card .th svg{width:100%;height:100%;display:block}
+.ex-card .nm{font-size:.72rem;padding:.34rem .42rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ex-nav{flex:0 0 auto;width:30px;height:30px;border-radius:9px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);font-size:1.15rem;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s}
+.ex-nav:hover{border-color:var(--accent);background:rgba(0,212,255,.08)}
+.ex-nav:disabled{opacity:.3;cursor:default}
+.ex-empty{flex:1;font-size:.8rem;color:var(--muted);padding:1rem .4rem;text-align:center}
+.ex-prev-modal .th{display:block;width:100%;max-width:240px;aspect-ratio:1/1;margin:0 auto 1rem;border-radius:14px;background:#0a0f1c}
+.ex-prev-modal .th svg{width:100%;height:100%;display:block}
 .price-strip{align-self:stretch;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.75rem;margin:.15rem 0 0;padding:.45rem .65rem;border:1px solid rgba(148,163,184,.14);border-radius:14px;background:rgba(2,6,23,.58);box-shadow:none}.price-strip .price{display:flex;align-items:center;gap:.42rem;margin:0;padding:0;background:transparent;border:none;border-radius:0}.price-strip .price .pl{font-size:.72rem;color:var(--muted2)}.price-strip .price .pv{font-size:.94rem;color:var(--text)}.price-strip .price small{display:inline;margin-left:.4rem;font-size:.66rem;text-align:left;color:var(--muted)}.price-strip .btnrow{display:flex;gap:.45rem;margin:0;justify-self:end}.price-strip .btn{padding:.52rem .72rem;border-radius:11px;font-size:.78rem;white-space:nowrap}.price-strip .note{grid-column:1/-1;font-size:.68rem;line-height:1.25;color:var(--muted);padding:0;margin:-.2rem 0 0;border:0}.panel .summary{position:static;background:none;margin:0;padding:0}.field .range-row input[type=range]{min-height:32px}.rval{font-variant-numeric:tabular-nums}.acc[open] .acc-body{animation:segIn .16s ease}.seg[data-pane="beispiele"] .ic{filter:saturate(1.1)}
-@media(max-width:840px){.example-grid{grid-template-columns:1fr}.price-strip{position:sticky;bottom:74px;z-index:35;grid-template-columns:1fr auto;background:rgba(2,6,23,.86);backdrop-filter:blur(10px)}.price-strip .note{display:none}.price-strip .btnrow .btn-ghost{display:none}.price-strip .price small{display:none}}
-@media(max-width:520px){.price-strip{grid-template-columns:1fr}.price-strip .btnrow{width:100%}.price-strip .btnrow .btn-primary{width:100%}.price-strip .price{justify-content:space-between}.example-card{padding:.62rem}}
+@media(max-width:840px){.price-strip{position:sticky;bottom:74px;z-index:35;grid-template-columns:1fr auto;background:rgba(2,6,23,.86);backdrop-filter:blur(10px)}.price-strip .note{display:none}.price-strip .btnrow .btn-ghost{display:none}.price-strip .price small{display:none}}
+@media(max-width:520px){.price-strip{grid-template-columns:1fr}.price-strip .btnrow{width:100%}.price-strip .btnrow .btn-primary{width:100%}.price-strip .price{justify-content:space-between}.ex-card{flex:0 0 104px;width:104px}}
 
 </style>
 </head>
@@ -408,32 +414,19 @@ body{background:linear-gradient(180deg,#050b18 0%,#020617 100%)}
       <div class="panel-head">
         <div class="panel-head-txt">
           <h2 id="panelTitle">Beispiele</h2>
-          <div class="psub" id="panelSub">1–2 Beispielbilder als Inspiration ansehen.</div>
+          <div class="psub" id="panelSub">Beispiele nach Kategorie — antippen & in den Editor übernehmen.</div>
         </div>
         <button type="button" class="panel-close" id="panelClose" aria-label="Fenster schließen" title="Schließen">✕</button>
       </div>
 
       <div class="seg-pane active" id="pane-beispiele">
-        <div class="example-grid" aria-label="Beispielbilder">
-          <button type="button" class="example-card" data-example="1">
-            <span class="example-img example-img-1" aria-hidden="true">
-              <span class="ex-product"></span>
-              <span class="ex-text ex-title">MAX</span>
-              <span class="ex-text ex-sub">Beste Dad seit 2026</span>
-            </span>
-            <strong>Beispiel: Flaschenöffner</strong>
-            <small>Text mittig, kleines Motiv unten – sauber und gut lesbar.</small>
-          </button>
-          <button type="button" class="example-card" data-example="2">
-            <span class="example-img example-img-2" aria-hidden="true">
-              <span class="ex-tag"></span>
-              <span class="ex-text ex-title">ZOE</span>
-              <span class="ex-text ex-sub">♡ 11.06.2026</span>
-            </span>
-            <strong>Beispiel: Schlüsselanhänger</strong>
-            <small>Name groß, Datum klein – viel freie Fläche, edle Wirkung.</small>
-          </button>
+        <div class="cat-tabs" id="exCats" aria-label="Beispiel-Kategorien"></div>
+        <div class="ex-pager">
+          <button type="button" class="ex-nav" id="exPrev" aria-label="Zurück">‹</button>
+          <div class="ex-track" id="exTrack" aria-label="Beispiele"></div>
+          <button type="button" class="ex-nav" id="exNext" aria-label="Weiter">›</button>
         </div>
+        <div class="ex-hint sub" style="margin:.1rem 0 .5rem">Beispiel antippen → Vorschau → <b>in deinen Editor übernehmen</b>.</div>
         <div class="saved-block">
           <div class="tpl-result-head"><span class="trh-ic">💾</span><span class="trh-lbl">Meine Designs</span></div>
           <div class="sub" style="margin:.3rem 0 .55rem">Eigene Entwürfe speichern und später wieder laden.</div>
@@ -4699,21 +4692,114 @@ document.getElementById('lh').addEventListener('input',()=>{
 })();
 
 
-// Beispielbilder: nur anschauen, nichts automatisch einfügen.
-(function(){
-  function showExample(n){
-    const data = n==='2'
-      ? {title:'Beispiel: Schlüsselanhänger', sub:'Name groß, Datum klein – elegant und gut lesbar.'}
-      : {title:'Beispiel: Flaschenöffner', sub:'Großer Name, kurze zweite Zeile und Motiv mit genug Randabstand.'};
-    const back=document.createElement('div');
-    back.className='ob-back';
-    back.style.display='flex';
-    back.innerHTML='<div class="ob-card example-light"><div class="ob-ic">👀</div><h3>'+data.title+'</h3><p class="sub" style="margin:.35rem 0 1rem">'+data.sub+'</p><div class="example-img example-img-'+(n==='2'?'2':'1')+'" style="max-width:260px;margin:0 auto 1rem"><span class="'+(n==='2'?'ex-tag':'ex-product')+'"></span><span class="ex-text ex-title">'+(n==='2'?'ZOE':'MAX')+'</span><span class="ex-text ex-sub">'+(n==='2'?'♡ 11.06.2026':'Beste Dad seit 2026')+'</span></div><button type="button" class="btn btn-primary" style="width:100%">Schließen</button></div>';
-    back.addEventListener('click',e=>{ if(e.target===back || e.target.tagName==='BUTTON') back.remove(); });
-    document.body.appendChild(back);
+// ---------- Beispiel-Galerie: kategorisiert, blätterbar, in den Editor übernehmbar ----------
+const EX_CATS=[['alle','Alle'],['hochzeit','💍 Hochzeit'],['familie','💐 Familie & Liebe'],['bier','🍺 Bier & Wirtshaus'],['geburtstag','🎉 Geburtstag'],['business','🛠️ Business']];
+function EX(id,cat,name,lines,opts){
+  opts=opts||{};
+  const zeileVals=lines.map(l=>typeof l==='string'?l:l.t);
+  const lineStyle=lines.map(l=>{ const o2=(typeof l==='string')?{}:l; return {fam:o2.fam||'arial',italic:!!o2.italic,bold:!!o2.bold,underline:!!o2.underline}; });
+  return {id,cat,name,obj:'card',design:{
+    zeileVals, lineGeom:zeileVals.map(()=>null), lineStyle, items:[],
+    textPos:{x:null,y:null}, textScaleX:opts.scaleX||1, textAng:opts.ang||0,
+    textCap:opts.cap||5, textCurve:opts.curve||0, textLsp:opts.lsp||0, textLh:(opts.lh!=null?opts.lh:0.55)
+  }};
+}
+const EXAMPLES=[
+  EX('h1','hochzeit','Anna & Tom',[{t:'Anna & Tom',fam:'didot'},{t:'12.07.2026',fam:'didot'}],{cap:5,lh:0.6}),
+  EX('h2','hochzeit','Für immer',[{t:'Für immer',fam:'caveat'}],{cap:7,curve:35}),
+  EX('h3','hochzeit','Just Married',[{t:'JUST',fam:'bebas'},{t:'MARRIED',fam:'bebas'}],{cap:7,lh:0.45}),
+  EX('f1','familie','Beste Mama',[{t:'Beste Mama',fam:'caveat'},{t:'der Welt',fam:'caveat'}],{cap:6,lh:0.5}),
+  EX('f2','familie','Familie Wolf',[{t:'Familie',fam:'baskerville'},{t:'Wolf',fam:'baskerville'}],{cap:6,lh:0.55}),
+  EX('f3','familie','Papa – Held',[{t:'PAPA',fam:'copperplate'},{t:'Held & Vorbild',fam:'didot'}],{cap:6,lh:0.55}),
+  EX('b1','bier','Prost!',[{t:'PROST!',fam:'bebas'}],{cap:10}),
+  EX('b2','bier',"O'zapft is",[{t:"O'zapft is",fam:'oswald'}],{cap:7,curve:-30}),
+  EX('b3','bier','Stammtisch',[{t:'STAMM',fam:'copperplate'},{t:'TISCH',fam:'copperplate'}],{cap:7,lh:0.5}),
+  EX('g1','geburtstag','Happy Birthday',[{t:'Happy',fam:'pacifico'},{t:'Birthday',fam:'pacifico'}],{cap:6,lh:0.5}),
+  EX('g2','geburtstag','30 Jahre',[{t:'30',fam:'bebas'},{t:'JAHRE',fam:'bebas'}],{cap:9,lh:0.4}),
+  EX('biz1','business','Wolf Lasermark',[{t:'WOLF',fam:'din'},{t:'LASERMARK',fam:'din'}],{cap:6,lh:0.5}),
+  EX('biz2','business','Danke Team',[{t:'Danke!',fam:'oswald'},{t:'Team 2026',fam:'oswald'}],{cap:6,lh:0.55})
+];
+let exCat='alle';
+const exThumbCache={};
+function exThumbSVG(ex){
+  if(exThumbCache[ex.id]) return exThumbCache[ex.id];
+  const o=OBJECTS[ex.obj]||OBJECTS.card;
+  const S={cur:current,zv:zeileVals,lg:lineGeom,ls:lineStyle,lb:linesBound,it:items,tp:textPos,tsx:textScaleX,ta:textAng,tc:textCap,tcu:textCurve,tl:textLsp,tlh:textLh,sid:selId};
+  let svg='<svg viewBox="0 0 1 1" xmlns="http://www.w3.org/2000/svg"></svg>';
+  try{
+    const d=ex.design;
+    current=ex.obj; selId=null;
+    zeileVals=d.zeileVals.slice();
+    lineGeom=d.lineGeom.map(()=>null);
+    lineStyle=d.lineStyle.map(s=>({...s}));
+    linesBound = zeileVals.length>1;
+    items=[];
+    textPos={x:null,y:null}; textScaleX=d.textScaleX; textAng=d.textAng;
+    textCap=d.textCap; textCurve=d.textCurve||0; textLsp=d.textLsp||0; textLh=(d.textLh!=null?d.textLh:0.55);
+    svg=`<svg viewBox="0 0 ${o.wmm} ${o.hmm}" xmlns="http://www.w3.org/2000/svg">${renderSVGGroups()}</svg>`.replace(/fill="#000"/g,'fill="#dff6ff"');
+  }catch(e){}
+  finally{
+    current=S.cur; zeileVals=S.zv; lineGeom=S.lg; lineStyle=S.ls; linesBound=S.lb; items=S.it;
+    textPos=S.tp; textScaleX=S.tsx; textAng=S.ta; textCap=S.tc; textCurve=S.tcu; textLsp=S.tl; textLh=S.tlh; selId=S.sid;
   }
-  document.querySelectorAll('.example-card').forEach(b=>b.addEventListener('click',()=>showExample(b.dataset.example)));
-})();
+  exThumbCache[ex.id]=svg; return svg;
+}
+function exFiltered(){ return exCat==='alle'?EXAMPLES:EXAMPLES.filter(e=>e.cat===exCat); }
+function buildExCats(){
+  const t=document.getElementById('exCats'); if(!t) return; t.innerHTML='';
+  EX_CATS.forEach(([key,lbl])=>{
+    const b=document.createElement('div');
+    b.className='cat-tab'+(key===exCat?' active':'');
+    b.textContent=lbl;
+    b.onclick=()=>{ exCat=key; buildExCats(); buildExCards(); };
+    t.appendChild(b);
+  });
+}
+function buildExCards(){
+  const tr=document.getElementById('exTrack'); if(!tr) return; tr.innerHTML='';
+  const list=exFiltered();
+  if(!list.length){ tr.innerHTML='<div class="ex-empty">Keine Beispiele in dieser Kategorie.</div>'; updateExNav(); return; }
+  list.forEach(ex=>{
+    const c=document.createElement('div'); c.className='ex-card'; c.title=ex.name;
+    c.innerHTML=`<div class="th">${exThumbSVG(ex)}</div><div class="nm">${escapeXML(ex.name)}</div>`;
+    c.onclick=()=>exPreview(ex);
+    tr.appendChild(c);
+  });
+  tr.scrollLeft=0; updateExNav();
+}
+function updateExNav(){
+  const tr=document.getElementById('exTrack'), p=document.getElementById('exPrev'), n=document.getElementById('exNext');
+  if(!tr||!p||!n) return;
+  const max=tr.scrollWidth-tr.clientWidth-2;
+  p.disabled=tr.scrollLeft<=2;
+  n.disabled=tr.scrollLeft>=max;
+}
+function exPage(dir){
+  const tr=document.getElementById('exTrack'); if(!tr) return;
+  tr.scrollBy({left:dir*Math.max(160,tr.clientWidth*0.8),behavior:'smooth'});
+}
+function exPreview(ex){
+  const back=document.createElement('div'); back.className='ob-back'; back.style.display='flex';
+  back.innerHTML=`<div class="ob-card ex-prev-modal"><div class="ob-ic">👀</div><h3>${escapeXML(ex.name)}</h3><div class="th">${exThumbSVG(ex)}</div><button type="button" class="btn btn-primary" data-act="apply" style="width:100%;margin-bottom:.55rem">✏️ In meinen Editor übernehmen</button><button type="button" class="btn btn-ghost" data-act="close" style="width:100%">Schließen</button></div>`;
+  back.addEventListener('click',e=>{
+    const act=e.target.getAttribute&&e.target.getAttribute('data-act');
+    if(e.target===back||act==='close'){ back.remove(); }
+    else if(act==='apply'){ back.remove(); exApply(ex); }
+  });
+  document.body.appendChild(back);
+}
+function exApply(ex){
+  selId=null;
+  if(ex.obj && ex.obj!==current && OBJECTS[ex.obj]){ designs[current]=snapshotDesign(); current=ex.obj; }
+  const d=ex.design;
+  restoreDesign({
+    zeileVals:d.zeileVals.slice(), lineGeom:d.zeileVals.map(()=>null), lineStyle:d.lineStyle.map(s=>({...s})), items:[],
+    textPos:{x:null,y:null}, textScaleX:d.textScaleX, textAng:d.textAng,
+    textCap:d.textCap, textCurve:d.textCurve, textLsp:d.textLsp, textLh:d.textLh
+  });
+  buildPicker(); buildZeilen(); showSel(); render(); histReset();
+  openPane('text');
+}
 
 // Stabilere Textregler: nach jeder Änderung Auswahlrahmen, Preis und Undo sauber nachziehen.
 function wlAfterTextControl(){
@@ -4724,7 +4810,7 @@ function wlAfterTextControl(){
 
 // Segment-Tabs (Text / Motive / Logo)
 const PANE_META={
-  beispiele:{t:'Beispiele',s:'1–2 Beispielbilder als Inspiration ansehen.'},
+  beispiele:{t:'Beispiele',s:'Beispiele nach Kategorie — antippen & in den Editor übernehmen.'},
   text:{t:'Text',s:'Tippe deinen Wunschtext — Stil je Zeile einstellbar.'},
   motive:{t:'Grafiken',s:'Motiv anklicken, dann frei im Bild platzieren.'},
   logo:{t:'Logo / Bild',s:'Logo als SVG/DXF oder Bild (PNG/JPG) — auto Schwarz-Weiß.'},
@@ -4795,6 +4881,13 @@ buildClipGrid();
 applyAngleDefault();
 buildPicker();
 renderSavedDesigns();
+buildExCats();
+buildExCards();
+(function(){
+  const p=document.getElementById('exPrev'); if(p) p.onclick=()=>exPage(-1);
+  const n=document.getElementById('exNext'); if(n) n.onclick=()=>exPage(1);
+  const tr=document.getElementById('exTrack'); if(tr) tr.addEventListener('scroll',updateExNav,{passive:true});
+})();
 (function(){ const b=document.getElementById('saveDesignBtn'); if(b) b.onclick=saveCurrentDesign; })();
 // fonts may load slightly late → re-render once ready
 if(document.fonts && document.fonts.ready){ document.fonts.ready.then(render); }
