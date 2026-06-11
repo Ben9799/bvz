@@ -3034,14 +3034,14 @@ function snapshotDesign(){
     lineGeom: lineGeom.map(g=> g?{...g}:null),
     lineStyle: lineStyle.map(s=>({...s})),
     items: items.map(it=>{ const c=Object.assign({},it); delete c.img; return c; }),
-    textPos: {...textPos}, textScaleX, textAng, textCap, textCurve, textLsp, textLh
+    textPos: {...textPos}, textScaleX, textAng, textCap, textCurve, textLsp, textLh, textFlipX, textFlipY
   };
 }
 function restoreDesign(d){
   if(!d){
     zeileVals=['Max Mustermann']; lineGeom=[null]; lineStyle=[newStyle()]; items=[];
     textPos={x:null,y:null}; textScaleX=1; textCap=4;
-    textCurve=0; textLsp=0; textLh=0.55;
+    textCurve=0; textLsp=0; textLh=0.55; textFlipX=false; textFlipY=false;
     applyAngleDefault();
     return;
   }
@@ -3051,6 +3051,7 @@ function restoreDesign(d){
   items=d.items.map(it=>{ const c=Object.assign({},it); makeItemImg(c); return c; });
   textPos={...d.textPos}; textScaleX=d.textScaleX; textCap=d.textCap;
   textCurve=d.textCurve||0; textLsp=d.textLsp||0; textLh=(d.textLh!=null?d.textLh:0.55);
+  textFlipX=!!d.textFlipX; textFlipY=!!d.textFlipY;
   textAng=d.textAng; setTangSlider(textAng);
   linesBound = zeileVals.length>1 && lineGeom.every(g=>!g);
 }
@@ -3070,6 +3071,8 @@ let textCap=4;         // Schrifthöhe des Block-Texts — entkoppelt, damit der
 let textCurve=0;       // Krümmung des Block-Texts (-100..100, 0=gerade)
 let textLsp=0;         // Laufweite/Buchstabenabstand des Blocks (em-Bruchteil)
 let textLh=0.55;       // Zeilenabstand-Faktor (Lücke = capMM*textLh)
+let textFlipX=false;   // Block-Text horizontal gespiegelt
+let textFlipY=false;   // Block-Text vertikal gespiegelt
 const THETA_MAX=Math.PI*2; // max. Bogenwinkel bei Krümmung 100 → voller Kreis (360°)
 const MAX_ZEILEN=8;
 // Echte Schriftarten in 3 Kategorien (je 2) — plus Schalter kursiv/fett/unterstrichen.
@@ -3570,7 +3573,7 @@ function render(){
   ctx.save();
   ctx.translate(px(tc.x,s),py(tc.y,s));
   ctx.rotate(textAng*Math.PI/180);
-  ctx.scale(textScaleX,1);
+  ctx.scale(textScaleX*(textFlipX?-1:1), (textFlipY?-1:1));
   ctx.fillStyle = inkColor(o);
   setEngrave(ctx,s,o);
   ctx.textAlign='center'; ctx.textBaseline='middle';
@@ -3592,7 +3595,7 @@ function render(){
       ctx.save();
       ctx.translate(px(lg.x,s),py(lg.y,s));
       ctx.rotate(lg.angle*Math.PI/180);
-      ctx.scale(lg.scaleX,1);
+      ctx.scale(lg.scaleX*(lg.flipX?-1:1), (lg.flipY?-1:1));
       ctx.fillStyle=inkColor(o);
       setEngrave(ctx,s,o);
       ctx.textAlign='center'; ctx.textBaseline='middle';
@@ -3688,7 +3691,7 @@ function renderSVGGroups(){
     const fs=(ln.capMM/cr);
     const st=`${ln.f.italic?' font-style="italic"':''}${(ln.f.underline&&!textCurve)?' text-decoration="underline"':''}`;
     const inner=svgTextLine(ln.str,fs,ln.f.css,ln.f.weight,st,off,textCurve,textLsp);
-    eng+=`<g transform="translate(${tc.x.toFixed(2)},${tc.y.toFixed(2)}) rotate(${tang}) scale(${textScaleX.toFixed(4)},1)">${inner}</g>`;
+    eng+=`<g transform="translate(${tc.x.toFixed(2)},${tc.y.toFixed(2)}) rotate(${tang}) scale(${(textScaleX*(textFlipX?-1:1)).toFixed(4)},${textFlipY?-1:1})">${inner}</g>`;
   });
   let freeEng='';
   zeileVals.forEach((v,i)=>{
@@ -3698,7 +3701,7 @@ function renderSVGGroups(){
     const bend=lg.curve||0;
     const st=`${ff.italic?' font-style="italic"':''}${(ff.underline&&!bend)?' text-decoration="underline"':''}`;
     const inner=svgTextLine(str,fs,ff.css,ff.weight,st,0,bend,lg.lsp||0);
-    freeEng+=`<g transform="translate(${lg.x.toFixed(2)},${lg.y.toFixed(2)}) rotate(${lg.angle}) scale(${lg.scaleX.toFixed(4)},1)">${inner}</g>`;
+    freeEng+=`<g transform="translate(${lg.x.toFixed(2)},${lg.y.toFixed(2)}) rotate(${lg.angle}) scale(${(lg.scaleX*(lg.flipX?-1:1)).toFixed(4)},${lg.flipY?-1:1})">${inner}</g>`;
   });
   eng+=freeEng;
   const itemsSVG=items.map(itemExportSVG).join('');
@@ -4274,13 +4277,18 @@ function selButtons(g,s){
     {x:BR.x,y:BR.y,action:'resize',icon:'resize'},
     {x:BL.x,y:BL.y,action:'delete',icon:'trash'}
   ];
-  // Mini-Leiste oben (nur für Grafik/Logo-Elemente sinnvoll)
+  // Mini-Leiste oben — Spiegeln gilt für ALLE Elemente (Text, freie Zeile, Grafik/Logo)
   const top=[];
   const it=items.find(i=>i.id===selId);
+  const isText = selId==='text' || (typeof selId==='string' && selId.indexOf('line:')===0);
   if(it){
     const acts=[{action:'duplicate',icon:'dup'},{action:'center',icon:'center'},{action:'flipH',icon:'flipH'},{action:'flipV',icon:'flipV'}];
     // "Nach vorne" nur sinnvoll, wenn mehrere Elemente überlappen können.
     if(items.length>1) acts.push({action:'front',icon:'front'});
+    const gap=34, ty=H.topMid.y-36, sx=H.topMid.x-(acts.length-1)*gap/2;
+    acts.forEach((a,i)=>top.push({x:sx+i*gap,y:ty,action:a.action,icon:a.icon}));
+  } else if(isText){
+    const acts=[{action:'flipH',icon:'flipH'},{action:'flipV',icon:'flipV'}];
     const gap=34, ty=H.topMid.y-36, sx=H.topMid.x-(acts.length-1)*gap/2;
     acts.forEach((a,i)=>top.push({x:sx+i*gap,y:ty,action:a.action,icon:a.icon}));
   }
@@ -4385,15 +4393,18 @@ function hitTest(m){
       const str=zeileVals[i]?zeileVals[i].trim():'', lg=lineGeom[i]; if(!str||!lg) continue;
       const f=fontOf(i), cr=capRatio(f.css,f.weight);
       const natW=emWidthRatio(str,f.css,f.weight)*(lg.cap/cr);
-      if(pointInRotRect(m.x,m.y,lg.x,lg.y,natW*lg.scaleX/2+1.5,lg.cap/2+1.5,lg.angle)) return {type:'line',i};
+      const lhw=curveHalfWidthMM(natW, lg.curve||0)*lg.scaleX+1.5;
+      const lhh=lg.cap/2+curveSagittaMM(natW, lg.curve||0)/2+1.5;
+      if(pointInRotRect(m.x,m.y,lg.x,lg.y,lhw,lhh,lg.angle)) return {type:'line',i};
     }
   }
   const L=layout();
   if(L.lines.length){
     const z=OBJECTS[current].zone, tc=textCenter(z);
-    const gap=L.capMM*0.55;
-    const tw=textNatHalfW(L)*textScaleX+1.5;
-    const th=(L.lines.length*L.capMM+(L.lines.length-1)*gap)/2+1.5;
+    const gap=L.capMM*textLh;
+    const natWb=textNatHalfW(L)*2;
+    const tw=curveHalfWidthMM(natWb, textCurve)*textScaleX+1.5;
+    const th=(L.lines.length*L.capMM+(L.lines.length-1)*gap)/2+curveSagittaMM(natWb, textCurve)/2+1.5;
     if(pointInRotRect(m.x,m.y,tc.x,tc.y,tw,th,textAng)) return {type:'text'};
   }
   return null;
@@ -4405,6 +4416,17 @@ const snapGeom=g=>({cx:g.cx,cy:g.cy,hw:g.hw,hh:g.hh,angle:g.angle});
 function localOf(m,g0){
   const a=-g0.angle*Math.PI/180, dx=m.x-g0.cx, dy=m.y-g0.cy;
   return { lx:dx*Math.cos(a)-dy*Math.sin(a), ly:dx*Math.sin(a)+dy*Math.cos(a) };
+}
+function flipSel(axis){
+  if(selId==='text'){ if(axis==='x') textFlipX=!textFlipX; else textFlipY=!textFlipY; }
+  else if(typeof selId==='string' && selId.indexOf('line:')===0){
+    const lg=lineGeom[+selId.slice(5)]; if(!lg) return;
+    if(axis==='x') lg.flipX=!lg.flipX; else lg.flipY=!lg.flipY;
+  } else {
+    const it=items.find(i=>i.id===selId); if(!it) return;
+    if(axis==='x') it.flipX=!it.flipX; else it.flipY=!it.flipY;
+  }
+  histCommit(); render();
 }
 cv.addEventListener('pointerdown',e=>{
   if(!curS) return;
@@ -4422,8 +4444,7 @@ cv.addEventListener('pointerdown',e=>{
         if(b.action==='duplicate'){ selDuplicate(); return; }
         if(b.action==='center'){ selCenterFn(); return; }
         if(b.action==='front'){ selBringFront(); return; }
-        if(b.action==='flipH'){ const it=items.find(i=>i.id===selId); if(it){ it.flipX=!it.flipX; histCommit(); render(); } return; }
-        if(b.action==='flipV'){ const it=items.find(i=>i.id===selId); if(it){ it.flipY=!it.flipY; histCommit(); render(); } return; }
+        if(b.action==='flipH'||b.action==='flipV'){ flipSel(b.action==='flipH'?'x':'y'); return; }
       }
     }
   }
@@ -4515,6 +4536,7 @@ function buildPicker(){
       selId=null;
       restoreDesign(designs[k]);           // Ziel-Entwurf laden (oder frisch)
       buildPicker(); buildZeilen(); showSel(); render();
+      if(typeof buildExCards==='function') buildExCards(); // Beispiel-Vorschauen ans neue Stück anpassen
       histReset();                         // Undo-Verlauf pro Objekt
     };
     p.appendChild(d);
@@ -4698,20 +4720,40 @@ function EX(id,cat,name,lines,opts){
   opts=opts||{};
   const zeileVals=lines.map(l=>typeof l==='string'?l:l.t);
   const lineStyle=lines.map(l=>{ const o2=(typeof l==='string')?{}:l; return {fam:o2.fam||'arial',italic:!!o2.italic,bold:!!o2.bold,underline:!!o2.underline}; });
-  const zc=OBJECTS.card.zone, cx=zc.x+zc.w/2, cy=zc.y+zc.h/2;
+  // Nur die Roh-Vorlage speichern — die konkreten mm-Koordinaten werden je nach aktivem
+  // Objekt (Karte/Schlüsselanhänger) erst in exBuildDesign berechnet, damit sich jedes
+  // Beispiel an das gewählte Stück anpasst.
+  return {id,cat,name,zeileVals,lineStyle,opts};
+}
+// Beispiel-Vorlage → konkretes Design, an die Gravurzone des Objekts angepasst.
+function exBuildDesign(ex, objKey){
+  const o=OBJECTS[objKey]||OBJECTS.card, zc=o.zone;
+  const cx=zc.x+zc.w/2, cy=zc.y+zc.h/2, vert=(o.orient==='v');
+  const opts=ex.opts||{};
+  const zeileVals=ex.zeileVals.slice();
   let items=[], textPos={x:null,y:null};
   if(opts.icon){
     const ic=(typeof opts.icon==='string')?{k:opts.icon}:opts.icon;
-    const wmm=ic.wmm||9;
-    const iy=(ic.y!=null)?ic.y:(zc.y+zc.h-wmm/2-2);
-    items=[{__clip:ic.k, x:(ic.x!=null?ic.x:cx), y:iy, wmm:wmm, angle:ic.angle||0}];
-    textPos={x:null, y:(ic.ty!=null?ic.ty:cy-(wmm/2+2))};
+    // Icon nie breiter als die Zone — bei der schmalen Schlüssel-Zone deutlich kleiner.
+    let wmm=Math.min(ic.wmm||9, zc.w*0.8, zc.h*0.45);
+    const margin=Math.max(1.2, Math.min(zc.w,zc.h)*0.06);
+    if(vert){
+      // Hochformat: Icon ans untere Ende des Schafts, Text in den oberen Rest.
+      const iy=zc.y+zc.h-wmm/2-margin;
+      items=[{__clip:ic.k, x:cx, y:iy, wmm:wmm, angle:ic.angle||0}];
+      textPos={x:cx, y:zc.y+(zc.h-wmm-margin)/2};
+    } else {
+      const iy=zc.y+zc.h-wmm/2-margin;
+      items=[{__clip:ic.k, x:cx, y:iy, wmm:wmm, angle:ic.angle||0}];
+      textPos={x:null, y:cy-(wmm/2+2)};
+    }
   }
-  return {id,cat,name,obj:'card',design:{
-    zeileVals, lineGeom:zeileVals.map(()=>null), lineStyle, items:items, textPos:textPos,
-    textScaleX:opts.scaleX||1, textAng:opts.ang||0,
+  return {
+    zeileVals, lineGeom:zeileVals.map(()=>null), lineStyle:ex.lineStyle.map(s=>({...s})),
+    items, textPos,
+    textScaleX:opts.scaleX||1, textAng:(vert? -90 : (opts.ang||0)),
     textCap:opts.cap||5, textCurve:opts.curve||0, textLsp:opts.lsp||0, textLh:(opts.lh!=null?opts.lh:0.55)
-  }};
+  };
 }
 function exExpandItems(its){
   return (its||[]).map(function(it){
@@ -4762,13 +4804,14 @@ const EXAMPLES=[
 let exCat='alle';
 const exThumbCache={};
 function exThumbSVG(ex){
-  if(exThumbCache[ex.id]) return exThumbCache[ex.id];
-  const o=OBJECTS[ex.obj]||OBJECTS.card;
-  const S={cur:current,zv:zeileVals,lg:lineGeom,ls:lineStyle,lb:linesBound,it:items,tp:textPos,tsx:textScaleX,ta:textAng,tc:textCap,tcu:textCurve,tl:textLsp,tlh:textLh,sid:selId};
+  const ckey=current+':'+ex.id;
+  if(exThumbCache[ckey]) return exThumbCache[ckey];
+  const o=OBJECTS[current]||OBJECTS.card;
+  const S={zv:zeileVals,lg:lineGeom,ls:lineStyle,lb:linesBound,it:items,tp:textPos,tsx:textScaleX,ta:textAng,tc:textCap,tcu:textCurve,tl:textLsp,tlh:textLh,sid:selId,fx:textFlipX,fy:textFlipY};
   let svg='<svg viewBox="0 0 1 1" xmlns="http://www.w3.org/2000/svg"></svg>';
   try{
-    const d=ex.design;
-    current=ex.obj; selId=null;
+    const d=exBuildDesign(ex, current);
+    selId=null;
     zeileVals=d.zeileVals.slice();
     lineGeom=d.lineGeom.map(()=>null);
     lineStyle=d.lineStyle.map(s=>({...s}));
@@ -4776,13 +4819,15 @@ function exThumbSVG(ex){
     items=exExpandItems(d.items);
     textPos=d.textPos?{...d.textPos}:{x:null,y:null}; textScaleX=d.textScaleX; textAng=d.textAng;
     textCap=d.textCap; textCurve=d.textCurve||0; textLsp=d.textLsp||0; textLh=(d.textLh!=null?d.textLh:0.55);
+    textFlipX=false; textFlipY=false;
     svg=`<svg viewBox="0 0 ${o.wmm} ${o.hmm}" xmlns="http://www.w3.org/2000/svg">${renderSVGGroups()}</svg>`.replace(/fill="#000"/g,'fill="#dff6ff"');
   }catch(e){}
   finally{
-    current=S.cur; zeileVals=S.zv; lineGeom=S.lg; lineStyle=S.ls; linesBound=S.lb; items=S.it;
+    zeileVals=S.zv; lineGeom=S.lg; lineStyle=S.ls; linesBound=S.lb; items=S.it;
     textPos=S.tp; textScaleX=S.tsx; textAng=S.ta; textCap=S.tc; textCurve=S.tcu; textLsp=S.tl; textLh=S.tlh; selId=S.sid;
+    textFlipX=S.fx; textFlipY=S.fy;
   }
-  exThumbCache[ex.id]=svg; return svg;
+  exThumbCache[ckey]=svg; return svg;
 }
 function exFiltered(){ return exCat==='alle'?EXAMPLES:EXAMPLES.filter(e=>e.cat===exCat); }
 function buildExCats(){
@@ -4830,12 +4875,13 @@ function exPreview(ex){
 }
 function exApply(ex){
   selId=null;
-  if(ex.obj && ex.obj!==current && OBJECTS[ex.obj]){ designs[current]=snapshotDesign(); current=ex.obj; }
-  const d=ex.design;
+  // Beispiel wird auf das AKTUELL gewählte Stück angewendet (kein Objekt-Wechsel mehr).
+  const d=exBuildDesign(ex, current);
   restoreDesign({
     zeileVals:d.zeileVals.slice(), lineGeom:d.zeileVals.map(()=>null), lineStyle:d.lineStyle.map(s=>({...s})), items:exExpandItems(d.items),
     textPos:d.textPos?{...d.textPos}:{x:null,y:null}, textScaleX:d.textScaleX, textAng:d.textAng,
-    textCap:d.textCap, textCurve:d.textCurve, textLsp:d.textLsp, textLh:d.textLh
+    textCap:d.textCap, textCurve:d.textCurve, textLsp:d.textLsp, textLh:d.textLh,
+    textFlipX:false, textFlipY:false
   });
   buildPicker(); buildZeilen(); showSel(); render(); histReset();
   openPane('text');
