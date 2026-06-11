@@ -6,7 +6,8 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Gravur-Studio (intern) | Wolf Lasermark</title>
 <link rel="icon" type="image/png" sizes="48x48" href="images/favicon-48.png">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,700&display=swap" rel="stylesheet"><style>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,400;0,700;1,400&family=Barlow:ital,wght@0,400;0,700;1,400&family=Oswald:wght@400;600&family=Anton&family=Cinzel:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Special+Elite&family=Great+Vibes&family=Caveat:wght@400;700&family=Permanent+Marker&display=swap" rel="stylesheet"><style>
 :root{
   --bg:#020617; --s1:#0b1120; --s2:#111827; --s3:#1e293b;
   --border:rgba(0,212,255,0.12); --accent:#00d4ff; --accent2:#0099bb;
@@ -470,6 +471,17 @@ body{background:linear-gradient(180deg,#050b18 0%,#020617 100%)}
             <div class="field" style="margin-bottom:0;margin-top:.55rem">
               <label>Zeilenabstand <span class="rval" id="lhVal">0.55</span></label>
               <div class="range-row"><input type="range" id="lh" min="0.1" max="1.5" step="0.05" value="0.55"></div>
+            </div>
+            <div class="field" style="margin-bottom:0;margin-top:.7rem">
+              <label>Gravur-Stil</label>
+              <div class="seg-group" style="display:flex;gap:.4rem">
+                <button type="button" class="tool-btn active" id="stilFill" style="flex:1">▰ Fläche (gefüllt)</button>
+                <button type="button" class="tool-btn" id="stilOutline" style="flex:1">▱ Kontur (feine Linie)</button>
+              </div>
+            </div>
+            <div class="field" id="strokeRow" style="margin-bottom:0;margin-top:.55rem;display:none">
+              <label>Linienstärke <span class="rval" id="strokeVal">0.25 mm</span></label>
+              <div class="range-row"><input type="range" id="gstroke" min="0.1" max="1.0" step="0.05" value="0.25"></div>
             </div>
           </div>
         </details>
@@ -3034,14 +3046,15 @@ function snapshotDesign(){
     lineGeom: lineGeom.map(g=> g?{...g}:null),
     lineStyle: lineStyle.map(s=>({...s})),
     items: items.map(it=>{ const c=Object.assign({},it); delete c.img; return c; }),
-    textPos: {...textPos}, textScaleX, textAng, textCap, textCurve, textLsp, textLh, textFlipX, textFlipY
+    textPos: {...textPos}, textScaleX, textAng, textCap, textCurve, textLsp, textLh, textFlipX, textFlipY, gravStil, gravStroke
   };
 }
 function restoreDesign(d){
   if(!d){
-    zeileVals=['Max Mustermann']; lineGeom=[null]; lineStyle=[newStyle()]; items=[];
+    zeileVals=['']; lineGeom=[null]; lineStyle=[newStyle()]; items=[];
     textPos={x:null,y:null}; textScaleX=1; textCap=4;
     textCurve=0; textLsp=0; textLh=0.55; textFlipX=false; textFlipY=false;
+    gravStil='fill'; gravStroke=0.25;
     applyAngleDefault();
     return;
   }
@@ -3052,6 +3065,7 @@ function restoreDesign(d){
   textPos={...d.textPos}; textScaleX=d.textScaleX; textCap=d.textCap;
   textCurve=d.textCurve||0; textLsp=d.textLsp||0; textLh=(d.textLh!=null?d.textLh:0.55);
   textFlipX=!!d.textFlipX; textFlipY=!!d.textFlipY;
+  gravStil=d.gravStil||'fill'; gravStroke=d.gravStroke!=null?d.gravStroke:0.25;
   textAng=d.textAng; setTangSlider(textAng);
   linesBound = zeileVals.length>1 && lineGeom.every(g=>!g);
 }
@@ -3061,7 +3075,7 @@ let selId=null;    // ausgewähltes Element-id (oder 'text' / 'zone' / null)
 
 // ---------- Text-Zeilen (dynamisch: 1..n) ----------
 const EMOJI_RE2=/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{2300}-\u{23FF}\u{2190}-\u{21FF}\u{FE00}-\u{FE0F}\u{200D}\u{20E3}]/gu;
-let zeileVals=['Max Mustermann'];
+let zeileVals=[''];
 let lineGeom=[null];   // pro Zeile: null=im Block (gestapelt) | {x,y,angle,cap,scaleX}=frei platziert
 let linesBound=false;  // false = Zeilen getrennt (Standard) · true = zu einem Block verbunden
 // Pro Zeile EIGENER, KONKRETER Stil (keine Vererbung, kein globales Überschreiben → springt nicht mehr).
@@ -3073,6 +3087,8 @@ let textLsp=0;         // Laufweite/Buchstabenabstand des Blocks (em-Bruchteil)
 let textLh=0.55;       // Zeilenabstand-Faktor (Lücke = capMM*textLh)
 let textFlipX=false;   // Block-Text horizontal gespiegelt
 let textFlipY=false;   // Block-Text vertikal gespiegelt
+let gravStil='fill';   // 'fill' = Flächengravur (gefüllt) · 'outline' = Konturgravur (feine Linien, fiber-tauglich)
+let gravStroke=0.25;   // Linienstärke (mm) im Kontur-Modus
 const THETA_MAX=Math.PI*2; // max. Bogenwinkel bei Krümmung 100 → voller Kreis (360°)
 const MAX_ZEILEN=8;
 // Echte Schriftarten in 3 Kategorien (je 2) — plus Schalter kursiv/fett/unterstrichen.
@@ -3081,17 +3097,17 @@ const MAX_ZEILEN=8;
 // Nur Schriften, die LightBurn (macOS-Systemfonts) sicher kennt -> Vorschau == Download.
 const FONT_FAMS={
   arial:       {label:'Arial',              cat:'Schlank',     css:'Arial',               weight:400},
-  dmsans:      {label:'Avenir',             cat:'Schlank',     css:'Avenir Next',         weight:400},
-  din:         {label:'DIN Alternate',      cat:'Schlank',     css:'DIN Alternate',       weight:400},
-  oswald:      {label:'DIN Condensed',      cat:'Kräftig',     css:'DIN Condensed',       weight:400},
-  bebas:       {label:'Impact',             cat:'Kräftig',     css:'Impact',              weight:400},
-  copperplate: {label:'Copperplate',        cat:'Kräftig',     css:'Copperplate',         weight:400},
-  didot:       {label:'Didot',              cat:'Elegant',     css:'Didot',               weight:400},
-  baskerville: {label:'Baskerville',        cat:'Elegant',     css:'Baskerville',         weight:400},
-  typewriter:  {label:'Typewriter',         cat:'Elegant',     css:'American Typewriter', weight:400},
-  pacifico:    {label:'Snell Roundhand',    cat:'Handschrift', css:'Snell Roundhand',     weight:400},
-  caveat:      {label:'Bradley Hand',       cat:'Handschrift', css:'Bradley Hand',        weight:400},
-  markerfelt:  {label:'Marker Felt',        cat:'Handschrift', css:'Marker Felt',         weight:400}
+  dmsans:      {label:'Avenir',             cat:'Schlank',     css:'Jost',                weight:400},
+  din:         {label:'DIN',                cat:'Schlank',     css:'Barlow',              weight:400},
+  oswald:      {label:'DIN Condensed',      cat:'Kräftig',     css:'Oswald',              weight:400},
+  bebas:       {label:'Impact',             cat:'Kräftig',     css:'Anton',               weight:400},
+  copperplate: {label:'Copperplate',        cat:'Kräftig',     css:'Cinzel',              weight:400},
+  didot:       {label:'Didot',              cat:'Elegant',     css:'Playfair Display',    weight:400},
+  baskerville: {label:'Baskerville',        cat:'Elegant',     css:'Libre Baskerville',   weight:400},
+  typewriter:  {label:'Typewriter',         cat:'Elegant',     css:'Special Elite',       weight:400},
+  pacifico:    {label:'Schreibschrift',     cat:'Handschrift', css:'Great Vibes',         weight:400},
+  caveat:      {label:'Handschrift',        cat:'Handschrift', css:'Caveat',              weight:400},
+  markerfelt:  {label:'Marker',             cat:'Handschrift', css:'Permanent Marker',    weight:400}
 };
 const FONT_FAM_DEFAULT='arial';
 function newStyle(){ return {fam:'arial', italic:false, bold:false, underline:false}; }
@@ -3159,8 +3175,16 @@ function buildZeilen(){
   if(typeof updateBindBtn==='function') updateBindBtn();
 }
 
+function iconStrokeVB(it){ // gewünschte Linienstärke (mm) → viewBox-Einheiten
+  const vb=String(it.viewBox).trim().split(/[\s,]+/).map(Number);
+  const vw=vb[2]||100;
+  return Math.max(0.4, gravStroke*vw/Math.max(1, it.wmm||vw));
+}
 function itemSVGString(it,color){
-  const body = it.colored ? it.inner : `<g fill="${color}" stroke="${color}" stroke-linejoin="round">${it.inner}</g>`;
+  let body;
+  if(it.colored) body=it.inner;
+  else if(gravStil==='outline') body=`<g fill="none" stroke="${color}" stroke-width="${iconStrokeVB(it).toFixed(2)}" stroke-linejoin="round" stroke-linecap="round">${it.inner}</g>`;
+  else body=`<g fill="${color}" stroke="${color}" stroke-linejoin="round">${it.inner}</g>`;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${it.viewBox}" width="${it.bw}" height="${it.bh}">${body}</svg>`;
 }
 function makeItemImg(it){
@@ -3371,7 +3395,10 @@ function itemExportSVG(it){
     const t=`translate(${it.x.toFixed(3)},${it.y.toFixed(3)}) rotate(${(it.angle||0).toFixed(2)}) scale(${fx},${fy}) translate(${(-it.wmm/2).toFixed(3)},${(-hmm/2).toFixed(3)})`;
     return `<g transform="${t}"><image x="0" y="0" width="${it.wmm.toFixed(3)}" height="${hmm.toFixed(3)}" preserveAspectRatio="none" xlink:href="${it.src}" href="${it.src}"/></g>`;
   }
-  const body = it.colored ? it.inner : `<g fill="#000" stroke="#000" stroke-linejoin="round">${it.inner}</g>`;
+  const body = it.colored ? it.inner
+    : (gravStil==='outline'
+        ? `<g fill="none" stroke="#000" stroke-width="${iconStrokeVB(it).toFixed(2)}" stroke-linejoin="round" stroke-linecap="round">${it.inner}</g>`
+        : `<g fill="#000" stroke="#000" stroke-linejoin="round">${it.inner}</g>`);
   // Flatten to a single transform (no nested <svg>/preserveAspectRatio — LightBurn mishandles that,
   // which moved the icon/logo and skewed the angle). This maps the viewBox box exactly onto the
   // mm placement so the export matches the preview 1:1.
@@ -3428,22 +3455,25 @@ function curveHalfWidthMM(widthMM,bend){
 }
 // Zeichnet EINE Textzeile (gerade ODER gekrümmt) inkl. Laufweite. ctx ist bereits auf die Text-Mitte
 // transformiert (translate/rotate/scale). yOff = vertikaler Versatz der Zeile (px). bend in %, lspEm em-Bruchteil.
-function drawTextLine(ctx,str,sizePx,font,yOff,bend,lspEm,underline){
+function drawTextLine(ctx,str,sizePx,font,yOff,bend,lspEm,underline,strokePx){
   ctx.save();
   ctx.font=`${font.italic?'italic ':''}${font.weight} ${sizePx}px "${font.css}"`;
   ctx.textAlign='center'; ctx.textBaseline='middle';
+  const outline=strokePx>0;
+  if(outline){ ctx.lineWidth=strokePx; ctx.strokeStyle=ctx.fillStyle; ctx.lineJoin='round'; ctx.lineCap='round'; }
+  const paint=(t,x,y)=> outline ? ctx.strokeText(t,x,y) : ctx.fillText(t,x,y);
   const chars=Array.from(str||''); const lsp=(lspEm||0)*sizePx;
   if(!bend && !lsp){
-    ctx.fillText(str,0,yOff);
-    if(underline){ const w=ctx.measureText(str).width; ctx.fillRect(-w/2, yOff+sizePx*0.42, w, Math.max(1,sizePx*0.06)); }
+    paint(str,0,yOff);
+    if(underline){ const w=ctx.measureText(str).width; ctx.fillRect(-w/2, yOff+sizePx*0.42, w, Math.max(1,outline?strokePx:sizePx*0.06)); }
     ctx.restore(); return;
   }
   const adv=chars.map(c=>ctx.measureText(c).width);
   const W=adv.reduce((a,b)=>a+b,0)+(chars.length-1)*lsp;
   if(!bend){
     let x=-W/2;
-    chars.forEach((c,k)=>{ ctx.fillText(c, x+adv[k]/2, yOff); x+=adv[k]+lsp; });
-    if(underline) ctx.fillRect(-W/2, yOff+sizePx*0.42, W, Math.max(1,sizePx*0.06));
+    chars.forEach((c,k)=>{ paint(c, x+adv[k]/2, yOff); x+=adv[k]+lsp; });
+    if(underline) ctx.fillRect(-W/2, yOff+sizePx*0.42, W, Math.max(1,outline?strokePx:sizePx*0.06));
   } else {
     const sgn=Math.sign(bend), theta=bend/100*THETA_MAX, R=W/Math.abs(theta);
     const sag=R*(1-Math.cos(Math.abs(theta)/2)); // Bogen vertikal um yOff zentrieren (sonst hängt er nach unten raus)
@@ -3451,7 +3481,7 @@ function drawTextLine(ctx,str,sizePx,font,yOff,bend,lspEm,underline){
     let acc=0;
     chars.forEach((c,k)=>{
       const phi=((acc+adv[k]/2)/W-0.5)*theta;
-      ctx.save(); ctx.rotate(phi); ctx.translate(0,-R*sgn); ctx.fillText(c,0,0); ctx.restore();
+      ctx.save(); ctx.rotate(phi); ctx.translate(0,-R*sgn); paint(c,0,0); ctx.restore();
       acc+=adv[k]+lsp;
     });
   }
@@ -3462,9 +3492,10 @@ function drawTextLine(ctx,str,sizePx,font,yOff,bend,lspEm,underline){
 function svgTextLine(str,fsMM,css,weight,styleAttr,yOff,bend,lspEm){
   const chars=Array.from(str||''); if(!chars.length) return '';
   const lspMM=(lspEm||0)*fsMM;
+  const paintAttr=gravStil==='outline' ? `fill="none" stroke="#000" stroke-width="${gravStroke.toFixed(3)}" stroke-linejoin="round"` : 'fill="#000"';
   if(!bend){
     const ls=lspMM?` letter-spacing="${lspMM.toFixed(3)}"`:'';
-    return `<text x="0" y="${yOff.toFixed(2)}" font-family="${css}" font-weight="${weight}"${styleAttr}${ls} font-size="${fsMM.toFixed(2)}" text-anchor="middle" dominant-baseline="central" fill="#000">${escapeXML(str)}</text>`;
+    return `<text x="0" y="${yOff.toFixed(2)}" font-family="${css}" font-weight="${weight}"${styleAttr}${ls} font-size="${fsMM.toFixed(2)}" text-anchor="middle" dominant-baseline="central" ${paintAttr}>${escapeXML(str)}</text>`;
   }
   measCtx.font=`${weight} 100px "${css}"`;
   const adv=chars.map(c=>measCtx.measureText(c).width/100*fsMM);
@@ -3474,7 +3505,7 @@ function svgTextLine(str,fsMM,css,weight,styleAttr,yOff,bend,lspEm){
   let acc=0, out='';
   chars.forEach((c,k)=>{
     const phi=((acc+adv[k]/2)/W-0.5)*theta, phd=phi*180/Math.PI;
-    out+=`<text transform="translate(0,${(yOff+R*sgn-sgn*sag/2).toFixed(3)}) rotate(${phd.toFixed(3)}) translate(0,${(-R*sgn).toFixed(3)})" x="0" y="0" font-family="${css}" font-weight="${weight}"${styleAttr} font-size="${fsMM.toFixed(2)}" text-anchor="middle" dominant-baseline="central" fill="#000">${escapeXML(c)}</text>`;
+    out+=`<text transform="translate(0,${(yOff+R*sgn-sgn*sag/2).toFixed(3)}) rotate(${phd.toFixed(3)}) translate(0,${(-R*sgn).toFixed(3)})" x="0" y="0" font-family="${css}" font-weight="${weight}"${styleAttr} font-size="${fsMM.toFixed(2)}" text-anchor="middle" dominant-baseline="central" ${paintAttr}>${escapeXML(c)}</text>`;
     acc+=adv[k]+lspMM;
   });
   return out;
@@ -3583,7 +3614,7 @@ function render(){
   L.lines.forEach((ln,i)=>{
     const offset=(i-(total-1)/2)*lineStepPx;
     const sizePx=(ln.capMM/capRatio(ln.f.css,ln.f.weight))*s.ppmm;
-    drawTextLine(ctx,ln.str,sizePx,ln.f,offset,textCurve,textLsp,ln.f.underline);
+    drawTextLine(ctx,ln.str,sizePx,ln.f,offset,textCurve,textLsp,ln.f.underline, gravStil==='outline'?Math.max(0.6,gravStroke*s.ppmm):0);
   });
   ctx.restore();
 
@@ -3600,7 +3631,7 @@ function render(){
       setEngrave(ctx,s,o);
       ctx.textAlign='center'; ctx.textBaseline='middle';
       const sizePx=(lg.cap/fcr)*s.ppmm;
-      drawTextLine(ctx,str,sizePx,ff,0,lg.curve||0,lg.lsp||0,ff.underline);
+      drawTextLine(ctx,str,sizePx,ff,0,lg.curve||0,lg.lsp||0,ff.underline, gravStil==='outline'?Math.max(0.6,gravStroke*s.ppmm):0);
       ctx.restore();
     });
   }
@@ -4136,6 +4167,7 @@ function setFineSliders(){
   const c=document.getElementById('curve'); if(c){ c.value=curveV; document.getElementById('curveVal').textContent=curveV; }
   const l=document.getElementById('lsp'); if(l){ l.value=lspV; document.getElementById('lspVal').textContent=lspV; }
   const h=document.getElementById('lh'); if(h){ h.value=textLh; document.getElementById('lhVal').textContent=(+textLh).toFixed(2); }
+  if(typeof syncStilUI==='function') syncStilUI();
 }
 function syncSelSliders(){
   const g=selGeom();
@@ -4277,6 +4309,12 @@ function selButtons(g,s){
     {x:BR.x,y:BR.y,action:'resize',icon:'resize'},
     {x:BL.x,y:BL.y,action:'delete',icon:'trash'}
   ];
+  // Seiten-Griffe: Breite (rechte Kante) und Höhe (untere Kante) UNABHÄNGIG strecken
+  const RE=H.edges[1], BE=H.edges[2]; // rechts-Mitte, unten-Mitte
+  const edges=[
+    {x:RE.x,y:RE.y,action:'stretch',dirX:1,dirY:0,icon:'stretchX'},
+    {x:BE.x,y:BE.y,action:'stretch',dirX:0,dirY:1,icon:'stretchY'}
+  ];
   // Mini-Leiste oben — Spiegeln gilt für ALLE Elemente (Text, freie Zeile, Grafik/Logo)
   const top=[];
   const it=items.find(i=>i.id===selId);
@@ -4292,7 +4330,7 @@ function selButtons(g,s){
     const gap=34, ty=H.topMid.y-36, sx=H.topMid.x-(acts.length-1)*gap/2;
     acts.forEach((a,i)=>top.push({x:sx+i*gap,y:ty,action:a.action,icon:a.icon}));
   }
-  return {corners,top,all:[...corners,...top]};
+  return {corners,edges,top,all:[...corners,...edges,...top]};
 }
 function rrPath(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
 function drawSelBtn(ctx,b){
@@ -4355,6 +4393,8 @@ function drawHandleIcon(ctx,cx,cy,name,col){
     ctx.setLineDash([2,2]); ctx.beginPath(); ctx.moveTo(-6.5,0); ctx.lineTo(6.5,0); ctx.stroke(); ctx.setLineDash([]);
     arrow(0,-1.5,0,-6); arrow(0,1.5,0,6);
   }
+  else if(name==='stretchX'){ ctx.lineWidth=1.6; arrow(0,0,-6.5,0); arrow(0,0,6.5,0); ctx.beginPath(); ctx.moveTo(0,-4.5); ctx.lineTo(0,4.5); ctx.stroke(); }
+  else if(name==='stretchY'){ ctx.lineWidth=1.6; arrow(0,0,0,-6.5); arrow(0,0,0,6.5); ctx.beginPath(); ctx.moveTo(-4.5,0); ctx.lineTo(4.5,0); ctx.stroke(); }
   ctx.restore();
 }
 
@@ -4442,6 +4482,7 @@ cv.addEventListener('pointerdown',e=>{
       if(distPx(p,b)<=16){
         if(b.action==='rotate'){ drag={mode:'rotate',g0:snapGeom(g)}; startGrab(e); return; }
         if(b.action==='resize'){ const d0=Math.hypot(m.x-g.cx,m.y-g.cy); drag={mode:'resize',g0:snapGeom(g),startDist:Math.max(d0,0.5)}; startGrab(e); return; }
+        if(b.action==='stretch'){ drag={mode:'stretch',g0:snapGeom(g),dirX:b.dirX,dirY:b.dirY}; startGrab(e); return; }
         if(b.action==='move'){ drag={mode:'move',g0:snapGeom(g),gx:m.x-g.cx,gy:m.y-g.cy}; startGrab(e); return; }
         if(b.action==='delete'){ selDelete(); return; }
         if(b.action==='duplicate'){ selDuplicate(); return; }
@@ -4706,6 +4747,29 @@ document.getElementById('lh').addEventListener('input',()=>{
   document.getElementById('lhVal').textContent=v.toFixed(2);
   textLh=v; wlAfterTextControl();
 });
+// Gravur-Stil: Fläche (gefüllt) ↔ Kontur (feine Linien, fiber-tauglich)
+function syncStilUI(){
+  const bf=document.getElementById('stilFill'), bo=document.getElementById('stilOutline');
+  if(bf) bf.classList.toggle('active', gravStil==='fill');
+  if(bo) bo.classList.toggle('active', gravStil==='outline');
+  const sr=document.getElementById('strokeRow'); if(sr) sr.style.display = gravStil==='outline' ? '' : 'none';
+  const gs=document.getElementById('gstroke'); if(gs){ gs.value=gravStroke; document.getElementById('strokeVal').textContent=(+gravStroke).toFixed(2)+' mm'; }
+}
+function regenItems(){ items.forEach(it=>{ if(!it.raster) makeItemImg(it); }); }
+function setGravStil(stil){
+  gravStil = stil==='outline' ? 'outline' : 'fill';
+  syncStilUI(); regenItems();
+  if(typeof histCommit==='function') histCommit();
+  render();
+}
+document.getElementById('stilFill').addEventListener('click',()=>setGravStil('fill'));
+document.getElementById('stilOutline').addEventListener('click',()=>setGravStil('outline'));
+document.getElementById('gstroke').addEventListener('input',()=>{
+  gravStroke=parseFloat(document.getElementById('gstroke').value);
+  document.getElementById('strokeVal').textContent=gravStroke.toFixed(2)+' mm';
+  regenItems(); render();
+});
+document.getElementById('gstroke').addEventListener('change',()=>{ if(typeof histCommit==='function') histCommit(); });
 // Schwarz-Weiß-Schwelle für hochgeladene Bilder (wirkt auf das ausgewählte Raster-Element)
 (function(){
   const bt=document.getElementById('bwThresh'); if(!bt) return;
@@ -5008,7 +5072,7 @@ buildExCards();
 })();
 (function(){ const b=document.getElementById('saveDesignBtn'); if(b) b.onclick=saveCurrentDesign; })();
 // fonts may load slightly late → re-render once ready
-if(document.fonts && document.fonts.ready){ document.fonts.ready.then(render); }
+if(document.fonts && document.fonts.ready){ document.fonts.ready.then(()=>{ for(const k in capRatioCache) delete capRatioCache[k]; if(typeof buildExCards==='function') buildExCards(); render(); }); }
 render();
 histReset();
 updatePrice();
