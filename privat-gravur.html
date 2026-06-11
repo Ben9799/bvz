@@ -229,6 +229,103 @@ input[type=range]{flex:1;accent-color:var(--accent)}
   .panel{position:static;width:auto;margin-top:.9rem;display:block;backdrop-filter:none;background:linear-gradient(180deg,rgba(17,24,39,0.55),rgba(11,17,32,0.55))}
   .panel-close{display:none}
 }
+
+
+/* =========================================================
+   WL CLEAN EDITOR UI v2
+   Ziel: Vorschau bleibt immer der Mittelpunkt; Werkzeuge liegen sauber
+   in einer rechten Icon-Leiste + leichtem Flyout statt als Funktionshaufen.
+   ========================================================= */
+:root{
+  --studio-max:1500px;
+  --drawer-w:392px;
+  --rail-w:76px;
+  --soft-border:rgba(148,163,184,.16);
+  --glass:rgba(15,23,42,.70);
+}
+.wrap{max-width:var(--studio-max);padding:0 clamp(.85rem,2vw,1.4rem)}
+.hero{padding:1.15rem 0 .45rem;text-align:left;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1rem;align-items:end}
+.hero h1{font-size:clamp(1.35rem,2.4vw,2.15rem)}
+.hero p{margin:.25rem 0 0;max-width:72ch;font-size:.93rem}
+.picker{justify-content:flex-start;margin:.8rem 0 1rem;gap:.55rem;overflow-x:auto;flex-wrap:nowrap;padding-bottom:.15rem;scrollbar-width:thin}
+.obj{min-width:178px;padding:.68rem .82rem;border-radius:13px;background:rgba(15,23,42,.58);box-shadow:0 8px 24px rgba(0,0,0,.16)}
+.obj.active{box-shadow:0 0 0 1px rgba(0,212,255,.22),0 14px 36px rgba(0,212,255,.08)}
+.studio{display:grid;grid-template-columns:minmax(0,1fr) var(--rail-w);gap:1rem;align-items:start;margin-bottom:2rem}
+.stage{position:sticky;top:72px;min-height:calc(100vh - 152px);padding:1rem;justify-content:stretch;gap:.75rem;background:linear-gradient(180deg,rgba(15,23,42,.72),rgba(2,6,23,.62));border-color:var(--soft-border);box-shadow:0 24px 80px rgba(0,0,0,.30)}
+.preview-head{align-self:stretch;display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.15rem .2rem .25rem;color:var(--text)}
+.preview-head strong{display:block;font-family:'Syne',sans-serif;font-size:1.02rem;letter-spacing:-.01em}.preview-kicker{display:block;font-size:.68rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.05rem}.preview-chip{font-size:.72rem;font-weight:800;color:var(--muted2);border:1px solid var(--soft-border);border-radius:999px;padding:.28rem .62rem;background:rgba(255,255,255,.035)}
+.cv-wrap{flex:1;min-height:360px;max-height:calc(100vh - 285px);align-items:center;background:radial-gradient(circle at 50% 35%,rgba(0,212,255,.08),transparent 38%),rgba(2,6,23,.34);border:1px solid rgba(148,163,184,.12);padding:clamp(.55rem,1.3vw,1rem);box-shadow:inset 0 0 0 1px rgba(255,255,255,.025)}
+#cv{max-height:calc(100vh - 320px);box-shadow:0 28px 80px rgba(0,0,0,.34),0 0 0 1px rgba(255,255,255,.06);background:#080d18}
+.dims,.warn{align-self:stretch}.dims{font-size:.78rem}.warn{font-size:.78rem}.stage-bar{position:relative;align-self:center;max-width:920px;background:rgba(2,6,23,.62);border:1px solid rgba(148,163,184,.12);border-radius:16px;padding:.38rem;box-shadow:0 14px 36px rgba(0,0,0,.22)}
+.stage-bar .tool-btn{min-height:36px;border-radius:11px;background:rgba(255,255,255,.035)}
+.rail{position:sticky;top:82px;z-index:30;gap:.5rem}.rail .seg{width:var(--rail-w);height:70px;border-radius:18px;background:rgba(15,23,42,.78);border-color:rgba(148,163,184,.15);box-shadow:0 16px 42px rgba(0,0,0,.26)}.rail .seg small{font-size:.62rem}.rail .seg.active{border-color:var(--accent);background:linear-gradient(135deg,rgba(0,212,255,.24),rgba(0,153,187,.12))}
+.panel{border-color:rgba(148,163,184,.18);background:linear-gradient(180deg,rgba(15,23,42,.96),rgba(2,6,23,.94));box-shadow:0 30px 110px rgba(0,0,0,.50)}
+.panel-head{position:sticky;top:0;z-index:2;margin:-1.2rem -1.2rem 1rem;padding:1.05rem 1.2rem .9rem;background:linear-gradient(180deg,rgba(15,23,42,.98),rgba(15,23,42,.88));border-bottom:1px solid rgba(148,163,184,.12);border-radius:18px 18px 0 0}.panel-head h2{font-size:1.05rem}.panel-head .psub{font-size:.77rem}.seg-pane{padding-bottom:.2rem}.acc{background:rgba(15,23,42,.45);border-color:rgba(148,163,184,.12)}.filt-card,.tpl-result,.sel-hint,.logo-box{border-color:rgba(148,163,184,.13);background:rgba(255,255,255,.026)}.cat-tab,.tpl-chip,.tool-btn{border-color:rgba(148,163,184,.14)}.price{background:linear-gradient(135deg,rgba(0,212,255,.08),rgba(0,153,187,.035));border-color:rgba(0,212,255,.18)}
+@media(min-width:841px){
+  .stage{padding-right:1rem;transition:none}.studio:has(.panel.open) .stage{padding-right:1rem}.rail{position:sticky;top:82px;right:auto}.panel{position:fixed;top:88px;right:max(1rem,calc((100vw - var(--studio-max))/2 + 1.25rem + var(--rail-w) + .85rem));bottom:1rem;width:min(var(--drawer-w),calc(100vw - 9rem));max-height:none;overflow-y:auto;z-index:60;display:none;transform:translateX(14px) scale(.985);opacity:0;transition:transform .18s ease,opacity .18s ease}.panel.open{display:block;transform:none;opacity:1}.clip-grid{max-height:calc(100vh - 310px)}.tpl-row{max-height:calc(100vh - 410px)}
+}
+@media(max-width:1100px) and (min-width:841px){.hero{display:block}.cv-wrap{min-height:320px}.stage-bar .tool-btn{font-size:.76rem;padding:.45rem .58rem}.panel{right:calc(var(--rail-w) + 1.25rem);width:min(370px,calc(100vw - 8.5rem))}}
+@media(max-width:840px){
+  .wrap{padding:0 .78rem}.hero{display:block;text-align:left;padding:.9rem 0 .35rem}.picker{margin:.7rem -.78rem .9rem;padding:0 .78rem .2rem}.studio{display:block}.stage{position:relative;top:auto;min-height:auto;padding:.75rem;border-radius:17px}.preview-head{padding:.15rem .1rem}.cv-wrap{min-height:300px;max-height:none;padding:.45rem}#cv{max-height:none}.stage-bar{position:sticky;bottom:.55rem;z-index:25;max-width:100%;overflow-x:auto;justify-content:flex-start;flex-wrap:nowrap}.stage-bar .tool-btn{white-space:nowrap;flex:0 0 auto}.rail{position:sticky;bottom:0;top:auto;z-index:45;margin:.8rem -.78rem 0;padding:.55rem .78rem;display:grid;grid-template-columns:repeat(5,1fr);gap:.45rem;background:linear-gradient(180deg,rgba(2,6,23,0),rgba(2,6,23,.96) 22%);backdrop-filter:blur(10px)}.rail .seg{width:auto;height:58px;border-radius:15px}.panel{margin:.75rem 0 1rem;border-radius:17px}.panel-head{margin:-1.2rem -1.2rem 1rem;border-radius:17px 17px 0 0}.row2{grid-template-columns:1fr}.saved-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:520px){.obj{min-width:158px}.preview-chip{display:none}.cv-wrap{min-height:250px}.rail .seg small{font-size:.56rem}.rail .seg .ic{font-size:1.15rem}.saved-grid{grid-template-columns:repeat(2,1fr)}}
+
+
+/* =========================================================
+   WL LASERLIEBE-INSPIRIERT v3
+   Aufbau nach Konfigurator-Logik: Bühne im Zentrum, Kachel-Werkzeuge,
+   linke Schnellaktionen, klare Schritte + Hinweise.
+   ========================================================= */
+:root{
+  --drawer-w:410px;
+  --rail-w:82px;
+  --surface:rgba(15,23,42,.82);
+  --surface2:rgba(2,6,23,.72);
+  --line:rgba(148,163,184,.18);
+  --warm:#f6c55c;
+}
+body{background:linear-gradient(180deg,#050b18 0%,#020617 100%)}
+.header-inner{max-width:var(--studio-max)}
+.badge{background:rgba(0,212,255,.06)}
+.hero{grid-template-columns:minmax(0,1fr) minmax(280px,420px);align-items:center;padding:1rem 0 .55rem}
+.hero::after{content:'Schritt für Schritt gestalten · Text · Motiv · Logo · QR';justify-self:end;color:var(--muted2);font-size:.8rem;font-weight:800;border:1px solid var(--line);border-radius:999px;padding:.42rem .75rem;background:rgba(255,255,255,.035)}
+.config-flow{display:grid;grid-template-columns:repeat(4,1fr);gap:.55rem;margin:.2rem 0 .85rem}
+.flow-step{display:flex;align-items:center;gap:.62rem;padding:.64rem .78rem;border:1px solid var(--line);border-radius:15px;background:rgba(15,23,42,.48);min-width:0}
+.flow-num{width:26px;height:26px;flex:0 0 auto;display:grid;place-items:center;border-radius:50%;font-family:'Syne',sans-serif;font-weight:800;font-size:.78rem;background:rgba(0,212,255,.13);border:1px solid rgba(0,212,255,.28);color:var(--accent)}
+.flow-step strong{display:block;font-family:'Syne',sans-serif;font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.flow-step small{display:block;font-size:.68rem;color:var(--muted);line-height:1.2}.flow-step.active{border-color:rgba(0,212,255,.40);background:linear-gradient(135deg,rgba(0,212,255,.13),rgba(255,255,255,.025));box-shadow:0 10px 32px rgba(0,212,255,.07)}
+.picker{background:rgba(2,6,23,.35);border:1px solid rgba(148,163,184,.10);border-radius:18px;padding:.55rem;box-shadow:inset 0 0 0 1px rgba(255,255,255,.018)}
+.studio{grid-template-columns:minmax(0,1fr) var(--rail-w);gap:.85rem}.stage{overflow:hidden;border-radius:24px;background:linear-gradient(180deg,rgba(248,250,252,.055),rgba(15,23,42,.58)),radial-gradient(circle at 50% 40%,rgba(0,212,255,.10),transparent 46%);border-color:rgba(148,163,184,.20)}
+.preview-head{border:1px solid rgba(148,163,184,.12);border-radius:16px;background:rgba(2,6,23,.42);padding:.65rem .78rem;box-shadow:0 10px 32px rgba(0,0,0,.16)}.preview-head strong{font-size:1.12rem}.preview-chip{background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.22);color:#b8f7ce}
+.stage-canvas-shell{position:relative;flex:1;width:100%;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center}.cv-wrap{width:100%;min-height:420px;border-radius:22px;background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.07),transparent 36%),rgba(2,6,23,.34)}#cv{border-radius:18px}.canvas-tools{position:absolute;left:.85rem;top:.85rem;z-index:18;display:flex;flex-direction:column;gap:.42rem}.canvas-tools .tool-btn{width:44px;height:44px;padding:0;border-radius:14px;background:rgba(2,6,23,.78);backdrop-filter:blur(12px);font-size:1.05rem;box-shadow:0 10px 24px rgba(0,0,0,.28)}.canvas-tools .tool-btn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.view-actions{display:flex;gap:.4rem;align-items:center;justify-content:center;flex-wrap:wrap}.view-actions .tool-btn{min-width:42px}.stage-bar{max-width:760px}.stage-bar .tool-btn:nth-child(1),.stage-bar .tool-btn:nth-child(2),.stage-bar .tool-btn:nth-child(3),.stage-bar .tool-btn:nth-child(4),.stage-bar .tool-btn:nth-child(5){display:none}
+.rail{gap:.56rem}.rail .seg{height:76px;border-radius:20px;background:rgba(248,250,252,.06);border-color:rgba(148,163,184,.18)}.rail .seg .ic{font-size:1.45rem}.rail .seg.active{background:linear-gradient(135deg,rgba(0,212,255,.25),rgba(246,197,92,.08));box-shadow:0 18px 44px rgba(0,212,255,.18)}
+.panel{border-radius:22px}.panel-head{border-radius:22px 22px 0 0}.ll-hint{border:1px solid rgba(246,197,92,.25);background:linear-gradient(135deg,rgba(246,197,92,.09),rgba(0,212,255,.045));border-radius:15px;padding:.82rem .92rem;margin-bottom:1rem;color:var(--muted2);font-size:.8rem;line-height:1.45}.ll-hint b{color:#ffe7ac}.ll-mini-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.55rem;margin:.7rem 0}.ll-mini{border:1px solid var(--line);background:rgba(255,255,255,.03);border-radius:14px;padding:.72rem}.ll-mini strong{display:block;font-family:'Syne',sans-serif;font-size:.86rem}.ll-mini small{color:var(--muted);font-size:.72rem}.area-card{border:1px solid var(--line);border-radius:15px;background:rgba(255,255,255,.028);padding:.8rem;margin-bottom:.65rem}.area-card.active{border-color:rgba(0,212,255,.45);background:rgba(0,212,255,.07)}.area-card strong{font-family:'Syne',sans-serif}.area-card small{display:block;color:var(--muted2);margin-top:.15rem}.summary{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(15,23,42,0),rgba(15,23,42,.98) 20%);margin:1rem -1.2rem -1.2rem;padding:1.2rem}.btn-primary{box-shadow:0 14px 32px rgba(0,212,255,.16)}
+@media(min-width:841px){.panel{right:max(1rem,calc((100vw - var(--studio-max))/2 + .75rem + var(--rail-w) + .85rem));top:82px}.rail{top:82px}.stage{top:74px;min-height:calc(100vh - 128px)}}
+@media(max-width:1100px) and (min-width:841px){.config-flow{grid-template-columns:repeat(2,1fr)}.hero::after{display:none}.cv-wrap{min-height:360px}}
+@media(max-width:840px){.hero::after{display:none}.config-flow{display:flex;overflow-x:auto;margin:.2rem -.78rem .8rem;padding:0 .78rem .15rem}.flow-step{min-width:210px}.stage-canvas-shell{min-height:300px}.cv-wrap{min-height:285px}.canvas-tools{position:static;flex-direction:row;align-self:center;margin:.45rem 0 .1rem}.canvas-tools .tool-btn span{position:static;width:auto;height:auto;clip:auto;font-size:.72rem;margin-left:.25rem}.canvas-tools .tool-btn{width:auto;height:38px;padding:0 .6rem}.rail{grid-template-columns:repeat(6,1fr)}.summary{position:static;margin-top:1rem;background:none;padding-top:1rem}.stage-bar .tool-btn:nth-child(6){display:flex}}
+@media(max-width:520px){.rail{grid-template-columns:repeat(3,1fr);padding-bottom:.75rem}.rail .seg{height:54px}.ll-mini-grid{grid-template-columns:1fr}}
+
+
+
+/* =========================================================
+   WL USER-WÜNSCHE v4
+   - Keine Sprüche/Vorlagen: nur Beispielbilder
+   - Preis als schmale fixe Leiste im Vorschau-Bereich
+   - stabilere Textregler / klarere Slider-Zonen
+   ========================================================= */
+.example-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin:.75rem 0 1rem}
+.example-card{appearance:none;text-align:left;border:1px solid rgba(148,163,184,.16);background:rgba(255,255,255,.032);color:var(--text);border-radius:16px;padding:.72rem;cursor:pointer;font-family:inherit;transition:transform .15s,border-color .15s,background .15s}
+.example-card:hover{transform:translateY(-2px);border-color:rgba(0,212,255,.45);background:rgba(0,212,255,.07)}
+.example-card strong{display:block;font-family:'Syne',sans-serif;font-size:.88rem;margin:.55rem 0 .12rem}.example-card small{display:block;color:var(--muted2);font-size:.72rem;line-height:1.35}
+.example-img{position:relative;display:block;aspect-ratio:1/1;border-radius:14px;background:radial-gradient(circle at 50% 42%,rgba(255,255,255,.92),rgba(226,232,240,.68));border:1px solid rgba(255,255,255,.12);overflow:hidden;box-shadow:inset 0 0 0 1px rgba(2,6,23,.05)}
+.ex-product{position:absolute;inset:18% 22%;border-radius:28px;background:linear-gradient(135deg,#cbd5e1,#f8fafc);box-shadow:0 16px 35px rgba(15,23,42,.20)}
+.ex-tag{position:absolute;inset:15% 25% 14% 25%;border-radius:22px 22px 30px 30px;background:linear-gradient(135deg,#dbeafe,#f8fafc);box-shadow:0 16px 35px rgba(15,23,42,.20)}
+.ex-tag:before{content:'';position:absolute;left:50%;top:11%;width:18px;height:18px;border-radius:50%;transform:translateX(-50%);background:#0f172a;opacity:.18}.ex-product:before{content:'';position:absolute;left:50%;top:13%;width:20px;height:20px;border-radius:50%;transform:translateX(-50%);background:#0f172a;opacity:.14}
+.ex-text{position:absolute;left:12%;right:12%;text-align:center;color:#111827}.ex-title{top:42%;font-family:'Syne',sans-serif;font-weight:800;font-size:1.35rem;letter-spacing:.06em}.ex-sub{top:58%;font-weight:700;font-size:.72rem;opacity:.75}.example-img-2 .ex-title{top:45%}.example-img-2 .ex-sub{top:59%}
+.price-strip{align-self:stretch;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.75rem;margin:.15rem 0 0;padding:.45rem .65rem;border:1px solid rgba(148,163,184,.14);border-radius:14px;background:rgba(2,6,23,.58);box-shadow:none}.price-strip .price{display:flex;align-items:center;gap:.42rem;margin:0;padding:0;background:transparent;border:none;border-radius:0}.price-strip .price .pl{font-size:.72rem;color:var(--muted2)}.price-strip .price .pv{font-size:.94rem;color:var(--text)}.price-strip .price small{display:inline;margin-left:.4rem;font-size:.66rem;text-align:left;color:var(--muted)}.price-strip .btnrow{display:flex;gap:.45rem;margin:0;justify-self:end}.price-strip .btn{padding:.52rem .72rem;border-radius:11px;font-size:.78rem;white-space:nowrap}.price-strip .note{grid-column:1/-1;font-size:.68rem;line-height:1.25;color:var(--muted);padding:0;margin:-.2rem 0 0;border:0}.panel .summary{position:static;background:none;margin:0;padding:0}.field .range-row input[type=range]{min-height:32px}.rval{font-variant-numeric:tabular-nums}.acc[open] .acc-body{animation:segIn .16s ease}.seg[data-pane="beispiele"] .ic{filter:saturate(1.1)}
+@media(max-width:840px){.example-grid{grid-template-columns:1fr}.price-strip{position:sticky;bottom:74px;z-index:35;grid-template-columns:1fr auto;background:rgba(2,6,23,.86);backdrop-filter:blur(10px)}.price-strip .note{display:none}.price-strip .btnrow .btn-ghost{display:none}.price-strip .price small{display:none}}
+@media(max-width:520px){.price-strip{grid-template-columns:1fr}.price-strip .btnrow{width:100%}.price-strip .btnrow .btn-primary{width:100%}.price-strip .price{justify-content:space-between}.example-card{padding:.62rem}}
+
 </style>
 </head>
 <body>
@@ -240,7 +337,6 @@ input[type=range]{flex:1;accent-color:var(--accent)}
       <picture><source srcset="images/wolf-lasermark-icon.webp" type="image/webp"><img src="images/wolf-lasermark-icon.png" alt="Wolf Lasermark"></picture>
       <div>Wolf <span>Lasermark</span></div>
     </a>
-    <span class="badge">🔒 Intern · Gravur-Studio (POC)</span>
   </div>
 </header>
 
@@ -253,10 +349,32 @@ input[type=range]{flex:1;accent-color:var(--accent)}
 
   <div class="picker" id="picker"></div>
 
+  <div class="config-flow" aria-label="Konfigurator Schritte">
+    <div class="flow-step active"><span class="flow-num">1</span><span><strong>Artikel wählen</strong><small>Gravurbereich prüfen</small></span></div>
+    <div class="flow-step active"><span class="flow-num">2</span><span><strong>Design erstellen</strong><small>Text, Motiv, Logo, QR</small></span></div>
+    <div class="flow-step"><span class="flow-num">3</span><span><strong>Vorschau prüfen</strong><small>Abstand & Lesbarkeit</small></span></div>
+  </div>
+
   <div class="studio">
     <div class="stage">
-      <div class="cv-wrap" id="cvWrap"><canvas id="cv" width="600" height="600"></canvas></div>
-      <div class="dims" id="dims"></div>
+      <div class="preview-head">
+        <div>
+          <span class="preview-kicker">Live-Vorschau</span>
+          <strong>Dein Gravurmotiv</strong>
+        </div>
+        <span class="preview-chip">Maßgenau · mm</span>
+      </div>
+      <div class="stage-canvas-shell">
+        <div class="canvas-tools" aria-label="Schnellaktionen auf der Designfläche">
+          <button class="tool-btn quick-action" data-click="undoBtn" title="Rückgängig">↶ <span>Zurück</span></button>
+          <button class="tool-btn quick-action" data-click="redoBtn" title="Wiederholen">↷ <span>Vor</span></button>
+          <button class="tool-btn quick-action" data-click="zoomIn" title="Vergrößern">＋ <span>Zoom</span></button>
+          <button class="tool-btn quick-action" data-click="zoomOut" title="Verkleinern">− <span>Zoom</span></button>
+          <button class="tool-btn" id="rotatePreview" title="Ansicht drehen">⟳ <span>Drehen</span></button>
+        </div>
+        <div class="cv-wrap" id="cvWrap"><canvas id="cv" width="600" height="600"></canvas></div>
+      </div>
+      <div class="dims admin-only" id="dims"></div>
       <div class="warn" id="warn"></div>
       <div class="stage-bar">
         <button class="tool-btn" id="undoBtn" title="Rückgängig (Strg+Z)">↶ Rückgängig</button>
@@ -266,54 +384,63 @@ input[type=range]{flex:1;accent-color:var(--accent)}
         <button class="tool-btn" id="zoomIn" title="Vergrößern">➕</button>
         <button class="tool-btn" id="saveImg" title="Vorschau als PNG speichern">🖼 Als Bild speichern</button>
       </div>
+      <div class="summary price-strip">
+        <div class="price" id="priceBox">
+          <div><span class="pl">Preis (Richtwert)</span></div>
+          <div style="text-align:right"><span class="pv" id="priceVal">–</span><small id="priceBreak"></small></div>
+        </div>
+        <div class="btnrow admin-only" style="margin-top:.7rem">
+          <button class="btn btn-ghost admin-only" id="dlsvg">⬇ LightBurn-SVG</button>
+        </div>
+      </div>
     </div>
 
     <div class="rail" id="rail">
-      <button class="seg active" data-pane="vorlagen"><span class="ic">✨</span><small>Vorlagen</small></button>
+      <button class="seg active" data-pane="beispiele"><span class="ic">👀</span><small>Beispiele</small></button>
       <button class="seg" data-pane="text"><span class="ic">✏️</span><small>Text</small></button>
       <button class="seg" data-pane="motive"><span class="ic">🎨</span><small>Grafik</small></button>
       <button class="seg" data-pane="logo"><span class="ic">🖼️</span><small>Logo</small></button>
       <button class="seg" data-pane="code"><span class="ic">🔳</span><small>Code</small></button>
+      <button class="seg" data-pane="areas"><span class="ic">▦</span><small>Flächen</small></button>
     </div>
 
     <div class="panel" id="panel">
       <div class="panel-head">
         <div class="panel-head-txt">
-          <h2 id="panelTitle">Vorlagen &amp; Sprüche</h2>
-          <div class="psub" id="panelSub">Fertige Sprüche nach Anlass &amp; Empfänger.</div>
+          <h2 id="panelTitle">Beispiele</h2>
+          <div class="psub" id="panelSub">1–2 Beispielbilder als Inspiration ansehen.</div>
         </div>
         <button type="button" class="panel-close" id="panelClose" aria-label="Fenster schließen" title="Schließen">✕</button>
       </div>
 
-      <div class="seg-pane active" id="pane-vorlagen">
-        <div class="sub">Wofür ist das Geschenk? Bereich aufklappen &amp; Kategorie wählen — passende Sprüche erscheinen darunter.</div>
-        <div class="cat-tabs" id="allTab" style="margin-bottom:.6rem"></div>
-        <details class="acc" id="accPerson">
-          <summary><span class="ic">🎁</span> Für eine Person <span class="hint">Empfänger wählen</span><span class="chev">▾</span></summary>
-          <div class="acc-body">
-            <div class="cat-tabs" id="recTabs"></div>
-          </div>
-        </details>
-        <details class="acc" id="accEvent">
-          <summary><span class="ic">📅</span> Für ein Ereignis <span class="hint">Anlass wählen</span><span class="chev">▾</span></summary>
-          <div class="acc-body">
-            <div class="cat-tabs" id="occTabs"></div>
-          </div>
-        </details>
-        <div class="tpl-result">
-          <div class="tpl-result-head">
-            <span class="trh-ic">💬</span>
-            <span class="trh-lbl" id="tplResultLbl">Passende Sprüche</span>
-            <span class="trh-count" id="tplResultCount"></span>
-          </div>
-          <div class="tpl-row" id="tplRow"></div>
+      <div class="seg-pane active" id="pane-beispiele">
+        <div class="example-grid" aria-label="Beispielbilder">
+          <button type="button" class="example-card" data-example="1">
+            <span class="example-img example-img-1" aria-hidden="true">
+              <span class="ex-product"></span>
+              <span class="ex-text ex-title">MAX</span>
+              <span class="ex-text ex-sub">Beste Dad seit 2026</span>
+            </span>
+            <strong>Beispiel: Flaschenöffner</strong>
+            <small>Text mittig, kleines Motiv unten – sauber und gut lesbar.</small>
+          </button>
+          <button type="button" class="example-card" data-example="2">
+            <span class="example-img example-img-2" aria-hidden="true">
+              <span class="ex-tag"></span>
+              <span class="ex-text ex-title">ZOE</span>
+              <span class="ex-text ex-sub">♡ 11.06.2026</span>
+            </span>
+            <strong>Beispiel: Schlüsselanhänger</strong>
+            <small>Name groß, Datum klein – viel freie Fläche, edle Wirkung.</small>
+          </button>
         </div>
         <div class="saved-block">
           <div class="tpl-result-head"><span class="trh-ic">💾</span><span class="trh-lbl">Meine Designs</span></div>
-          <div class="sub" style="margin:.3rem 0 .55rem">Speichere deinen Entwurf und lade ihn jederzeit wieder.</div>
+          <div class="sub" style="margin:.3rem 0 .55rem">Eigene Entwürfe speichern und später wieder laden.</div>
           <button type="button" id="saveDesignBtn" class="tool-btn" style="width:100%;justify-content:center;margin-bottom:.55rem">💾 Aktuelles Design speichern</button>
           <div class="saved-grid" id="savedGrid"></div>
         </div>
+        <div id="allTab" style="display:none"></div><div id="recTabs" style="display:none"></div><div id="occTabs" style="display:none"></div><div id="tplRow" style="display:none"></div><span id="tplResultLbl" style="display:none"></span><span id="tplResultCount" style="display:none"></span>
       </div>
 
       <div class="seg-pane" id="pane-text">
@@ -376,7 +503,7 @@ input[type=range]{flex:1;accent-color:var(--accent)}
       </div>
 
       <div class="seg-pane" id="pane-code">
-        <div class="sub">QR-Code aus Text oder Link — wird als saubere <b>Vektor-Gravur</b> eingefügt (ideal für LightBurn) und ist frei platzierbar.</div>
+        <div class="sub">QR-Code aus Text oder Link — wird als saubere <b>Vektor-Gravur</b> eingefügt und ist frei platzierbar.</div>
         <div class="field" style="margin-bottom:.5rem">
           <label>Text oder Link <span style="color:var(--muted)">(auch Spotify)</span></label>
           <input type="text" id="qrInput" maxlength="300" placeholder="z. B. https://wolf-lasermark.de">
@@ -384,6 +511,18 @@ input[type=range]{flex:1;accent-color:var(--accent)}
         <button type="button" class="tool-btn" id="qrBtn" style="width:100%;justify-content:center">🔳 QR-Code einfügen</button>
         <p class="sub" style="margin-top:.6rem">Tipp: Auch einen <b>Spotify-Song-Link</b> einfügen (in Spotify → Teilen → Link kopieren) — eingescannt öffnet der Code den Song direkt zum Abspielen.</p>
         <div class="code-msg" id="codeMsg"></div>
+      </div>
+
+      <div class="seg-pane" id="pane-areas">
+        <div class="ll-hint"><b>Gravurflächen:</b> Hier ist die Laserliebe-Logik vorbereitet: Wenn ein Produkt später Vorderseite/Rückseite oder mehrere Bereiche hat, kann der Kunde zwischen den Flächen wechseln.</div>
+        <div class="area-card active"><strong>Front / Hauptfläche</strong><small>Aktive Vorschaufläche — hier werden Text, Motive, Logo und QR platziert.</small></div>
+        <div class="area-card"><strong>Rückseite / zweite Fläche</strong><small>Optional vorbereiteter Platzhalter für Produkte mit zweiter Gravurseite.</small></div>
+        <div class="ll-mini-grid">
+          <div class="ll-mini"><strong>↶ Undo / Redo</strong><small>Links direkt auf der Designfläche erreichbar.</small></div>
+          <div class="ll-mini"><strong>＋ Zoom</strong><small>Kleine Details leichter positionieren.</small></div>
+          <div class="ll-mini"><strong>⟳ Ansicht drehen</strong><small>Zum Hochkant-/Querformat-Prüfen.</small></div>
+          <div class="ll-mini"><strong>🎯 Element-Griffe</strong><small>Verschieben, drehen, skalieren und löschen.</small></div>
+        </div>
       </div>
 
       <div class="sel-hint" id="selHint" style="display:none">
@@ -405,17 +544,7 @@ input[type=range]{flex:1;accent-color:var(--accent)}
           <div class="logo-hint" id="serieStatus" style="margin-top:.5rem"></div>
         </div>
       </details>
-      <div class="summary">
-        <div class="price" id="priceBox">
-          <div><span class="pl">Preis (Richtwert)</span></div>
-          <div style="text-align:right"><span class="pv" id="priceVal">–</span><small id="priceBreak"></small></div>
-        </div>
-        <div class="btnrow" style="margin-top:.7rem">
-          <button class="btn btn-ghost admin-only" id="dlsvg">⬇ LightBurn-SVG</button>
-          <button class="btn btn-primary" id="anfrage">Gravur anfragen</button>
-        </div>
-        <div class="note">Maßgenau: Die SVG wird in echten Millimetern exportiert (viewBox in mm) und ist direkt in LightBurn nutzbar. Text &amp; Motive lassen sich frei platzieren; die Schrift wird bei Bedarf verkleinert, damit sie passt.</div>
-      </div>
+
     </div>
   </div>
 
@@ -430,7 +559,7 @@ input[type=range]{flex:1;accent-color:var(--accent)}
     <div class="ob-steps">
       <div class="ob-step"><span class="ob-num">1</span><span><b>Objekt wählen</b> — z. B. Flaschenöffner oder Schlüsselhänger.</span></div>
       <div class="ob-step"><span class="ob-num">2</span><span><b>Text &amp; Motive</b> gestalten — Schrift, Stil und Symbole je Zeile frei einstellen.</span></div>
-      <div class="ob-step"><span class="ob-num">3</span><span><b>Frei platzieren</b> — alles im Bild ziehen, drehen, größer/kleiner machen. Dann anfragen.</span></div>
+      <div class="ob-step"><span class="ob-num">3</span><span><b>Frei platzieren</b> — alles im Bild ziehen, drehen, größer/kleiner machen.</span></div>
     </div>
     <button class="btn btn-primary" id="obStart" style="width:100%">Los geht's</button>
   </div>
@@ -2930,6 +3059,7 @@ function restoreDesign(d){
   textPos={...d.textPos}; textScaleX=d.textScaleX; textCap=d.textCap;
   textCurve=d.textCurve||0; textLsp=d.textLsp||0; textLh=(d.textLh!=null?d.textLh:0.55);
   textAng=d.textAng; setTangSlider(textAng);
+  linesBound = zeileVals.length>1 && lineGeom.every(g=>!g);
 }
 let textPos={x:null,y:null}; // mm-Mittelpunkt des Textes (null=Zonen-Mitte)
 let textScaleX=1;  // horizontale Streckung des Textes (1=natürlich)
@@ -2939,6 +3069,7 @@ let selId=null;    // ausgewähltes Element-id (oder 'text' / 'zone' / null)
 const EMOJI_RE2=/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{2300}-\u{23FF}\u{2190}-\u{21FF}\u{FE00}-\u{FE0F}\u{200D}\u{20E3}]/gu;
 let zeileVals=['Max Mustermann'];
 let lineGeom=[null];   // pro Zeile: null=im Block (gestapelt) | {x,y,angle,cap,scaleX}=frei platziert
+let linesBound=false;  // false = Zeilen getrennt (Standard) · true = zu einem Block verbunden
 // Pro Zeile EIGENER, KONKRETER Stil (keine Vererbung, kein globales Überschreiben → springt nicht mehr).
 let lineStyle=[newStyle()];
 let textAng=0;         // Winkel des Text-Blocks — entkoppelt vom Schieberegler, damit dieser die aktive Auswahl dreht
@@ -2946,7 +3077,7 @@ let textCap=4;         // Schrifthöhe des Block-Texts — entkoppelt, damit der
 let textCurve=0;       // Krümmung des Block-Texts (-100..100, 0=gerade)
 let textLsp=0;         // Laufweite/Buchstabenabstand des Blocks (em-Bruchteil)
 let textLh=0.55;       // Zeilenabstand-Faktor (Lücke = capMM*textLh)
-const THETA_MAX=Math.PI*0.9; // max. Bogenwinkel bei Krümmung 100
+const THETA_MAX=Math.PI*2; // max. Bogenwinkel bei Krümmung 100 → voller Kreis (360°)
 const MAX_ZEILEN=8;
 // Echte Schriftarten in 3 Kategorien (je 2) — plus Schalter kursiv/fett/unterstrichen.
 // Der Fett-Schalter erhöht die Strichstärke; die Grundschriften sind absichtlich NICHT fett,
@@ -3029,6 +3160,7 @@ function buildZeilen(){
   });
   const addBtn=document.getElementById('addZeile');
   if(addBtn) addBtn.style.display = zeileVals.length>=MAX_ZEILEN ? 'none' : 'flex';
+  if(typeof updateBindBtn==='function') updateBindBtn();
 }
 
 function itemSVGString(it,color){
@@ -3361,7 +3493,8 @@ function layout(){
   // shrink capMM until all lines fit length-wise AND the stack fits (each line uses its own font)
   for(let i=0;i<200;i++){
     const widest=Math.max(...meas.map(lineW));
-    const stackH=meas.length*capMM + (meas.length-1)*gapMM() + 2*curveSagittaMM(widest,textCurve);
+    // Krümmung NICHT in den Shrink einrechnen: sonst kollabiert gekrümmter Text (Vollkreis) auf Minimalgröße.
+    const stackH=meas.length*capMM + (meas.length-1)*gapMM();
     if(widest<=availLen && stackH<=availStack) break;
     capMM-=0.1;
     if(capMM<=1.2){ capMM=1.2; fits=false; break; }
@@ -3492,15 +3625,19 @@ function render(){
     ctx.restore();
   }
   if(g){
-    ctx.save();
-    ctx.translate(px(g.cx,s),py(g.cy,s)); ctx.rotate(g.angle*Math.PI/180);
-    ctx.setLineDash([4,3]); ctx.lineWidth=1; ctx.strokeStyle='rgba(0,212,255,0.95)';
-    ctx.strokeRect(-g.hw*s.ppmm,-g.hh*s.ppmm,g.hw*2*s.ppmm,g.hh*2*s.ppmm);
-    ctx.restore();
-    // laserliebe-Stil: Symbol-Knöpfe an den 4 Ecken (+ Mini-Leiste oben)
-    if(selId!=='zone'){
-      const B=selButtons(g,s);
-      B.all.forEach(b=>drawSelBtn(ctx,b));
+    // Beim Verschieben: Rahmen + Ecken-Knöpfe ausblenden, damit man die Platzierung klar sieht.
+    const movingNow = drag && drag.mode==='move';
+    if(!movingNow){
+      ctx.save();
+      ctx.translate(px(g.cx,s),py(g.cy,s)); ctx.rotate(g.angle*Math.PI/180);
+      ctx.setLineDash([4,3]); ctx.lineWidth=1; ctx.strokeStyle='rgba(0,212,255,0.95)';
+      ctx.strokeRect(-g.hw*s.ppmm,-g.hh*s.ppmm,g.hw*2*s.ppmm,g.hh*2*s.ppmm);
+      ctx.restore();
+      // laserliebe-Stil: Symbol-Knöpfe an den 4 Ecken (+ Mini-Leiste oben)
+      if(selId!=='zone'){
+        const B=selButtons(g,s);
+        B.all.forEach(b=>drawSelBtn(ctx,b));
+      }
     }
     // Dreh-Anzeige: Winkel-Badge + Einrast-Hilfslinien bei 0/90/180/270°
     if(drag && drag.mode==='rotate'){
@@ -3934,6 +4071,30 @@ function mergeAllLines(){
   if(typeof selId==='string' && selId.indexOf('line:')===0) selId=null;
   buildZeilen(); showSel(); render();
 }
+// Standard: jede Zeile ist EIGENSTÄNDIG (frei platzierbar). Weist jeder Zeile ohne Geometrie
+// eine freie Position zu (gestapelt an der Block-Stelle) — bestehende freie Zeilen bleiben unberührt.
+function separateAllLines(){
+  const o=OBJECTS[current], z=o.zone, tc=textCenter(z);
+  const L=layout(); const cap=L.capMM||textCap;
+  const step=cap*(1+textLh), n=zeileVals.length, a=textAng*Math.PI/180;
+  zeileVals.forEach((v,idx)=>{
+    if(lineGeom[idx]) return;
+    const off=(idx-(n-1)/2)*step;
+    lineGeom[idx]={ x:tc.x - Math.sin(a)*off, y:tc.y + Math.cos(a)*off, angle:textAng, cap, scaleX:textScaleX, curve:textCurve, lsp:textLsp };
+  });
+}
+function updateBindBtn(){
+  const b=document.getElementById('mergeZeilen'); if(!b) return;
+  const multi=zeileVals.length>1;
+  b.style.display = multi ? 'flex' : 'none';
+  b.textContent = linesBound ? '✂ Zeilen trennen' : '🔗 Zeilen verbinden';
+}
+function toggleBindLines(){
+  linesBound=!linesBound;
+  if(linesBound){ mergeAllLines(); }
+  else { separateAllLines(); buildZeilen(); showSel(); render(); }
+  updateBindBtn();
+}
 function showSel(){
   const hint=document.getElementById('selHint');
   const it=items.find(i=>i.id===selId);
@@ -4296,7 +4457,7 @@ cv.addEventListener('pointermove',e=>{
     if(drag.dirY!==0) ng.hh=Math.max(0.75,Math.abs(L.ly));
     applySelGeom(ng);
   }
-  syncSelSliders(); render();
+  wlAfterTextControl();
 });
 function endDrag(e){ if(drag){ drag=null; rotSnap=null; cv.classList.remove('grabbing'); try{cv.releasePointerCapture(e.pointerId);}catch(_){} histSchedule(); render(); } }
 cv.addEventListener('pointerup',endDrag);
@@ -4463,7 +4624,7 @@ document.getElementById('cap').addEventListener('input',()=>{
   const lg=selLineGeom();
   if(lg){ lg.cap=v; const g=selGeom(); if(g) applySelGeom(g); }
   else if(!items.find(i=>i.id===selId)){ textCap=v; }  // Elemente nutzen den Größe-Regler in der Auswahl-Box
-  render();
+  wlAfterTextControl();
 });
 // Schriftart/Stil wird je Zeile direkt unter der Zeile gesetzt (buildZeilen) — kein globaler Regler mehr.
 // Drehen-Schieberegler dreht die AKTUELLE Auswahl (Block-Text / freie Zeile / Element)
@@ -4473,7 +4634,7 @@ document.getElementById('tang').addEventListener('input',()=>{
   if(selId==='zone'){ /* Zone wird nicht gedreht */ }
   else if(selId){ const g=selGeom(); if(g) applySelGeom({...g, angle:v}); }
   else { textAng=v; }
-  syncSelSliders(); render();
+  wlAfterTextControl();
 });
 // Krümmung: wirkt auf die aktive Zeile (frei) bzw. den Block-Text
 document.getElementById('curve').addEventListener('input',()=>{
@@ -4482,7 +4643,7 @@ document.getElementById('curve').addEventListener('input',()=>{
   const lg=selLineGeom();
   if(lg) lg.curve=v;
   else if(!items.find(i=>i.id===selId)) textCurve=v;
-  render();
+  wlAfterTextControl();
 });
 // Laufweite (Buchstabenabstand): Schiebereglerwert v → em-Bruchteil v/100
 document.getElementById('lsp').addEventListener('input',()=>{
@@ -4491,13 +4652,13 @@ document.getElementById('lsp').addEventListener('input',()=>{
   const lg=selLineGeom();
   if(lg) lg.lsp=v/100;
   else if(!items.find(i=>i.id===selId)) textLsp=v/100;
-  render();
+  wlAfterTextControl();
 });
 // Zeilenabstand (nur Block-Text)
 document.getElementById('lh').addEventListener('input',()=>{
   const v=parseFloat(document.getElementById('lh').value);
   document.getElementById('lhVal').textContent=v.toFixed(2);
-  textLh=v; render();
+  textLh=v; wlAfterTextControl();
 });
 // Schwarz-Weiß-Schwelle für hochgeladene Bilder (wirkt auf das ausgewählte Raster-Element)
 (function(){
@@ -4508,13 +4669,39 @@ document.getElementById('lh').addEventListener('input',()=>{
     if(it && it.raster){ reprocessRaster(it, parseInt(bt.value,10)); if(typeof histCommit==='function') histCommit(); }
   });
 })();
+
+
+// Beispielbilder: nur anschauen, nichts automatisch einfügen.
+(function(){
+  function showExample(n){
+    const data = n==='2'
+      ? {title:'Beispiel: Schlüsselanhänger', sub:'Name groß, Datum klein – elegant und gut lesbar.'}
+      : {title:'Beispiel: Flaschenöffner', sub:'Großer Name, kurze zweite Zeile und Motiv mit genug Randabstand.'};
+    const back=document.createElement('div');
+    back.className='ob-back';
+    back.style.display='flex';
+    back.innerHTML='<div class="ob-card example-light"><div class="ob-ic">👀</div><h3>'+data.title+'</h3><p class="sub" style="margin:.35rem 0 1rem">'+data.sub+'</p><div class="example-img example-img-'+(n==='2'?'2':'1')+'" style="max-width:260px;margin:0 auto 1rem"><span class="'+(n==='2'?'ex-tag':'ex-product')+'"></span><span class="ex-text ex-title">'+(n==='2'?'ZOE':'MAX')+'</span><span class="ex-text ex-sub">'+(n==='2'?'♡ 11.06.2026':'Beste Dad seit 2026')+'</span></div><button type="button" class="btn btn-primary" style="width:100%">Schließen</button></div>';
+    back.addEventListener('click',e=>{ if(e.target===back || e.target.tagName==='BUTTON') back.remove(); });
+    document.body.appendChild(back);
+  }
+  document.querySelectorAll('.example-card').forEach(b=>b.addEventListener('click',()=>showExample(b.dataset.example)));
+})();
+
+// Stabilere Textregler: nach jeder Änderung Auswahlrahmen, Preis und Undo sauber nachziehen.
+function wlAfterTextControl(){
+  try{ applyAngleDefault(); }catch(e){}
+  try{ syncSelSliders(); }catch(e){}
+  try{ render(); }catch(e){}
+}
+
 // Segment-Tabs (Text / Motive / Logo)
 const PANE_META={
+  beispiele:{t:'Beispiele',s:'1–2 Beispielbilder als Inspiration ansehen.'},
   text:{t:'Text',s:'Tippe deinen Wunschtext — Stil je Zeile einstellbar.'},
-  vorlagen:{t:'Vorlagen & Sprüche',s:'Fertige Sprüche nach Anlass & Empfänger.'},
   motive:{t:'Grafiken',s:'Motiv anklicken, dann frei im Bild platzieren.'},
   logo:{t:'Logo / Bild',s:'Logo als SVG/DXF oder Bild (PNG/JPG) — auto Schwarz-Weiß.'},
-  code:{t:'QR-Code',s:'QR aus Text oder Link — als Vektor-Gravur.'}
+  code:{t:'QR-Code',s:'QR aus Text oder Link — als Vektor-Gravur.'},
+  areas:{t:'Gravurflächen',s:'Bereiche, Ansicht und Arbeitsfläche verwalten.'}
 };
 function openPane(pane){
   document.querySelectorAll('.seg').forEach(x=>x.classList.toggle('active',x.dataset.pane===pane));
@@ -4523,6 +4710,17 @@ function openPane(pane){
   const m=PANE_META[pane]; if(m){ const t=document.getElementById('panelTitle'),s=document.getElementById('panelSub'); if(t)t.textContent=m.t; if(s)s.textContent=m.s; }
   const panel=document.getElementById('panel'); if(panel)panel.classList.add('open');
 }
+
+// Quick-Actions links auf der Designfläche: klicken nur die bestehenden Buttons an.
+document.querySelectorAll('.quick-action').forEach(btn=>btn.addEventListener('click',()=>{
+  const target=document.getElementById(btn.dataset.click); if(target) target.click();
+}));
+(function(){
+  const b=document.getElementById('rotatePreview'), wrap=document.getElementById('cvWrap');
+  let r=false;
+  if(b&&wrap){ b.addEventListener('click',()=>{ r=!r; wrap.style.transform=r?'rotate(90deg)':'none'; wrap.style.transition='transform .22s ease'; b.classList.toggle('active',r); }); }
+})();
+
 document.querySelectorAll('.seg').forEach(b=>b.addEventListener('click',()=>{
   const panel=document.getElementById('panel');
   if(b.classList.contains('active') && panel && panel.classList.contains('open') && window.matchMedia('(min-width:841px)').matches){
@@ -4541,16 +4739,17 @@ document.getElementById('dlsvg').onclick=downloadSVG;
   const ex=document.getElementById('serieExport'); if(ex) ex.onclick=exportSeries;
   const fi=document.getElementById('serieFile'); if(fi) fi.addEventListener('change',e=>{ const f=e.target.files[0]; if(f) handleSerieFile(f); e.target.value=''; });
 })();
-document.getElementById('anfrage').onclick=()=>{ alert('Anfrage-Versand wird im nächsten Schritt angebunden (Formspree + Foto-Upload), wie auf der Typenschild-Seite.'); };
 
 // Zeile hinzufügen
 document.getElementById('addZeile').addEventListener('click',()=>{
   if(zeileVals.length>=MAX_ZEILEN) return;
-  zeileVals.push(''); lineGeom.push(null); lineStyle.push(newStyle()); buildZeilen(); render();
+  zeileVals.push(''); lineGeom.push(null); lineStyle.push(newStyle());
+  if(!linesBound) separateAllLines(); // neue + bestehende Zeilen automatisch eigenständig
+  buildZeilen(); render();
   const inps=document.querySelectorAll('#zeilen .zeile-input');
   if(inps.length) inps[inps.length-1].focus();
 });
-document.getElementById('mergeZeilen').addEventListener('click',mergeAllLines);
+document.getElementById('mergeZeilen').addEventListener('click',toggleBindLines);
 // Admin: Gravurbereich markieren (Rahmen auswählen → mit Griffen anpassen)
 document.getElementById('zoneBtn').addEventListener('click',()=>{
   select(selId==='zone'?null:'zone');
