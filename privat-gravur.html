@@ -472,17 +472,6 @@ body{background:linear-gradient(180deg,#050b18 0%,#020617 100%)}
               <label>Zeilenabstand <span class="rval" id="lhVal">0.55</span></label>
               <div class="range-row"><input type="range" id="lh" min="0.1" max="1.5" step="0.05" value="0.55"></div>
             </div>
-            <div class="field" style="margin-bottom:0;margin-top:.7rem">
-              <label>Gravur-Stil</label>
-              <div class="seg-group" style="display:flex;gap:.4rem">
-                <button type="button" class="tool-btn active" id="stilFill" style="flex:1">▰ Fläche (gefüllt)</button>
-                <button type="button" class="tool-btn" id="stilOutline" style="flex:1">▱ Kontur (feine Linie)</button>
-              </div>
-            </div>
-            <div class="field" id="strokeRow" style="margin-bottom:0;margin-top:.55rem;display:none">
-              <label>Linienstärke <span class="rval" id="strokeVal">0.25 mm</span></label>
-              <div class="range-row"><input type="range" id="gstroke" min="0.1" max="1.0" step="0.05" value="0.25"></div>
-            </div>
           </div>
         </details>
       </div>
@@ -532,6 +521,18 @@ body{background:linear-gradient(180deg,#050b18 0%,#020617 100%)}
 
       <div class="sel-hint" id="selHint" style="display:none">
         <span class="ic">🎯</span> <b id="selName">Element</b> ausgewählt — direkt im Bild bearbeiten: Ecken-Symbole zum <b>Verschieben</b>, <b>Drehen</b>, <b>Größe</b> &amp; <b>Löschen</b>.
+      </div>
+
+      <div class="field-group" id="gravStilBox" style="display:none;margin-top:.7rem">
+        <div class="group-head"><span class="ic">🪶</span> Gravur-Stil <span class="hint" id="gravStilWhat"></span></div>
+        <div class="seg-group" style="display:flex;gap:.4rem">
+          <button type="button" class="tool-btn active" id="stilFill" style="flex:1">▰ Fläche (gefüllt)</button>
+          <button type="button" class="tool-btn" id="stilOutline" style="flex:1">▱ Kontur (feine Linie)</button>
+        </div>
+        <div class="field" id="strokeRow" style="margin-bottom:0;margin-top:.55rem;display:none">
+          <label>Linienstärke <span class="rval" id="strokeVal">0.10 mm</span></label>
+          <div class="range-row"><input type="range" id="gstroke" min="0.05" max="0.5" step="0.05" value="0.1"></div>
+        </div>
       </div>
 
       <button type="button" class="tool-btn admin-only" id="zoneBtn" style="width:100%;margin-top:1rem;justify-content:center">▦ Gravurbereich anpassen (Admin)</button>
@@ -3046,15 +3047,14 @@ function snapshotDesign(){
     lineGeom: lineGeom.map(g=> g?{...g}:null),
     lineStyle: lineStyle.map(s=>({...s})),
     items: items.map(it=>{ const c=Object.assign({},it); delete c.img; return c; }),
-    textPos: {...textPos}, textScaleX, textAng, textCap, textCurve, textLsp, textLh, textFlipX, textFlipY, gravStil, gravStroke
+    textPos: {...textPos}, textScaleX, textAng, textCap, textCurve, textLsp, textLh, textFlipX, textFlipY
   };
 }
 function restoreDesign(d){
   if(!d){
-    zeileVals=['']; lineGeom=[null]; lineStyle=[newStyle()]; items=[];
+    zeileVals=[]; lineGeom=[]; lineStyle=[]; items=[];
     textPos={x:null,y:null}; textScaleX=1; textCap=4;
     textCurve=0; textLsp=0; textLh=0.55; textFlipX=false; textFlipY=false;
-    gravStil='fill'; gravStroke=0.25;
     applyAngleDefault();
     return;
   }
@@ -3065,7 +3065,6 @@ function restoreDesign(d){
   textPos={...d.textPos}; textScaleX=d.textScaleX; textCap=d.textCap;
   textCurve=d.textCurve||0; textLsp=d.textLsp||0; textLh=(d.textLh!=null?d.textLh:0.55);
   textFlipX=!!d.textFlipX; textFlipY=!!d.textFlipY;
-  gravStil=d.gravStil||'fill'; gravStroke=d.gravStroke!=null?d.gravStroke:0.25;
   textAng=d.textAng; setTangSlider(textAng);
   linesBound = zeileVals.length>1 && lineGeom.every(g=>!g);
 }
@@ -3075,11 +3074,11 @@ let selId=null;    // ausgewähltes Element-id (oder 'text' / 'zone' / null)
 
 // ---------- Text-Zeilen (dynamisch: 1..n) ----------
 const EMOJI_RE2=/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{2300}-\u{23FF}\u{2190}-\u{21FF}\u{FE00}-\u{FE0F}\u{200D}\u{20E3}]/gu;
-let zeileVals=[''];
-let lineGeom=[null];   // pro Zeile: null=im Block (gestapelt) | {x,y,angle,cap,scaleX}=frei platziert
+let zeileVals=[];      // Start ohne Zeile — der Kunde fügt selbst die erste Zeile hinzu
+let lineGeom=[];       // pro Zeile: null=im Block (gestapelt) | {x,y,angle,cap,scaleX}=frei platziert
 let linesBound=false;  // false = Zeilen getrennt (Standard) · true = zu einem Block verbunden
 // Pro Zeile EIGENER, KONKRETER Stil (keine Vererbung, kein globales Überschreiben → springt nicht mehr).
-let lineStyle=[newStyle()];
+let lineStyle=[];
 let textAng=0;         // Winkel des Text-Blocks — entkoppelt vom Schieberegler, damit dieser die aktive Auswahl dreht
 let textCap=4;         // Schrifthöhe des Block-Texts — entkoppelt, damit der Höhe-Regler die aktive Auswahl ändert
 let textCurve=0;       // Krümmung des Block-Texts (-100..100, 0=gerade)
@@ -3087,8 +3086,9 @@ let textLsp=0;         // Laufweite/Buchstabenabstand des Blocks (em-Bruchteil)
 let textLh=0.55;       // Zeilenabstand-Faktor (Lücke = capMM*textLh)
 let textFlipX=false;   // Block-Text horizontal gespiegelt
 let textFlipY=false;   // Block-Text vertikal gespiegelt
-let gravStil='fill';   // 'fill' = Flächengravur (gefüllt) · 'outline' = Konturgravur (feine Linien, fiber-tauglich)
-let gravStroke=0.25;   // Linienstärke (mm) im Kontur-Modus
+// Gravur-Stil ist PRO ELEMENT: Textzeilen tragen ihn in lineStyle[i].stil/.stroke, Motive in it.stil/.stroke.
+// 'fill' = Flächengravur (gefüllt) · 'outline' = Konturgravur (feine Linie, fiber-tauglich). Default-Strichstärke 0.1 mm.
+const DEF_STROKE=0.1;
 const THETA_MAX=Math.PI*2; // max. Bogenwinkel bei Krümmung 100 → voller Kreis (360°)
 const MAX_ZEILEN=8;
 // Echte Schriftarten in 3 Kategorien (je 2) — plus Schalter kursiv/fett/unterstrichen.
@@ -3110,7 +3110,9 @@ const FONT_FAMS={
   markerfelt:  {label:'Marker',             cat:'Handschrift', css:'Permanent Marker',    weight:400}
 };
 const FONT_FAM_DEFAULT='arial';
-function newStyle(){ return {fam:'arial', italic:false, bold:false, underline:false}; }
+function newStyle(){ return {fam:'arial', italic:false, bold:false, underline:false, stil:'fill', stroke:DEF_STROKE}; }
+function styStil(ls){ return ls && ls.stil==='outline' ? 'outline' : 'fill'; }
+function styStroke(ls){ return ls && ls.stroke!=null ? ls.stroke : DEF_STROKE; }
 function getLines(){ return zeileVals.map(v=>v.trim()).filter(Boolean); }
 function fontOf(i){
   const st=lineStyle[i]||lineStyle[0]||newStyle();
@@ -3178,12 +3180,12 @@ function buildZeilen(){
 function iconStrokeVB(it){ // gewünschte Linienstärke (mm) → viewBox-Einheiten
   const vb=String(it.viewBox).trim().split(/[\s,]+/).map(Number);
   const vw=vb[2]||100;
-  return Math.max(0.4, gravStroke*vw/Math.max(1, it.wmm||vw));
+  return Math.max(0.3, styStroke(it)*vw/Math.max(1, it.wmm||vw));
 }
 function itemSVGString(it,color){
   let body;
   if(it.colored) body=it.inner;
-  else if(gravStil==='outline') body=`<g fill="none" stroke="${color}" stroke-width="${iconStrokeVB(it).toFixed(2)}" stroke-linejoin="round" stroke-linecap="round">${it.inner}</g>`;
+  else if(styStil(it)==='outline') body=`<g fill="none" stroke="${color}" stroke-width="${iconStrokeVB(it).toFixed(2)}" stroke-linejoin="round" stroke-linecap="round">${it.inner}</g>`;
   else body=`<g fill="${color}" stroke="${color}" stroke-linejoin="round">${it.inner}</g>`;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${it.viewBox}" width="${it.bw}" height="${it.bh}">${body}</svg>`;
 }
@@ -3396,7 +3398,7 @@ function itemExportSVG(it){
     return `<g transform="${t}"><image x="0" y="0" width="${it.wmm.toFixed(3)}" height="${hmm.toFixed(3)}" preserveAspectRatio="none" xlink:href="${it.src}" href="${it.src}"/></g>`;
   }
   const body = it.colored ? it.inner
-    : (gravStil==='outline'
+    : (styStil(it)==='outline'
         ? `<g fill="none" stroke="#000" stroke-width="${iconStrokeVB(it).toFixed(2)}" stroke-linejoin="round" stroke-linecap="round">${it.inner}</g>`
         : `<g fill="#000" stroke="#000" stroke-linejoin="round">${it.inner}</g>`);
   // Flatten to a single transform (no nested <svg>/preserveAspectRatio — LightBurn mishandles that,
@@ -3489,10 +3491,10 @@ function drawTextLine(ctx,str,sizePx,font,yOff,bend,lspEm,underline,strokePx){
 }
 // SVG-Markup einer Zeile (gerade ODER gekrümmt). fsMM=Schriftgröße in mm. transform wird vom Aufrufer gesetzt;
 // hier nur der innere Versatz (yOff) + Krümmung. Gibt <text>… bzw. mehrere <text>… zurück.
-function svgTextLine(str,fsMM,css,weight,styleAttr,yOff,bend,lspEm){
+function svgTextLine(str,fsMM,css,weight,styleAttr,yOff,bend,lspEm,stil,stroke){
   const chars=Array.from(str||''); if(!chars.length) return '';
   const lspMM=(lspEm||0)*fsMM;
-  const paintAttr=gravStil==='outline' ? `fill="none" stroke="#000" stroke-width="${gravStroke.toFixed(3)}" stroke-linejoin="round"` : 'fill="#000"';
+  const paintAttr=stil==='outline' ? `fill="none" stroke="#000" stroke-width="${(stroke!=null?stroke:DEF_STROKE).toFixed(3)}" stroke-linejoin="round"` : 'fill="#000"';
   if(!bend){
     const ls=lspMM?` letter-spacing="${lspMM.toFixed(3)}"`:'';
     return `<text x="0" y="${yOff.toFixed(2)}" font-family="${css}" font-weight="${weight}"${styleAttr}${ls} font-size="${fsMM.toFixed(2)}" text-anchor="middle" dominant-baseline="central" ${paintAttr}>${escapeXML(str)}</text>`;
@@ -3516,7 +3518,7 @@ function svgTextLine(str,fsMM,css,weight,styleAttr,yOff,bend,lspEm){
 function layout(){
   const o=OBJECTS[current], z=o.zone;
   let capMM=textCap;
-  const meas=blockEntries().map(e=>{ const f=fontOf(e.oi); return {str:e.str, oi:e.oi, f, cr:capRatio(f.css,f.weight)}; });
+  const meas=blockEntries().map(e=>{ const f=fontOf(e.oi); const ls=lineStyle[e.oi]; return {str:e.str, oi:e.oi, f, cr:capRatio(f.css,f.weight), stil:styStil(ls), stroke:styStroke(ls)}; });
   if(!meas.length) return {o,z,lines:[],capMM,fits:true};
 
   // available primary axis = width for horizontal, height for vertical
@@ -3535,7 +3537,7 @@ function layout(){
     capMM-=0.1;
     if(capMM<=1.2){ capMM=1.2; fits=false; break; }
   }
-  const lines=meas.map(m=>({str:m.str, oi:m.oi, f:m.f, capMM, wmm:lineW(m)}));
+  const lines=meas.map(m=>({str:m.str, oi:m.oi, f:m.f, capMM, wmm:lineW(m), stil:m.stil, stroke:m.stroke}));
   return {o,z,lines,capMM,fits};
 }
 
@@ -3614,7 +3616,7 @@ function render(){
   L.lines.forEach((ln,i)=>{
     const offset=(i-(total-1)/2)*lineStepPx;
     const sizePx=(ln.capMM/capRatio(ln.f.css,ln.f.weight))*s.ppmm;
-    drawTextLine(ctx,ln.str,sizePx,ln.f,offset,textCurve,textLsp,ln.f.underline, gravStil==='outline'?Math.max(0.6,gravStroke*s.ppmm):0);
+    drawTextLine(ctx,ln.str,sizePx,ln.f,offset,textCurve,textLsp,ln.f.underline, ln.stil==='outline'?Math.max(0.35,ln.stroke*s.ppmm):0);
   });
   ctx.restore();
 
@@ -3622,7 +3624,7 @@ function render(){
   {
     zeileVals.forEach((v,i)=>{
       const str=v.trim(), lg=lineGeom[i]; if(!str||!lg) return;
-      const ff=fontOf(i), fcr=capRatio(ff.css,ff.weight);
+      const ff=fontOf(i), fcr=capRatio(ff.css,ff.weight), lst=lineStyle[i];
       ctx.save();
       ctx.translate(px(lg.x,s),py(lg.y,s));
       ctx.rotate(lg.angle*Math.PI/180);
@@ -3631,7 +3633,7 @@ function render(){
       setEngrave(ctx,s,o);
       ctx.textAlign='center'; ctx.textBaseline='middle';
       const sizePx=(lg.cap/fcr)*s.ppmm;
-      drawTextLine(ctx,str,sizePx,ff,0,lg.curve||0,lg.lsp||0,ff.underline, gravStil==='outline'?Math.max(0.6,gravStroke*s.ppmm):0);
+      drawTextLine(ctx,str,sizePx,ff,0,lg.curve||0,lg.lsp||0,ff.underline, styStil(lst)==='outline'?Math.max(0.35,styStroke(lst)*s.ppmm):0);
       ctx.restore();
     });
   }
@@ -3721,17 +3723,17 @@ function renderSVGGroups(){
     const cr=capRatio(ln.f.css,ln.f.weight);
     const fs=(ln.capMM/cr);
     const st=`${ln.f.italic?' font-style="italic"':''}${(ln.f.underline&&!textCurve)?' text-decoration="underline"':''}`;
-    const inner=svgTextLine(ln.str,fs,ln.f.css,ln.f.weight,st,off,textCurve,textLsp);
+    const inner=svgTextLine(ln.str,fs,ln.f.css,ln.f.weight,st,off,textCurve,textLsp,ln.stil,ln.stroke);
     eng+=`<g transform="translate(${tc.x.toFixed(2)},${tc.y.toFixed(2)}) rotate(${tang}) scale(${(textScaleX*(textFlipX?-1:1)).toFixed(4)},${textFlipY?-1:1})">${inner}</g>`;
   });
   let freeEng='';
   zeileVals.forEach((v,i)=>{
     const str=v.trim(), lg=lineGeom[i]; if(!str||!lg) return;
-    const ff=fontOf(i), cr=capRatio(ff.css,ff.weight);
+    const ff=fontOf(i), cr=capRatio(ff.css,ff.weight), lst=lineStyle[i];
     const fs=(lg.cap/cr);
     const bend=lg.curve||0;
     const st=`${ff.italic?' font-style="italic"':''}${(ff.underline&&!bend)?' text-decoration="underline"':''}`;
-    const inner=svgTextLine(str,fs,ff.css,ff.weight,st,0,bend,lg.lsp||0);
+    const inner=svgTextLine(str,fs,ff.css,ff.weight,st,0,bend,lg.lsp||0,styStil(lst),styStroke(lst));
     freeEng+=`<g transform="translate(${lg.x.toFixed(2)},${lg.y.toFixed(2)}) rotate(${lg.angle}) scale(${(lg.scaleX*(lg.flipX?-1:1)).toFixed(4)},${lg.flipY?-1:1})">${inner}</g>`;
   });
   eng+=freeEng;
@@ -4747,27 +4749,48 @@ document.getElementById('lh').addEventListener('input',()=>{
   document.getElementById('lhVal').textContent=v.toFixed(2);
   textLh=v; wlAfterTextControl();
 });
-// Gravur-Stil: Fläche (gefüllt) ↔ Kontur (feine Linien, fiber-tauglich)
-function syncStilUI(){
-  const bf=document.getElementById('stilFill'), bo=document.getElementById('stilOutline');
-  if(bf) bf.classList.toggle('active', gravStil==='fill');
-  if(bo) bo.classList.toggle('active', gravStil==='outline');
-  const sr=document.getElementById('strokeRow'); if(sr) sr.style.display = gravStil==='outline' ? '' : 'none';
-  const gs=document.getElementById('gstroke'); if(gs){ gs.value=gravStroke; document.getElementById('strokeVal').textContent=(+gravStroke).toFixed(2)+' mm'; }
+// Gravur-Stil: PRO AUSWAHL (gewählte Textzeile(n) ODER gewähltes Motiv) — Fläche (gefüllt) ↔ Kontur (feine Linie).
+// Liefert {stil,stroke} der aktuellen Auswahl oder null, wenn der Stil-Schalter nicht anwendbar ist
+// (kein/Zonen-Auswahl, leerer Text, Raster-Bild oder farbiges Motiv).
+function selStilGet(){
+  if(selId==='text'){ const be=blockEntries(); if(!be.length) return null; const ls=lineStyle[be[0].oi]; return {stil:styStil(ls),stroke:styStroke(ls),kind:'text'}; }
+  if(typeof selId==='string' && selId.indexOf('line:')===0){ const i=+selId.slice(5); if(!(zeileVals[i]||'').trim()) return null; const ls=lineStyle[i]; return {stil:styStil(ls),stroke:styStroke(ls),kind:'text'}; }
+  const it=items.find(i=>i.id===selId);
+  if(it && !it.raster && !it.colored) return {stil:styStil(it),stroke:styStroke(it),kind:'item'};
+  return null;
 }
-function regenItems(){ items.forEach(it=>{ if(!it.raster) makeItemImg(it); }); }
+function selStilApply(fn){
+  if(selId==='text'){ const be=blockEntries(); if(!be.length) return false; be.forEach(e=>fn(lineStyle[e.oi]||(lineStyle[e.oi]=newStyle()))); return true; }
+  if(typeof selId==='string' && selId.indexOf('line:')===0){ const i=+selId.slice(5); if(!(zeileVals[i]||'').trim()) return false; fn(lineStyle[i]||(lineStyle[i]=newStyle())); return true; }
+  const it=items.find(i=>i.id===selId);
+  if(it && !it.raster && !it.colored){ fn(it); return true; }
+  return false;
+}
+function syncStilUI(){
+  const box=document.getElementById('gravStilBox'); const cur=selStilGet();
+  if(box) box.style.display = cur ? 'block' : 'none';
+  if(!cur) return;
+  const bf=document.getElementById('stilFill'), bo=document.getElementById('stilOutline');
+  if(bf) bf.classList.toggle('active', cur.stil==='fill');
+  if(bo) bo.classList.toggle('active', cur.stil==='outline');
+  const sr=document.getElementById('strokeRow'); if(sr) sr.style.display = cur.stil==='outline' ? '' : 'none';
+  const gs=document.getElementById('gstroke'); if(gs){ gs.value=cur.stroke; const sv=document.getElementById('strokeVal'); if(sv) sv.textContent=(+cur.stroke).toFixed(2)+' mm'; }
+  const what=document.getElementById('gravStilWhat'); if(what) what.textContent = cur.kind==='item' ? '(gewähltes Motiv)' : '(gewählter Text)';
+}
+function regenSelItem(){ const it=items.find(i=>i.id===selId); if(it && !it.raster) makeItemImg(it); }
 function setGravStil(stil){
-  gravStil = stil==='outline' ? 'outline' : 'fill';
-  syncStilUI(); regenItems();
+  const v = stil==='outline' ? 'outline' : 'fill';
+  if(!selStilApply(t=>{ t.stil=v; if(t.stroke==null) t.stroke=DEF_STROKE; })) return;
+  regenSelItem(); syncStilUI();
   if(typeof histCommit==='function') histCommit();
   render();
 }
 document.getElementById('stilFill').addEventListener('click',()=>setGravStil('fill'));
 document.getElementById('stilOutline').addEventListener('click',()=>setGravStil('outline'));
 document.getElementById('gstroke').addEventListener('input',()=>{
-  gravStroke=parseFloat(document.getElementById('gstroke').value);
-  document.getElementById('strokeVal').textContent=gravStroke.toFixed(2)+' mm';
-  regenItems(); render();
+  const v=parseFloat(document.getElementById('gstroke').value);
+  document.getElementById('strokeVal').textContent=v.toFixed(2)+' mm';
+  selStilApply(t=>{ t.stroke=v; }); regenSelItem(); render();
 });
 document.getElementById('gstroke').addEventListener('change',()=>{ if(typeof histCommit==='function') histCommit(); });
 // Schwarz-Weiß-Schwelle für hochgeladene Bilder (wirkt auf das ausgewählte Raster-Element)
