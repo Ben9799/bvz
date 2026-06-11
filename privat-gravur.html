@@ -4360,8 +4360,11 @@ function drawHandleIcon(ctx,cx,cy,name,col){
 
 // ---------- Element-Aktionen (von den Canvas-Knöpfen) ----------
 function selDelete(){
-  if(typeof selId==='string' && selId.indexOf('line:')===0){ const i=+selId.slice(5); zeileVals[i]=''; lineGeom[i]=null; buildZeilen(); applyText(); select(null); return; }
-  if(selId==='text'){ select(null); return; }
+  if(typeof selId==='string' && selId.indexOf('line:')===0){ const i=+selId.slice(5); zeileVals.splice(i,1); lineGeom.splice(i,1); lineStyle.splice(i,1); buildZeilen(); select(null); return; }
+  if(selId==='text'){ // Block-Text löschen: alle gestapelten (nicht frei platzierten) Zeilen entfernen
+    for(let i=zeileVals.length-1;i>=0;i--){ if(lineGeom[i]==null){ zeileVals.splice(i,1); lineGeom.splice(i,1); lineStyle.splice(i,1); } }
+    buildZeilen(); select(null); return;
+  }
   items=items.filter(i=>i.id!==selId); select(null);
 }
 function selDuplicate(){ const it=items.find(i=>i.id===selId); if(it){ addItem({ label:it.label, viewBox:it.viewBox, bw:it.bw, bh:it.bh, inner:it.inner, colored:it.colored, x:it.x+5, y:it.y+5, wmm:it.wmm, angle:it.angle }); } }
@@ -4725,34 +4728,63 @@ function EX(id,cat,name,lines,opts){
   // Beispiel an das gewählte Stück anpasst.
   return {id,cat,name,zeileVals,lineStyle,opts};
 }
-// Beispiel-Vorlage → konkretes Design, an die Gravurzone des Objekts angepasst.
+// Beispiel-Vorlage → konkretes Design, das IMMER in die Gravurzone des Objekts passt.
+// Reserviert (falls Icon) ein Icon-Band am Ende der Längsachse und schrumpft die
+// Schrifthöhe so, dass Text + Icon vollständig im gestrichelten Rahmen bleiben.
 function exBuildDesign(ex, objKey){
   const o=OBJECTS[objKey]||OBJECTS.card, zc=o.zone;
-  const cx=zc.x+zc.w/2, cy=zc.y+zc.h/2, vert=(o.orient==='v');
+  const cx=zc.x+zc.w/2, vert=(o.orient==='v');
   const opts=ex.opts||{};
   const zeileVals=ex.zeileVals.slice();
-  let items=[], textPos={x:null,y:null};
+  const lineStyle=ex.lineStyle.map(s=>({...s}));
+  const lh=(opts.lh!=null?opts.lh:0.55);
+  const usedLines=zeileVals.filter(v=>v&&v.trim());
+  const nL=Math.max(1, usedLines.length);
+  const margin=Math.max(1.2, Math.min(zc.w,zc.h)*0.06);
+
+  // Icon-Band (am unteren Ende der Höhe) reservieren
+  let iconWmm=0, band=0, iconKey=null, iconAng=0;
   if(opts.icon){
     const ic=(typeof opts.icon==='string')?{k:opts.icon}:opts.icon;
-    // Icon nie breiter als die Zone — bei der schmalen Schlüssel-Zone deutlich kleiner.
-    let wmm=Math.min(ic.wmm||9, zc.w*0.8, zc.h*0.45);
-    const margin=Math.max(1.2, Math.min(zc.w,zc.h)*0.06);
-    if(vert){
-      // Hochformat: Icon ans untere Ende des Schafts, Text in den oberen Rest.
-      const iy=zc.y+zc.h-wmm/2-margin;
-      items=[{__clip:ic.k, x:cx, y:iy, wmm:wmm, angle:ic.angle||0}];
-      textPos={x:cx, y:zc.y+(zc.h-wmm-margin)/2};
-    } else {
-      const iy=zc.y+zc.h-wmm/2-margin;
-      items=[{__clip:ic.k, x:cx, y:iy, wmm:wmm, angle:ic.angle||0}];
-      textPos={x:null, y:cy-(wmm/2+2)};
-    }
+    iconKey=ic.k; iconAng=ic.angle||0;
+    iconWmm=Math.min(ic.wmm||9, zc.w*0.82, zc.h*0.4);
+    band=iconWmm+1.6*margin;
+  }
+  // verbleibende Textfläche (Zone minus Icon-Band entlang der Höhe)
+  const textW=zc.w, textH=Math.max(2, zc.h-band);
+  // Stapel-Achse (mehrere Zeilen) vs. Längs-Achse (eine Zeile)
+  const stackBudget=vert?textW:textH;
+  const lenBudget  =vert?textH:textW;
+
+  // cap an die Textfläche anpassen: passt der Zeilen-Stapel?
+  let cap=opts.cap||5;
+  cap=Math.min(cap, (stackBudget-0.6)/(nL+(nL-1)*lh));
+  // …und passt die breiteste Zeile in die Länge? (Schätzung über die echte Schriftbreite)
+  let maxRatio=0.4;
+  zeileVals.forEach((v,i)=>{
+    const s=(v||'').trim(); if(!s) return;
+    const f=FONT_FAMS[(lineStyle[i]||{}).fam]||FONT_FAMS.arial;
+    const cr=capRatio(f.css,f.weight);
+    const r=emWidthRatio(s,f.css,f.weight)/cr;
+    if(r>maxRatio) maxRatio=r;
+  });
+  cap=Math.min(cap, (lenBudget*0.94)/maxRatio);
+  cap=Math.max(1.5, cap);
+
+  // Positionen: Text mittig in der Textfläche, Icon mittig im Band
+  let items=[], textPos={x:null,y:null};
+  if(iconKey){
+    const iy=zc.y+textH+band/2;
+    items=[{__clip:iconKey, x:cx, y:iy, wmm:iconWmm, angle:iconAng}];
+    textPos={x:(vert?cx:null), y:zc.y+textH/2};
+  } else if(vert){
+    textPos={x:cx, y:zc.y+zc.h/2};
   }
   return {
-    zeileVals, lineGeom:zeileVals.map(()=>null), lineStyle:ex.lineStyle.map(s=>({...s})),
+    zeileVals, lineGeom:zeileVals.map(()=>null), lineStyle,
     items, textPos,
     textScaleX:opts.scaleX||1, textAng:(vert? -90 : (opts.ang||0)),
-    textCap:opts.cap||5, textCurve:opts.curve||0, textLsp:opts.lsp||0, textLh:(opts.lh!=null?opts.lh:0.55)
+    textCap:cap, textCurve:opts.curve||0, textLsp:opts.lsp||0, textLh:lh
   };
 }
 function exExpandItems(its){
