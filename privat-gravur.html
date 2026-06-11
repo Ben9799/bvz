@@ -4705,19 +4705,39 @@ function EX(id,cat,name,lines,opts){
   }};
 }
 const EXAMPLES=[
+  // 💍 Hochzeit
   EX('h1','hochzeit','Anna & Tom',[{t:'Anna & Tom',fam:'didot'},{t:'12.07.2026',fam:'didot'}],{cap:5,lh:0.6}),
   EX('h2','hochzeit','Für immer',[{t:'Für immer',fam:'caveat'}],{cap:7,curve:35}),
   EX('h3','hochzeit','Just Married',[{t:'JUST',fam:'bebas'},{t:'MARRIED',fam:'bebas'}],{cap:7,lh:0.45}),
+  EX('h4','hochzeit','An deiner Hand',[{t:'An deiner Hand',fam:'didot'},{t:'ein Leben lang',fam:'didot'}],{cap:4,lh:0.6}),
+  EX('h5','hochzeit','Nicht ohne Dich',[{t:'Nicht ohne',fam:'pacifico'},{t:'Dich',fam:'pacifico'}],{cap:6,lh:0.5}),
+  EX('h6','hochzeit','Mr. & Mrs.',[{t:'Mr. & Mrs.',fam:'bebas'}],{cap:8}),
+  // 💐 Familie & Liebe
   EX('f1','familie','Beste Mama',[{t:'Beste Mama',fam:'caveat'},{t:'der Welt',fam:'caveat'}],{cap:6,lh:0.5}),
   EX('f2','familie','Familie Wolf',[{t:'Familie',fam:'baskerville'},{t:'Wolf',fam:'baskerville'}],{cap:6,lh:0.55}),
   EX('f3','familie','Papa – Held',[{t:'PAPA',fam:'copperplate'},{t:'Held & Vorbild',fam:'didot'}],{cap:6,lh:0.55}),
+  EX('f4','familie','Papa fahr vorsichtig',[{t:'Papa fahr',fam:'oswald'},{t:'vorsichtig',fam:'oswald'}],{cap:5,lh:0.55}),
+  EX('f5','familie','Bester Opa',[{t:'Bester Opa',fam:'copperplate'}],{cap:7}),
+  EX('f6','familie','Mein Glück',[{t:'Meine Familie',fam:'caveat'},{t:'mein Glück',fam:'caveat'}],{cap:5,lh:0.5}),
+  // 🍺 Bier & Wirtshaus
   EX('b1','bier','Prost!',[{t:'PROST!',fam:'bebas'}],{cap:10}),
   EX('b2','bier',"O'zapft is",[{t:"O'zapft is",fam:'oswald'}],{cap:7,curve:-30}),
   EX('b3','bier','Stammtisch',[{t:'STAMM',fam:'copperplate'},{t:'TISCH',fam:'copperplate'}],{cap:7,lh:0.5}),
+  EX('b4','bier','Ein Prosit',[{t:'Ein Prosit',fam:'oswald'}],{cap:7,curve:25}),
+  EX('b5','bier','Zum Wohl',[{t:'Zum Wohl',fam:'copperplate'}],{cap:8}),
+  EX('b6','bier','Servus',[{t:'SERVUS',fam:'bebas'}],{cap:10}),
+  // 🎉 Geburtstag
   EX('g1','geburtstag','Happy Birthday',[{t:'Happy',fam:'pacifico'},{t:'Birthday',fam:'pacifico'}],{cap:6,lh:0.5}),
   EX('g2','geburtstag','30 Jahre',[{t:'30',fam:'bebas'},{t:'JAHRE',fam:'bebas'}],{cap:9,lh:0.4}),
+  EX('g3','geburtstag','Alles Gute',[{t:'Alles Gute',fam:'caveat'}],{cap:7}),
+  EX('g4','geburtstag','Happy 40',[{t:'HAPPY 40',fam:'bebas'}],{cap:9}),
+  EX('g5','geburtstag','Zum Geburtstag',[{t:'Zum',fam:'oswald'},{t:'Geburtstag',fam:'oswald'}],{cap:6,lh:0.5}),
+  // 🛠️ Business
   EX('biz1','business','Wolf Lasermark',[{t:'WOLF',fam:'din'},{t:'LASERMARK',fam:'din'}],{cap:6,lh:0.5}),
-  EX('biz2','business','Danke Team',[{t:'Danke!',fam:'oswald'},{t:'Team 2026',fam:'oswald'}],{cap:6,lh:0.55})
+  EX('biz2','business','Danke Team',[{t:'Danke!',fam:'oswald'},{t:'Team 2026',fam:'oswald'}],{cap:6,lh:0.55}),
+  EX('biz3','business','Vielen Dank',[{t:'Vielen Dank',fam:'didot'}],{cap:6}),
+  EX('biz4','business','10 Jahre Treue',[{t:'10 Jahre',fam:'copperplate'},{t:'Treue',fam:'copperplate'}],{cap:6,lh:0.5}),
+  EX('biz5','business','Jubiläum',[{t:'Jubiläum',fam:'copperplate'}],{cap:8})
 ];
 let exCat='alle';
 const exThumbCache={};
