@@ -872,17 +872,16 @@ body.mode-firmen #leistungen .leist-grid {
 .bsp-img-wrap {
   position: relative;
   aspect-ratio: 16 / 9;
-  overflow: hidden;
-  background: var(--s2);
-  border-radius: 20px;
+  background: transparent;
   cursor: zoom-in;
 }
 .bsp-img-wrap img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  padding: 1.8rem;
+  padding: 1.6rem 1.8rem 3rem;
   display: block;
+  filter: drop-shadow(0 16px 28px rgba(0,0,0,0.5));
   transition: transform 0.5s ease;
 }
 .bsp-slide:hover .bsp-img-wrap img {
