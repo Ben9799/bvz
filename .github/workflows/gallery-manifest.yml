@@ -1,8 +1,9 @@
-name: Galerie-Manifest aktualisieren
+name: Galerie optimieren + Manifest aktualisieren
 
-# Wenn Bence Bilder in images/galerie/ hochlaedt oder loescht, wird die
-# Liste images/galerie/manifest.json automatisch neu erzeugt. Die Webseite
-# liest diese Liste und zeigt genau die Bilder aus dem Ordner an.
+# Wenn Bence Bilder in images/galerie/ hochlaedt, werden sie automatisch
+# fuer das Web optimiert (max ~2000px, WebP q88 -> klein, aber ohne sichtbaren
+# Qualitaetsverlust) und die Liste images/galerie/manifest.json neu erzeugt.
+# Bence muss nichts komprimieren - einfach ein schoenes Bild hochladen.
 
 on:
   push:
@@ -19,17 +20,47 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build-manifest:
+  optimize-and-manifest:
     # Eigene Commits des Bots nicht erneut verarbeiten (verhindert Schleife)
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
+      - name: Werkzeuge installieren
+        run: sudo apt-get update && sudo apt-get install -y imagemagick libheif-examples
+
+      - name: Bilder optimieren (max 2000px, WebP q88)
+        run: |
+          cd images/galerie
+          shopt -s nullglob nocaseglob
+          for f in *.jpg *.jpeg *.png *.gif *.bmp *.tif *.tiff *.heic *.heif *.webp; do
+            [ -e "$f" ] || continue
+            extlc=$(echo "${f##*.}" | tr 'A-Z' 'a-z')
+            # Bereits optimierte WebP (<=2000px) ueberspringen -> kein Re-Encode
+            w=$(identify -format '%w' "$f[0]" 2>/dev/null || echo 0)
+            if [ "$extlc" = "webp" ] && [ "$w" -gt 0 ] && [ "$w" -le 2000 ]; then
+              echo "skip (schon optimiert): $f"; continue
+            fi
+            src="$f"
+            # HEIC/HEIF zuerst nach PNG wandeln, falls ImageMagick es nicht direkt liest
+            if { [ "$extlc" = "heic" ] || [ "$extlc" = "heif" ]; } && command -v heif-convert >/dev/null; then
+              if heif-convert "$f" "${f%.*}.__heic.png" >/dev/null 2>&1; then src="${f%.*}.__heic.png"; fi
+            fi
+            out="${f%.*}.webp"; tmp="${f%.*}.__tmp.webp"
+            if convert "$src[0]" -auto-orient -resize '2000x2000>' -strip -quality 88 -define webp:alpha-quality=92 "$tmp" 2>/dev/null; then
+              mv "$tmp" "$out"
+              [ "$f" != "$out" ] && rm -f "$f"
+              echo "optimiert: $f -> $out"
+            else
+              echo "FEHLER bei $f (uebersprungen)"; rm -f "$tmp"
+            fi
+            rm -f "${f%.*}.__heic.png"
+          done
+
       - name: Manifest generieren
         run: |
           cd images/galerie
-          # Alle Bilddateien (ausser manifest.json) sortiert auflisten -> JSON-Array
           ls -1 \
             | grep -Ei '\.(png|webp|jpe?g|gif|avif|svg)$' \
             | LC_ALL=C sort \
@@ -41,10 +72,10 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet -- images/galerie/manifest.json; then
-            echo "Keine Aenderung am Manifest."
+          git add -A images/galerie
+          if git diff --cached --quiet; then
+            echo "Keine Aenderung."
           else
-            git add images/galerie/manifest.json
-            git commit -m "chore: Galerie-Manifest automatisch aktualisiert"
+            git commit -m "chore: Galerie-Bilder optimiert + Manifest aktualisiert"
             git push
           fi
