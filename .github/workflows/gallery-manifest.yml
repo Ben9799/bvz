@@ -1,0 +1,50 @@
+name: Galerie-Manifest aktualisieren
+
+# Wenn Bence Bilder in images/galerie/ hochlaedt oder loescht, wird die
+# Liste images/galerie/manifest.json automatisch neu erzeugt. Die Webseite
+# liest diese Liste und zeigt genau die Bilder aus dem Ordner an.
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'images/galerie/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gallery-manifest
+  cancel-in-progress: false
+
+jobs:
+  build-manifest:
+    # Eigene Commits des Bots nicht erneut verarbeiten (verhindert Schleife)
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Manifest generieren
+        run: |
+          cd images/galerie
+          # Alle Bilddateien (ausser manifest.json) sortiert auflisten -> JSON-Array
+          ls -1 \
+            | grep -Ei '\.(png|webp|jpe?g|gif|avif|svg)$' \
+            | LC_ALL=C sort \
+            | python3 -c "import sys, json; print(json.dumps([l.strip() for l in sys.stdin if l.strip()], indent=2, ensure_ascii=False))" \
+            > manifest.json
+          echo "Manifest:" && cat manifest.json
+
+      - name: Aenderungen committen
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- images/galerie/manifest.json; then
+            echo "Keine Aenderung am Manifest."
+          else
+            git add images/galerie/manifest.json
+            git commit -m "chore: Galerie-Manifest automatisch aktualisiert"
+            git push
+          fi
