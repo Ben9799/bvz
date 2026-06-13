@@ -4747,7 +4747,7 @@ revealEls.forEach(el=>revealObs.observe(el));
 
   function buildSlides(files) {
     track.innerHTML = '';
-    files.forEach(function(name) {
+    files.forEach(function(name, i) {
       const src = dir + '/' + name;
       const slide = document.createElement('div');
       slide.className = 'bsp-slide';
@@ -4756,7 +4756,7 @@ revealEls.forEach(el=>revealObs.observe(el));
       wrap.setAttribute('data-full', src);
       const img = document.createElement('img');
       img.src = src;
-      img.alt = '';
+      img.alt = 'Lasergravur auf Metall – Beispiel ' + (i + 1);
       img.loading = 'lazy';
       wrap.appendChild(img);
       slide.appendChild(wrap);
