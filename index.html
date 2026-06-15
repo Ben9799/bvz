@@ -2994,6 +2994,120 @@ body.mode-firmen .privat-only { display: none !important; }
     </div>
   </section>
 
+  <!-- ====== MARKIERUNGSBERATER ====== -->
+  <style>
+    .mb-sec { position:relative; z-index:1; padding:5rem 1.5rem; }
+    .mb-inner { max-width:1080px; margin:0 auto; }
+    .mb-header { text-align:center; margin-bottom:2.5rem; }
+    .mb-grid { display:grid; grid-template-columns:minmax(0,300px) minmax(0,1fr); gap:1.5rem; align-items:start; }
+    .mb-mats { display:flex; flex-direction:column; gap:.6rem; }
+    .mb-mat { display:flex; align-items:center; gap:.7rem; width:100%; text-align:left;
+      background:var(--s2); border:1px solid var(--border2); color:var(--text);
+      padding:.85rem 1rem; border-radius:var(--radius); cursor:pointer; font:inherit; font-weight:600;
+      transition:border-color .18s, background .18s, transform .18s; }
+    .mb-mat:hover { border-color:var(--accent); transform:translateX(3px); }
+    .mb-mat.active { border-color:var(--accent); background:linear-gradient(135deg,rgba(0,200,255,0.12),rgba(0,200,255,0.03)); box-shadow:0 0 0 1px var(--accent-glow); }
+    .mb-mat .mb-ic { font-size:1.3rem; line-height:1; }
+    .mb-panel { background:var(--s1); border:1px solid var(--border2); border-radius:var(--radius-lg); padding:1.8rem; min-height:260px; }
+    .mb-panel h3 { font-size:1.25rem; margin-bottom:.3rem; }
+    .mb-panel .mb-note { color:var(--muted2); font-size:.92rem; margin-bottom:1.3rem; line-height:1.5; }
+    .mb-marks { display:flex; flex-direction:column; gap:.85rem; margin-bottom:1.5rem; }
+    .mb-mark { background:var(--s2); border:1px solid var(--border2); border-radius:var(--radius); padding:.9rem 1.1rem; position:relative; }
+    .mb-mark.star { border-color:var(--accent); background:linear-gradient(135deg,rgba(0,200,255,0.08),transparent); }
+    .mb-mark .mb-t { font-weight:700; display:flex; align-items:center; gap:.5rem; margin-bottom:.25rem; }
+    .mb-mark .mb-badge { font-size:.66rem; font-weight:800; letter-spacing:.04em; text-transform:uppercase;
+      color:#0a0a0c; background:var(--accent); padding:.12rem .45rem; border-radius:6px; }
+    .mb-mark .mb-d { color:var(--muted2); font-size:.88rem; line-height:1.5; }
+    .mb-cta { display:flex; flex-wrap:wrap; gap:.7rem; }
+    .mb-btn { display:inline-flex; align-items:center; gap:.4rem; padding:.7rem 1.2rem; border-radius:999px;
+      font-weight:700; font-size:.9rem; text-decoration:none; transition:transform .18s, box-shadow .18s; }
+    .mb-btn-primary { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#0a0a0c; }
+    .mb-btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 20px var(--accent-glow); }
+    .mb-btn-ghost { background:transparent; color:var(--text); border:1px solid var(--border); }
+    .mb-btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+    @media (max-width:760px){ .mb-grid{ grid-template-columns:1fr; } .mb-mats{ flex-direction:row; flex-wrap:wrap; } .mb-mat{ width:auto; flex:1 1 45%; } }
+  </style>
+  <section class="mb-sec reveal" id="markierungsberater">
+    <div class="mb-inner">
+      <div class="mb-header">
+        <div class="section-tag">🎯 Markierungsberater</div>
+        <h2 class="section-title">Welche Markierung für <span>welches Material</span>?</h2>
+        <p class="section-sub">Wählen Sie Ihr Werkstoff – wir zeigen die passenden Verfahren auf unserem 100&nbsp;W JPT-MOPA-Faserlaser.</p>
+      </div>
+      <div class="mb-grid">
+        <div class="mb-mats" id="mbMats"></div>
+        <div class="mb-panel" id="mbPanel"></div>
+      </div>
+    </div>
+  </section>
+  <script>
+    (function(){
+      const MB = {
+        edelstahl:{ label:'Edelstahl (V2A / V4A)', ic:'🔩',
+          note:'Hier spielt unser MOPA-Faserlaser seine volle Stärke aus – von tiefschwarz bis farbig, alles korrosionsbeständig.',
+          marks:[
+            {t:'Schwarz-Anlassen', star:true, d:'Tiefenfreie, korrosionsbeständige schwarze Markierung – ideal für Typenschilder, Seriennummern und Medizintechnik (auch ablaufkonform).'},
+            {t:'Farbgravur (MOPA)', star:true, d:'Echte Farben durch gezieltes Anlassen – Logos und Akzente, die auffallen. Nur mit MOPA-Technik möglich.'},
+            {t:'Tiefengravur', star:false, d:'Materialabtrag für haptische, besonders abriebfeste Kennzeichnung.'}
+          ]},
+        alu_elox:{ label:'Aluminium eloxiert', ic:'⬜',
+          note:'Eloxalschicht-Abtrag liefert brillanten, dauerhaften Kontrast – perfekt für Frontplatten und Schilder.',
+          marks:[
+            {t:'Eloxalabtrag', star:true, d:'Heller, abriebfester Kontrast durch Abtrag der Eloxalschicht – scharfe Kanten, sehr langlebig.'},
+            {t:'Feine Skalen & Text', star:false, d:'Bis ±0,01 mm – auch kleinste Schriften und Messskalen sauber lesbar.'}
+          ]},
+        alu_blank:{ label:'Aluminium blank', ic:'🪟',
+          note:'Blankes Alu markieren wir kontrastreich dunkel oder mit haptischer Gravur.',
+          marks:[
+            {t:'Dunkle Markierung', star:false, d:'Kontrastreiche, dauerhafte Beschriftung ohne Materialschwächung.'},
+            {t:'Tiefengravur', star:false, d:'Für haptische Kennzeichnung und fortlaufende Nummern.'}
+          ]},
+        messing:{ label:'Messing & Kupfer', ic:'🟤',
+          note:'Buntmetalle gravieren wir tief und kontrastreich – edel für Schilder und Geschenke.',
+          marks:[
+            {t:'Tiefengravur', star:true, d:'Klar lesbare, haptische Gravur mit hohem Wertanmutungs-Effekt.'},
+            {t:'Dunkle Markierung', star:false, d:'Feiner, dunkler Kontrast für Logos und Text.'}
+          ]},
+        titan:{ label:'Titan', ic:'⚙️',
+          note:'Titan erlaubt mit dem MOPA-Laser spektakuläre Anlassfarben – einzigartig und dauerhaft.',
+          marks:[
+            {t:'Farbanlassen (MOPA)', star:true, d:'Lebhafte Spektralfarben durch präzise Energiesteuerung – ein echtes Alleinstellungsmerkmal.'},
+            {t:'Schwarze Markierung', star:false, d:'Hochkontrastige, beständige Kennzeichnung für Industrie und Medizintechnik.'}
+          ]},
+        kunststoff:{ label:'Kunststoff', ic:'🧩',
+          note:'Je nach Kunststoff sehr unterschiedlich – wir empfehlen vorab eine kostenlose Probemarkierung.',
+          marks:[
+            {t:'Hell-Dunkel-Kontrast', star:false, d:'Bei vielen Technik-Kunststoffen (ABS, PC, PA) sauber und dauerhaft.'},
+            {t:'Schäumen / Aufhellen', star:false, d:'Erhabene oder helle Markierung – materialabhängig, daher Test empfohlen.'}
+          ]}
+      };
+      const order=['edelstahl','alu_elox','alu_blank','messing','titan','kunststoff'];
+      const matsEl=document.getElementById('mbMats'), panelEl=document.getElementById('mbPanel');
+      if(!matsEl||!panelEl) return;
+      function render(key){
+        const d=MB[key];
+        document.querySelectorAll('.mb-mat').forEach(b=>b.classList.toggle('active', b.dataset.k===key));
+        panelEl.innerHTML =
+          '<h3>'+d.ic+' '+d.label+'</h3>'+
+          '<p class="mb-note">'+d.note+'</p>'+
+          '<div class="mb-marks">'+ d.marks.map(m=>
+            '<div class="mb-mark'+(m.star?' star':'')+'">'+
+              '<div class="mb-t">'+m.t+(m.star?'<span class="mb-badge">MOPA-Stärke</span>':'')+'</div>'+
+              '<div class="mb-d">'+m.d+'</div>'+
+            '</div>').join('')+'</div>'+
+          '<div class="mb-cta">'+
+            '<a class="mb-btn mb-btn-primary" href="#contact">Angebot anfragen →</a>'+
+            '<a class="mb-btn mb-btn-ghost" href="kostenlose-probegravur.html">Kostenlose Probegravur</a>'+
+          '</div>';
+      }
+      matsEl.innerHTML = order.map(k=>
+        '<button type="button" class="mb-mat" data-k="'+k+'"><span class="mb-ic">'+MB[k].ic+'</span>'+MB[k].label+'</button>'
+      ).join('');
+      matsEl.querySelectorAll('.mb-mat').forEach(b=> b.addEventListener('click',()=>render(b.dataset.k)));
+      render('edelstahl');
+    })();
+  </script>
+
   <!-- ====== RATGEBER & WISSEN ====== -->
   <section class="leistungen reveal" id="ratgeber">
     <div class="leistungen-inner">
