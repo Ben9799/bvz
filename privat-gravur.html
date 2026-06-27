@@ -417,6 +417,9 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
           <div><span class="pl">Preis (Richtwert)</span></div>
           <div style="text-align:right"><span class="pv" id="priceVal">–</span><small id="priceBreak"></small></div>
         </div>
+        <div class="btnrow" style="margin-top:.7rem;grid-column:1/-1">
+          <button class="pg-order-btn" id="bestellBtn">🛒 Jetzt bestellen</button>
+        </div>
         <div class="btnrow admin-only" style="margin-top:.7rem">
           <button class="btn btn-ghost admin-only" id="dlsvg">⬇ LightBurn-SVG</button>
         </div>
@@ -5238,6 +5241,218 @@ render();
 histReset();
 updatePrice();
 maybeOnboard();
+</script>
+
+<!-- ============ BESTELLUNG + ZAHLUNG (PayPal + Karte) ============ -->
+<style>
+.pg-order-btn{display:block;width:100%;border:0;border-radius:12px;padding:.85rem 1rem;font-weight:800;font-size:1rem;
+  background:linear-gradient(135deg,#00d4ff,#0a84ff);color:#04121f;cursor:pointer;letter-spacing:.2px}
+.pg-order-btn:hover{filter:brightness(1.06)}
+.pg-back{position:fixed;inset:0;z-index:9000;background:rgba(2,6,16,.78);backdrop-filter:blur(6px);
+  display:none;align-items:flex-start;justify-content:center;overflow:auto;padding:24px 14px}
+.pg-back.show{display:flex}
+.pg-card{width:100%;max-width:520px;background:#0c1322;color:#e6edf6;border:1px solid #1d2740;border-radius:16px;
+  box-shadow:0 24px 70px rgba(0,0,0,.6);padding:20px 20px 26px;margin:auto}
+.pg-card h2{margin:0 0 .2rem;font-size:1.25rem}
+.pg-sub{color:#8aa0bd;font-size:.85rem;margin:0 0 1rem}
+.pg-sum{display:flex;justify-content:space-between;align-items:center;gap:.6rem;background:#0a1120;border:1px solid #1d2740;
+  border-radius:12px;padding:.7rem .9rem;margin-bottom:1rem}
+.pg-sum b{font-size:1.15rem;color:#00d4ff}
+.pg-row{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.pg-fld{margin-bottom:.6rem}
+.pg-fld.full{grid-column:1/-1}
+.pg-fld label{display:block;font-size:.74rem;color:#9fb2cc;margin:0 0 .25rem}
+.pg-fld input,.pg-fld textarea{width:100%;box-sizing:border-box;background:#070d1a;border:1px solid #243150;border-radius:9px;
+  color:#e6edf6;padding:.6rem .65rem;font-size:.92rem;font-family:inherit}
+.pg-fld input:focus,.pg-fld textarea:focus{outline:none;border-color:#0a84ff}
+.pg-qty{display:flex;align-items:center;gap:.5rem}
+.pg-qty input{width:72px;text-align:center}
+.pg-msg{min-height:1.2em;font-size:.84rem;margin:.4rem 0 .2rem}
+.pg-msg.err{color:#ff8585}
+.pg-msg.ok{color:#5be08a}
+#paypal-button-container{margin-top:.8rem;min-height:48px}
+.pg-x{position:absolute;top:12px;right:14px;background:none;border:0;color:#8aa0bd;font-size:1.5rem;cursor:pointer;line-height:1}
+.pg-card{position:relative}
+.pg-note{font-size:.72rem;color:#7488a5;margin-top:.7rem;line-height:1.4}
+.pg-success{text-align:center;padding:1rem 0}
+.pg-success .pg-check{font-size:2.6rem}
+.pg-success h2{margin:.4rem 0}
+.pg-success p{color:#aebdd2;font-size:.92rem}
+.pg-success .pg-order-btn{max-width:200px;margin:1.2rem auto 0}
+</style>
+<div class="pg-back" id="pgBack" role="dialog" aria-modal="true">
+  <div class="pg-card">
+    <button class="pg-x" id="pgClose" aria-label="Schließen">×</button>
+    <div id="pgForm">
+      <h2>Gravur bestellen</h2>
+      <p class="pg-sub">Sicher bezahlen mit PayPal oder Kredit-/Debitkarte.</p>
+      <div class="pg-sum">
+        <div><div id="pgSumProd" style="font-weight:700"></div><div id="pgSumBreak" style="font-size:.78rem;color:#8aa0bd"></div></div>
+        <b id="pgSumTotal">–</b>
+      </div>
+      <div class="pg-fld">
+        <label>Menge</label>
+        <div class="pg-qty"><button type="button" id="pgQtyMinus" class="btn btn-ghost" style="padding:.3rem .7rem">−</button>
+          <input type="number" id="pgQty" value="1" min="1" max="500" inputmode="numeric">
+          <button type="button" id="pgQtyPlus" class="btn btn-ghost" style="padding:.3rem .7rem">+</button></div>
+      </div>
+      <div class="pg-row">
+        <div class="pg-fld"><label>Name *</label><input id="pgName" autocomplete="name"></div>
+        <div class="pg-fld"><label>E-Mail *</label><input id="pgEmail" type="email" autocomplete="email"></div>
+        <div class="pg-fld"><label>Telefon</label><input id="pgTel" autocomplete="tel"></div>
+        <div class="pg-fld"><label>Land</label><input id="pgLand" value="Deutschland" autocomplete="country-name"></div>
+        <div class="pg-fld full"><label>Straße & Hausnummer *</label><input id="pgStrasse" autocomplete="street-address"></div>
+        <div class="pg-fld"><label>PLZ *</label><input id="pgPlz" autocomplete="postal-code"></div>
+        <div class="pg-fld"><label>Ort *</label><input id="pgOrt" autocomplete="address-level2"></div>
+        <div class="pg-fld full"><label>Anmerkung (optional)</label><textarea id="pgNote" rows="2"></textarea></div>
+      </div>
+      <div class="pg-msg" id="pgMsg"></div>
+      <div id="paypal-button-container"></div>
+      <p class="pg-note">Mit dem Klick auf Bezahlen wird dein gestaltetes Design an uns übermittelt. Preis inkl. USt. gemäß §19 UStG. Versand innerhalb Deutschlands.</p>
+    </div>
+    <div id="pgSuccess" class="pg-success" style="display:none">
+      <div class="pg-check">✅</div>
+      <h2>Vielen Dank<span id="pgThxName"></span>!</h2>
+      <p>Deine Bestellung ist eingegangen und bezahlt. Du erhältst in Kürze eine Bestätigung per E-Mail.</p>
+      <p style="font-size:.78rem;color:#7488a5">Bestellnummer: <span id="pgOrderNo"></span></p>
+      <button class="pg-order-btn" id="pgDone">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+const firebaseConfig = {
+  apiKey:"AIzaSyBLSp0en7wDD_71PF1n3qYXPF0YNTEWmIc",
+  authDomain:"auftrage-edc6d.firebaseapp.com",
+  projectId:"auftrage-edc6d",
+  storageBucket:"auftrage-edc6d.firebasestorage.app",
+  messagingSenderId:"675308449934",
+  appId:"1:675308449934:web:b4c1fc2e190647ace419df"
+};
+const app = getApps().find(a=>a.name==="wl-privat") || initializeApp(firebaseConfig, "wl-privat");
+const storage = getStorage(app);
+window.wlUploadDesign = function(blob, path, contentType){
+  return new Promise((resolve,reject)=>{
+    const task=uploadBytesResumable(ref(storage,path), blob, {contentType});
+    task.on("state_changed", null, reject, async()=>{ try{ resolve(await getDownloadURL(task.snapshot.ref)); }catch(e){ reject(e); } });
+  });
+};
+</script>
+
+<script>
+(function(){
+  const PAYPAL_CLIENT_ID="AVoTaZt4ucQUAQnCqzsA6hPNgsX5mblMBYqXJcRuJe01sIJXJi4q8mwsg8KxwSW9olpQZpf2XcTTvInV";
+  const FORMSPREE="https://formspree.io/f/xpqjjobb";
+  const $=(id)=>document.getElementById(id);
+  const val=(id)=>($(id)&&$(id).value||'').trim();
+
+  function pgQty(){ return Math.max(1, Math.min(500, parseInt($('pgQty').value,10)||1)); }
+  function pgUnit(){ return calcPrice().total; }
+  function pgTotal(){ return pgUnit()*pgQty(); }
+  function pgProdName(){ return OBJECTS[current].name; }
+  function pgDesc(){ return pgProdName()+' ×'+pgQty()+' – Wolf Lasermark Gravur'; }
+
+  function pgMsg(t,err){ const m=$('pgMsg'); if(!m) return; m.textContent=t||''; m.className='pg-msg'+(err?' err':(t?' ok':'')); }
+
+  function pgUpdateSummary(){
+    $('pgSumProd').textContent=pgProdName()+'  ×'+pgQty();
+    $('pgSumBreak').textContent='Einzelpreis '+fmtEUR(pgUnit());
+    $('pgSumTotal').textContent=fmtEUR(pgTotal());
+  }
+
+  function pgValidate(){
+    const need=[['pgName','Name'],['pgEmail','E-Mail'],['pgStrasse','Straße'],['pgPlz','PLZ'],['pgOrt','Ort']];
+    for(const [id,label] of need){ if(!val(id)){ pgMsg('Bitte '+label+' ausfüllen.',true); $(id).focus(); return false; } }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val('pgEmail'))){ pgMsg('Bitte eine gültige E-Mail eingeben.',true); $('pgEmail').focus(); return false; }
+    pgMsg(''); return true;
+  }
+
+  function dataURLtoBlob(d){ const [h,b]=d.split(','); const mime=(h.match(/:(.*?);/)||[,'image/png'])[1];
+    const bin=atob(b); const u=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i); return new Blob([u],{type:mime}); }
+
+  function pgCleanPNG(){ const was=exporting; exporting=true; render(); const d=cv.toDataURL('image/png'); exporting=was; render(); return d; }
+
+  async function pgFinalize(orderID, details){
+    pgMsg('Design wird übermittelt…');
+    const id=Date.now()+'-'+Math.random().toString(36).slice(2,8);
+    let svgUrl='', pngUrl='';
+    try{
+      const svgBlob=new Blob([renderSVG()],{type:'image/svg+xml'});
+      svgUrl=await window.wlUploadDesign(svgBlob,'privat-bestellungen/'+id+'/design.svg','image/svg+xml');
+      pngUrl=await window.wlUploadDesign(dataURLtoBlob(pgCleanPNG()),'privat-bestellungen/'+id+'/vorschau.png','image/png');
+    }catch(e){ console.error('Upload-Fehler',e); }
+    try{
+      const payer=(details&&details.payer)||{};
+      const fd=new FormData();
+      fd.append('Produkt',pgProdName());
+      fd.append('Menge',String(pgQty()));
+      fd.append('Einzelpreis',fmtEUR(pgUnit()));
+      fd.append('Gesamtpreis',fmtEUR(pgTotal()));
+      fd.append('Name',val('pgName'));
+      fd.append('Email',val('pgEmail'));
+      fd.append('Telefon',val('pgTel')||'–');
+      fd.append('Adresse',val('pgStrasse')+', '+val('pgPlz')+' '+val('pgOrt')+', '+(val('pgLand')||'Deutschland'));
+      fd.append('Anmerkung',val('pgNote')||'–');
+      fd.append('Design_SVG',svgUrl||'(Upload fehlgeschlagen)');
+      fd.append('Vorschau_PNG',pngUrl||'(Upload fehlgeschlagen)');
+      fd.append('PayPal_OrderID',orderID||'');
+      fd.append('PayPal_Status',(details&&details.status)||'');
+      fd.append('PayPal_Payer',payer.email_address||'');
+      fd.append('_replyto',val('pgEmail'));
+      fd.append('_subject','🛒 Neue PRIVAT-Gravur Bestellung: '+pgProdName()+' ×'+pgQty()+' – '+val('pgName'));
+      await fetch(FORMSPREE,{method:'POST',headers:{'Accept':'application/json'},body:fd});
+    }catch(e){ console.error('Formspree-Fehler',e); }
+    $('pgThxName').textContent=val('pgName')?(', '+val('pgName').split(' ')[0]):'';
+    $('pgOrderNo').textContent=id;
+    $('pgForm').style.display='none';
+    $('pgSuccess').style.display='block';
+  }
+
+  let pgPaypalLoaded=false, pgRendered=false;
+  function pgRenderPaypal(){
+    if(pgRendered || !window.paypal) return;
+    pgRendered=true;
+    window.paypal.Buttons({
+      style:{layout:'vertical',shape:'rect',label:'pay'},
+      onClick:(data,actions)=> pgValidate()? actions.resolve() : actions.reject(),
+      createOrder:(data,actions)=> actions.order.create({
+        purchase_units:[{ amount:{ value: pgTotal().toFixed(2), currency_code:'EUR' }, description: pgDesc().slice(0,127) }]
+      }),
+      onApprove:async(data,actions)=>{
+        pgMsg('Zahlung wird bestätigt…');
+        try{ const details=await actions.order.capture(); await pgFinalize(data.orderID, details); }
+        catch(e){ console.error(e); pgMsg('Fehler bei der Verarbeitung. Bitte kontaktieren Sie uns unter info@wolf-lasermark.de.',true); }
+      },
+      onError:(err)=>{ console.error('PayPal-Fehler',err); pgMsg('Es gab ein Problem mit der Zahlung. Bitte erneut versuchen.',true); }
+    }).render('#paypal-button-container');
+  }
+  function pgLoadPaypal(){
+    if(pgPaypalLoaded){ pgRenderPaypal(); return; }
+    const s=document.createElement('script');
+    s.src="https://www.paypal.com/sdk/js?client-id="+encodeURIComponent(PAYPAL_CLIENT_ID)+"&currency=EUR&locale=de_DE&components=buttons&enable-funding=card&disable-funding=sofort,giropay";
+    s.onload=()=>{ pgPaypalLoaded=true; pgRenderPaypal(); };
+    s.onerror=()=>pgMsg('PayPal konnte nicht geladen werden. Bitte später erneut versuchen.',true);
+    document.head.appendChild(s);
+  }
+
+  function pgOpen(){
+    $('pgForm').style.display='block'; $('pgSuccess').style.display='none';
+    pgMsg(''); pgUpdateSummary();
+    $('pgBack').classList.add('show'); document.body.style.overflow='hidden';
+    pgLoadPaypal();
+  }
+  function pgCloseModal(){ $('pgBack').classList.remove('show'); document.body.style.overflow=''; }
+
+  $('bestellBtn') && ($('bestellBtn').onclick=pgOpen);
+  $('pgClose') && ($('pgClose').onclick=pgCloseModal);
+  $('pgDone') && ($('pgDone').onclick=pgCloseModal);
+  $('pgBack') && $('pgBack').addEventListener('click',e=>{ if(e.target===$('pgBack')) pgCloseModal(); });
+  $('pgQty') && $('pgQty').addEventListener('input',pgUpdateSummary);
+  $('pgQtyPlus') && ($('pgQtyPlus').onclick=()=>{ $('pgQty').value=pgQty()+1; pgUpdateSummary(); });
+  $('pgQtyMinus') && ($('pgQtyMinus').onclick=()=>{ $('pgQty').value=Math.max(1,pgQty()-1); pgUpdateSummary(); });
+})();
 </script>
 </body>
 </html>
