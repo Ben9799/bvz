@@ -178,7 +178,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 .tool-btn:hover{border-color:var(--acc-line);color:var(--ink);background:var(--acc-soft)}
 .tool-btn.active{border-color:var(--acc-line);color:var(--ink);background:rgba(25,211,255,.14)}
 .tool-btn.danger:hover{border-color:var(--bad);color:#fff;background:rgba(248,113,113,.16)}
-.admin-only{display:none}
+body:not(.is-admin) .admin-only{display:none!important}
 
 /* Gruppen-Köpfe & Hinweise */
 .field-group{margin-bottom:1rem}
@@ -430,9 +430,9 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
       <button class="seg" data-pane="beispiele"><span class="ic">💾</span><small>Designs</small></button>
       <button class="seg active" data-pane="text"><span class="ic">✏️</span><small>Text</small></button>
       <button class="seg" data-pane="motive"><span class="ic">🎨</span><small>Grafik</small></button>
-      <button class="seg" data-pane="logo"><span class="ic">🖼️</span><small>Logo</small></button>
+      <button class="seg admin-only" data-pane="logo"><span class="ic">🖼️</span><small>Logo</small></button>
       <button class="seg" data-pane="code"><span class="ic">🔳</span><small>Code</small></button>
-      <button class="seg" data-pane="areas"><span class="ic">▦</span><small>Flächen</small></button>
+      <button class="seg admin-only" data-pane="areas"><span class="ic">▦</span><small>Flächen</small></button>
     </div>
 
     <div class="panel" id="panel">
@@ -4809,13 +4809,16 @@ function addQR(){
   }catch(e){ codeMsg('QR-Code konnte nicht erstellt werden (Text zu lang?).', false); }
 }
 
-// ---------- admin gate (nur Bence) ----------
+// ---------- admin gate (nur Bence) — geheimer Link erforderlich ----------
 (function(){
-  const url=new URL(location.href);
-  const param=(url.searchParams.get('admin')!==null || location.hash.indexOf('admin')>=0);
-  let saved=false;
-  try{ if(param) localStorage.setItem('wl_admin','1'); saved=(localStorage.getItem('wl_admin')==='1'); }catch(e){}
-  if(param || saved){ document.querySelectorAll('.admin-only').forEach(el=>el.style.display='block'); }
+  const ADMIN_KEY='gravur-7Hq2Lp9XmK4n'; // ?studio=<KEY> schaltet Admin frei, ?studio=off wieder aus
+  const supplied=new URL(location.href).searchParams.get('studio')||'';
+  try{
+    if(supplied==='off') localStorage.removeItem('wl_admin');
+    else if(supplied===ADMIN_KEY) localStorage.setItem('wl_admin','1');
+  }catch(e){}
+  let isAdmin=false; try{ isAdmin=(localStorage.getItem('wl_admin')==='1'); }catch(e){}
+  if(isAdmin) document.body.classList.add('is-admin');
 })();
 
 // Höhe-Schieberegler ändert die AKTUELLE Auswahl (freie Zeile) bzw. den Block-Text
