@@ -5326,6 +5326,7 @@ maybeOnboard();
 <script type="module">
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const firebaseConfig = {
   apiKey:"AIzaSyBLSp0en7wDD_71PF1n3qYXPF0YNTEWmIc",
   authDomain:"auftrage-edc6d.firebaseapp.com",
@@ -5336,11 +5337,15 @@ const firebaseConfig = {
 };
 const app = getApps().find(a=>a.name==="wl-privat") || initializeApp(firebaseConfig, "wl-privat");
 const storage = getStorage(app);
+const db = getFirestore(app);
 window.wlUploadDesign = function(blob, path, contentType){
   return new Promise((resolve,reject)=>{
     const task=uploadBytesResumable(ref(storage,path), blob, {contentType});
     task.on("state_changed", null, reject, async()=>{ try{ resolve(await getDownloadURL(task.snapshot.ref)); }catch(e){ reject(e); } });
   });
+};
+window.wlSaveBestellung = function(id, data){
+  return setDoc(doc(db,"privat-bestellungen",id), Object.assign({}, data, { status:"neu", createdAt: serverTimestamp() }));
 };
 </script>
 
@@ -5386,6 +5391,30 @@ window.wlUploadDesign = function(blob, path, contentType){
       svgUrl=await window.wlUploadDesign(svgBlob,'privat-bestellungen/'+id+'/design.svg','image/svg+xml');
       pngUrl=await window.wlUploadDesign(dataURLtoBlob(pgCleanPNG()),'privat-bestellungen/'+id+'/vorschau.png','image/png');
     }catch(e){ console.error('Upload-Fehler',e); }
+    try{
+      const payer0=(details&&details.payer)||{};
+      await window.wlSaveBestellung(id, {
+        produkt: pgProdName(),
+        menge: pgQty(),
+        einzelpreis: fmtEUR(pgUnit()),
+        gesamtpreis: fmtEUR(pgTotal()),
+        pricePaid: Number(pgTotal().toFixed(2)),
+        name: val('pgName'),
+        email: val('pgEmail'),
+        telefon: val('pgTel')||'',
+        strasse: val('pgStrasse'),
+        plz: val('pgPlz'),
+        ort: val('pgOrt'),
+        land: val('pgLand')||'Deutschland',
+        adresse: val('pgStrasse')+', '+val('pgPlz')+' '+val('pgOrt')+', '+(val('pgLand')||'Deutschland'),
+        anmerkung: val('pgNote')||'',
+        designSvgUrl: svgUrl||'',
+        vorschauPngUrl: pngUrl||'',
+        paypalOrderId: orderID||'',
+        paypalStatus: (details&&details.status)||'',
+        paypalPayer: payer0.email_address||''
+      });
+    }catch(e){ console.error('Firestore-Bestellung-Fehler',e); }
     try{
       const payer=(details&&details.payer)||{};
       const fd=new FormData();
