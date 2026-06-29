@@ -5290,7 +5290,7 @@ maybeOnboard();
       <h2>Gravur bestellen</h2>
       <p class="pg-sub">Sicher bezahlen mit PayPal oder Kredit-/Debitkarte.</p>
       <div class="pg-sum">
-        <div><div id="pgSumProd" style="font-weight:700"></div><div id="pgSumBreak" style="font-size:.78rem;color:#8aa0bd"></div></div>
+        <div><div id="pgSumProd" style="font-weight:700"></div><div id="pgSumBreak" style="font-size:.78rem;color:#8aa0bd"></div><div id="pgSumRabatt" style="font-size:.78rem;color:#19c37d;display:none"></div></div>
         <b id="pgSumTotal">–</b>
       </div>
       <div class="pg-fld">
@@ -5298,6 +5298,14 @@ maybeOnboard();
         <div class="pg-qty"><button type="button" id="pgQtyMinus" class="btn btn-ghost" style="padding:.3rem .7rem">−</button>
           <input type="number" id="pgQty" value="1" min="1" max="500" inputmode="numeric">
           <button type="button" id="pgQtyPlus" class="btn btn-ghost" style="padding:.3rem .7rem">+</button></div>
+      </div>
+      <div class="pg-fld">
+        <label>Gutschein-Code (optional)</label>
+        <div style="display:flex;gap:.5rem">
+          <input id="pgCouponInput" placeholder="WL-DANKE-XXXXX" autocomplete="off" style="flex:1;text-transform:uppercase">
+          <button type="button" id="pgCouponBtn" class="btn btn-ghost" style="padding:.3rem .9rem;white-space:nowrap">Einlösen</button>
+        </div>
+        <div id="pgCouponMsg" style="font-size:.78rem;margin-top:.35rem;color:#8aa0bd"></div>
       </div>
       <div class="pg-row">
         <div class="pg-fld"><label>Name *</label><input id="pgName" autocomplete="name"></div>
@@ -5326,7 +5334,7 @@ maybeOnboard();
 <script type="module">
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const firebaseConfig = {
   apiKey:"AIzaSyBLSp0en7wDD_71PF1n3qYXPF0YNTEWmIc",
   authDomain:"auftrage-edc6d.firebaseapp.com",
@@ -5347,6 +5355,47 @@ window.wlUploadDesign = function(blob, path, contentType){
 window.wlSaveBestellung = function(id, data){
   return setDoc(doc(db,"privat-bestellungen",id), Object.assign({}, data, { status:"neu", createdAt: serverTimestamp() }));
 };
+// Gutschein: nutzungsbasiert (max_uses/uses_count/redeemed_refs), abwaertskompatibel
+function wlCouponUses(c){
+  let maxUses = Number(c.max_uses); if(!Number.isFinite(maxUses) || maxUses < 1) maxUses = 1;
+  let usesCount = Number(c.uses_count);
+  if(!Number.isFinite(usesCount) || usesCount < 0) usesCount = c.status === "redeemed" ? maxUses : 0;
+  const refs = Array.isArray(c.redeemed_refs) ? c.redeemed_refs.slice() : (c.redeemed_ref ? [c.redeemed_ref] : []);
+  return { maxUses, usesCount, refs, remaining: maxUses - usesCount };
+}
+window.wlValidateCoupon = async function(code){
+  code = String(code || "").trim().toUpperCase();
+  if(!code) return { ok:false, reason:"Bitte einen Code eingeben." };
+  try{
+    const snap = await getDoc(doc(db,"coupons",code));
+    if(!snap.exists()) return { ok:false, reason:"Code nicht gefunden." };
+    const c = snap.data(); const now = Date.now();
+    if(c.status === "expired" || (c.expires_at && c.expires_at < now)) return { ok:false, reason:"Code abgelaufen." };
+    const u = wlCouponUses(c);
+    if(u.remaining <= 0) return { ok:false, reason:"Code bereits eingelöst." };
+    return { ok:true, percent: Number(c.percent) || 0, remaining: u.remaining, maxUses: u.maxUses };
+  }catch(e){ console.error("Coupon-Prüfung",e); return { ok:false, reason:"Prüfung fehlgeschlagen." }; }
+};
+window.wlRedeemCoupon = async function(code, ref){
+  code = String(code || "").trim().toUpperCase();
+  if(!code) return { ok:false, reason:"leer" };
+  const cRef = doc(db,"coupons",code);
+  try{
+    return await runTransaction(db, async(tx)=>{
+      const snap = await tx.get(cRef);
+      if(!snap.exists()) return { ok:false, reason:"Code nicht gefunden" };
+      const c = snap.data(); const now = Date.now();
+      if(c.status === "expired" || (c.expires_at && c.expires_at < now)) return { ok:false, reason:"abgelaufen" };
+      const u = wlCouponUses(c);
+      if(ref && u.refs.includes(ref)) return { ok:true, already:true };
+      if(u.remaining <= 0) return { ok:false, reason:"bereits eingelöst" };
+      const newCount = u.usesCount + 1;
+      const newRefs = ref ? [...u.refs, ref] : u.refs;
+      tx.update(cRef, { status: newCount >= u.maxUses ? "redeemed" : "issued", uses_count:newCount, redeemed_at:now, redeemed_ref: ref || "", redeemed_refs:newRefs });
+      return { ok:true };
+    });
+  }catch(e){ console.error("Coupon-Einlösung",e); return { ok:false, reason:"Einlösung fehlgeschlagen" }; }
+};
 </script>
 
 <script>
@@ -5359,6 +5408,9 @@ window.wlSaveBestellung = function(id, data){
   function pgQty(){ return Math.max(1, Math.min(500, parseInt($('pgQty').value,10)||1)); }
   function pgUnit(){ return calcPrice().total; }
   function pgTotal(){ return pgUnit()*pgQty(); }
+  let pgCoupon=null; // { code, percent }
+  function pgDiscount(){ return pgCoupon ? +(pgTotal()*pgCoupon.percent/100).toFixed(2) : 0; }
+  function pgFinalTotal(){ return Math.max(0, +(pgTotal()-pgDiscount()).toFixed(2)); }
   function pgProdName(){ return OBJECTS[current].name; }
   function pgDesc(){ return pgProdName()+' ×'+pgQty()+' – Wolf Lasermark Gravur'; }
 
@@ -5367,7 +5419,33 @@ window.wlSaveBestellung = function(id, data){
   function pgUpdateSummary(){
     $('pgSumProd').textContent=pgProdName()+'  ×'+pgQty();
     $('pgSumBreak').textContent='Einzelpreis '+fmtEUR(pgUnit());
-    $('pgSumTotal').textContent=fmtEUR(pgTotal());
+    const r=$('pgSumRabatt');
+    if(r){
+      if(pgCoupon && pgDiscount()>0){ r.style.display='block'; r.textContent='Gutschein '+pgCoupon.code+': −'+fmtEUR(pgDiscount())+' ('+pgCoupon.percent+'%)'; }
+      else { r.style.display='none'; r.textContent=''; }
+    }
+    $('pgSumTotal').textContent=fmtEUR(pgFinalTotal());
+  }
+
+  function pgCouponMsg(t,cls){ const m=$('pgCouponMsg'); if(!m) return; m.textContent=t||''; m.style.color = cls==='err'?'#ff6b6b':(cls==='ok'?'#19c37d':'#8aa0bd'); }
+  let pgCouponBusy=false;
+  async function pgToggleCoupon(){
+    if(pgCouponBusy) return;
+    if(pgCoupon){ // Entfernen
+      pgCoupon=null; $('pgCouponInput').disabled=false; $('pgCouponBtn').textContent='Einlösen';
+      pgCouponMsg(''); pgUpdateSummary(); return;
+    }
+    const code=(val('pgCouponInput')||'').toUpperCase();
+    if(!code){ pgCouponMsg('Bitte einen Code eingeben.','err'); $('pgCouponInput').focus(); return; }
+    pgCouponBusy=true; pgCouponMsg('Code wird geprüft…');
+    try{
+      const res = await window.wlValidateCoupon(code);
+      if(!res || !res.ok){ pgCouponMsg((res&&res.reason)||'Code ungültig.','err'); return; }
+      pgCoupon={ code, percent: Number(res.percent)||0 };
+      $('pgCouponInput').value=code; $('pgCouponInput').disabled=true; $('pgCouponBtn').textContent='Entfernen';
+      pgCouponMsg('Gutschein aktiv: −'+pgCoupon.percent+'%','ok');
+      pgUpdateSummary();
+    } finally { pgCouponBusy=false; }
   }
 
   function pgValidate(){
@@ -5391,14 +5469,19 @@ window.wlSaveBestellung = function(id, data){
       svgUrl=await window.wlUploadDesign(svgBlob,'privat-bestellungen/'+id+'/design.svg','image/svg+xml');
       pngUrl=await window.wlUploadDesign(dataURLtoBlob(pgCleanPNG()),'privat-bestellungen/'+id+'/vorschau.png','image/png');
     }catch(e){ console.error('Upload-Fehler',e); }
+    const finalTotal=pgFinalTotal(), disc=pgDiscount();
     try{
       const payer0=(details&&details.payer)||{};
       await window.wlSaveBestellung(id, {
         produkt: pgProdName(),
         menge: pgQty(),
         einzelpreis: fmtEUR(pgUnit()),
-        gesamtpreis: fmtEUR(pgTotal()),
-        pricePaid: Number(pgTotal().toFixed(2)),
+        originalpreis: fmtEUR(pgTotal()),
+        gesamtpreis: fmtEUR(finalTotal),
+        pricePaid: Number(finalTotal.toFixed(2)),
+        gutscheinCode: pgCoupon?pgCoupon.code:'',
+        gutscheinProzent: pgCoupon?pgCoupon.percent:0,
+        rabattBetrag: disc,
         name: val('pgName'),
         email: val('pgEmail'),
         telefon: val('pgTel')||'',
@@ -5415,13 +5498,15 @@ window.wlSaveBestellung = function(id, data){
         paypalPayer: payer0.email_address||''
       });
     }catch(e){ console.error('Firestore-Bestellung-Fehler',e); }
+    if(pgCoupon){ try{ await window.wlRedeemCoupon(pgCoupon.code, id); }catch(e){ console.error('Coupon-Redeem-Fehler',e); } }
     try{
       const payer=(details&&details.payer)||{};
       const fd=new FormData();
       fd.append('Produkt',pgProdName());
       fd.append('Menge',String(pgQty()));
       fd.append('Einzelpreis',fmtEUR(pgUnit()));
-      fd.append('Gesamtpreis',fmtEUR(pgTotal()));
+      if(pgCoupon){ fd.append('Gutschein',pgCoupon.code+' (−'+pgCoupon.percent+'% = −'+fmtEUR(disc)+')'); }
+      fd.append('Gesamtpreis',fmtEUR(finalTotal));
       fd.append('Name',val('pgName'));
       fd.append('Email',val('pgEmail'));
       fd.append('Telefon',val('pgTel')||'–');
@@ -5450,7 +5535,7 @@ window.wlSaveBestellung = function(id, data){
       style:{layout:'vertical',shape:'rect',label:'pay'},
       onClick:(data,actions)=> pgValidate()? actions.resolve() : actions.reject(),
       createOrder:(data,actions)=> actions.order.create({
-        purchase_units:[{ amount:{ value: pgTotal().toFixed(2), currency_code:'EUR' }, description: pgDesc().slice(0,127) }]
+        purchase_units:[{ amount:{ value: pgFinalTotal().toFixed(2), currency_code:'EUR' }, description: pgDesc().slice(0,127) }]
       }),
       onApprove:async(data,actions)=>{
         pgMsg('Zahlung wird bestätigt…');
@@ -5484,6 +5569,8 @@ window.wlSaveBestellung = function(id, data){
   $('pgQty') && $('pgQty').addEventListener('input',pgUpdateSummary);
   $('pgQtyPlus') && ($('pgQtyPlus').onclick=()=>{ $('pgQty').value=pgQty()+1; pgUpdateSummary(); });
   $('pgQtyMinus') && ($('pgQtyMinus').onclick=()=>{ $('pgQty').value=Math.max(1,pgQty()-1); pgUpdateSummary(); });
+  $('pgCouponBtn') && ($('pgCouponBtn').onclick=pgToggleCoupon);
+  $('pgCouponInput') && $('pgCouponInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); pgToggleCoupon(); } });
 })();
 </script>
 </body>
