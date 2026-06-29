@@ -5335,6 +5335,7 @@ maybeOnboard();
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 import { getFirestore, doc, setDoc, getDoc, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 const firebaseConfig = {
   apiKey:"AIzaSyBLSp0en7wDD_71PF1n3qYXPF0YNTEWmIc",
   authDomain:"auftrage-edc6d.firebaseapp.com",
@@ -5346,6 +5347,15 @@ const firebaseConfig = {
 const app = getApps().find(a=>a.name==="wl-privat") || initializeApp(firebaseConfig, "wl-privat");
 const storage = getStorage(app);
 const db = getFirestore(app);
+// Anonyme Anmeldung (wie Rechnung-App): die Firestore-Rules verlangen fuer
+// coupons read/update signedIn(). Ohne Auth schlaegt die Gutschein-Pruefung
+// mit permission-denied fehl. Bestellung anlegen geht auch ohne Auth.
+const auth = getAuth(app);
+window.wlAuthReady = new Promise((resolve)=>{
+  let done = false;
+  onAuthStateChanged(auth, (u)=>{ if(u && !done){ done = true; resolve(true); } });
+  signInAnonymously(auth).catch((e)=>{ console.error("Anon-Auth", e); if(!done){ done = true; resolve(false); } });
+});
 window.wlUploadDesign = function(blob, path, contentType){
   return new Promise((resolve,reject)=>{
     const task=uploadBytesResumable(ref(storage,path), blob, {contentType});
@@ -5367,6 +5377,7 @@ window.wlValidateCoupon = async function(code){
   code = String(code || "").trim().toUpperCase();
   if(!code) return { ok:false, reason:"Bitte einen Code eingeben." };
   try{
+    await window.wlAuthReady;
     const snap = await getDoc(doc(db,"coupons",code));
     if(!snap.exists()) return { ok:false, reason:"Code nicht gefunden." };
     const c = snap.data(); const now = Date.now();
@@ -5381,6 +5392,7 @@ window.wlRedeemCoupon = async function(code, ref){
   if(!code) return { ok:false, reason:"leer" };
   const cRef = doc(db,"coupons",code);
   try{
+    await window.wlAuthReady;
     return await runTransaction(db, async(tx)=>{
       const snap = await tx.get(cRef);
       if(!snap.exists()) return { ok:false, reason:"Code nicht gefunden" };
