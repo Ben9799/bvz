@@ -28,7 +28,8 @@
 
   header{position:sticky;top:0;z-index:50;background:rgba(250,248,245,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--hair)}
   .nav{display:flex;align-items:center;justify-content:space-between;height:70px}
-  .brand{font-family:var(--disp);font-size:1.35rem;font-weight:600;letter-spacing:.02em;display:flex;align-items:center;gap:.5rem}
+  .brand{font-family:var(--disp);font-size:1.35rem;font-weight:600;letter-spacing:.02em;display:flex;align-items:center;gap:.6rem}
+  .brand img{width:28px;height:28px;object-fit:contain;display:block}
   .brand small{font-family:var(--sans);font-size:.6rem;letter-spacing:.26em;text-transform:uppercase;color:var(--mut);font-weight:500;margin-top:6px}
   .nav-links{display:flex;gap:34px;font-size:.82rem;color:var(--ink-soft)}
   .nav-links a{transition:color .2s}.nav-links a:hover{color:var(--ink)}
@@ -172,7 +173,10 @@
 
 <header>
   <div class="wrap nav">
-    <div class="brand">Wolf&nbsp;Lasermark <small>Silberatelier</small></div>
+    <a class="brand" href="index.html" aria-label="Wolf Lasermark Silberatelier – zur Hauptseite">
+      <picture><source srcset="images/wolf-lasermark-icon.webp" type="image/webp"><img src="images/wolf-lasermark-icon.png" alt="Wolf Lasermark" width="28" height="28"></picture>
+      Wolf&nbsp;Lasermark <small>Silberatelier</small>
+    </a>
     <nav class="nav-links">
       <a href="#konfigurator">Gestalten</a>
       <a href="#kollektion">Kollektion</a>
