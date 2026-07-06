@@ -107,6 +107,8 @@
 
   footer{border-top:1px solid var(--hair);padding:40px 0;font-size:.78rem;color:var(--mut)}
   .foot-row{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px}
+  .foot-legal a{color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--hair)}
+  .foot-legal a:hover{color:var(--ink)}
 
   .dim-caption{margin-top:14px;font-size:.8rem;color:var(--ink-soft);letter-spacing:.03em;text-align:center}
   .drag-hint{margin-top:6px;font-size:.68rem;color:var(--mut);letter-spacing:.04em;text-align:center}
@@ -403,7 +405,7 @@
 <footer>
   <div class="wrap foot-row">
     <div>© Wolf Lasermark · Silberatelier — 925 Sterlingsilber, handgraviert in Bayern</div>
-    <div>Impressum · Datenschutz · Kontakt</div>
+    <div class="foot-legal"><a href="impressum.html">Impressum</a> · <a href="datenschutz.html">Datenschutz</a> · <a href="AGB.html">AGB</a> · <a href="AGB.html#widerrufsrecht">Widerruf</a></div>
   </div>
 </footer>
 
@@ -1160,7 +1162,7 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
       </div>
       <div class="pg-msg" id="pgMsg"></div>
       <div id="paypal-button-container"></div>
-      <p class="pg-note">Mit dem Klick auf Bezahlen wird dein gestaltetes Design an uns übermittelt. Preis inkl. USt. gemäß §19 UStG. Versand innerhalb Deutschlands.</p>
+      <p class="pg-note">Mit dem Klick auf Bezahlen wird dein gestaltetes Design an uns übermittelt. Endpreis gemäß §19 UStG – keine MwSt. ausweisbar. Versand innerhalb Deutschlands.</p>
     </div>
     <div id="pgSuccess" class="pg-success" style="display:none">
       <div class="pg-check">✅</div>
