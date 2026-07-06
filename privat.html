@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Für Privatkunden — Personalisierte Lasergravuren | Wolf Lasermark</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --paper:#faf8f5; --paper-2:#f3efe9; --card:#ffffff;
+    --ink:#1c1a17; --ink-soft:#4a463f; --mut:#8a8178; --hair:#e7e1d8;
+    --silver-3:#9aa0a9;
+    --accent:#7a7268;
+    --wl:#00b0dd; --wl-2:#0099cc; --wl-deep:#0a2740;
+    --wl-soft:rgba(0,176,221,.12); --wl-line:rgba(0,176,221,.32); --wl-glow:rgba(0,176,221,.22);
+    --shadow:0 24px 60px -28px rgba(40,34,26,.28);
+    --disp:'Cormorant Garamond',Georgia,serif;
+    --sans:'Inter',system-ui,sans-serif;
+  }
+  html{scroll-behavior:smooth}
+  body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.6;font-weight:400;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  img{display:block}
+  h1,h2,h3,h4{font-family:var(--disp);font-weight:500;letter-spacing:-.01em;line-height:1.08}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+  .kicker{font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;color:var(--wl-2);font-weight:600;display:inline-flex;align-items:center;gap:.5rem}
+  .kicker::before{content:"";width:26px;height:1px;background:var(--wl-line)}
+
+  header{position:sticky;top:0;z-index:50;background:rgba(250,248,245,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--hair)}
+  header::before{content:"";position:absolute;inset:0 0 auto 0;height:2px;background:linear-gradient(90deg,transparent,var(--wl) 30%,var(--wl-2) 70%,transparent)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:72px}
+  .brand{font-family:var(--disp);font-size:1.35rem;font-weight:600;letter-spacing:.02em;display:flex;align-items:center;gap:.65rem;line-height:1}
+  .brand img{width:34px;height:34px;object-fit:contain}
+  .brand .bt{display:flex;flex-direction:column}
+  .brand small{font-family:var(--sans);font-size:.58rem;letter-spacing:.26em;text-transform:uppercase;color:var(--wl-2);font-weight:600;margin-top:5px}
+  .nav-links{display:flex;gap:32px;font-size:.82rem;color:var(--ink-soft)}
+  .nav-links a{transition:color .2s}
+  .nav-links a:hover{color:var(--wl-2)}
+  .nav-cta{border:1px solid var(--ink);border-radius:100px;padding:.55rem 1.2rem;font-size:.78rem;letter-spacing:.04em;transition:.2s}
+  .nav-cta:hover{background:var(--ink);color:var(--paper);box-shadow:0 0 0 3px var(--wl-soft)}
+
+  .btn{font-family:var(--sans);font-size:.86rem;font-weight:500;letter-spacing:.03em;border-radius:100px;padding:.92rem 1.7rem;cursor:pointer;border:1px solid var(--ink);transition:.22s;background:none;color:var(--ink);display:inline-block}
+  .btn-fill{background:var(--ink);color:var(--paper)}
+  .btn-fill:hover{background:var(--wl-deep);border-color:var(--wl-deep);box-shadow:0 10px 30px -12px var(--wl-glow)}
+  .btn-ghost:hover{background:var(--ink);color:var(--paper)}
+
+  .hero{padding:78px 0 54px;position:relative}
+  .hero-watermark{position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:min(620px,64%);opacity:.4;z-index:0;pointer-events:none;
+    filter:drop-shadow(0 12px 30px rgba(10,39,64,.16))}
+  .hero-copy{position:relative;z-index:1;text-align:center}
+  .hero-copy .kicker{margin-bottom:22px}
+  .hero-copy h1{font-size:clamp(2.6rem,5.2vw,4.3rem);margin-top:16px}
+  .hero-copy h1 em{font-style:italic;color:var(--wl-2)}
+  .hero-copy p{margin:26px auto 34px;color:var(--ink-soft);font-size:1.04rem;max-width:52ch}
+  .hero-actions{display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:center}
+  .hero-meta{margin-top:34px;display:flex;gap:30px;font-size:.78rem;color:var(--mut);justify-content:center}
+  .hero-meta b{display:block;font-family:var(--disp);font-size:1.6rem;color:var(--ink);font-weight:600}
+  .hero-meta b em{font-style:normal;color:var(--wl-2)}
+
+  .trust{border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);background:var(--card)}
+  .trust-row{display:flex;justify-content:space-between;flex-wrap:wrap;gap:18px;padding:22px 0}
+  .trust-item{display:flex;align-items:center;gap:10px;font-size:.82rem;color:var(--ink-soft)}
+  .trust-item svg{width:20px;height:20px;stroke:var(--wl-2);fill:none;stroke-width:1.5}
+
+  section{padding:82px 0}
+  .sec-head{text-align:center;max-width:60ch;margin:0 auto 48px}
+  .sec-head .kicker{justify-content:center;display:inline-flex}
+  .sec-head h2{font-size:clamp(2rem,4vw,3rem);margin:14px 0 12px}
+  .sec-head p{color:var(--ink-soft)}
+
+  /* LEISTUNG */
+  .leist{display:grid;grid-template-columns:1fr 1.1fr;gap:48px;align-items:center;
+    background:var(--card);border:1px solid var(--hair);border-radius:24px;padding:44px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .leist::before{content:"";position:absolute;width:420px;height:420px;border-radius:50%;top:-180px;right:-140px;
+    background:radial-gradient(circle,var(--wl-soft),transparent 62%);pointer-events:none}
+  .leist h3{font-size:2rem;margin:10px 0 12px}
+  .leist p{color:var(--ink-soft);font-size:.98rem}
+  .leist-list{list-style:none;display:grid;gap:12px;margin-top:6px}
+  .leist-list li{display:flex;align-items:flex-start;gap:12px;font-size:.95rem;color:var(--ink-soft)}
+  .leist-list li::before{content:"";flex:0 0 20px;height:20px;margin-top:2px;border-radius:50%;
+    background:var(--wl-soft) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230099cc' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E") center/13px no-repeat}
+  .leist-cta{margin-top:24px}
+
+  /* PREISE */
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+  .preis{position:relative;background:var(--card);border:1px solid var(--hair);border-radius:20px;padding:30px 24px;text-align:center;transition:.25s}
+  .preis:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:var(--wl-line)}
+  .preis.featured{border-color:var(--wl-line);box-shadow:0 20px 50px -30px var(--wl-glow)}
+  .preis-badge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--wl-2);color:#fff;
+    font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;padding:.28rem .8rem;border-radius:100px}
+  .preis-ic{font-size:1.8rem;line-height:1}
+  .preis-name{font-family:var(--disp);font-size:1.3rem;font-weight:600;margin:12px 0 8px}
+  .preis-from{font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:var(--mut)}
+  .preis-amount{font-family:var(--disp);font-size:2.5rem;font-weight:600;line-height:1;color:var(--ink)}
+  .preis-unit{font-size:.76rem;color:var(--mut);margin-bottom:12px}
+  .preis-ex{font-size:.8rem;color:var(--ink-soft);line-height:1.5}
+  .preise-note{text-align:center;color:var(--mut);font-size:.82rem;margin-top:30px}
+  .preise-note a{color:var(--wl-2);font-weight:600}
+
+  /* ABLAUF */
+  .grid4.steps{gap:30px}
+  .step{text-align:center}
+  .step .dot{width:60px;height:60px;margin:0 auto 14px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:1.5rem;background:var(--card);border:1px solid var(--wl-line);box-shadow:0 10px 26px -16px var(--wl-glow)}
+  .step h4{font-size:1.35rem;margin-bottom:6px}
+  .step p{font-size:.88rem;color:var(--ink-soft)}
+
+  /* REVIEWS */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+  .review{background:var(--card);border:1px solid var(--hair);border-radius:20px;padding:32px;position:relative}
+  .review::before{content:"\201C";position:absolute;top:6px;left:20px;font-family:var(--disp);font-size:4rem;color:var(--wl-line);line-height:1}
+  .review p{font-family:var(--disp);font-style:italic;font-size:1.22rem;color:var(--ink);line-height:1.4;position:relative}
+  .review .who{margin-top:16px;font-size:.82rem;color:var(--mut)}
+
+  /* CTA */
+  .cta{position:relative;background:linear-gradient(180deg,#fff,var(--paper-2));border-top:1px solid var(--hair);overflow:hidden}
+  .cta::before{content:"";position:absolute;width:640px;height:640px;border-radius:50%;top:-260px;right:-160px;
+    background:radial-gradient(circle,var(--wl-glow),transparent 62%);pointer-events:none}
+  .cta::after{content:"";position:absolute;width:520px;height:520px;border-radius:50%;bottom:-260px;left:-120px;
+    background:radial-gradient(circle,rgba(0,176,221,.10),transparent 60%);pointer-events:none}
+  .cta-inner{position:relative;text-align:center;max-width:60ch;margin:0 auto;padding:14px 0}
+  .cta h2{font-size:clamp(2rem,4.4vw,3.2rem);margin:16px 0 14px}
+  .cta h2 em{font-style:italic;color:var(--wl-2)}
+  .cta p{color:var(--ink-soft);margin-bottom:30px}
+
+  footer{border-top:1px solid var(--hair);padding:40px 0;font-size:.78rem;color:var(--mut)}
+  .foot-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px}
+  .foot-brand{display:flex;align-items:center;gap:.6rem;font-family:var(--disp);font-size:1.05rem;color:var(--ink)}
+  .foot-brand img{width:24px;height:24px}
+  .foot-links{display:flex;gap:22px}
+  .foot-links a:hover{color:var(--wl-2)}
+
+  .fade{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+  .fade.in{opacity:1;transform:none}
+
+  @media(max-width:980px){ .grid4{grid-template-columns:1fr 1fr} }
+  @media(max-width:860px){
+    .hero-watermark{width:min(420px,80%)}
+    .leist{grid-template-columns:1fr;padding:32px}
+    .grid2{grid-template-columns:1fr}
+    .nav-links{display:none}
+    .hero-meta{gap:22px}
+  }
+  @media(max-width:560px){ .grid4{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="index.html" aria-label="Wolf Lasermark – zur Hauptseite">
+      <picture><source srcset="images/wolf-lasermark-icon.webp" type="image/webp"><img src="images/wolf-lasermark-icon.png" alt="Wolf Lasermark" width="34" height="34"></picture>
+      <span class="bt">Wolf&nbsp;Lasermark <small>Privatkunden</small></span>
+    </a>
+    <nav class="nav-links">
+      <a href="#leistungen">Leistungen</a>
+      <a href="#preise">Preise</a>
+      <a href="#bewertungen">Bewertungen</a>
+      <a href="#ablauf">Ablauf</a>
+    </nav>
+    <a href="shop.html" class="nav-cta">🛒 Zum Shop</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="wrap hero">
+  <img class="hero-watermark" src="images/wolf-lasermark-icon.png" alt="" aria-hidden="true">
+  <div class="hero-copy fade">
+    <span class="kicker">Für Privatkunden · Handgefertigt in Bayern</span>
+    <h1>Lasergravuren die<br><em>unvergesslich</em> bleiben</h1>
+    <p>Personalisierte Geschenke, Schmuck und Erinnerungsstücke – handgefertigt mit Präzisionslaser direkt aus Bayern.</p>
+    <div class="hero-actions">
+      <a href="shop.html" class="btn btn-fill">🛒 Jetzt im Shop bestellen</a>
+      <a href="#leistungen" class="btn btn-ghost">Mehr erfahren →</a>
+    </div>
+    <div class="hero-meta">
+      <div><b>±0,01</b>mm Präzision</div>
+      <div><b>≤8h</b>Antwortzeit</div>
+      <div><b><em>0%</em></b>MwSt · §19 UStG</div>
+    </div>
+  </div>
+</div>
+
+<!-- TRUST -->
+<div class="trust">
+  <div class="wrap trust-row">
+    <div class="trust-item"><svg viewBox="0 0 24 24"><path d="M3 12h18M12 3v18"/></svg> 100W JPT Faserlaser</div>
+    <div class="trust-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg> Antwort in ≤ 8 Stunden</div>
+    <div class="trust-item"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Keine Mindestmenge</div>
+    <div class="trust-item"><svg viewBox="0 0 24 24"><path d="M12 2l2.4 6.9H22l-6 4.4 2.3 7L12 16l-6.3 4.3L8 13.3 2 8.9h7.6z"/></svg> Kleinunternehmer – keine MwSt.</div>
+  </div>
+</div>
+
+<!-- LEISTUNG -->
+<section id="leistungen">
+  <div class="wrap">
+    <div class="sec-head fade">
+      <span class="kicker">Für Privatkunden</span>
+      <h2>Aus Alltag wird Unikat</h2>
+      <p>Machen Sie aus Alltagsgegenständen unvergessliche Erinnerungsstücke – mit Namen, Datum, Motiv oder Widmung.</p>
+    </div>
+    <div class="leist fade">
+      <div>
+        <span class="kicker">Was wir gravieren</span>
+        <h3>Ihr Moment, in Metall verewigt</h3>
+        <p>Ob Geschenk, Schmuck oder Andenken – wir veredeln Ihr Stück in Handarbeit mit dem Präzisionslaser.</p>
+        <div class="leist-cta"><a href="shop.html" class="btn btn-fill">🛒 Zum Shop – personalisieren</a></div>
+      </div>
+      <ul class="leist-list">
+        <li>Schmuck, Ringe, Anhänger &amp; Accessoires</li>
+        <li>Schlüsselanhänger, Stifte, Feuerzeuge</li>
+        <li>Trinkflaschen, Thermobecher, Messer</li>
+        <li>Erinnerungstafeln &amp; personalisierte Plaketten</li>
+        <li>Individuelle Motive, Logos &amp; Widmungen</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- PREISE -->
+<section id="preise" style="background:var(--card);border-top:1px solid var(--hair);border-bottom:1px solid var(--hair)">
+  <div class="wrap">
+    <div class="sec-head fade">
+      <span class="kicker">Preise</span>
+      <h2>Was kostet <em style="font-style:italic;color:var(--wl-2)">eine Gravur?</em></h2>
+      <p>Transparent &amp; fair – alle Preise sind Endpreise gemäß §19 UStG (keine MwSt.).</p>
+    </div>
+    <div class="grid4 fade">
+      <div class="preis">
+        <span class="preis-ic">💍</span>
+        <div class="preis-name">Schmuck &amp; Ringe</div>
+        <div class="preis-from">ab</div><div class="preis-amount">15&nbsp;€</div><div class="preis-unit">pro Stück</div>
+        <p class="preis-ex">Namen, Datum, Spruch auf Ring, Armband, Anhänger</p>
+      </div>
+      <div class="preis featured">
+        <div class="preis-badge">Beliebt</div>
+        <span class="preis-ic">🎁</span>
+        <div class="preis-name">Geschenke &amp; Accessoires</div>
+        <div class="preis-from">ab</div><div class="preis-amount">20&nbsp;€</div><div class="preis-unit">pro Stück</div>
+        <p class="preis-ex">Thermobecher, Messer, Feuerzeug, Schlüsselanhänger</p>
+      </div>
+      <div class="preis">
+        <span class="preis-ic">🪧</span>
+        <div class="preis-name">Schilder &amp; Plaketten</div>
+        <div class="preis-from">ab</div><div class="preis-amount">25&nbsp;€</div><div class="preis-unit">pro Stück</div>
+        <p class="preis-ex">Erinnerungstafeln, Metallkarten, Namensschilder</p>
+      </div>
+      <div class="preis">
+        <span class="preis-ic">💒</span>
+        <div class="preis-name">Hochzeit &amp; Jubiläum</div>
+        <div class="preis-from">ab</div><div class="preis-amount">30&nbsp;€</div><div class="preis-unit">pro Set</div>
+        <p class="preis-ex">Ringe, Gastgeschenke, Dankeskarten aus Metall</p>
+      </div>
+    </div>
+    <p class="preise-note fade">Alle Preise sind Richtwerte · Endpreise gemäß §19 UStG · <a href="shop.html">Unverbindlich anfragen →</a></p>
+  </div>
+</section>
+
+<!-- BEWERTUNGEN -->
+<section id="bewertungen">
+  <div class="wrap">
+    <div class="sec-head fade">
+      <span class="kicker">Stimmen unserer Kunden</span>
+      <h2>Was wir oft zu hören bekommen</h2>
+    </div>
+    <div class="grid2 fade">
+      <div class="review">
+        <p>Ich hatte ein personalisiertes Geschenk für meinen Mann bestellt – die Gravur war haargenau so wie ich mir das vorgestellt hatte. Schnelle Kommunikation, top Qualität.</p>
+        <div class="who">— sinngemäß, Privatkundin</div>
+      </div>
+      <div class="review">
+        <p>Hochzeitsringe gravieren lassen – das Ergebnis war wunderschön und der Preis absolut fair. Sehr professionell und herzlich. Nur zu empfehlen!</p>
+        <div class="who">— sinngemäß, Privatkunden</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABLAUF -->
+<section id="ablauf" style="background:var(--card);border-top:1px solid var(--hair);border-bottom:1px solid var(--hair)">
+  <div class="wrap">
+    <div class="sec-head fade">
+      <span class="kicker">So einfach geht's</span>
+      <h2>In vier Schritten zum Unikat</h2>
+    </div>
+    <div class="grid4 steps fade">
+      <div class="step"><div class="dot">🛒</div><h4>Shop besuchen</h4><p>Produkt wählen, Text oder Motiv eingeben. Oder WhatsApp schreiben.</p></div>
+      <div class="step"><div class="dot">✅</div><h4>Bestätigung</h4><p>Wir prüfen Ihr Design und senden eine Vorschau zur Freigabe.</p></div>
+      <div class="step"><div class="dot">⚡</div><h4>Lasergravur</h4><p>Ihr Stück wird mit dem 100W JPT Faserlaser präzise graviert.</p></div>
+      <div class="step"><div class="dot">🎁</div><h4>Freude erleben</h4><p>Ihr Unikat – perfekt verpackt, bereit zum Verschenken.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="wrap">
+    <div class="cta-inner fade">
+      <span class="kicker">Bereit?</span>
+      <h2>Ihr <em>persönliches</em> Unikat wartet</h2>
+      <p>Faire Preise, handgraviert in Bayern, perfekt verpackt zum Verschenken.</p>
+      <a href="shop.html" class="btn btn-fill">🛒 Jetzt im Shop stöbern</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-row">
+    <div class="foot-brand">
+      <img src="images/wolf-lasermark-icon.png" alt="Wolf Lasermark">
+      Wolf Lasermark · Für Privatkunden
+    </div>
+    <div class="foot-links">
+      <a href="impressum.html">Impressum</a>
+      <a href="datenschutz.html">Datenschutz</a>
+      <a href="AGB.html">AGB</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12});
+  document.querySelectorAll('.fade').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
