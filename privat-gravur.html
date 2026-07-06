@@ -146,6 +146,11 @@
   .photo-tools.on{display:block}
   .photo-tools .range-line{margin-top:10px}
   .photo-tools .mini-help{margin-top:10px}
+  .map-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
+  .map-row .map-input{margin:0}
+  .map-row .chip{white-space:nowrap}
+  .map-zoom-line{margin-top:12px}
+  .map-zoom-line .map-zoom-lbl{font-size:.78rem;color:var(--ink-soft);margin:0}
   #cfgPendant .photo-hit{fill:transparent;cursor:grab}
   #cfgPendant .photo-hit.dragging{cursor:grabbing}
   #cfgPendant .photo-frame-guide{fill:none;stroke:#9fb0c4;stroke-width:1;stroke-dasharray:5 4;opacity:.72;pointer-events:none}
@@ -356,6 +361,23 @@
             <p class="mini-help">Tipp: Das Foto in der Vorschau mit der Maus ziehen, um festzulegen, welcher Ausschnitt im Medaillon sichtbar ist.</p>
           </div>
         </div>
+        <div class="field" id="mapField">
+          <label>Karten-Gravur · nur Kreis (optional)</label>
+          <div class="map-row">
+            <input type="text" class="txt map-input" id="mapQuery" placeholder="Ort oder Koordinaten, z. B. Marienplatz München">
+            <button type="button" class="chip" id="mapGenBtn">Karte erzeugen</button>
+          </div>
+          <div class="range-line map-zoom-line">
+            <label class="map-zoom-lbl">Zoom</label>
+            <input type="range" id="mapZoom" min="250" max="1200" step="50" value="550">
+            <output id="mapZoomValue">mittel</output>
+          </div>
+          <p class="hint">Gib eine Adresse oder GPS-Koordinaten ein (z.&nbsp;B. <em>48.137, 11.575</em>). Wir erzeugen daraus automatisch die Straßenkarte mit Herz-Markierung an deinem Ort – als Gravur-Vorlage. Kartendaten © OpenStreetMap.</p>
+          <div class="photo-msg" id="mapMsg"></div>
+          <div class="photo-actions" id="mapActions" style="display:none">
+            <button type="button" class="linkbtn" id="mapRemove">Karte entfernen</button>
+          </div>
+        </div>
         <div class="field">
           <label>Kettenlänge</label>
           <div class="chips" id="lenChips">
@@ -473,6 +495,9 @@ let state={
   photoOffX:0,
   photoOffY:0,
   selectedLineId:1,
+  mapPaths:null,
+  mapLabel:'',
+  mapCenter:null,
   lines:[{id:1,text:'Emma',offX:0,offY:0,fontScale:1,angle:0,textMode:'straight'}]
 };
 const FRAME_STORAGE_KEY='wolf-lasermark-frame-calibration-v2';
@@ -551,6 +576,14 @@ function pendantBody(shape,cx,cy,MM,photo){
   if(shape==='circle'){
     const r=10*MM;
     let s=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#silver)" stroke="#ffffff" stroke-opacity=".6"/>`;
+    if(state.mapPaths){
+      const R=frameOf('circle').safeR*MM, id='mc'+(clipSeq++);
+      const scl=(2*R)/1000;
+      s+=`<clipPath id="${id}"><circle cx="${cx}" cy="${cy}" r="${R}"/></clipPath>`
+        +`<g clip-path="url(#${id})" transform="translate(${cx-R} ${cy-R}) scale(${scl})">${state.mapPaths}</g>`
+        +`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#cfd3d9" stroke-width="0.7"/>`;
+      return s;
+    }
     if(photo){
       const ri=frameOf('circle').safeR*MM, id='pc'+(clipSeq++);
       const metrics=getPhotoDisplayMetrics(MM);
@@ -616,8 +649,8 @@ function lineMarkup(line, shape, cx, cy, MM, variant='preview'){
 
 function pendant(shape, lines, cx, cy, MM, photo, variant='preview'){
   const body = pendantBody(shape,cx,cy,MM,photo);
-  const overlays = variant==='preview' ? overlayOutlines(shape,cx,cy,MM) + ((shape==='circle' && photo) ? photoGuideCircle(cx,cy,MM) : '') : '';
-  const text = (shape==='circle' && photo) ? '' : lines.map(line=>lineMarkup(line, shape, cx, cy, MM, variant)).join('');
+  const overlays = variant==='preview' ? overlayOutlines(shape,cx,cy,MM) + ((shape==='circle' && photo && !state.mapPaths) ? photoGuideCircle(cx,cy,MM) : '') : '';
+  const text = (shape==='circle' && (photo || state.mapPaths)) ? '' : lines.map(line=>lineMarkup(line, shape, cx, cy, MM, variant)).join('');
   return body + overlays + text;
 }
 
@@ -681,6 +714,7 @@ function ruler(shape,cx,cy,MM){
 function syncShapeChips(){
   document.querySelectorAll('#shapeChips .chip').forEach(x=>x.classList.toggle('on', x.dataset.shape===state.shape));
   document.getElementById('photoField').style.display = state.shape==='circle' ? 'block' : 'none';
+  var mapF=document.getElementById('mapField'); if(mapF) mapF.style.display = state.shape==='circle' ? 'block' : 'none';
 }
 function renderLineEditor(){
   const wrap=document.getElementById('lineEditor');
@@ -1054,6 +1088,7 @@ document.getElementById('photoInput').addEventListener('change',e=>{
       uploadLabel.textContent=file.name.length>22 ? file.name.slice(0,20)+'…' : file.name;
       setPhotoMsg('ok','Foto übernommen ('+w+'×'+h+' px). Ziehe das Foto in der Vorschau mit der Maus, um den sichtbaren Ausschnitt im Medaillon festzulegen.');
       photoActions.style.display='flex';
+      clearMap();
       if(state.shape!=='circle'){ state.shape='circle'; syncShapeChips(); }
       render();
     };
@@ -1092,6 +1127,117 @@ document.getElementById('photoZoomRange').addEventListener('input',e=>{
   renderPreviewOnly();
   syncPhotoUi();
 });
+
+// ---- map engraving (circle only) ----
+const mapMsgEl=document.getElementById('mapMsg');
+const mapActionsEl=document.getElementById('mapActions');
+const mapGenBtn=document.getElementById('mapGenBtn');
+function setMapMsg(kind,txt){ mapMsgEl.className='photo-msg '+kind; mapMsgEl.textContent=txt; }
+function mapBusy(b){ mapGenBtn.disabled=b; mapGenBtn.textContent=b?'…':'Karte erzeugen'; }
+function clearPhoto(){
+  if(!state.photo) return;
+  state.photo=null; state.photoWidth=0; state.photoHeight=0; state.photoScale=1; state.photoOffX=0; state.photoOffY=0;
+  const pi=document.getElementById('photoInput'); if(pi) pi.value='';
+  uploadLabel.textContent='Foto auswählen …';
+  photoMsg.className='photo-msg'; photoMsg.textContent='';
+  photoActions.style.display='none';
+}
+function clearMap(){
+  state.mapPaths=null; state.mapLabel=''; state.mapCenter=null;
+  mapActionsEl.style.display='none';
+  mapMsgEl.className='photo-msg'; mapMsgEl.textContent='';
+}
+function parseLatLon(str){
+  const m=String(str).trim().match(/^(-?\d{1,3}(?:\.\d+)?)[,;\s]+(-?\d{1,3}(?:\.\d+)?)$/);
+  if(!m) return null;
+  const lat=parseFloat(m[1]), lon=parseFloat(m[2]);
+  if(isNaN(lat)||isNaN(lon)||Math.abs(lat)>90||Math.abs(lon)>180) return null;
+  return {lat,lon};
+}
+async function geocode(q){
+  const url='https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(q);
+  const r=await fetch(url,{headers:{'Accept':'application/json'}});
+  if(!r.ok) throw new Error('geo');
+  const j=await r.json();
+  if(!j.length) throw new Error('notfound');
+  return {lat:parseFloat(j[0].lat), lon:parseFloat(j[0].lon), label:j[0].display_name};
+}
+function roadWidth(hw){
+  if(/motorway|trunk|primary/.test(hw)) return 4;
+  if(/secondary|tertiary/.test(hw)) return 2.6;
+  if(/residential|unclassified|living_street|pedestrian|road/.test(hw)) return 1.7;
+  return 1.05;
+}
+async function mapRender(center){
+  const R_m=+document.getElementById('mapZoom').value;
+  mapBusy(true); setMapMsg('','Karte wird erzeugt …');
+  try{
+    const q=`[out:json][timeout:25];(way["highway"](around:${R_m},${center.lat},${center.lon}););out geom;`;
+    const body='data='+encodeURIComponent(q);
+    const EPS=['https://overpass.private.coffee/api/interpreter','https://overpass.kumi.systems/api/interpreter','https://maps.mail.ru/osm/tools/overpass/api/interpreter'];
+    let j=null;
+    for(const ep of EPS){
+      try{ const r=await fetch(ep,{method:'POST',body}); if(!r.ok) continue; const d=await r.json(); if(d&&d.elements){ j=d; break; } }
+      catch(_){ }
+    }
+    if(!j) throw new Error('overpass');
+    const lat=center.lat, lon=center.lon;
+    const dLat=R_m/111320, dLon=R_m/(111320*Math.cos(lat*Math.PI/180));
+    const n=lat+dLat, sB=lat-dLat, w=lon-dLon, e=lon+dLon;
+    const px=lo=>(lo-w)/(e-w)*1000, py=la=>(n-la)/(n-sB)*1000;
+    let paths='';
+    (j.elements||[]).forEach(el=>{
+      if(el.type!=='way'||!el.geometry) return;
+      const pts=el.geometry.map(g=>px(g.lon).toFixed(1)+','+py(g.lat).toFixed(1)).join(' ');
+      const hw=(el.tags&&el.tags.highway)||'';
+      paths+=`<polyline points="${pts}" fill="none" stroke="#1c1a17" stroke-width="${roadWidth(hw)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+    });
+    if(!paths) throw new Error('empty');
+    const k=1.25, tx=(500-50*k), ty=(500-88*k);
+    const pin=`<path d="${UNIT_HEART}" transform="translate(${tx.toFixed(1)} ${ty.toFixed(1)}) scale(${k})" fill="#1c1a17" stroke="#faf8f5" stroke-width="7"/>`;
+    const rawLbl=String(center.label||'').trim();
+    let labelSvg='';
+    if(rawLbl){
+      const up=rawLbl.toUpperCase().replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+      const fs=Math.max(22, Math.min(42, 650/rawLbl.length));
+      const half=Math.min(300, fs*rawLbl.length*0.32);
+      labelSvg=`<line x1="${(500-half).toFixed(0)}" y1="820" x2="${(500+half).toFixed(0)}" y2="820" stroke="#1c1a17" stroke-width="2.4"/>`
+        +`<text x="500" y="886" text-anchor="middle" font-family="'Cormorant Garamond', Georgia, serif" font-size="${fs.toFixed(0)}" font-weight="600" letter-spacing="2" fill="#1c1a17" stroke="#faf8f5" stroke-width="6" style="paint-order:stroke">${up}</text>`;
+    }
+    state.mapPaths=paths+pin+labelSvg;
+    state.mapCenter=center;
+    state.mapLabel=center.label||(center.lat.toFixed(4)+', '+center.lon.toFixed(4));
+    clearPhoto();
+    if(state.shape!=='circle'){ state.shape='circle'; syncShapeChips(); }
+    mapActionsEl.style.display='flex';
+    setMapMsg('ok','Karte erzeugt: '+state.mapLabel);
+    render();
+  }catch(err){
+    const m=String(err&&err.message||err);
+    if(m==='empty') setMapMsg('warn','Keine Straßen in diesem Bereich. Bitte Zoom vergrößern.');
+    else setMapMsg('warn','Karte konnte nicht erzeugt werden. Bitte erneut versuchen.');
+  }finally{ mapBusy(false); }
+}
+async function mapGenerate(){
+  const q=document.getElementById('mapQuery').value.trim();
+  if(!q){ setMapMsg('warn','Bitte Ort oder Koordinaten eingeben.'); return; }
+  const ll=parseLatLon(q);
+  if(ll){ mapRender({lat:ll.lat,lon:ll.lon,label:q}); return; }
+  mapBusy(true); setMapMsg('','Ort wird gesucht …');
+  try{ const g=await geocode(q); mapRender({lat:g.lat,lon:g.lon,label:q}); }
+  catch(err){
+    mapBusy(false);
+    setMapMsg('warn', String(err&&err.message)==='notfound' ? 'Ort nicht gefunden. Bitte genauer eingeben (Straße, Stadt).' : 'Suche fehlgeschlagen. Bitte erneut versuchen.');
+  }
+}
+mapGenBtn.addEventListener('click',mapGenerate);
+document.getElementById('mapQuery').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); mapGenerate(); }});
+document.getElementById('mapRemove').addEventListener('click',()=>{ clearMap(); render(); });
+document.getElementById('mapZoom').addEventListener('input',e=>{
+  const v=+e.target.value;
+  document.getElementById('mapZoomValue').textContent = v<450?'eng':(v<800?'mittel':'weit');
+});
+document.getElementById('mapZoom').addEventListener('change',()=>{ if(state.mapCenter) mapRender(state.mapCenter); });
 
 // collection cards
 const items=[
@@ -1300,6 +1446,7 @@ window.wlRedeemCoupon = async function(code, ref){
   function pgProdName(){ return pgFormLabel()+' · 925 Silber'; }
   function pgGravurText(){ return state.lines.map(l=>(l.text||'').trim()).filter(Boolean).join(' | '); }
   function pgHasPhoto(){ return state.shape==='circle' && !!state.photo; }
+  function pgHasMap(){ return state.shape==='circle' && !!state.mapPaths; }
   function pgChain(){ return state.len+' cm'; }
   function pgDesc(){ return pgProdName()+' ×'+pgQty()+' – Wolf Lasermark Gravur'; }
 
@@ -1311,6 +1458,7 @@ window.wlRedeemCoupon = async function(code, ref){
     parts.push('<b>Form:</b> '+pgFormLabel());
     parts.push('<b>Kette:</b> '+pgChain());
     if(pgHasPhoto()) parts.push('<b>Foto-Gravur:</b> ja');
+    if(pgHasMap()) parts.push('<b>Karten-Gravur:</b> '+String(state.mapLabel||'ja').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])));
     const t=pgGravurText();
     if(t) parts.push('<b>Gravur:</b> '+t.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])));
     b.innerHTML=parts.join(' &nbsp;·&nbsp; ');
@@ -1350,7 +1498,7 @@ window.wlRedeemCoupon = async function(code, ref){
   }
 
   function pgValidate(){
-    if(!pgGravurText() && !pgHasPhoto()){ pgMsg('Bitte zuerst eine Gravur eingeben oder ein Foto hochladen.',true); return false; }
+    if(!pgGravurText() && !pgHasPhoto() && !pgHasMap()){ pgMsg('Bitte zuerst eine Gravur eingeben, ein Foto hochladen oder eine Karte erzeugen.',true); return false; }
     const need=[['pgName','Name'],['pgEmail','E-Mail'],['pgStrasse','Straße'],['pgPlz','PLZ'],['pgOrt','Ort']];
     for(const [id,label] of need){ if(!val(id)){ pgMsg('Bitte '+label+' ausfüllen.',true); $(id).focus(); return false; } }
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val('pgEmail'))){ pgMsg('Bitte eine gültige E-Mail eingeben.',true); $('pgEmail').focus(); return false; }
@@ -1409,6 +1557,8 @@ window.wlRedeemCoupon = async function(code, ref){
         kettenlaenge: pgChain(),
         gravurText: pgGravurText(),
         mitFoto: pgHasPhoto(),
+        mitKarte: pgHasMap(),
+        karteOrt: pgHasMap() ? (state.mapLabel||'') : '',
         menge: pgQty(),
         einzelpreis: fmtEUR(pgUnit()),
         originalpreis: fmtEUR(pgTotal()),
@@ -1440,8 +1590,9 @@ window.wlRedeemCoupon = async function(code, ref){
       fd.append('Produkt',pgProdName());
       fd.append('Form',pgFormLabel());
       fd.append('Kette',pgChain());
-      fd.append('Gravur',pgGravurText()||'(nur Foto)');
+      fd.append('Gravur',pgGravurText()|| (pgHasMap()?'(nur Karte)':'(nur Foto)'));
       fd.append('Foto',pgHasPhoto()?'ja':'nein');
+      fd.append('Karte',pgHasMap()?(state.mapLabel||'ja'):'nein');
       fd.append('Menge',String(pgQty()));
       fd.append('Einzelpreis',fmtEUR(pgUnit()));
       if(pgCoupon){ fd.append('Gutschein',pgCoupon.code+' (−'+pgCoupon.percent+'% = −'+fmtEUR(disc)+')'); }
