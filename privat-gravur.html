@@ -580,7 +580,7 @@ function pendantBody(shape,cx,cy,MM,photo){
       const R=frameOf('circle').safeR*MM, id='mc'+(clipSeq++);
       const scl=(2*R)/1000;
       s+=`<clipPath id="${id}"><circle cx="${cx}" cy="${cy}" r="${R}"/></clipPath>`
-        +`<g clip-path="url(#${id})" transform="translate(${cx-R} ${cy-R}) scale(${scl})">${state.mapPaths}</g>`
+        +`<g clip-path="url(#${id})"><g transform="translate(${cx-R} ${cy-R}) scale(${scl})">${state.mapPaths}</g></g>`
         +`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#cfd3d9" stroke-width="0.7"/>`;
       return s;
     }
