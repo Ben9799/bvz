@@ -700,7 +700,8 @@ function lineMarkup(line, shape, cx, cy, MM, variant='preview'){
 function pendant(shape, lines, cx, cy, MM, photo, variant='preview'){
   const body = pendantBody(shape,cx,cy,MM,photo);
   const overlays = variant==='preview' ? overlayOutlines(shape,cx,cy,MM) + ((shape==='circle' && photo && !state.mapPaths) ? photoGuideCircle(cx,cy,MM) : '') : '';
-  const text = (shape==='circle' && (photo || state.mapPaths)) ? '' : lines.map(line=>lineMarkup(line, shape, cx, cy, MM, variant)).join('');
+  const hideText = state.contentMode==='photo' || state.contentMode==='map' || (shape==='circle' && (photo || state.mapPaths));
+  const text = hideText ? '' : lines.map(line=>lineMarkup(line, shape, cx, cy, MM, variant)).join('');
   return body + overlays + text;
 }
 
