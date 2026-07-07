@@ -1519,6 +1519,12 @@ window.wlRedeemCoupon = async function(code, ref){
     clone.removeAttribute('style');
     const g=clone.querySelector('#cfgGuides'); if(g) g.innerHTML='';
     clone.setAttribute('xmlns','http://www.w3.org/2000/svg');
+    // Maßtreu exportieren: viewBox 0 0 300 300, mit CFG_MM=8 Einheiten/mm → 37,5 mm Kantenlänge,
+    // dadurch ist der ⌀20-mm-Anhänger in der Datei exakt 20 mm (kein manuelles Skalieren nötig).
+    const vb=(clone.getAttribute('viewBox')||'0 0 300 300').split(/\s+/).map(Number);
+    const mm=(n)=>(n/CFG_MM).toFixed(2)+'mm';
+    clone.setAttribute('width', mm(vb[2]||300));
+    clone.setAttribute('height', mm(vb[3]||300));
     return '<?xml version="1.0" encoding="UTF-8"?>\n'+new XMLSerializer().serializeToString(clone);
   }
   function pgRenderPNG(){
