@@ -1155,12 +1155,17 @@ function parseLatLon(str){
   return {lat,lon};
 }
 async function geocode(q){
-  const url='https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(q);
-  const r=await fetch(url,{headers:{'Accept':'application/json'}});
-  if(!r.ok) throw new Error('geo');
-  const j=await r.json();
-  if(!j.length) throw new Error('notfound');
-  return {lat:parseFloat(j[0].lat), lon:parseFloat(j[0].lon), label:j[0].display_name};
+  const enc=encodeURIComponent(q);
+  try{
+    const r=await fetch('https://photon.komoot.io/api/?limit=1&lang=de&q='+enc);
+    if(r.ok){ const j=await r.json(); const f=j.features&&j.features[0];
+      if(f&&f.geometry&&f.geometry.coordinates){ return {lat:+f.geometry.coordinates[1], lon:+f.geometry.coordinates[0]}; } }
+  }catch(_){ }
+  try{
+    const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+enc);
+    if(r.ok){ const j=await r.json(); if(j.length){ return {lat:parseFloat(j[0].lat), lon:parseFloat(j[0].lon)}; } }
+  }catch(_){ }
+  throw new Error('notfound');
 }
 function roadWidth(hw){
   if(/motorway|trunk|primary/.test(hw)) return 4;
