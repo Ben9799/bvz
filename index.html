@@ -386,6 +386,18 @@ picture { display: contents; }
   justify-content: center;
   animation: fadeUp 0.6s 0.3s ease both;
 }
+.hero-trial {
+  margin-top: 16px;
+  font-size: 0.9rem;
+  color: rgba(234,234,240,0.68);
+  animation: fadeUp 0.6s 0.4s ease both;
+}
+.hero-trial a {
+  color: var(--accent); font-weight: 700; text-decoration: none;
+  border-bottom: 1px solid rgba(0,200,255,0.35);
+  transition: border-color 0.2s;
+}
+.hero-trial a:hover { border-bottom-color: var(--accent); }
 .btn-primary {
   display: inline-flex; align-items: center; gap: 0.5rem;
   background: var(--accent); color: var(--bg);
@@ -2746,6 +2758,7 @@ body.mode-firmen .privat-only { display: none !important; }
         <a href="bestellung.html" class="btn-primary">🧮 Jetzt Angebot kalkulieren</a>
         <a href="#contact" class="btn-ghost">💬 Direkt anfragen →</a>
       </div>
+      <p class="hero-trial firmen-only">🎁 Neukunde? Testen Sie uns risikofrei mit einer <a href="kostenlose-probegravur.html">kostenlosen Probegravur&nbsp;→</a></p>
 
       <div class="hero-trust">
         <span class="trust-chip featured"><span class="ic">🤝</span> Bereits <strong class="js-anf-count">109</strong>&nbsp;Anfragen bearbeitet</span>

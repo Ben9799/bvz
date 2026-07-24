@@ -97,6 +97,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .result-wrap{padding:24px 32px 32px}
 
 /* Status hero */
+.reorder-cta{display:flex;align-items:center;gap:14px;max-width:520px;margin:18px auto 0;
+  background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:16px 18px;
+  text-decoration:none;transition:border-color .2s,transform .2s,box-shadow .2s}
+.reorder-cta:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:0 0 0 4px rgba(0,212,255,.08),0 8px 24px rgba(0,0,0,.18)}
+.reorder-ico{font-size:26px;line-height:1;flex-shrink:0}
+.reorder-txt{flex:1;min-width:0}
+.reorder-title{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.2px;margin-bottom:3px}
+.reorder-sub{font-size:12.5px;color:var(--text2);line-height:1.35}
+.reorder-arrow{font-size:20px;color:var(--accent);font-weight:700;flex-shrink:0}
 .status-hero{text-align:center;padding:4px 0 0}
 .status-hero-id{font-family:var(--mono);font-size:11px;color:var(--text3);margin-bottom:8px;letter-spacing:3px;text-transform:uppercase}
 .status-hero-name{font-size:22px;font-weight:800;letter-spacing:-.5px;margin-bottom:6px;line-height:1.2}
@@ -257,6 +266,16 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
     <div class="result-wrap" id="status-result" style="display:none"></div>
 
   </div>
+
+  <!-- CROSS-SELL: Nachbestellung -->
+  <a href="nachbestellung.html" class="reorder-cta">
+    <div class="reorder-ico">🔁</div>
+    <div class="reorder-txt">
+      <div class="reorder-title">Teile wieder bestellen?</div>
+      <div class="reorder-sub">Gleiche Gravur, gleiche Qualität — Ihre Beschriftung in wenigen Klicks nachbestellen.</div>
+    </div>
+    <div class="reorder-arrow">→</div>
+  </a>
 
   <div class="page-footer">
     <a href="index.html">← Zurück zur Website</a>
