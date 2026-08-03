@@ -557,6 +557,16 @@ picture { display: contents; }
   .trust-chip.featured { animation: none; }
 }
 
+/* Above-the-fold auf Mobil: weniger Kopf-Abstand, engere Abstände,
+   damit H1 + Sub + CTA + Probegravur ohne Scrollen sichtbar sind */
+@media (max-width: 640px) {
+  .hero { min-height: auto; padding: 4.5rem 1.4rem 3.5rem; }
+  .hero-badge { margin-bottom: 1.4rem; }
+  .hero h1 { margin-bottom: 1rem; }
+  .hero-sub { margin-bottom: 1.8rem; }
+  .hero-trust { margin-top: 2rem; }
+}
+
 /* ========================
    SHARED SECTION STYLES
    ======================== */
@@ -2846,8 +2856,8 @@ body.mode-firmen .privat-only { display: none !important; }
       </div>
 
       <!-- Firmen -->
-      <h1 class="firmen-only">Präzise Kennzeichnung<br>für <span>Ihr Unternehmen</span></h1>
-      <p class="hero-sub firmen-only">Seriennummern, QR-Codes, CE-Kennzeichnung und <strong>Express-Aufträge</strong> – dauerhaft, maschinenlesbar und normgerecht. Vom Einzelstück bis zur Serie, schnell und zuverlässig umgesetzt.</p>
+      <h1 class="firmen-only">Dauerhafte Metall-Kennzeichnung<br>für <span>Ihr Unternehmen</span></h1>
+      <p class="hero-sub firmen-only">Seriennummern, QR-Codes &amp; CE-Kennzeichnung – normgerecht graviert. <strong>Angebot in Sekunden, Muster in 48&nbsp;h.</strong></p>
       <div class="hero-ctas firmen-only">
         <a href="bestellung.html" class="btn-primary">🧮 Jetzt Angebot kalkulieren</a>
         <a href="#contact" class="btn-ghost">💬 Direkt anfragen →</a>
@@ -2856,14 +2866,10 @@ body.mode-firmen .privat-only { display: none !important; }
 
       <div class="hero-trust">
         <span class="trust-chip featured"><span class="ic">🤝</span> Bereits <strong class="js-anf-count">109</strong>&nbsp;Anfragen bearbeitet</span>
-        <span class="trust-chip"><span class="ic">✓</span> 100W JPT Faserlaser</span>
         <span class="trust-chip"><span class="ic">✓</span> ±0,01 mm Präzision</span>
         <span class="trust-chip"><span class="ic">✓</span> Antwort in ≤ 8h</span>
         <span class="trust-chip firmen-only"><span class="ic">✓</span> Express-Aufträge möglich</span>
-        <span class="trust-chip firmen-only"><span class="ic">✓</span> Automotive &amp; Luftfahrt</span>
-        <span class="trust-chip firmen-only"><span class="ic">✓</span> Werkzeugbau &amp; Spanntechnik</span>
         <span class="trust-chip"><span class="ic">✓</span> Keine Mindestmenge</span>
-        <span class="trust-chip"><span class="ic">✓</span> Kleinunternehmer – keine MwSt.</span>
       </div>
     </div>
   </section>
