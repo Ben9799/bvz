@@ -96,6 +96,71 @@
 }
 </script>
 
+<!-- HowTo Schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "Daten für die Lasergravur richtig anliefern",
+  "description": "Schritt-für-Schritt-Anleitung, wie Sie Grafikdaten für die Lasergravur auf Metall optimal vorbereiten: Vektorformat wählen, Schrift in Pfade umwandeln, Maße in Millimeter anlegen, Werkstoff angeben und die Datei zur Gravur übergeben.",
+  "totalTime": "PT10M",
+  "inLanguage": "de",
+  "supply": [
+    {
+      "@type": "HowToSupply",
+      "name": "Vektorgrafik (SVG, DXF oder vektorbasiertes PDF; alternativ AI/EPS)"
+    },
+    {
+      "@type": "HowToSupply",
+      "name": "Werkstoff-Angabe (z. B. Edelstahl V2A/V4A, Aluminium eloxiert/roh, Messing, Titan)"
+    }
+  ],
+  "tool": [
+    {
+      "@type": "HowToTool",
+      "name": "Adobe Illustrator, Inkscape oder CAD-Programm mit DXF-Export"
+    }
+  ],
+  "step": [
+    {
+      "@type": "HowToStep",
+      "position": 1,
+      "name": "Vektorformat wählen",
+      "text": "Legen Sie die Grafik als Vektor an (SVG, DXF oder vektorbasiertes PDF, alternativ AI/EPS). Vektor bleibt bei jeder Größe scharf und wird direkt in Laserpfade umgesetzt. Rasterbilder (PNG/TIFF/JPG) sind nur für Fotogravuren geeignet und sollten mindestens 300 dpi in Originalgröße haben.",
+      "url": "https://wolf-lasermark.de/daten-anliefern.html#formate"
+    },
+    {
+      "@type": "HowToStep",
+      "position": 2,
+      "name": "Schrift in Pfade umwandeln",
+      "text": "Wandeln Sie Texte vor dem Export in Pfade bzw. Kurven um (Illustrator: 'In Pfade umwandeln', Inkscape: 'Objekt → Objekt in Pfad umwandeln'). So wird die Schrift exakt graviert, auch wenn die Schriftart bei uns nicht installiert ist. Mindestbuchstabenhöhe auf Metall: 0,8–1 mm; Linien nicht dünner als 0,1 mm.",
+      "url": "https://wolf-lasermark.de/daten-anliefern.html#schrift"
+    },
+    {
+      "@type": "HowToStep",
+      "position": 3,
+      "name": "Maße 1:1 in Millimeter anlegen",
+      "text": "Datei in echter Größe in Millimeter (nicht in Zoll, nicht skaliert) anlegen. Gravurfeld und gewünschte Position des Motivs kennzeichnen und eine Bezugskante angeben. Die kostenlose Gravurvorlage enthält das Feld bereits.",
+      "url": "https://wolf-lasermark.de/daten-anliefern.html#masse"
+    },
+    {
+      "@type": "HowToStep",
+      "position": 4,
+      "name": "Werkstoff und gewünschten Effekt angeben",
+      "text": "Werkstoff möglichst genau nennen (z. B. Edelstahl V2A/V4A, Aluminium eloxiert/roh, Messing, Titan, Kunststoff) und angeben, ob dunkle Anlassbeschriftung, heller Hochkontrast oder Tiefengravur gewünscht ist. Bei größeren Serien fertigen wir vorab ein Testmuster auf Ihrem Werkstoff.",
+      "url": "https://wolf-lasermark.de/daten-anliefern.html#material"
+    },
+    {
+      "@type": "HowToStep",
+      "position": 5,
+      "name": "Datei senden und Angebot erhalten",
+      "text": "Senden Sie die vorbereitete Datei zusammen mit Material und Stückzahl per E-Mail an info@wolf-lasermark.de oder über den Angebot-Kalkulator. Rückmeldung mit Angebot in der Regel innerhalb von 8 Stunden, Musterfertigung in 48 Stunden. Keine Mindestmenge.",
+      "url": "https://wolf-lasermark.de/daten-anliefern.html#download"
+    }
+  ]
+}
+</script>
+
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="ratgeber.css">
 </head>
