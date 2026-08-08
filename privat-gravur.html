@@ -183,6 +183,24 @@
   .ms-del{border:0;background:none;color:var(--mut);font-size:1.1rem;cursor:pointer;line-height:1;padding:.35rem}
   .ms-del:hover{color:var(--ink)}
   .ms-year{font-family:var(--disp);font-size:1.02rem;text-align:center}
+  .taf-presets{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .taf-preset{display:flex;flex-direction:column;gap:1px;padding:.5rem .45rem;cursor:pointer;text-align:left;
+          border:1px solid var(--hair);border-radius:10px;background:var(--paper);font-family:var(--sans)}
+  .taf-preset b{font-size:.78rem;font-weight:600;color:var(--ink)}
+  .taf-preset span{font-size:.66rem;color:var(--mut)}
+  .taf-preset:hover{border-color:var(--accent)}
+  .taf-preset.on{border-color:var(--accent);background:var(--paper-2)}
+  @media(max-width:420px){.taf-presets{grid-template-columns:repeat(2,1fr)}}
+  /* Das Motiv wird gezeigt, nicht beschrieben — der Kunde erkennt die Linie wieder,
+     die er gleich auf dem Stahl sieht. */
+  .ms-icons{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:2px}
+  .ms-ico{display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 2px;cursor:pointer;
+          border:1px solid transparent;border-radius:8px;background:var(--paper);color:var(--mut);
+          font-family:var(--sans);font-size:.56rem;line-height:1.15;text-align:center}
+  .ms-ico svg{width:20px;height:20px}
+  .ms-ico span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+  .ms-ico:hover{color:var(--ink);border-color:var(--hair)}
+  .ms-ico.on{color:var(--ink);border-color:var(--accent);background:var(--paper-2)}
 
   .mode-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px}
   .mode-card{border:1px solid var(--hair);background:var(--paper);border-radius:14px;padding:9px 7px 8px;cursor:pointer;text-align:center;transition:.18s;display:flex;flex-direction:column;align-items:center;gap:5px;font-family:var(--sans)}
@@ -548,6 +566,12 @@
       </div>
 
       <div class="config-controls">
+        <div class="field">
+          <label>Vorschläge</label>
+          <div class="taf-presets" id="tafPresets"></div>
+          <p class="mini-help">Ein Startpunkt — jede Zeile bleibt frei änderbar.</p>
+        </div>
+
         <div class="field">
           <label for="tafTitle">Überschrift</label>
           <input class="txt" id="tafTitle" maxlength="26" value="Unsere Geschichte" placeholder="Unsere Geschichte">
@@ -1542,7 +1566,45 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
   };
   const ICON_KEYS=Object.keys(ICONS);
 
+  /* Startpunkte statt leerer Felder: wer schon eine fertige Tafel vor sich
+     sieht, tauscht Namen und Jahre aus, statt vor dem leeren Blatt zu sitzen. */
+  const PRESETS=[
+    {key:'weg', name:'Lebensweg', hint:'Für Paare',
+     title:'Unsere Geschichte', quote:'Ich würde dich immer wieder wählen.', names:'Anna & Lukas',
+     ms:[{year:'1998',l1:'Unser erstes',l2:'Kennenlernen',icon:'kaffee'},
+         {year:'2003',l1:'Unsere',l2:'Hochzeit',icon:'ringe'},
+         {year:'2012',l1:'Unser erstes',l2:'Zuhause',icon:'haus'},
+         {year:'2026',l1:'Unsere',l2:'Familie',icon:'familie'}]},
+    {key:'jahr', name:'Jahrestag', hint:'Gemeinsame Jahre',
+     title:'Seit 2001', quote:'Und wir würden es wieder tun.', names:'Martina & Stefan',
+     ms:[{year:'2001',l1:'Der erste',l2:'Tanz',icon:'herz'},
+         {year:'2004',l1:'Das Ja-Wort',l2:'',icon:'ringe'},
+         {year:'2011',l1:'Unser Zuhause',l2:'',icon:'haus'},
+         {year:'2026',l1:'25 Jahre',l2:'zu zweit',icon:'stern'}]},
+    {key:'andenken', name:'Andenken', hint:'In Erinnerung',
+     title:'In Erinnerung', quote:'Wer geliebt wird, geht nicht fort.', names:'Hans Bergmann',
+     ms:[{year:'1948',l1:'Geboren in',l2:'Rosenheim',icon:'stern'},
+         {year:'1972',l1:'Die eigene',l2:'Werkstatt',icon:'haus'},
+         {year:'1980',l1:'Vater',l2:'geworden',icon:'familie'},
+         {year:'2024',l1:'Immer bei',l2:'uns',icon:'herz'}]},
+    {key:'danke', name:'Danksagung', hint:'Ein Dankeschön',
+     title:'Danke', quote:'Für alles, was selbstverständlich schien.', names:'Für Frau Keller',
+     ms:[{year:'2006',l1:'Der erste',l2:'Schultag',icon:'stern'},
+         {year:'2013',l1:'Unzählige',l2:'Stunden',icon:'kaffee'},
+         {year:'2026',l1:'Ein offenes',l2:'Ohr',icon:'herz'}]},
+    {key:'trophae', name:'Auszeichnung', hint:'Trophäe',
+     title:'Auszeichnung', quote:'Verdient — und nicht vergessen.', names:'Team Fertigung',
+     ms:[{year:'2026',l1:'Erster Platz',l2:'Regionalfinale',icon:'stern'}]},
+    {key:'ruhestand', name:'Ruhestand', hint:'Zum Abschied',
+     title:'Vierzig Jahre', quote:'Und jetzt: alle Zeit der Welt.', names:'Für Peter',
+     ms:[{year:'1986',l1:'Der erste',l2:'Arbeitstag',icon:'kaffee'},
+         {year:'1994',l1:'Die eigene',l2:'Abteilung',icon:'haus'},
+         {year:'2010',l1:'Hundert',l2:'Azubis',icon:'familie'},
+         {year:'2026',l1:'Der letzte',l2:'Arbeitstag',icon:'stern'}]}
+  ];
+
   const st={
+    preset:'weg',
     title:'Unsere Geschichte',
     quote:'Ich würde dich immer wieder wählen.',
     names:'Anna & Lukas',
@@ -1629,9 +1691,11 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
       + `letter-spacing="${P(1.5)}" fill="${ENG}" font-weight="500">${esc(up(st.title))}</text>`;
     out+=dividerMarkup(20);
     if(!st.sketch){
-      out+=`<rect x="${X(15)}" y="${Y(25)}" width="${P(75)}" height="${P(54)}" rx="${P(2)}" fill="none" `
+      // data-ph: reine Bildschirm-Hilfe. Der Export streift sie ab, sonst
+      // stuende der gestrichelte Rahmen samt "Euer Foto" spaeter im Stahl.
+      out+=`<g data-ph="1"><rect x="${X(15)}" y="${Y(25)}" width="${P(75)}" height="${P(54)}" rx="${P(2)}" fill="none" `
         + `stroke="${ENG}" stroke-opacity=".28" stroke-width=".7" stroke-dasharray="${P(2)} ${P(1.6)}"/>`
-        + `<text x="${cx}" y="${Y(53)}" text-anchor="middle" font-family="Inter,sans-serif" font-size="${P(3)}" fill="${ENG}" opacity=".5">Euer Foto</text>`;
+        + `<text x="${cx}" y="${Y(53)}" text-anchor="middle" font-family="Inter,sans-serif" font-size="${P(3)}" fill="${ENG}" opacity=".5">Euer Foto</text></g>`;
     }
     out+=timelineMarkup();
     if(st.quote) out+=`<text x="${cx}" y="${Y(120)}" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" `
@@ -1808,6 +1872,26 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
   }
 
   /* ---------- Meilenstein-Zeilen ---------- */
+  function renderPresets(){
+    $('tafPresets').innerHTML=PRESETS.map(p=>
+      `<button type="button" class="taf-preset${p.key===st.preset?' on':''}" data-preset="${p.key}"
+         aria-pressed="${p.key===st.preset?'true':'false'}"><b>${esc(p.name)}</b><span>${esc(p.hint)}</span></button>`).join('');
+  }
+
+  function applyPreset(key){
+    const p=PRESETS.find(x=>x.key===key); if(!p) return;
+    st.preset=key; st.title=p.title; st.quote=p.quote; st.names=p.names;
+    st.ms=JSON.parse(JSON.stringify(p.ms));
+    $('tafTitle').value=p.title; $('tafQuote').value=p.quote; $('tafNames').value=p.names;
+    renderPresets(); renderMs(); render();
+  }
+
+  const shortLabel=k=>ICONS[k].label.split('·')[0].trim();
+  function iconPreview(k){
+    return `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" `
+      + `stroke-linecap="round" stroke-linejoin="round">${ICONS[k].d.map(d=>`<path d="${d}"/>`).join('')}</svg>`;
+  }
+
   function renderMs(){
     const box=$('tafMilestones');
     box.innerHTML=st.ms.map((m,i)=>
@@ -1816,8 +1900,10 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
          <div class="ms-stack">
            <input data-f="l1" maxlength="20" value="${esc(m.l1)}" placeholder="Zeile 1" aria-label="Zeile 1">
            <input data-f="l2" maxlength="20" value="${esc(m.l2)}" placeholder="Zeile 2" aria-label="Zeile 2">
-           <select data-f="icon" aria-label="Motiv">${ICON_KEYS.map(k=>
-             `<option value="${k}"${k===m.icon?' selected':''}>${esc(ICONS[k].label)}</option>`).join('')}</select>
+           <div class="ms-icons" role="radiogroup" aria-label="Motiv">${ICON_KEYS.map(k=>
+             `<button type="button" class="ms-ico${k===m.icon?' on':''}" data-ico="${k}" role="radio"
+                aria-checked="${k===m.icon?'true':'false'}" title="${esc(ICONS[k].label)}">
+                ${iconPreview(k)}<span>${esc(shortLabel(k))}</span></button>`).join('')}</div>
          </div>
          <button type="button" class="ms-del" data-del="${i}" title="Station entfernen" aria-label="Station entfernen">×</button>
        </div>`).join('');
@@ -1845,6 +1931,9 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
   }
 
   function bind(){
+    $('tafPresets').addEventListener('click',e=>{
+      const b=e.target.closest('[data-preset]'); if(b) applyPreset(b.dataset.preset);
+    });
     $('tafTitle').addEventListener('input',e=>{st.title=e.target.value;render();});
     $('tafQuote').addEventListener('input',e=>{st.quote=e.target.value;render();});
     $('tafNames').addEventListener('input',e=>{st.names=e.target.value;render();});
@@ -1862,12 +1951,17 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
       const i=+row.dataset.i, f=e.target.dataset.f; if(!f||!st.ms[i]) return;
       st.ms[i][f]=e.target.value; render();
     });
-    $('tafMilestones').addEventListener('change',e=>{
-      const row=e.target.closest('.ms-row'); if(!row) return;
-      const i=+row.dataset.i, f=e.target.dataset.f; if(f!=='icon'||!st.ms[i]) return;
-      st.ms[i].icon=e.target.value; render();
-    });
     $('tafMilestones').addEventListener('click',e=>{
+      const row=e.target.closest('.ms-row'); if(!row) return;
+      const i=+row.dataset.i;
+      const ico=e.target.closest('[data-ico]');
+      if(ico && st.ms[i]){
+        st.ms[i].icon=ico.dataset.ico;
+        row.querySelectorAll('.ms-ico').forEach(b=>{
+          const on=b===ico; b.classList.toggle('on',on); b.setAttribute('aria-checked',on?'true':'false');
+        });
+        return render();
+      }
       const b=e.target.closest('[data-del]'); if(!b) return;
       if(st.ms.length<=1) return;
       st.ms.splice(+b.dataset.del,1); renderMs(); render();
@@ -1882,7 +1976,9 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
   /* Export fuer Bestellung/Kasse */
   function exportSVG(){
     const w=PLATE.w, h=PLATE.h;
-    const inner=$('tafEng').innerHTML;
+    const eng=$('tafEng').cloneNode(true);
+    eng.querySelectorAll('[data-ph]').forEach(n=>n.remove());
+    const inner=eng.innerHTML;
     let port='';
     if(st.sketch){
       const g=portraitGeom();
@@ -1960,7 +2056,7 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
     return html;
   }
 
-  renderMs(); bind(); render(); paintHero();
+  renderPresets(); renderMs(); bind(); render(); paintHero();
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{ render(); paintHero(); });
 })();
 </script>
