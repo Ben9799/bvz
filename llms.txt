@@ -18,7 +18,6 @@
 - [QR-Code & DataMatrix auf Metall](https://wolf-lasermark.de/qr-code-datamatrix-metall.html): maschinenlesbare Codes für Rückverfolgbarkeit, GS1, UDI und Industrie 4.0, auch Einzelstücke.
 - [Barcode auf Metall](https://wolf-lasermark.de/barcode-auf-metall.html): dauerhafte, maschinenlesbare 1D-Codes (Code 128/39, EAN) für Lager, Produktion und Rückverfolgbarkeit.
 - [Laser-Testservice](https://wolf-lasermark.de/laser-testservice.html): Material- und Prototypentest auf dem 100-W-Faserlaser mit Parameter-Studie, Musterfoto und Serienangebot.
-- [Privatgravur / Silberatelier](https://wolf-lasermark.de/privat-gravur.html): personalisierte 925-Sterlingsilber-Ketten und Geschenkgravuren für Privatkunden.
 
 ## Materialien
 - Edelstahl (V2A / V4A / 1.4301 / 1.4571), eloxiertes und blankes Aluminium, weitere Metalle auf Anfrage
