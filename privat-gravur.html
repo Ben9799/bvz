@@ -191,6 +191,10 @@
   .taf-preset:hover{border-color:var(--accent)}
   .taf-preset.on{border-color:var(--accent);background:var(--paper-2)}
   @media(max-width:420px){.taf-presets{grid-template-columns:repeat(2,1fr)}}
+  /* Zahl+Wort und Von+Bis gehoeren zusammen und sollen nebeneinander stehen. */
+  .taf-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
+  .taf-pair .field{margin:0}
+  textarea.txt{resize:vertical;min-height:88px;line-height:1.5;font:inherit}
   /* Das Motiv wird gezeigt, nicht beschrieben — der Kunde erkennt die Linie wieder,
      die er gleich auf dem Stahl sieht. */
   .ms-icons{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:2px}
@@ -572,13 +576,13 @@
           <p class="mini-help">Ein Startpunkt — jede Zeile bleibt frei änderbar.</p>
         </div>
 
-        <div class="field">
+        <div class="field" data-fld="title">
           <label for="tafTitle">Überschrift</label>
           <input class="txt" id="tafTitle" maxlength="26" value="Unsere Geschichte" placeholder="Unsere Geschichte">
           <p class="mini-help">Wird in gesperrten Großbuchstaben graviert.</p>
         </div>
 
-        <div class="field">
+        <div class="field" data-fld="photo">
           <label>Porträt aus eurem Foto</label>
           <label class="upload" id="tafUploadLabel" for="tafPhotoInput">
             <svg viewBox="0 0 24 24"><path d="M12 16V4m0 0L8 8m4-4 4 4"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
@@ -604,18 +608,51 @@
           <p class="hint">Am besten ein scharfes, nahes Foto: Gesichter groß im Bild, gleichmäßiges Licht, ruhiger Hintergrund. Die Vorschau zeigt dir sofort, ob das Foto trägt.</p>
         </div>
 
-        <div class="field">
-          <label>Eure Stationen</label>
+        <div class="taf-pair" data-fld="bigNum">
+          <div class="field">
+            <label for="tafBigNum">Zahl in der Mitte</label>
+            <input class="txt" id="tafBigNum" maxlength="3" placeholder="25">
+          </div>
+          <div class="field">
+            <label for="tafBigLabel">Wort darunter</label>
+            <input class="txt" id="tafBigLabel" maxlength="12" placeholder="Jahre">
+          </div>
+        </div>
+
+        <div class="taf-pair" data-fld="dateA">
+          <div class="field">
+            <label for="tafDateA">Von</label>
+            <input class="txt" id="tafDateA" maxlength="16" placeholder="2001">
+          </div>
+          <div class="field" data-fld="dateB">
+            <label for="tafDateB">Bis</label>
+            <input class="txt" id="tafDateB" maxlength="16" placeholder="2026">
+          </div>
+        </div>
+
+        <div class="field" data-fld="sub">
+          <label for="tafSub">Für wen</label>
+          <input class="txt" id="tafSub" maxlength="34" placeholder="Für Frau Keller">
+        </div>
+
+        <div class="field" data-fld="msg">
+          <label for="tafMsg">Widmung</label>
+          <textarea class="txt" id="tafMsg" rows="4" maxlength="180" placeholder="Eine Zeile pro Gedanke."></textarea>
+          <p class="mini-help">Höchstens vier Zeilen — jede Zeilenschaltung wird graviert.</p>
+        </div>
+
+        <div class="field" data-fld="ms">
+          <label id="tafMsLabel">Eure Stationen</label>
           <div id="tafMilestones"></div>
           <button type="button" class="linkbtn" id="tafAddMs">+ Station hinzufügen</button>
         </div>
 
-        <div class="field">
+        <div class="field" data-fld="quote">
           <label for="tafQuote">Satz in der Mitte</label>
           <input class="txt" id="tafQuote" maxlength="52" value="Ich würde dich immer wieder wählen." placeholder="Euer Satz">
         </div>
 
-        <div class="field">
+        <div class="field" data-fld="names">
           <label for="tafNames">Namen</label>
           <input class="txt" id="tafNames" maxlength="30" value="Anna &amp; Lukas" placeholder="Anna &amp; Lukas">
         </div>
@@ -1569,45 +1606,42 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
   /* Startpunkte statt leerer Felder: wer schon eine fertige Tafel vor sich
      sieht, tauscht Namen und Jahre aus, statt vor dem leeren Blatt zu sitzen. */
   const PRESETS=[
-    {key:'weg', name:'Lebensweg', hint:'Für Paare',
+    {key:'weg', name:'Lebensweg', hint:'Für Paare', layout:'timeline',
      title:'Unsere Geschichte', quote:'Ich würde dich immer wieder wählen.', names:'Anna & Lukas',
      ms:[{year:'1998',l1:'Unser erstes',l2:'Kennenlernen',icon:'kaffee'},
          {year:'2003',l1:'Unsere',l2:'Hochzeit',icon:'ringe'},
          {year:'2012',l1:'Unser erstes',l2:'Zuhause',icon:'haus'},
          {year:'2026',l1:'Unsere',l2:'Familie',icon:'familie'}]},
-    {key:'jahr', name:'Jahrestag', hint:'Gemeinsame Jahre',
-     title:'Seit 2001', quote:'Und wir würden es wieder tun.', names:'Martina & Stefan',
-     ms:[{year:'2001',l1:'Der erste',l2:'Tanz',icon:'herz'},
-         {year:'2004',l1:'Das Ja-Wort',l2:'',icon:'ringe'},
-         {year:'2011',l1:'Unser Zuhause',l2:'',icon:'haus'},
-         {year:'2026',l1:'25 Jahre',l2:'zu zweit',icon:'stern'}]},
-    {key:'andenken', name:'Andenken', hint:'In Erinnerung',
+    {key:'jahr', name:'Jahrestag', hint:'Gemeinsame Jahre', layout:'jubilee',
+     title:'Unser Jahrestag', quote:'Und wir würden es wieder tun.', names:'Martina & Stefan',
+     bigNum:'25', bigLabel:'Jahre', dateA:'2001', dateB:'2026'},
+    {key:'andenken', name:'Andenken', hint:'In Erinnerung', layout:'memorial',
      title:'In Erinnerung', quote:'Wer geliebt wird, geht nicht fort.', names:'Hans Bergmann',
-     ms:[{year:'1948',l1:'Geboren in',l2:'Rosenheim',icon:'stern'},
-         {year:'1972',l1:'Die eigene',l2:'Werkstatt',icon:'haus'},
-         {year:'1980',l1:'Vater',l2:'geworden',icon:'familie'},
-         {year:'2024',l1:'Immer bei',l2:'uns',icon:'herz'}]},
-    {key:'danke', name:'Danksagung', hint:'Ein Dankeschön',
-     title:'Danke', quote:'Für alles, was selbstverständlich schien.', names:'Für Frau Keller',
-     ms:[{year:'2006',l1:'Der erste',l2:'Schultag',icon:'stern'},
-         {year:'2013',l1:'Unzählige',l2:'Stunden',icon:'kaffee'},
-         {year:'2026',l1:'Ein offenes',l2:'Ohr',icon:'herz'}]},
-    {key:'trophae', name:'Auszeichnung', hint:'Trophäe',
+     dateA:'1948', dateB:'2024', sub:'In Liebe — deine Familie'},
+    {key:'danke', name:'Danksagung', hint:'Ein Dankeschön', layout:'dedication',
+     title:'Danke', names:'Klasse 4b', sub:'Für Frau Keller',
+     msg:'Für jede Frage, die nie zu viel war.\nFür die Geduld an den zähen Tagen.\nFür das Vertrauen, das uns getragen hat.\nWir vergessen das nicht.'},
+    {key:'trophae', name:'Auszeichnung', hint:'Trophäe', layout:'award',
      title:'Auszeichnung', quote:'Verdient — und nicht vergessen.', names:'Team Fertigung',
-     ms:[{year:'2026',l1:'Erster Platz',l2:'Regionalfinale',icon:'stern'}]},
-    {key:'ruhestand', name:'Ruhestand', hint:'Zum Abschied',
+     bigNum:'1', bigLabel:'Platz', sub:'Regionalfinale Fertigungstechnik', dateA:'14. Juni 2026'},
+    {key:'ruhestand', name:'Ruhestand', hint:'Zum Abschied', layout:'career',
      title:'Vierzig Jahre', quote:'Und jetzt: alle Zeit der Welt.', names:'Für Peter',
-     ms:[{year:'1986',l1:'Der erste',l2:'Arbeitstag',icon:'kaffee'},
-         {year:'1994',l1:'Die eigene',l2:'Abteilung',icon:'haus'},
-         {year:'2010',l1:'Hundert',l2:'Azubis',icon:'familie'},
-         {year:'2026',l1:'Der letzte',l2:'Arbeitstag',icon:'stern'}]}
+     ms:[{year:'1986',l1:'Der erste Arbeitstag',l2:'',icon:'kaffee'},
+         {year:'1994',l1:'Die eigene Abteilung',l2:'',icon:'haus'},
+         {year:'2010',l1:'Hundert Azubis',l2:'',icon:'familie'},
+         {year:'2026',l1:'Der letzte Arbeitstag',l2:'',icon:'stern'}]}
   ];
 
   const st={
     preset:'weg',
+    layout:'timeline',
     title:'Unsere Geschichte',
     quote:'Ich würde dich immer wieder wählen.',
     names:'Anna & Lukas',
+    /* Nur einzelne Anlaesse brauchen diese Felder — welche, sagt LAYOUTS[].fields.
+       Sie leben trotzdem immer im State, damit ein Wechsel hin und zurueck die
+       Eingaben nicht verliert. */
+    bigNum:'', bigLabel:'', dateA:'', dateB:'', sub:'', msg:'',
     line:64,
     crop:32,           // 0 = oberer Bildrand, 100 = unterer
     sketchW:0, sketchH:0,
@@ -1663,6 +1697,104 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
       + ic.d.map(d=>`<path d="${d}"/>`).join('') + `</g>`;
   }
 
+  /* ---------- Bausteine, die sich die Anlass-Layouts teilen ---------- */
+  const CX=()=>X(PLATE.w/2);
+
+  function txt(str,ymm,o){
+    if(!str && str!==0) return '';
+    o=o||{};
+    const fam=o.serif?'Cormorant Garamond,serif':'Inter,sans-serif';
+    const a=[`x="${o.x!=null?X(o.x):CX()}"`,`y="${Y(ymm)}"`,`text-anchor="${o.anchor||'middle'}"`,
+      `font-family="${fam}"`,`font-size="${P(o.size||3.4)}"`,`fill="${ENG}"`];
+    if(o.weight) a.push(`font-weight="${o.weight}"`);
+    if(o.italic) a.push('font-style="italic"');
+    if(o.track) a.push(`letter-spacing="${P(o.track)}"`);
+    if(o.op) a.push(`opacity="${o.op}"`);
+    /* Linksbuendige Zeilen haben weniger Platz als die Plattenbreite —
+       shrinkToFit muss ihr eigenes Limit kennen, sonst laufen sie ueber. */
+    if(o.maxw) a.push(`data-maxw="${o.maxw}"`);
+    return `<text ${a.join(' ')}>${esc(o.raw?str:String(str))}</text>`;
+  }
+
+  const headline=t=>txt(up(t),15,{size:4.1,track:1.5,weight:500});
+
+  /* Grosse Zahl mit Wort — beim Jahrestag darunter, in der Auszeichnung
+     darueber: unten laufen im Kranz die beiden Stiele zusammen, dort waere das
+     Wort halb verdeckt. Oben steht der Kranz offen. */
+  function numeralMarkup(num,label,ymm,above){
+    let out=txt(num,ymm,{serif:true,size:22,weight:600});
+    if(label) out+=txt(up(label),above?ymm-17:ymm+8.5,{size:3.6,track:2.2,weight:500});
+    return out;
+  }
+
+  /* Ein Lorbeerblatt: spitze Mandelform, entlang +x liegend, dann gedreht.
+     Ellipsen sahen aus wie Schlaufen — ein Blatt braucht zwei Spitzen. */
+  function leafMM(xmm,ymm,lenmm,angDeg){
+    const L=P(lenmm), w=L*.34, x=X(xmm), y=Y(ymm);
+    return `<path d="M0 0 Q ${(L*.5).toFixed(2)} ${(-w).toFixed(2)} ${L.toFixed(2)} 0 `
+      + `Q ${(L*.5).toFixed(2)} ${w.toFixed(2)} 0 0 Z" fill="none" stroke="${ENG}" `
+      + `stroke-width="${P(.45)}" stroke-linejoin="round" `
+      + `transform="translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${angDeg.toFixed(1)})"/>`;
+  }
+
+  /* Halber Lorbeerkranz: quadratischer Stiel von unten aussen nach oben, die
+     Blaetter tangential daran. Zweimal gespiegelt ergibt den Kranz der
+     Auszeichnung. */
+  function laurel(cxmm,cymm,rmm,mirror){
+    const d=mirror?-1:1;
+    const p0=[cxmm,cymm+rmm], p1=[cxmm+d*rmm*1.16,cymm+rmm*.42], p2=[cxmm+d*rmm*.66,cymm-rmm*.62];
+    const B=t=>[Math.pow(1-t,2)*p0[0]+2*(1-t)*t*p1[0]+t*t*p2[0],
+                Math.pow(1-t,2)*p0[1]+2*(1-t)*t*p1[1]+t*t*p2[1]];
+    const T=t=>[2*(1-t)*(p1[0]-p0[0])+2*t*(p2[0]-p1[0]),
+                2*(1-t)*(p1[1]-p0[1])+2*t*(p2[1]-p1[1])];
+    let out=`<path d="M${X(p0[0])} ${Y(p0[1])} Q ${X(p1[0])} ${Y(p1[1])} ${X(p2[0])} ${Y(p2[1])}" `
+      + `fill="none" stroke="${ENG}" stroke-width="${P(.6)}" stroke-linecap="round"/>`;
+    for(let i=0;i<5;i++){
+      const t=.16+i*.19, pt=B(t), tan=T(t);
+      const base=Math.atan2(tan[1],tan[0])*180/Math.PI;
+      out+=leafMM(pt[0],pt[1],rmm*.42,base-d*42);
+      out+=leafMM(pt[0],pt[1],rmm*.42,base+d*42);
+    }
+    return out;
+  }
+
+  /* Waagerechter Zweig — flankiert die grosse Zahl des Jahrestags, ohne wie
+     ein Kranz zu wirken. */
+  function sprig(cxmm,cymm,lenmm,dir){
+    let out=`<path d="M${X(cxmm)} ${Y(cymm)} H${X(cxmm+dir*lenmm)}" fill="none" `
+      + `stroke="${ENG}" stroke-width="${P(.6)}" stroke-linecap="round"/>`;
+    for(let i=0;i<4;i++){
+      const x=cxmm+dir*lenmm*(.18+i*.24);
+      out+=leafMM(x,cymm,lenmm*.34,dir>0?-38:180+38);
+      out+=leafMM(x,cymm,lenmm*.34,dir>0?38:180-38);
+    }
+    return out;
+  }
+
+  /* Senkrechte Stationsliste — die Ruhestand-Tafel liest sich wie ein
+     Dienstzeugnis, nicht wie der geschwungene Lebensweg. */
+  function stationListMarkup(y0,step){
+    const list=st.ms.slice(0,4);
+    const xYear=44, xText=52, xDot=48;
+    let out='';
+    list.forEach((m,i)=>{
+      const y=y0+i*step;
+      if(m.year) out+=txt(m.year,y,{x:xYear,anchor:'end',serif:true,size:5.4,weight:600});
+      out+=`<circle cx="${X(xDot)}" cy="${Y(y-1.5)}" r="${P(.9)}" fill="${ENG}"/>`;
+      if(i<list.length-1) out+=`<path d="M${X(xDot)} ${Y(y+.4)}V${Y(y+step-3.4)}" stroke="${ENG}" `
+        + `stroke-width=".6" opacity=".5" stroke-linecap="round"/>`;
+      const label=[m.l1,m.l2].filter(Boolean).join(' ');
+      if(label) out+=txt(label,y,{x:xText,anchor:'start',size:3.4,maxw:PLATE.w-xText-8});
+    });
+    return out;
+  }
+
+  /* Freier Widmungstext: der Kunde tippt Zeilenumbrueche, wir gravieren sie. */
+  function messageMarkup(y0,step,maxLines){
+    return String(st.msg||'').split('\n').map(s=>s.trim()).filter(Boolean).slice(0,maxLines)
+      .map((l,i)=>txt(l,y0+i*step,{size:3.5})).join('');
+  }
+
   function timelineMarkup(){
     const list=st.ms.slice(0,5), n=list.length;
     if(!n) return '';
@@ -1684,39 +1816,130 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
     return out;
   }
 
-  function engravingMarkup(){
-    const cx=X(PLATE.w/2);
-    let out='';
-    if(st.title) out+=`<text x="${cx}" y="${Y(15)}" text-anchor="middle" font-family="Inter,sans-serif" font-size="${P(4.1)}" `
-      + `letter-spacing="${P(1.5)}" fill="${ENG}" font-weight="500">${esc(up(st.title))}</text>`;
-    out+=dividerMarkup(20);
-    if(!st.sketch){
-      // data-ph: reine Bildschirm-Hilfe. Der Export streift sie ab, sonst
-      // stuende der gestrichelte Rahmen samt "Euer Foto" spaeter im Stahl.
-      out+=`<g data-ph="1"><rect x="${X(15)}" y="${Y(25)}" width="${P(75)}" height="${P(54)}" rx="${P(2)}" fill="none" `
-        + `stroke="${ENG}" stroke-opacity=".28" stroke-width=".7" stroke-dasharray="${P(2)} ${P(1.6)}"/>`
-        + `<text x="${cx}" y="${Y(53)}" text-anchor="middle" font-family="Inter,sans-serif" font-size="${P(3)}" fill="${ENG}" opacity=".5">Euer Foto</text></g>`;
-    }
-    out+=timelineMarkup();
-    if(st.quote) out+=`<text x="${cx}" y="${Y(120)}" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" `
-      + `font-size="${P(6.4)}" fill="${ENG}">${esc(st.quote)}</text>`;
-    out+=dividerMarkup(126.5);
-    if(st.names) out+=`<text x="${cx}" y="${Y(134)}" text-anchor="middle" font-family="Inter,sans-serif" font-size="${P(3.4)}" `
-      + `letter-spacing="${P(1.1)}" fill="${ENG}" font-weight="500">${esc(up(st.names))}</text>`;
-    return out;
+  /* Der gestrichelte Rahmen ist reine Bildschirm-Hilfe (data-ph). Der Export
+     streift ihn ab, sonst stuende er samt "Euer Foto" spaeter im Stahl. */
+  function placeholder(){
+    const p=port(); if(!p || st.sketch) return '';
+    return `<g data-ph="1"><rect x="${X(p.x)}" y="${Y(p.y)}" width="${P(p.w)}" height="${P(p.h)}" rx="${P(p.rx)}" fill="none" `
+      + `stroke="${ENG}" stroke-opacity=".28" stroke-width=".7" stroke-dasharray="${P(2)} ${P(1.6)}"/>`
+      + txt('Euer Foto',p.y+p.h/2+1,{size:3,op:'.5'})+`</g>`;
   }
+
+  /* Jeder Anlass bekommt eine eigene Komposition. Ein Jahrestag lebt von der
+     grossen Zahl, ein Andenken von Ruhe und Weissraum, eine Auszeichnung von
+     der Urkunden-Achse — der geschwungene Lebensweg passt eben nur zum Lebensweg.
+     `port` ist das Portraitfeld (rx=w/2 ergibt den Kreis), `fields` steuert,
+     welche Eingabefelder ueberhaupt sichtbar sind. */
+  const LAYOUTS={
+    timeline:{
+      port:{x:15,y:25,w:75,h:54,rx:2},
+      fields:['title','photo','ms','quote','names'],
+      labels:{ms:'Eure Stationen',quote:'Satz in der Mitte',names:'Namen'},
+      msMax:5,
+      draw(){
+        return headline(st.title)+dividerMarkup(20)+placeholder()+timelineMarkup()
+          + txt(st.quote,120,{serif:true,italic:true,size:6.4})
+          + dividerMarkup(126.5)
+          + txt(up(st.names),134,{size:3.4,track:1.1,weight:500});
+      }
+    },
+    jubilee:{
+      port:{x:27.5,y:27,w:50,h:50,rx:25},
+      fields:['title','photo','bigNum','bigLabel','dateA','dateB','quote','names'],
+      labels:{bigNum:'Zahl in der Mitte',bigLabel:'Wort darunter',dateA:'Von',dateB:'Bis',
+              quote:'Euer Satz',names:'Namen'},
+      draw(){
+        const span=[st.dateA,st.dateB].filter(Boolean).join('  —  ');
+        return headline(st.title)+dividerMarkup(20)+placeholder()
+          + sprig(30,94,13,-1)+sprig(75,94,13,1)
+          + numeralMarkup(st.bigNum,st.bigLabel,99)
+          + txt(span,115,{serif:true,size:4.6,track:.4})
+          + dividerMarkup(120.5)
+          + txt(st.quote,129,{serif:true,italic:true,size:6})
+          + txt(up(st.names),136.5,{size:3.4,track:1.1,weight:500});
+      }
+    },
+    memorial:{
+      port:{x:27.5,y:25,w:50,h:62,rx:2},
+      fields:['title','photo','names','dateA','dateB','quote','sub'],
+      labels:{names:'Name',dateA:'Geboren',dateB:'Gestorben',quote:'Satz',sub:'Abschlusszeile'},
+      draw(){
+        /* * und † sind die uebliche deutsche Schreibweise und in jeder Schrift
+           vorhanden — Sonderzeichen wie ✳ waeren ein Schriftglueckspiel. */
+        const dates=[st.dateA?'* '+st.dateA:'', st.dateB?'† '+st.dateB:''].filter(Boolean).join('     ');
+        return headline(st.title)+dividerMarkup(20)+placeholder()
+          + txt(st.names,99,{serif:true,size:8,weight:600})
+          + txt(dates,108,{size:4,track:.6})
+          + dividerMarkup(114)
+          + txt(st.quote,124,{serif:true,italic:true,size:6})
+          + txt(st.sub,134,{serif:true,italic:true,size:4});
+      }
+    },
+    dedication:{
+      port:{x:20,y:26,w:65,h:44,rx:2},
+      fields:['title','photo','sub','msg','names'],
+      labels:{title:'Grosses Wort oben',sub:'Für wen',msg:'Widmung',names:'Unterschrift'},
+      draw(){
+        return txt(up(st.title),17,{size:6.2,track:3,weight:500})+dividerMarkup(22.5)+placeholder()
+          + txt(st.sub,81,{serif:true,italic:true,size:5.6})
+          + messageMarkup(92,7.5,4)
+          + dividerMarkup(122)
+          + txt(up(st.names),133,{size:3.4,track:1.1,weight:500});
+      }
+    },
+    award:{
+      port:null,
+      fields:['title','bigNum','bigLabel','names','sub','quote','dateA'],
+      labels:{bigNum:'Platzierung',bigLabel:'Wort darunter',names:'Ausgezeichnet',
+              sub:'Anlass',quote:'Satz',dateA:'Datum'},
+      draw(){
+        return headline(st.title)+dividerMarkup(20)
+          + laurel(52.5,51,20,true)+laurel(52.5,51,20,false)
+          + numeralMarkup(st.bigNum,st.bigLabel,62,true)
+          + txt(st.names,86,{serif:true,size:8,weight:600})
+          + txt(st.sub,95.5,{size:3.6,maxw:80})
+          + dividerMarkup(102)
+          + txt(st.quote,115,{serif:true,italic:true,size:6})
+          + txt(up(st.dateA),129,{size:3.2,track:1.1,weight:500});
+      }
+    },
+    career:{
+      port:{x:32.5,y:25,w:40,h:40,rx:2},
+      fields:['title','photo','ms','quote','names'],
+      labels:{ms:'Stationen',quote:'Satz',names:'Namen'},
+      msMax:4,
+      draw(){
+        return headline(st.title)+dividerMarkup(20)+placeholder()
+          + stationListMarkup(78,10.5)
+          + dividerMarkup(117)
+          + txt(st.quote,127,{serif:true,italic:true,size:6})
+          + txt(up(st.names),136,{size:3.4,track:1.1,weight:500});
+      }
+    }
+  };
+
+  const LAY=()=>LAYOUTS[st.layout]||LAYOUTS.timeline;
+  /* Steht in der Bestellung ganz vorne: die Werkstatt sieht sofort, welche
+     Komposition graviert werden soll. */
+  const LAY_NAME=()=>{ const p=PRESETS.find(x=>x.key===st.preset); return p?p.name:''; };
+  const port=()=>LAY().port;
+  const hasField=f=>LAY().fields.indexOf(f)>=0;
+
+  function engravingMarkup(){ return LAY().draw(); }
 
   /* Ueberlange Zeilen schrumpfen, statt ueber den Rand zu laufen. */
   function shrinkToFit(){
-    const maxW=P(PLATE.w-18);
+    const plateMax=P(PLATE.w-18);
     $('tafEng').querySelectorAll('text').forEach(t=>{
       let w;
       try{ w=t.getComputedTextLength(); }catch(_){ return; }
-      if(!w||w<=maxW) return;
+      const own=parseFloat(t.getAttribute('data-maxw'));
+      const lim=own>0?P(own):plateMax;
+      if(!w||w<=lim) return;
       const fs=parseFloat(t.getAttribute('font-size'));
-      t.setAttribute('font-size',(fs*maxW/w).toFixed(2));
+      t.setAttribute('font-size',(fs*lim/w).toFixed(2));
       const ls=t.getAttribute('letter-spacing');
-      if(ls) t.setAttribute('letter-spacing',(parseFloat(ls)*maxW/w).toFixed(2));
+      if(ls) t.setAttribute('letter-spacing',(parseFloat(ls)*lim/w).toFixed(2));
     });
   }
 
@@ -1735,12 +1958,12 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
   /* Cover-Zuschnitt: das Bild fuellt das Portraitfeld immer ganz aus, der
      sichtbare Ausschnitt laesst sich senkrecht verschieben (Gesichter sitzen
      selten in der Bildmitte). */
-  const PORT={x:15,y:25,w:75,h:54};
   function portraitGeom(){
-    const rw=P(PORT.w), rh=P(PORT.h), a=(st.sketchW&&st.sketchH)?st.sketchW/st.sketchH:rw/rh;
+    const p=port()||{x:15,y:25,w:75,h:54,rx:2};
+    const rw=P(p.w), rh=P(p.h), a=(st.sketchW&&st.sketchH)?st.sketchW/st.sketchH:rw/rh;
     let w,h;
     if(a>rw/rh){ h=rh; w=rh*a; } else { w=rw; h=rw/a; }
-    return {x:X(PORT.x)+(rw-w)/2, y:Y(PORT.y)+(rh-h)*(st.crop/100), w:w, h:h};
+    return {x:X(p.x)+(rw-w)/2, y:Y(p.y)+(rh-h)*(st.crop/100), w:w, h:h};
   }
 
   let brushCache='';
@@ -1754,10 +1977,15 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
     $('tafStand').innerHTML=standMarkup();
     $('tafRuler').innerHTML=rulerMarkup();
 
-    const img=$('tafPortrait'), rect=$('tafPortraitRect');
-    rect.setAttribute('x',X(15)); rect.setAttribute('y',Y(25));
-    rect.setAttribute('width',P(75)); rect.setAttribute('height',P(54));
-    if(st.sketch){
+    const img=$('tafPortrait'), rect=$('tafPortraitRect'), p=port();
+    /* rx = halbe Breite macht aus demselben <rect> den Kreis des Jahrestags —
+       dafuer braucht die Buehne keinen zweiten Clip-Pfad. */
+    if(p){
+      rect.setAttribute('x',X(p.x)); rect.setAttribute('y',Y(p.y));
+      rect.setAttribute('width',P(p.w)); rect.setAttribute('height',P(p.h));
+      rect.setAttribute('rx',P(p.rx));
+    }
+    if(st.sketch && p){
       const g=portraitGeom();
       img.setAttribute('href',st.sketch);
       img.setAttributeNS('http://www.w3.org/1999/xlink','xlink:href',st.sketch);
@@ -1878,12 +2106,41 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
          aria-pressed="${p.key===st.preset?'true':'false'}"><b>${esc(p.name)}</b><span>${esc(p.hint)}</span></button>`).join('');
   }
 
+  /* Nur die Felder zeigen, die der gewaehlte Anlass wirklich graviert — und
+     sie so benennen, wie sie dort heissen ("Namen" vs. "Ausgezeichnet"). */
+  const FLD_INPUT={title:'tafTitle',quote:'tafQuote',names:'tafNames',sub:'tafSub',
+    msg:'tafMsg',bigNum:'tafBigNum',bigLabel:'tafBigLabel',dateA:'tafDateA',dateB:'tafDateB'};
+
+  /* Ohne Grundwerte bliebe die Beschriftung des zuletzt gewaehlten Anlasses
+     stehen, sobald der naechste sie nicht ueberschreibt. */
+  const DEFAULT_LABELS={title:'Überschrift',quote:'Satz in der Mitte',names:'Namen',
+    sub:'Für wen',msg:'Widmung',bigNum:'Zahl in der Mitte',bigLabel:'Wort darunter',
+    dateA:'Von',dateB:'Bis',ms:'Eure Stationen'};
+
+  function syncFields(){
+    const lay=LAY(), labels=Object.assign({},DEFAULT_LABELS,lay.labels||{});
+    document.querySelectorAll('#paneTafel [data-fld]').forEach(el=>{
+      el.style.display=hasField(el.dataset.fld)?'':'none';
+    });
+    Object.keys(FLD_INPUT).forEach(f=>{
+      const inp=$(FLD_INPUT[f]); if(!inp) return;
+      const lab=inp.previousElementSibling;
+      if(labels[f] && lab && lab.tagName==='LABEL') lab.textContent=labels[f];
+    });
+    $('tafMsLabel').textContent=labels.ms;
+    const max=lay.msMax||5;
+    $('tafAddMs').style.display=st.ms.length>=max?'none':'';
+  }
+
   function applyPreset(key){
     const p=PRESETS.find(x=>x.key===key); if(!p) return;
-    st.preset=key; st.title=p.title; st.quote=p.quote; st.names=p.names;
-    st.ms=JSON.parse(JSON.stringify(p.ms));
-    $('tafTitle').value=p.title; $('tafQuote').value=p.quote; $('tafNames').value=p.names;
-    renderPresets(); renderMs(); render();
+    st.preset=key; st.layout=p.layout||'timeline';
+    ['title','quote','names','sub','msg','bigNum','bigLabel','dateA','dateB'].forEach(f=>{
+      st[f]=p[f]||'';
+      const inp=$(FLD_INPUT[f]); if(inp) inp.value=st[f];
+    });
+    if(p.ms) st.ms=JSON.parse(JSON.stringify(p.ms));
+    renderPresets(); renderMs(); syncFields(); render();
   }
 
   const shortLabel=k=>ICONS[k].label.split('·')[0].trim();
@@ -1907,7 +2164,7 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
          </div>
          <button type="button" class="ms-del" data-del="${i}" title="Station entfernen" aria-label="Station entfernen">×</button>
        </div>`).join('');
-    $('tafAddMs').style.display=st.ms.length>=5?'none':'';
+    $('tafAddMs').style.display=st.ms.length>=(LAY().msMax||5)?'none':'';
   }
 
   /* ---------- Bindings ---------- */
@@ -1934,9 +2191,10 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
     $('tafPresets').addEventListener('click',e=>{
       const b=e.target.closest('[data-preset]'); if(b) applyPreset(b.dataset.preset);
     });
-    $('tafTitle').addEventListener('input',e=>{st.title=e.target.value;render();});
-    $('tafQuote').addEventListener('input',e=>{st.quote=e.target.value;render();});
-    $('tafNames').addEventListener('input',e=>{st.names=e.target.value;render();});
+    Object.keys(FLD_INPUT).forEach(f=>{
+      const inp=$(FLD_INPUT[f]); if(!inp) return;
+      inp.addEventListener('input',e=>{ st[f]=e.target.value; render(); });
+    });
     $('tafLineRange').addEventListener('input',e=>{
       st.line=+e.target.value; $('tafLineValue').value=e.target.value;
       if(photoImg) applyPhoto();
@@ -1967,7 +2225,7 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
       st.ms.splice(+b.dataset.del,1); renderMs(); render();
     });
     $('tafAddMs').addEventListener('click',()=>{
-      if(st.ms.length>=5) return;
+      if(st.ms.length>=(LAY().msMax||5)) return;
       st.ms.push({year:'',l1:'',l2:'',icon:'herz'}); renderMs(); render();
     });
     bindProductSwitch();
@@ -1979,12 +2237,13 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
     const eng=$('tafEng').cloneNode(true);
     eng.querySelectorAll('[data-ph]').forEach(n=>n.remove());
     const inner=eng.innerHTML;
-    let port='';
-    if(st.sketch){
+    let portOut='';
+    const p=port();
+    if(st.sketch && p){
       const g=portraitGeom();
       const mx=((g.x-X0)/S).toFixed(3), my=((g.y-Y0)/S).toFixed(3);
       const mw=(g.w/S).toFixed(3), mh=(g.h/S).toFixed(3);
-      port=`<clipPath id="portClip"><rect x="${PORT.x}" y="${PORT.y}" width="${PORT.w}" height="${PORT.h}" rx="2"/></clipPath>`
+      portOut=`<clipPath id="portClip"><rect x="${p.x}" y="${p.y}" width="${p.w}" height="${p.h}" rx="${p.rx}"/></clipPath>`
          + `<g clip-path="url(#portClip)"><image x="${mx}" y="${my}" width="${mw}" height="${mh}" `
          + `preserveAspectRatio="none" href="${st.sketch}" xlink:href="${st.sketch}"/></g>`;
     }
@@ -1993,7 +2252,7 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
     return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" `
       + `width="${w}mm" height="${h}mm" viewBox="0 0 ${w} ${h}">`
       + `<g id="Kontur"><path d="M26 0H79A26 26 0 0 1 105 26V144A4 4 0 0 1 101 148H4A4 4 0 0 1 0 144V26A26 26 0 0 1 26 0Z" fill="none" stroke="#000" stroke-width=".2"/></g>`
-      + `<g id="Gravur">${port}${g}</g></svg>`;
+      + `<g id="Gravur">${portOut}${g}</g></svg>`;
   }
 
   window.WL_PRODUCT='tafel';
@@ -2001,17 +2260,30 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
     price:()=>PLATE.price,
     name:()=>`Erinnerungstafel ${PLATE.w}×${PLATE.h} mm · Edelstahl mit Sockel`,
     summary:()=>{
-      const parts=[st.title, st.ms.map(m=>[m.year,m.l1,m.l2].filter(Boolean).join(' ')).filter(Boolean).join(' · '), st.quote, st.names];
+      /* Nur mitschicken, was der gewaehlte Anlass auch graviert — sonst stuenden
+         Felder in der Bestellung, die auf der Tafel gar nicht vorkommen. */
+      const f=x=>hasField(x)?st[x]:'';
+      const stations=hasField('ms')
+        ? st.ms.map(m=>[m.year,m.l1,m.l2].filter(Boolean).join(' ')).filter(Boolean).join(' · ') : '';
+      const num=[f('bigNum'),f('bigLabel')].filter(Boolean).join(' ');
+      const span=[f('dateA'),f('dateB')].filter(Boolean).join(' — ');
+      const parts=[LAY_NAME(), f('title'), num, span, f('sub'),
+        String(f('msg')||'').split('\n').filter(Boolean).join(' / '), stations, f('quote'), f('names')];
       return parts.filter(Boolean).join(' | ');
     },
     hasPhoto:()=>!!st.sketch,
     photo:()=>st.photo,
     sketch:()=>st.sketch,
-    state:()=>JSON.parse(JSON.stringify({title:st.title,quote:st.quote,names:st.names,ms:st.ms,line:st.line})),
+    state:()=>JSON.parse(JSON.stringify({preset:st.preset,layout:st.layout,title:st.title,
+      quote:st.quote,names:st.names,sub:st.sub,msg:st.msg,bigNum:st.bigNum,bigLabel:st.bigLabel,
+      dateA:st.dateA,dateB:st.dateB,ms:st.ms,line:st.line})),
     svg:exportSVG,
     validate:()=>{
-      if(!st.title.trim()&&!st.quote.trim()&&!st.names.trim()) return 'Bitte trage mindestens eine Zeile ein.';
-      return '';
+      /* Leer ist nur, was der Anlass ueberhaupt anbietet — eine Auszeichnung
+         ohne "quote" ist vollstaendig, eine Tafel ganz ohne Text nicht. */
+      const filled=LAY().fields.some(f=>f!=='photo'&&f!=='ms'&&String(st[f]||'').trim())
+        || (hasField('ms')&&st.ms.some(m=>[m.year,m.l1,m.l2].some(v=>String(v||'').trim())));
+      return filled?'':'Bitte trage mindestens eine Zeile ein.';
     },
     render:render
   };
@@ -2056,7 +2328,7 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
     return html;
   }
 
-  renderPresets(); renderMs(); bind(); render(); paintHero();
+  renderPresets(); renderMs(); syncFields(); bind(); render(); paintHero();
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{ render(); paintHero(); });
 })();
 </script>
