@@ -192,6 +192,12 @@
   .taf-preset.on{border-color:var(--accent);background:var(--paper-2)}
   @media(max-width:420px){.taf-presets{grid-template-columns:repeat(2,1fr)}}
   /* Zahl+Wort und Von+Bis gehoeren zusammen und sollen nebeneinander stehen. */
+  .art-style{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+  .art-opt{display:flex;flex-direction:column;gap:1px;padding:.5rem .45rem;cursor:pointer;text-align:left;
+    border:1px solid rgba(255,255,255,.14);border-radius:9px;background:rgba(255,255,255,.03);color:inherit}
+  .art-opt b{font-size:.82rem;font-weight:600}
+  .art-opt span{font-size:.66rem;opacity:.62;line-height:1.25}
+  .art-opt.on{border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.09)}
   .taf-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
   .taf-pair .field{margin:0}
   textarea.txt{resize:vertical;min-height:88px;line-height:1.5;font:inherit}
@@ -559,6 +565,7 @@
               <g id="tafBrush" opacity=".5"></g>
               <image id="tafPortrait" x="0" y="0" width="0" height="0" clip-path="url(#tafPortraitClip)"
                      preserveAspectRatio="xMidYMid slice" style="display:none"/>
+              <g id="tafPortraitArt" clip-path="url(#tafPortraitClip)"></g>
               <g id="tafEng"></g>
             </g>
             <path id="tafPlateEdge" d="" fill="none" stroke="#ffffff" stroke-opacity=".55" stroke-width=".9"/>
@@ -594,6 +601,12 @@
             <button type="button" class="linkbtn" id="tafPhotoRemove">Foto entfernen</button>
           </div>
           <div id="tafPhotoTools" style="display:none">
+            <div class="art-style" role="radiogroup" aria-label="Darstellung">
+              <button type="button" class="art-opt on" data-style="clip" role="radio" aria-checked="true">
+                <b>Clipart</b><span>Vektor — in jeder Größe scharf</span></button>
+              <button type="button" class="art-opt" data-style="line" role="radio" aria-checked="false">
+                <b>Linienzeichnung</b><span>Feine Bleistift-Wirkung</span></button>
+            </div>
             <div class="range-line" style="margin-top:12px">
               <input type="range" id="tafLineRange" min="30" max="90" step="1" value="58">
               <output id="tafLineValue">58</output>
@@ -1645,6 +1658,8 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
     line:64,
     crop:32,           // 0 = oberer Bildrand, 100 = unterer
     sketchW:0, sketchH:0,
+    artStyle:'clip',   // 'clip' = echte Vektor-Clipart, 'line' = Dodge-Linienbild
+    art:null,          // {d,tw,th} — Pfade der Clipart, gehen als Vektor in den Export
     photo:null,        // Original-DataURL (geht mit in die Bestellung)
     sketch:null,       // erzeugte Linienzeichnung als DataURL
     ms:[
@@ -1818,8 +1833,10 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
 
   /* Der gestrichelte Rahmen ist reine Bildschirm-Hilfe (data-ph). Der Export
      streift ihn ab, sonst stuende er samt "Euer Foto" spaeter im Stahl. */
+  const hasArtwork=()=>!!(st.sketch||(st.art&&st.art.d));
+
   function placeholder(){
-    const p=port(); if(!p || st.sketch) return '';
+    const p=port(); if(!p || hasArtwork()) return '';
     return `<g data-ph="1"><rect x="${X(p.x)}" y="${Y(p.y)}" width="${P(p.w)}" height="${P(p.h)}" rx="${P(p.rx)}" fill="none" `
       + `stroke="${ENG}" stroke-opacity=".28" stroke-width=".7" stroke-dasharray="${P(2)} ${P(1.6)}"/>`
       + txt('Euer Foto',p.y+p.h/2+1,{size:3,op:'.5'})+`</g>`;
@@ -1995,6 +2012,17 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
       img.style.display='';
     } else { img.style.display='none'; }
 
+    /* Die Clipart wird in der Vorschau aus denselben Pfaden gezeichnet, die
+       spaeter exportiert werden — sonst bestellt der Kunde etwas anderes,
+       als er sieht. */
+    const art=$('tafPortraitArt');
+    if(st.art && st.art.d && p){
+      const g=portraitGeom();
+      art.innerHTML=`<g transform="translate(${g.x.toFixed(2)} ${g.y.toFixed(2)}) `
+        + `scale(${(g.w/st.art.tw).toFixed(5)} ${(g.h/st.art.th).toFixed(5)})">`
+        + `<path d="${st.art.d}" fill="${ENG}" fill-rule="evenodd"/></g>`;
+    } else art.innerHTML='';
+
     $('tafEng').innerHTML=engravingMarkup();
     shrinkToFit();
     $('tafDimCaption').textContent=`${PLATE.w} × ${PLATE.h} mm · ${String(PLATE.thick).replace('.',',')} mm Edelstahl · mit Sockel`;
@@ -2053,18 +2081,179 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
     return {url:c.toDataURL('image/png'),sharp,w:img.naturalWidth,h:img.naturalHeight};
   }
 
+  /* ---------- Foto -> echte Vektor-Clipart ---------- */
+  /* Die Dodge-Linienzeichnung bleibt ein Bild: der Laser rastert sie Zeile fuer
+     Zeile, und wer sie vergroessert, sieht Pixel. Eine Clipart aus echten Pfaden
+     ist dagegen Vektor — LightBurn faehrt Konturen ab, jede Groesse bleibt sauber.
+     Deshalb tracen wir selbst, komplett lokal und ohne Bibliothek:
+     Otsu-Schwelle -> Flecken putzen -> Pixelkanten zu Schleifen -> Douglas-Peucker
+     -> weiche Quadratik-Kurven. */
+
+  function otsuThreshold(gray){
+    const hist=new Uint32Array(256);
+    for(let i=0;i<gray.length;i++) hist[Math.max(0,Math.min(255,gray[i]|0))]++;
+    const total=gray.length;
+    let sum=0; for(let t=0;t<256;t++) sum+=t*hist[t];
+    let sumB=0,wB=0,best=-1,thr=128;
+    for(let t=0;t<256;t++){
+      wB+=hist[t]; if(!wB) continue;
+      const wF=total-wB; if(!wF) break;
+      sumB+=t*hist[t];
+      const mB=sumB/wB, mF=(sum-sumB)/wF, between=wB*wF*(mB-mF)*(mB-mF);
+      if(between>best){ best=between; thr=t; }
+    }
+    return thr;
+  }
+
+  /* Einzelne Streupixel wuerden hunderte Mini-Pfade erzeugen. Wer kleiner ist
+     als die Mindestflaeche, wird der Umgebung zugeschlagen — bei BEIDEN Farben,
+     sonst bleiben Naselocher im Gesicht stehen. */
+  function despeckle(m,w,h,minArea){
+    const lab=new Int32Array(w*h).fill(-1), sizes=[], stack=[];
+    let comp=0;
+    for(let i=0;i<m.length;i++){
+      if(lab[i]>=0) continue;
+      const v=m[i]; let n=0; stack.length=0; stack.push(i); lab[i]=comp;
+      while(stack.length){
+        const p=stack.pop(); n++;
+        const x=p%w, y=(p/w)|0;
+        if(x>0     && lab[p-1]<0 && m[p-1]===v){ lab[p-1]=comp; stack.push(p-1); }
+        if(x<w-1   && lab[p+1]<0 && m[p+1]===v){ lab[p+1]=comp; stack.push(p+1); }
+        if(y>0     && lab[p-w]<0 && m[p-w]===v){ lab[p-w]=comp; stack.push(p-w); }
+        if(y<h-1   && lab[p+w]<0 && m[p+w]===v){ lab[p+w]=comp; stack.push(p+w); }
+      }
+      sizes.push(n); comp++;
+    }
+    for(let i=0;i<m.length;i++) if(sizes[lab[i]]<minArea) m[i]=m[i]?0:1;
+    return m;
+  }
+
+  /* Jede Grenze zwischen Vorder- und Hintergrundpixel ist eine Einheitskante.
+     Gerichtet gesammelt und an den Ecken verkettet ergeben sie geschlossene
+     Schleifen — Aussenkanten und Loecher gleichermassen. Mit fill-rule=evenodd
+     stanzen sich die Loecher von selbst aus. */
+  function traceLoops(m,w,h){
+    const stride=w+1, edges=new Map();
+    const at=(x,y)=>(x<0||y<0||x>=w||y>=h)?0:m[y*w+x];
+    const push=(x0,y0,x1,y1)=>{
+      const k=y0*stride+x0, a=edges.get(k);
+      if(a) a.push([x1,y1]); else edges.set(k,[[x1,y1]]);
+    };
+    for(let y=0;y<h;y++) for(let x=0;x<w;x++){
+      if(!m[y*w+x]) continue;
+      if(!at(x,y-1)) push(x,y,x+1,y);
+      if(!at(x+1,y)) push(x+1,y,x+1,y+1);
+      if(!at(x,y+1)) push(x+1,y+1,x,y+1);
+      if(!at(x-1,y)) push(x,y+1,x,y);
+    }
+    const loops=[];
+    for(const [k,arr] of edges){
+      const sx=k%stride, sy=(k/stride)|0;
+      while(arr.length){
+        const pts=[[sx,sy]];
+        let cur=arr.pop(), guard=0;
+        while(cur && guard++<400000){
+          pts.push(cur);
+          if(cur[0]===sx && cur[1]===sy) break;
+          const na=edges.get(cur[1]*stride+cur[0]);
+          if(!na || !na.length) break;
+          cur=na.pop();
+        }
+        if(pts.length>5){
+          const f=pts[0], l=pts[pts.length-1];
+          if(f[0]===l[0] && f[1]===l[1]) pts.pop();
+          loops.push(pts);
+        }
+      }
+    }
+    return loops;
+  }
+
+  function simplifyRing(pts,eps){
+    const n=pts.length;
+    if(n<4) return pts;
+    const keep=new Uint8Array(n); keep[0]=keep[n-1]=1;
+    const stack=[[0,n-1]];
+    while(stack.length){
+      const seg=stack.pop(), a=seg[0], b=seg[1];
+      if(b<=a+1) continue;
+      const ax=pts[a][0], ay=pts[a][1], dx=pts[b][0]-ax, dy=pts[b][1]-ay;
+      const len=Math.hypot(dx,dy)||1;
+      let best=-1, bi=-1;
+      for(let i=a+1;i<b;i++){
+        const d=Math.abs((pts[i][0]-ax)*dy-(pts[i][1]-ay)*dx)/len;
+        if(d>best){ best=d; bi=i; }
+      }
+      if(best>eps){ keep[bi]=1; stack.push([a,bi],[bi,b]); }
+    }
+    const out=[];
+    for(let i=0;i<n;i++) if(keep[i]) out.push(pts[i]);
+    return out;
+  }
+
+  /* Treppenstufen weichzeichnen: der Pfad laeuft ueber die Kantenmitten, die
+     Ecke selbst wird zum Kontrollpunkt. Aus dem Pixelrand wird eine Rundung. */
+  function ringPath(pts){
+    const n=pts.length;
+    if(n<3) return '';
+    const mid=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2];
+    const m0=mid(pts[n-1],pts[0]);
+    let d='M'+m0[0].toFixed(2)+' '+m0[1].toFixed(2);
+    for(let i=0;i<n;i++){
+      const c=pts[i], m=mid(c,pts[(i+1)%n]);
+      d+='Q'+c[0].toFixed(2)+' '+c[1].toFixed(2)+' '+m[0].toFixed(2)+' '+m[1].toFixed(2);
+    }
+    return d+'Z';
+  }
+
+  function makeClipart(img,strength){
+    const MAX=380, sc=Math.min(1,MAX/Math.max(img.naturalWidth,img.naturalHeight));
+    const w=Math.max(1,Math.round(img.naturalWidth*sc)), h=Math.max(1,Math.round(img.naturalHeight*sc));
+    const c=document.createElement('canvas'); c.width=w; c.height=h;
+    const cx=c.getContext('2d',{willReadFrequently:true});
+    cx.drawImage(img,0,0,w,h);
+    const g=toGray(cx.getImageData(0,0,w,h).data);
+    const sharp=sharpness(g,w,h);
+    const bl=boxBlur(g,w,h,Math.max(1,Math.round(Math.min(w,h)/150)));
+    /* Otsu trennt Motiv und Hintergrund von selbst; der Regler verschiebt die
+       Schwelle nur noch, damit der Kunde mehr oder weniger Flaeche bekommt. */
+    const thr=otsuThreshold(bl)+(strength-60)*1.7;
+    const m=new Uint8Array(w*h);
+    for(let i=0;i<m.length;i++) m[i]=bl[i]<thr?1:0;
+    despeckle(m,w,h,Math.max(10,Math.round(w*h*0.0013)));
+    const loops=traceLoops(m,w,h);
+    let d='', nodes=0;
+    for(const lp of loops){
+      const s=simplifyRing(lp,1.1);
+      if(s.length<3) continue;
+      nodes+=s.length; d+=ringPath(s);
+    }
+    return {d,tw:w,th:h,nodes,sharp,w:img.naturalWidth,h:img.naturalHeight};
+  }
+
   function msg(kind,txt){ const m=$('tafPhotoMsg'); m.className='photo-msg '+kind; m.textContent=txt; }
 
   let photoImg=null;
   function applyPhoto(){
     if(!photoImg) return;
-    const r=makeSketch(photoImg,st.line);
-    st.sketch=r.url; st.sketchW=r.w; st.sketchH=r.h;
+    let r;
+    if(st.artStyle==='clip'){
+      r=makeClipart(photoImg,st.line);
+      /* Ein leeres Trace-Ergebnis waere eine leere Tafel — dann lieber die
+         Linienzeichnung zeigen als gar nichts. */
+      if(r.d){ st.art={d:r.d,tw:r.tw,th:r.th}; st.sketch=null; }
+      else { st.art=null; r=makeSketch(photoImg,st.line); st.sketch=r.url; }
+    } else {
+      r=makeSketch(photoImg,st.line);
+      st.sketch=r.url; st.art=null;
+    }
+    st.sketchW=r.w; st.sketchH=r.h;
     const small=Math.min(r.w,r.h)<900;
     const blurry=r.sharp<7;
     if(small&&blurry) msg('warn','Das Foto ist klein und wirkt unscharf — bitte ein größeres, schärferes Bild wählen.');
     else if(small) msg('warn',`Das Foto ist recht klein (${r.w}×${r.h} px). Für feine Linien sind mindestens 900 px auf der kurzen Seite besser.`);
     else if(blurry) msg('warn','Das Foto wirkt unscharf. Ein schärferes Bild gibt deutlich feinere Linien.');
+    else if(st.art) msg('ok','Sieht gut aus — als Vektor-Clipart, sauber in jeder Größe.');
     else msg('ok','Sieht gut aus — so wird euer Porträt graviert.');
     render();
   }
@@ -2090,7 +2279,7 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
   }
 
   function clearPhoto(){
-    photoImg=null; st.photo=null; st.sketch=null;
+    photoImg=null; st.photo=null; st.sketch=null; st.art=null;
     $('tafPhotoInput').value='';
     $('tafUploadText').textContent='Foto auswählen';
     $('tafPhotoActions').style.display='none';
@@ -2202,6 +2391,14 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
     $('tafCropRange').addEventListener('input',e=>{
       st.crop=+e.target.value; $('tafCropValue').value=e.target.value; render();
     });
+    $('tafPhotoTools').addEventListener('click',e=>{
+      const b=e.target.closest('[data-style]'); if(!b) return;
+      st.artStyle=b.dataset.style;
+      document.querySelectorAll('#tafPhotoTools .art-opt').forEach(o=>{
+        const on=o===b; o.classList.toggle('on',on); o.setAttribute('aria-checked',on?'true':'false');
+      });
+      applyPhoto();
+    });
     $('tafPhotoInput').addEventListener('change',e=>loadPhoto(e.target.files&&e.target.files[0]));
     $('tafPhotoRemove').addEventListener('click',clearPhoto);
     $('tafMilestones').addEventListener('input',e=>{
@@ -2239,13 +2436,26 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
     const inner=eng.innerHTML;
     let portOut='';
     const p=port();
-    if(st.sketch && p){
+    if(hasArtwork() && p){
       const g=portraitGeom();
-      const mx=((g.x-X0)/S).toFixed(3), my=((g.y-Y0)/S).toFixed(3);
-      const mw=(g.w/S).toFixed(3), mh=(g.h/S).toFixed(3);
-      portOut=`<clipPath id="portClip"><rect x="${p.x}" y="${p.y}" width="${p.w}" height="${p.h}" rx="${p.rx}"/></clipPath>`
-         + `<g clip-path="url(#portClip)"><image x="${mx}" y="${my}" width="${mw}" height="${mh}" `
-         + `preserveAspectRatio="none" href="${st.sketch}" xlink:href="${st.sketch}"/></g>`;
+      const mx=(g.x-X0)/S, my=(g.y-Y0)/S, mw=g.w/S, mh=g.h/S;
+      const clip=`<clipPath id="portClip"><rect x="${p.x}" y="${p.y}" width="${p.w}" height="${p.h}" rx="${p.rx}"/></clipPath>`;
+      if(st.art && st.art.d){
+        /* Echte Pfade statt eingebettetem Bild: LightBurn faehrt Konturen ab,
+           und die Datei bleibt in jeder Groesse scharf. */
+        /* clip-path und transform duerfen NICHT auf demselben <g> sitzen: der
+           Clip-Rahmen wird sonst mitskaliert, und vom Portrait bleibt ein
+           Splitter uebrig. Aussen clippen, innen transformieren — genau wie
+           in der Vorschau. */
+        portOut=clip+`<g clip-path="url(#portClip)">`
+          + `<g transform="translate(${mx.toFixed(3)} ${my.toFixed(3)}) `
+          + `scale(${(mw/st.art.tw).toFixed(6)} ${(mh/st.art.th).toFixed(6)})">`
+          + `<path d="${st.art.d}" fill="#000" fill-rule="evenodd"/></g></g>`;
+      } else {
+        portOut=clip+`<g clip-path="url(#portClip)"><image x="${mx.toFixed(3)}" y="${my.toFixed(3)}" `
+          + `width="${mw.toFixed(3)}" height="${mh.toFixed(3)}" `
+          + `preserveAspectRatio="none" href="${st.sketch}" xlink:href="${st.sketch}"/></g>`;
+      }
     }
     // Zurueck in echte mm: die Vorschau rechnet in px, der Export soll 1:1 mm sein.
     const g=`<g transform="translate(${(-X0/S).toFixed(4)} ${(-Y0/S).toFixed(4)}) scale(${(1/S).toFixed(6)})">${inner}</g>`;
@@ -2271,7 +2481,7 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
         String(f('msg')||'').split('\n').filter(Boolean).join(' / '), stations, f('quote'), f('names')];
       return parts.filter(Boolean).join(' | ');
     },
-    hasPhoto:()=>!!st.sketch,
+    hasPhoto:hasArtwork,
     photo:()=>st.photo,
     sketch:()=>st.sketch,
     state:()=>JSON.parse(JSON.stringify({preset:st.preset,layout:st.layout,title:st.title,
@@ -2323,7 +2533,7 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
       eng.insertAdjacentHTML('afterbegin',coupleArt());
     }
     let html=c.outerHTML;
-    ['tafSteel','tafBase','tafPlateClipPath','tafPortraitClip','tafPortraitRect','tafPlateBody','tafBrush','tafPortrait','tafEng','tafPlateEdge','tafStand','tafPlate']
+    ['tafSteel','tafBase','tafPlateClipPath','tafPortraitClip','tafPortraitRect','tafPlateBody','tafBrush','tafPortrait','tafPortraitArt','tafEng','tafPlateEdge','tafStand','tafPlate']
       .forEach(id=>{ html=html.split(id).join(id+'Hero'); });
     return html;
   }
