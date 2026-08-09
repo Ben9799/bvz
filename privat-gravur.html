@@ -192,7 +192,8 @@
   .taf-preset.on{border-color:var(--accent);background:var(--paper-2)}
   @media(max-width:420px){.taf-presets{grid-template-columns:repeat(2,1fr)}}
   /* Zahl+Wort und Von+Bis gehoeren zusammen und sollen nebeneinander stehen. */
-  .art-style{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+  .art-style{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+  @media(max-width:420px){.art-style{grid-template-columns:1fr 1fr}}
   .art-opt{display:flex;flex-direction:column;gap:1px;padding:.5rem .45rem;cursor:pointer;text-align:left;
     border:1px solid rgba(255,255,255,.14);border-radius:9px;background:rgba(255,255,255,.03);color:inherit}
   .art-opt b{font-size:.82rem;font-weight:600}
@@ -602,10 +603,12 @@
           </div>
           <div id="tafPhotoTools" style="display:none">
             <div class="art-style" role="radiogroup" aria-label="Darstellung">
-              <button type="button" class="art-opt on" data-style="clip" role="radio" aria-checked="true">
-                <b>Clipart</b><span>Vektor — in jeder Größe scharf</span></button>
+              <button type="button" class="art-opt on" data-style="stroke" role="radio" aria-checked="true">
+                <b>Strichzeichnung</b><span>Feine Linien — schnell graviert</span></button>
+              <button type="button" class="art-opt" data-style="clip" role="radio" aria-checked="false">
+                <b>Clipart</b><span>Kräftige Flächen</span></button>
               <button type="button" class="art-opt" data-style="line" role="radio" aria-checked="false">
-                <b>Linienzeichnung</b><span>Feine Bleistift-Wirkung</span></button>
+                <b>Bleistift</b><span>Weiches Bild</span></button>
             </div>
             <div class="range-line" style="margin-top:12px">
               <input type="range" id="tafLineRange" min="30" max="90" step="1" value="58">
@@ -1658,8 +1661,8 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
     line:64,
     crop:32,           // 0 = oberer Bildrand, 100 = unterer
     sketchW:0, sketchH:0,
-    artStyle:'clip',   // 'clip' = echte Vektor-Clipart, 'line' = Dodge-Linienbild
-    art:null,          // {d,tw,th} — Pfade der Clipart, gehen als Vektor in den Export
+    artStyle:'stroke', // 'stroke' = Vektor-Striche, 'clip' = gefuellte Clipart, 'line' = Dodge-Bild
+    art:null,          // {d,tw,th,stroke} — Pfade, gehen als echter Vektor in den Export
     photo:null,        // Original-DataURL (geht mit in die Bestellung)
     sketch:null,       // erzeugte Linienzeichnung als DataURL
     ms:[
@@ -1834,6 +1837,17 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
   /* Der gestrichelte Rahmen ist reine Bildschirm-Hilfe (data-ph). Der Export
      streift ihn ab, sonst stuende er samt "Euer Foto" spaeter im Stahl. */
   const hasArtwork=()=>!!(st.sketch||(st.art&&st.art.d));
+
+  /* Ein Pfad, zwei Bedeutungen: die Clipart ist gefuellt, die Strichzeichnung
+     wird nur nachgefahren. Vorschau und Export holen ihn hier — sonst driften
+     sie auseinander. */
+  function artPathMarkup(color){
+    if(!st.art||!st.art.d) return '';
+    return st.art.stroke
+      ? `<path d="${st.art.d}" fill="none" stroke="${color}" stroke-width="${st.art.stroke}" `
+        + `stroke-linecap="round" stroke-linejoin="round"/>`
+      : `<path d="${st.art.d}" fill="${color}" fill-rule="evenodd"/>`;
+  }
 
   function placeholder(){
     const p=port(); if(!p || hasArtwork()) return '';
@@ -2020,7 +2034,7 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
       const g=portraitGeom();
       art.innerHTML=`<g transform="translate(${g.x.toFixed(2)} ${g.y.toFixed(2)}) `
         + `scale(${(g.w/st.art.tw).toFixed(5)} ${(g.h/st.art.th).toFixed(5)})">`
-        + `<path d="${st.art.d}" fill="${ENG}" fill-rule="evenodd"/></g>`;
+        + artPathMarkup(ENG)+`</g>`;
     } else art.innerHTML='';
 
     $('tafEng').innerHTML=engravingMarkup();
@@ -2231,17 +2245,153 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
     return {d,tw:w,th:h,nodes,sharp,w:img.naturalWidth,h:img.naturalHeight};
   }
 
+  /* ---------- Foto -> Vektor-Strichzeichnung ---------- */
+  /* Flaechen muss der Laser zeilenweise ausfuellen, Striche faehrt er einfach ab:
+     schneller, weniger Waerme im Blech, und das Motiv bleibt lesbar. Wir suchen
+     die Kanten also als LINIEN, nicht als Flecken: Differenz zweier Unschaerfen
+     (Difference of Gaussians) findet, wo es dunkler ist als die Umgebung, die
+     Skelettierung duennt das auf einen Pixel aus, und die Verfolgung macht daraus
+     Polylinien. */
+
+  /* Nur Vordergrund-Krimskrams entfernen — anders als beim Clipart darf hier
+     NICHTS zugeschuettet werden, sonst wachsen die Linien zu Flaechen zusammen. */
+  function dropSmallFg(m,w,h,minArea){
+    const lab=new Int32Array(w*h).fill(-1), sizes=[], stack=[];
+    let comp=0;
+    for(let i=0;i<m.length;i++){
+      if(!m[i]||lab[i]>=0) continue;
+      let n=0; stack.length=0; stack.push(i); lab[i]=comp;
+      while(stack.length){
+        const p=stack.pop(); n++;
+        const x=p%w, y=(p/w)|0;
+        for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++){
+          const a=x+dx, b=y+dy;
+          if(a<0||b<0||a>=w||b>=h) continue;
+          const q=b*w+a;
+          if(m[q] && lab[q]<0){ lab[q]=comp; stack.push(q); }
+        }
+      }
+      sizes.push(n); comp++;
+    }
+    for(let i=0;i<m.length;i++) if(m[i] && sizes[lab[i]]<minArea) m[i]=0;
+    return m;
+  }
+
+  /* Zhang-Suen: duennt die Kantenbaender auf eine Pixelbreite aus, ohne die
+     Linien zu zerreissen. */
+  function thin(m,w,h){
+    const at=(x,y)=>(x<0||y<0||x>=w||y>=h)?0:m[y*w+x];
+    const del=[];
+    let changed=true, guard=0;
+    while(changed && guard++<40){
+      changed=false;
+      for(let step=0;step<2;step++){
+        del.length=0;
+        for(let y=0;y<h;y++) for(let x=0;x<w;x++){
+          if(!m[y*w+x]) continue;
+          const p2=at(x,y-1),p3=at(x+1,y-1),p4=at(x+1,y),p5=at(x+1,y+1),
+                p6=at(x,y+1),p7=at(x-1,y+1),p8=at(x-1,y),p9=at(x-1,y-1);
+          const B=p2+p3+p4+p5+p6+p7+p8+p9;
+          if(B<2||B>6) continue;
+          const s=[p2,p3,p4,p5,p6,p7,p8,p9,p2];
+          let A=0;
+          for(let i=0;i<8;i++) if(s[i]===0&&s[i+1]===1) A++;
+          if(A!==1) continue;
+          if(step===0){ if(p2*p4*p6) continue; if(p4*p6*p8) continue; }
+          else       { if(p2*p4*p8) continue; if(p2*p6*p8) continue; }
+          del.push(y*w+x);
+        }
+        if(del.length){ changed=true; for(let i=0;i<del.length;i++) m[del[i]]=0; }
+      }
+    }
+    return m;
+  }
+
+  /* Erst von den Enden her verfolgen, damit die Striche ganz bleiben; was dann
+     noch uebrig ist, sind geschlossene Ringe. Gerade Nachbarn vor den
+     diagonalen — sonst zickzackt die Linie durch das Pixelgitter. */
+  function tracePolylines(m,w,h,minLen){
+    const NB=[[1,0],[0,1],[-1,0],[0,-1],[1,1],[-1,1],[-1,-1],[1,-1]];
+    const at=(x,y)=>(x<0||y<0||x>=w||y>=h)?0:m[y*w+x];
+    const used=new Uint8Array(w*h), lines=[];
+    const degree=(x,y)=>{ let c=0; for(const d of NB) c+=at(x+d[0],y+d[1]); return c; };
+    function walk(sx,sy){
+      const pts=[[sx,sy]]; used[sy*w+sx]=1;
+      let x=sx,y=sy;
+      for(;;){
+        let nx=-1,ny=-1;
+        for(const d of NB){
+          const a=x+d[0], b=y+d[1];
+          if(at(a,b) && !used[b*w+a]){ nx=a; ny=b; break; }
+        }
+        if(nx<0) break;
+        used[ny*w+nx]=1; pts.push([nx,ny]); x=nx; y=ny;
+      }
+      if(pts.length>=minLen) lines.push(pts);
+    }
+    for(let y=0;y<h;y++) for(let x=0;x<w;x++)
+      if(m[y*w+x] && !used[y*w+x] && degree(x,y)===1) walk(x,y);
+    for(let y=0;y<h;y++) for(let x=0;x<w;x++)
+      if(m[y*w+x] && !used[y*w+x]) walk(x,y);
+    return lines;
+  }
+
+  /* Offener Streckenzug, an den Kantenmitten weich gefuehrt; Anfang und Ende
+     bleiben stehen, damit die Linie nicht schrumpft. */
+  function polyPath(pts){
+    const n=pts.length;
+    if(n<2) return '';
+    const f=v=>v.toFixed(2);
+    if(n===2) return `M${f(pts[0][0])} ${f(pts[0][1])}L${f(pts[1][0])} ${f(pts[1][1])}`;
+    let d=`M${f(pts[0][0])} ${f(pts[0][1])}`;
+    for(let i=1;i<n-1;i++){
+      const c=pts[i];
+      d+=`Q${f(c[0])} ${f(c[1])} ${f((c[0]+pts[i+1][0])/2)} ${f((c[1]+pts[i+1][1])/2)}`;
+    }
+    return d+`L${f(pts[n-1][0])} ${f(pts[n-1][1])}`;
+  }
+
+  function makeLineArt(img,strength){
+    const MAX=430, sc=Math.min(1,MAX/Math.max(img.naturalWidth,img.naturalHeight));
+    const w=Math.max(1,Math.round(img.naturalWidth*sc)), h=Math.max(1,Math.round(img.naturalHeight*sc));
+    const c=document.createElement('canvas'); c.width=w; c.height=h;
+    const cx=c.getContext('2d',{willReadFrequently:true});
+    cx.drawImage(img,0,0,w,h);
+    const g=toGray(cx.getImageData(0,0,w,h).data);
+    const sharp=sharpness(g,w,h);
+    const base=boxBlur(g,w,h,1);
+    const r1=Math.max(1,Math.round(Math.min(w,h)/230));
+    const b1=boxBlur(base,w,h,r1);
+    const b2=boxBlur(base,w,h,Math.max(r1+1,Math.round(r1*2.8)));
+    /* tau steuert, ab welchem Kontrast eine Kante zur Linie wird: kleiner = mehr
+       Linien (auch Rauschen), groesser = nur die kraeftigen Zuege. */
+    const tau=Math.max(2,13-(strength-60)*0.17);
+    const m=new Uint8Array(w*h);
+    for(let i=0;i<m.length;i++) m[i]=(b1[i]-b2[i])<-tau?1:0;
+    dropSmallFg(m,w,h,Math.max(6,Math.round(w*h*0.00022)));
+    thin(m,w,h);
+    const minLen=Math.max(5,Math.round(Math.min(w,h)/38));
+    const lines=tracePolylines(m,w,h,minLen);
+    let d='', nodes=0;
+    for(const lp of lines){
+      const s=simplifyRing(lp,0.9);
+      if(s.length<2) continue;
+      nodes+=s.length; d+=polyPath(s);
+    }
+    return {d,tw:w,th:h,stroke:1.6,nodes,sharp,w:img.naturalWidth,h:img.naturalHeight};
+  }
+
   function msg(kind,txt){ const m=$('tafPhotoMsg'); m.className='photo-msg '+kind; m.textContent=txt; }
 
   let photoImg=null;
   function applyPhoto(){
     if(!photoImg) return;
     let r;
-    if(st.artStyle==='clip'){
-      r=makeClipart(photoImg,st.line);
-      /* Ein leeres Trace-Ergebnis waere eine leere Tafel — dann lieber die
-         Linienzeichnung zeigen als gar nichts. */
-      if(r.d){ st.art={d:r.d,tw:r.tw,th:r.th}; st.sketch=null; }
+    if(st.artStyle==='stroke'||st.artStyle==='clip'){
+      r=st.artStyle==='stroke'?makeLineArt(photoImg,st.line):makeClipart(photoImg,st.line);
+      /* Ein leeres Trace-Ergebnis waere eine leere Tafel — dann lieber das
+         weiche Bleistift-Bild zeigen als gar nichts. */
+      if(r.d){ st.art={d:r.d,tw:r.tw,th:r.th,stroke:r.stroke||0}; st.sketch=null; }
       else { st.art=null; r=makeSketch(photoImg,st.line); st.sketch=r.url; }
     } else {
       r=makeSketch(photoImg,st.line);
@@ -2253,6 +2403,7 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
     if(small&&blurry) msg('warn','Das Foto ist klein und wirkt unscharf — bitte ein größeres, schärferes Bild wählen.');
     else if(small) msg('warn',`Das Foto ist recht klein (${r.w}×${r.h} px). Für feine Linien sind mindestens 900 px auf der kurzen Seite besser.`);
     else if(blurry) msg('warn','Das Foto wirkt unscharf. Ein schärferes Bild gibt deutlich feinere Linien.');
+    else if(st.art&&st.art.stroke) msg('ok','Sieht gut aus — feine Striche, die der Laser einfach nachfährt.');
     else if(st.art) msg('ok','Sieht gut aus — als Vektor-Clipart, sauber in jeder Größe.');
     else msg('ok','Sieht gut aus — so wird euer Porträt graviert.');
     render();
@@ -2450,7 +2601,7 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
         portOut=clip+`<g clip-path="url(#portClip)">`
           + `<g transform="translate(${mx.toFixed(3)} ${my.toFixed(3)}) `
           + `scale(${(mw/st.art.tw).toFixed(6)} ${(mh/st.art.th).toFixed(6)})">`
-          + `<path d="${st.art.d}" fill="#000" fill-rule="evenodd"/></g></g>`;
+          + artPathMarkup('#000')+`</g></g>`;
       } else {
         portOut=clip+`<g clip-path="url(#portClip)"><image x="${mx.toFixed(3)}" y="${my.toFixed(3)}" `
           + `width="${mw.toFixed(3)}" height="${mh.toFixed(3)}" `
