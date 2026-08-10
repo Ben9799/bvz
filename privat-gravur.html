@@ -726,7 +726,7 @@
     </div>
     <div class="faq-wrap fade">
       <details class="faq-item"><summary>Welches Foto soll ich hochladen?</summary><p>Ein scharfes, nahes Bild – Gesichter groß im Bild, gutes Licht. Am schönsten wird die Zeichnung mit freigestelltem Hintergrund: einfach das Motiv auf dem iPhone gedrückt halten und kopieren, oder einen Dienst wie remove.bg nutzen – dann bleibt nur die Person, mit feinen, sauberen Linien. Die kurze Bildseite sollte mindestens 900 Pixel haben. Der Konfigurator prüft das sofort und sagt dir, ob das Bild trägt.</p></details>
-      <details class="faq-item"><summary>Woraus besteht die Tafel?</summary><p>Aus 1,5 mm gebürstetem Edelstahl, 105 × 148 mm, mit passendem Standfuß. Der Stahl läuft nicht an und ist unempfindlich – die Tafel kann dauerhaft stehen bleiben.</p></details>
+      <details class="faq-item"><summary>Woraus besteht die Tafel?</summary><p>Aus 2 mm gebürstetem Edelstahl, 105 × 148 mm, mit passendem Standfuß. Der Stahl läuft nicht an und ist unempfindlich – die Tafel kann dauerhaft stehen bleiben.</p></details>
       <details class="faq-item"><summary>Ist das wirklich echtes Silber?</summary><p>Ja. Jeder Anhänger besteht aus massivem 925er Sterlingsilber und ist als solches gestempelt – kein versilbertes Material.</p></details>
       <details class="faq-item"><summary>Kann ich meine Gravur vorher sehen?</summary><p>Ja. Die Vorschau zeigt dein Motiv live und maßstabsgetreu – genau diese Datei geht in die Gravur. Was du siehst, bekommst du.</p></details>
       <details class="faq-item"><summary>Hält die Gravur dauerhaft?</summary><p>Die Gravur wird mit dem Präzisionslaser dauerhaft in das Metall eingebracht. Sie ist wischfest und verblasst nicht – anders als aufgedruckte oder oberflächliche Beschriftungen.</p></details>
@@ -1564,7 +1564,7 @@ document.getElementById('collection').innerHTML = `
   <div class="prod fade">
     <div class="prod-img" id="collTafel"></div>
     <div class="prod-body">
-      <h3>Erinnerungstafel</h3><p>105 × 148 mm · 1,5 mm Edelstahl · mit Sockel</p>
+      <h3>Erinnerungstafel</h3><p>105 × 148 mm · 2 mm Edelstahl · mit Sockel</p>
       <div class="prod-price">ab 89 €</div>
     </div>
   </div>` + items.map(it=>`
@@ -1598,7 +1598,7 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
    Anders als beim Anhaenger gibt es hier bewusst KEINE freie Positionierung —
    die Komposition soll sich nicht zerstoeren lassen. */
 (function(){
-  const PLATE={w:105,h:148,rTop:26,rBot:4,insert:9,thick:1.5,price:89};
+  const PLATE={w:105,h:148,rTop:26,rBot:4,insert:9,thick:2,price:89};
   const S=1.6, X0=(300-PLATE.w*S)/2, Y0=20;
   const ENG='#3c414a';
   const X=mm=>X0+mm*S, Y=mm=>Y0+mm*S, P=mm=>mm*S;
