@@ -1632,15 +1632,12 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
     {key:'jahr', name:'Jahrestag', hint:'Gemeinsame Jahre', layout:'jubilee',
      title:'Unser Jahrestag', quote:'Und wir würden es wieder tun.', names:'Martina & Stefan',
      bigNum:'25', bigLabel:'Jahre', dateA:'2001', dateB:'2026'},
-    {key:'andenken', name:'Andenken', hint:'In Erinnerung', layout:'memorial',
-     title:'In Erinnerung', quote:'Wer geliebt wird, geht nicht fort.', names:'Hans Bergmann',
-     dateA:'1948', dateB:'2024', sub:'In Liebe — deine Familie'},
     {key:'danke', name:'Danksagung', hint:'Ein Dankeschön', layout:'dedication',
      title:'Danke', names:'Klasse 4b', sub:'Für Frau Keller',
      msg:'Für jede Frage, die nie zu viel war.\nFür die Geduld an den zähen Tagen.\nFür das Vertrauen, das uns getragen hat.\nWir vergessen das nicht.'},
     {key:'trophae', name:'Auszeichnung', hint:'Trophäe', layout:'award',
      title:'Auszeichnung', quote:'Verdient — und nicht vergessen.', names:'Team Fertigung',
-     bigNum:'1', bigLabel:'Platz', sub:'Regionalfinale Fertigungstechnik', dateA:'14. Juni 2026'},
+     sub:'Regionalfinale Fertigungstechnik', dateA:'14. Juni 2026'},
     {key:'ruhestand', name:'Ruhestand', hint:'Zum Abschied', layout:'career',
      title:'Vierzig Jahre', quote:'Und jetzt: alle Zeit der Welt.', names:'Für Peter',
      ms:[{year:'1986',l1:'Der erste Arbeitstag',l2:'',icon:'kaffee'},
@@ -1861,8 +1858,8 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
   }
 
   /* Jeder Anlass bekommt eine eigene Komposition. Ein Jahrestag lebt von der
-     grossen Zahl, ein Andenken von Ruhe und Weissraum, eine Auszeichnung von
-     der Urkunden-Achse — der geschwungene Lebensweg passt eben nur zum Lebensweg.
+     grossen Zahl, eine Danksagung vom Widmungstext, eine Auszeichnung von der
+     Urkunden-Achse — der geschwungene Lebensweg passt eben nur zum Lebensweg.
      `port` ist das Portraitfeld (rx=w/2 ergibt den Kreis), `fields` steuert,
      welche Eingabefelder ueberhaupt sichtbar sind. */
   const LAYOUTS={
@@ -1894,22 +1891,9 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
           + txt(up(st.names),136.5,{size:3.4,track:1.1,weight:500});
       }
     },
-    memorial:{
-      port:{x:27.5,y:25,w:50,h:62,rx:2},
-      fields:['title','photo','names','dateA','dateB','quote','sub'],
-      labels:{names:'Name',dateA:'Geboren',dateB:'Gestorben',quote:'Satz',sub:'Abschlusszeile'},
-      draw(){
-        /* * und † sind die uebliche deutsche Schreibweise und in jeder Schrift
-           vorhanden — Sonderzeichen wie ✳ waeren ein Schriftglueckspiel. */
-        const dates=[st.dateA?'* '+st.dateA:'', st.dateB?'† '+st.dateB:''].filter(Boolean).join('     ');
-        return headline(st.title)+dividerMarkup(20)+placeholder()
-          + txt(st.names,99,{serif:true,size:8,weight:600})
-          + txt(dates,108,{size:4,track:.6})
-          + dividerMarkup(114)
-          + txt(st.quote,124,{serif:true,italic:true,size:6})
-          + txt(st.sub,134,{serif:true,italic:true,size:4});
-      }
-    },
+    /* Das Andenken-Layout ist am 2026-08-09 entfallen: Bence will keinen
+       Trauer-Anlass im Shop ("az szomoru"). Wer es je zurueckholt, braucht
+       auch wieder den Preset-Eintrag mit layout:'memorial'. */
     dedication:{
       port:{x:20,y:26,w:65,h:44,rx:2},
       fields:['title','photo','sub','msg','names'],
@@ -1924,18 +1908,19 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
     },
     award:{
       port:null,
-      fields:['title','bigNum','bigLabel','names','sub','quote','dateA'],
-      labels:{bigNum:'Platzierung',bigLabel:'Wort darunter',names:'Ausgezeichnet',
-              sub:'Anlass',quote:'Satz',dateA:'Datum'},
+      fields:['title','names','sub','quote','dateA'],
+      labels:{names:'Ausgezeichnet',sub:'Anlass',quote:'Satz',dateA:'Datum'},
       draw(){
+        /* Platzierung ist am 2026-08-09 entfallen (Bence: gehoert nicht hierher).
+           Der Kranz wird dadurch kleiner — als leerer Rahmen in Originalgroesse
+           haette er ausgesehen, als fehle etwas darin. */
         return headline(st.title)+dividerMarkup(20)
-          + laurel(52.5,51,20,true)+laurel(52.5,51,20,false)
-          + numeralMarkup(st.bigNum,st.bigLabel,62,true)
-          + txt(st.names,86,{serif:true,size:8,weight:600})
-          + txt(st.sub,95.5,{size:3.6,maxw:80})
-          + dividerMarkup(102)
-          + txt(st.quote,115,{serif:true,italic:true,size:6})
-          + txt(up(st.dateA),129,{size:3.2,track:1.1,weight:500});
+          + laurel(52.5,48,15,true)+laurel(52.5,48,15,false)
+          + txt(st.names,80,{serif:true,size:8,weight:600})
+          + txt(st.sub,90,{size:3.6,maxw:80})
+          + dividerMarkup(97)
+          + txt(st.quote,112,{serif:true,italic:true,size:6})
+          + txt(up(st.dateA),128,{size:3.2,track:1.1,weight:500});
       }
     },
     career:{
