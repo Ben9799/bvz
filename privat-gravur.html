@@ -630,7 +630,7 @@
             <label for="tafBigNum">Zahl in der Mitte</label>
             <input class="txt" id="tafBigNum" maxlength="3" placeholder="25">
           </div>
-          <div class="field">
+          <div class="field" data-fld="bigLabel">
             <label for="tafBigLabel">Wort darunter</label>
             <input class="txt" id="tafBigLabel" maxlength="12" placeholder="Jahre">
           </div>
@@ -1637,7 +1637,7 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
      msg:'Für jede Frage, die nie zu viel war.\nFür die Geduld an den zähen Tagen.\nFür das Vertrauen, das uns getragen hat.\nWir vergessen das nicht.'},
     {key:'trophae', name:'Auszeichnung', hint:'Trophäe', layout:'award',
      title:'Auszeichnung', quote:'Verdient — und nicht vergessen.', names:'Team Fertigung',
-     sub:'Regionalfinale Fertigungstechnik', dateA:'14. Juni 2026'},
+     bigNum:'1', sub:'Regionalfinale Fertigungstechnik', dateA:'14. Juni 2026'},
     {key:'ruhestand', name:'Ruhestand', hint:'Zum Abschied', layout:'career',
      title:'Vierzig Jahre', quote:'Und jetzt: alle Zeit der Welt.', names:'Für Peter',
      ms:[{year:'1986',l1:'Der erste Arbeitstag',l2:'',icon:'kaffee'},
@@ -1908,19 +1908,19 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
     },
     award:{
       port:null,
-      fields:['title','names','sub','quote','dateA'],
-      labels:{names:'Ausgezeichnet',sub:'Anlass',quote:'Satz',dateA:'Datum'},
+      fields:['title','bigNum','names','sub','quote','dateA'],
+      labels:{bigNum:'Platzierung',names:'Ausgezeichnet',sub:'Anlass',quote:'Satz',dateA:'Datum'},
       draw(){
-        /* Platzierung ist am 2026-08-09 entfallen (Bence: gehoert nicht hierher).
-           Der Kranz wird dadurch kleiner — als leerer Rahmen in Originalgroesse
-           haette er ausgesehen, als fehle etwas darin. */
+        /* Nur das Wort "PLATZ" ist am 2026-08-09 entfallen (Bence), die Zahl
+           bleibt: sie steht allein und mittig im Kranz. */
         return headline(st.title)+dividerMarkup(20)
-          + laurel(52.5,48,15,true)+laurel(52.5,48,15,false)
-          + txt(st.names,80,{serif:true,size:8,weight:600})
-          + txt(st.sub,90,{size:3.6,maxw:80})
-          + dividerMarkup(97)
-          + txt(st.quote,112,{serif:true,italic:true,size:6})
-          + txt(up(st.dateA),128,{size:3.2,track:1.1,weight:500});
+          + laurel(52.5,51,20,true)+laurel(52.5,51,20,false)
+          + numeralMarkup(st.bigNum,'',60)
+          + txt(st.names,86,{serif:true,size:8,weight:600})
+          + txt(st.sub,95.5,{size:3.6,maxw:80})
+          + dividerMarkup(102)
+          + txt(st.quote,115,{serif:true,italic:true,size:6})
+          + txt(up(st.dateA),129,{size:3.2,track:1.1,weight:500});
       }
     },
     career:{
@@ -2846,6 +2846,12 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
       if(labels[f] && lab && lab.tagName==='LABEL') lab.textContent=labels[f];
     });
     $('tafMsLabel').textContent=labels.ms;
+    /* Bleibt von einem Zweier-Paar nur ein Feld uebrig (Auszeichnung: Zahl ohne
+       Wort), soll es die ganze Breite nehmen statt eine leere Spalte zu lassen. */
+    document.querySelectorAll('#paneTafel .taf-pair').forEach(p=>{
+      const shown=[...p.children].filter(c=>c.style.display!=='none').length;
+      p.style.gridTemplateColumns=shown>1?'':'1fr';
+    });
     const max=lay.msMax||5;
     $('tafAddMs').style.display=st.ms.length>=max?'none':'';
   }
