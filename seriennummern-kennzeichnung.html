@@ -145,6 +145,61 @@
 }
 </script>
 
+<!-- HowTo Schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "Seriennummern per Laser kennzeichnen lassen – so läuft der Auftrag",
+  "description": "Ablauf für die fortlaufende, rückverfolgbare Seriennummern-Kennzeichnung per Faserlaser auf Metall (Edelstahl V2A/V4A, Aluminium, Stahl, Titan, Messing) bei Wolf Lasermark in Bruckmühl bei Rosenheim: von der Anfrage mit Nummernlogik (Startwert, Schrittweite, Format, Präfix, Datum/Charge) über Angebot und Freigabe bis zur Produktion und Lieferung – auch Einzelstücke, Prototypen und Kleinserien ohne Mindestmenge.",
+  "totalTime": "PT8H",
+  "inLanguage": "de-DE",
+  "supply": [
+    {
+      "@type": "HowToSupply",
+      "name": "Metall-Bauteil (Edelstahl V2A/V4A, Aluminium, Stahl, Titan oder Messing)"
+    },
+    {
+      "@type": "HowToSupply",
+      "name": "Nummernlogik: Startwert, Schrittweite, Format (führende Nullen), optional Präfix/Suffix, Datum oder Chargenbestandteil"
+    }
+  ],
+  "tool": [
+    {
+      "@type": "HowToTool",
+      "name": "Angebot-Kalkulator auf wolf-lasermark.de"
+    }
+  ],
+  "step": [
+    {
+      "@type": "HowToStep",
+      "position": 1,
+      "name": "Anfrage stellen",
+      "text": "Material, Stückzahl und Nummernlogik (Startwert, Schrittweite, Format, optional Präfix/Datum/Charge) angeben – am einfachsten über den Angebot-Kalkulator auf wolf-lasermark.de.",
+      "url": "https://wolf-lasermark.de/index.html#angebot"
+    },
+    {
+      "@type": "HowToStep",
+      "position": 2,
+      "name": "Angebot & Abstimmung",
+      "text": "Wolf Lasermark klärt Nummernlogik, Platzierung und Material und sendet ein Angebot – meist innerhalb von 8 Stunden."
+    },
+    {
+      "@type": "HowToStep",
+      "position": 3,
+      "name": "Freigabe & Produktion",
+      "text": "Nach Freigabe werden die fortlaufenden Seriennummern auf dem 100 W JPT-Faserlaser graviert – dauerhaft lesbar, optional in Kombination mit DataMatrix oder QR-Code und auf Wunsch mit Testmuster."
+    },
+    {
+      "@type": "HowToStep",
+      "position": 4,
+      "name": "Lieferung oder Abholung",
+      "text": "Fertige Teile werden deutschlandweit versendet oder in Bruckmühl bei Rosenheim abgeholt. Express auf Anfrage."
+    }
+  ]
+}
+</script>
+
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="ratgeber.css">
 </head>
