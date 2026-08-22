@@ -234,12 +234,18 @@
   .ms-icons{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin-top:6px}
   /* Telefonon 5 oszlopban a nevek levagodnak ("Ki..." = Kinderwagen). Harom
      oszlopban a leghosszabb nev is kifer, es igy tenyleg olvashato, mit valaszt. */
-  @media(max-width:520px){.ms-icons{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  .ms-pick,.ms-icons{grid-column:1/-1}   /* sajat sor a racsban, teljes szelessegben:
+     a belso oszlop csak ~137 px, ott a hosszabb motivum-nevek levagodtak */
+  @media(max-width:520px){.ms-icons{grid-template-columns:repeat(4,minmax(0,1fr))}}
   .ms-ico{display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 2px;cursor:pointer;
           border:1px solid transparent;border-radius:8px;background:var(--paper);color:var(--mut);
           font-family:var(--sans);font-size:.56rem;line-height:1.15;text-align:center}
   .ms-ico svg{width:20px;height:20px}
   .ms-ico span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+  /* Telefonon inkabb tordeljon ket sorba, mint hogy levagja a nevet.
+     FONTOS: ez a szabaly a fenti UTAN all, kulonben a nowrap felulirna. */
+  @media(max-width:520px){.ms-ico span{white-space:normal;overflow-wrap:anywhere;
+    text-overflow:clip;line-height:1.15;font-size:.58rem}}
   .ms-ico:hover{color:var(--ink);border-color:var(--hair)}
   .ms-ico.on{color:var(--ink);border-color:var(--accent);background:var(--paper-2)}
 
@@ -2908,16 +2914,16 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
          <div class="ms-stack">
            <input data-f="l1" maxlength="20" value="${esc(m.l1)}" placeholder="Zeile 1" aria-label="Zeile 1">
            <input data-f="l2" maxlength="20" value="${esc(m.l2)}" placeholder="Zeile 2" aria-label="Zeile 2">
+         </div>
+         <button type="button" class="ms-del" data-del="${i}" title="Station entfernen" aria-label="Station entfernen">×</button>
            <button type="button" class="ms-pick" data-pick="${i}" aria-expanded="false"
              aria-label="Motiv wählen — aktuell ${esc(icoLabel(m.icon))}">
              ${iconPreview(icoKey(m.icon))}<span>${esc(shortLabel(icoKey(m.icon)))}</span><i class="ms-caret">▾</i>
            </button>
-           <div class="ms-icons" role="radiogroup" aria-label="Motiv" hidden>${ICON_KEYS.map(k=>
-             `<button type="button" class="ms-ico${k===m.icon?' on':''}" data-ico="${k}" role="radio"
-                aria-checked="${k===m.icon?'true':'false'}" title="${esc(ICONS[k].label)}">
-                ${iconPreview(k)}<span>${esc(shortLabel(k))}</span></button>`).join('')}</div>
-         </div>
-         <button type="button" class="ms-del" data-del="${i}" title="Station entfernen" aria-label="Station entfernen">×</button>
+         <div class="ms-icons" role="radiogroup" aria-label="Motiv" hidden>${ICON_KEYS.map(k=>
+           `<button type="button" class="ms-ico${k===m.icon?' on':''}" data-ico="${k}" role="radio"
+              aria-checked="${k===m.icon?'true':'false'}" title="${esc(ICONS[k].label)}">
+              ${iconPreview(k)}<span>${esc(shortLabel(k))}</span></button>`).join('')}</div>
        </div>`).join('');
     $('tafAddMs').style.display=st.ms.length>=(LAY().msMax||5)?'none':'';
   }
