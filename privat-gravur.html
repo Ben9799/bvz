@@ -236,7 +236,9 @@
      oszlopban a leghosszabb nev is kifer, es igy tenyleg olvashato, mit valaszt. */
   .ms-pick,.ms-icons{grid-column:1/-1}   /* sajat sor a racsban, teljes szelessegben:
      a belso oszlop csak ~137 px, ott a hosszabb motivum-nevek levagodtak */
-  @media(max-width:520px){.ms-icons{grid-template-columns:repeat(4,minmax(0,1fr))}}
+  /* 3 oszlop, mert 4-nel a leghosszabb nev ket sorba tort a szo kozepen
+     ("Kinderwage/n") -- az csunya. Harom oszlopban egy sorban kifer. */
+  @media(max-width:520px){.ms-icons{grid-template-columns:repeat(3,minmax(0,1fr))}}
   .ms-ico{display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 2px;cursor:pointer;
           border:1px solid transparent;border-radius:8px;background:var(--paper);color:var(--mut);
           font-family:var(--sans);font-size:.56rem;line-height:1.15;text-align:center}
