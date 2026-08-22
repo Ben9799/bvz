@@ -1870,13 +1870,19 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
       const a=X(xs[i]+r), b=X(xs[i+1]-r), yy=Y(cy), amp=P(i%2?-3.2:3.2), d=(b-a)/3;
       out+=`<path d="M${a} ${yy}C${a+d} ${yy+amp},${b-d} ${yy-amp},${b} ${yy}" fill="none" stroke="${ENG}" stroke-width=".7" opacity=".75"/>`;
     }
+    // Mennyi hely jut egy allomasnak? A szomszedig tarto tavolsag, es a
+    // szelso allomasoknal a tabla szeleig -- a felirat kozepre igazitott,
+    // tehat mindket iranyba a fele lohet ki.
+    const GAP=2.4, MARG=4;
+    const step=n>1?(PLATE.w-2*m)/(n-1):(PLATE.w-2*m);
     list.forEach((it,i)=>{
       const cx=xs[i];
+      const maxw=Math.max(7, Math.min(step-GAP, 2*(cx-MARG), 2*(PLATE.w-cx-MARG)));
       out+=`<circle cx="${X(cx)}" cy="${Y(cy)}" r="${P(r)}" fill="none" stroke="${ENG}" stroke-width=".8"/>`;
       out+=iconMarkup(it.icon,cx,cy,6.2);
-      if(it.year) out+=`<text x="${X(cx)}" y="${Y(100.4)}" text-anchor="middle" font-family="Cormorant Garamond,serif" font-size="${P(5)}" font-weight="600" fill="${ENG}">${esc(it.year)}</text>`;
-      if(it.l1) out+=`<text x="${X(cx)}" y="${Y(105.1)}" text-anchor="middle" font-family="Inter,sans-serif" font-size="${P(2.9)}" fill="${ENG}">${esc(it.l1)}</text>`;
-      if(it.l2) out+=`<text x="${X(cx)}" y="${Y(108.9)}" text-anchor="middle" font-family="Inter,sans-serif" font-size="${P(2.9)}" fill="${ENG}">${esc(it.l2)}</text>`;
+      if(it.year) out+=`<text x="${X(cx)}" y="${Y(100.4)}" text-anchor="middle" font-family="Cormorant Garamond,serif" font-size="${P(5)}" font-weight="600" fill="${ENG}" data-maxw="${maxw.toFixed(1)}">${esc(it.year)}</text>`;
+      if(it.l1) out+=`<text x="${X(cx)}" y="${Y(105.1)}" text-anchor="middle" font-family="Inter,sans-serif" font-size="${P(2.9)}" fill="${ENG}" data-maxw="${maxw.toFixed(1)}" data-msline="1">${esc(it.l1)}</text>`;
+      if(it.l2) out+=`<text x="${X(cx)}" y="${Y(108.9)}" text-anchor="middle" font-family="Inter,sans-serif" font-size="${P(2.9)}" fill="${ENG}" data-maxw="${maxw.toFixed(1)}" data-msline="1">${esc(it.l2)}</text>`;
     });
     return out;
   }
@@ -2007,6 +2013,19 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
       const ls=t.getAttribute('letter-spacing');
       if(ls) t.setAttribute('letter-spacing',(parseFloat(ls)*lim/w).toFixed(2));
     });
+    balanceStationLines();
+  }
+
+  /* Az allomas-feliratok EGY meretet kapnak: a legkisebbet, amit a leghosszabb
+     szoveg megkovetelt. Kulonben az egyik allomas alatt nagy, a masik alatt
+     apro betu allna -- az atfedes megszunne, de a tabla rendetlen maradna. */
+  function balanceStationLines(){
+    const els=$('tafEng').querySelectorAll('text[data-msline]');
+    if(els.length<2) return;
+    let min=Infinity;
+    els.forEach(t=>{ const f=parseFloat(t.getAttribute('font-size')); if(f>0&&f<min) min=f; });
+    if(!isFinite(min)) return;
+    els.forEach(t=>{ t.setAttribute('font-size',min.toFixed(2)); });
   }
 
   function rulerMarkup(){
