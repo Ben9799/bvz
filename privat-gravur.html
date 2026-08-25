@@ -3154,60 +3154,6 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
     });
     bindProductSwitch();
 
-    /* Nur fuer die Werkstatt, nie fuer Kunden sichtbar: mit ?test=1 in der
-       Adresse erscheint ein Knopf, der GENAU die Dateien herunterlaedt, die
-       eine echte Bestellung liefert — design.svg (massstabsgetreu in mm, mit
-       allen Texten und dem Portrait) und vorschau.png. */
-    if(/[?&#]test=1/.test(location.href)){
-      const dl=(blob,name)=>{
-        const a=document.createElement('a');
-        a.href=URL.createObjectURL(blob); a.download=name;
-        document.body.appendChild(a); a.click(); a.remove();
-        setTimeout(()=>URL.revokeObjectURL(a.href),4000);
-      };
-      /* Zwei getrennte Knoepfe — je EIN Download pro Klick, sonst blockt der
-         Browser den zweiten als "mehrere Downloads". */
-      const mkBtn=(label,fn)=>{
-        const b=document.createElement('button');
-        b.type='button'; b.className='linkbtn';
-        b.textContent=label;
-        b.style.cssText='display:block;margin-top:14px;font-size:.82rem';
-        b.addEventListener('click',async()=>{
-          const t=b.textContent; b.disabled=true; b.textContent='… wird erzeugt';
-          try{ await fn(); }
-          catch(e){ console.error(e); alert('Test-Download fehlgeschlagen: '+e.message); }
-          b.disabled=false; b.textContent=t;
-        });
-        return b;
-      };
-      const bSvg=mkBtn('⬇ design.svg herunterladen (Test)',async()=>{
-        try{ await ensureExportFonts(); }catch(e){}
-        const raw=exportSVG();
-        dl(new Blob(['<?xml version="1.0" encoding="UTF-8"?>\n'+raw],{type:'image/svg+xml'}),'design.svg');
-      });
-      const bPng=mkBtn('⬇ vorschau.png herunterladen (Test)',async()=>{
-        try{ await ensureExportFonts(); }catch(e){}
-        const raw=exportSVG();
-        /* Genau wie der Checkout rendert: SVG als Bild auf Canvas. */
-        await new Promise((ok,bad)=>{
-          const img=new Image();
-          img.onload=()=>{
-            try{
-              const sc=2000/148, c=document.createElement('canvas');
-              c.width=Math.round(105*sc); c.height=Math.round(148*sc);
-              const cx=c.getContext('2d');
-              cx.fillStyle='#ffffff'; cx.fillRect(0,0,c.width,c.height);
-              cx.drawImage(img,0,0,c.width,c.height);
-              c.toBlob(bl=>{ if(bl){ dl(bl,'vorschau.png'); ok(); } else bad(new Error('PNG leer')); },'image/png');
-            }catch(e){ bad(e); }
-          };
-          img.onerror=()=>bad(new Error('SVG nicht renderbar'));
-          img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(raw);
-        });
-      });
-      const host=document.querySelector('#paneTafel .config-controls');
-      if(host){ host.appendChild(bSvg); host.appendChild(bPng); }
-    }
   }
 
   /* Export fuer Bestellung/Kasse */
@@ -3753,6 +3699,62 @@ window.wlRedeemCoupon = async function(code, ref){
   $('pgQtyMinus') && ($('pgQtyMinus').onclick=()=>{ $('pgQty').value=Math.max(1,pgQty()-1); pgUpdateSummary(); });
   $('pgCouponBtn') && ($('pgCouponBtn').onclick=pgToggleCoupon);
   $('pgCouponInput') && $('pgCouponInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); pgToggleCoupon(); } });
+
+  /* WERKSTATT-TEST — nur mit ?test=1 in der Adresse, Kunden sehen das nie.
+     Der Knopf laedt GENAU die Dateien, die eine echte Bestellung erzeugt:
+     pgDesignSVG() und pgRenderPNG(). Frueher rief er das tafel-spezifische
+     exportSVG() auf und haengte sich nur in #paneTafel — bei der Kette gab es
+     deshalb gar keinen Download. Beide Funktionen liegen in DIESEM Scope; der
+     alte Block lag im ersten <script> und kam an sie nicht heran.
+
+     Wichtig fuers Geschaeft: die Gravurdatei ist das Produkt. Deshalb bleibt
+     der Download hinter ?test=1 — ohne den Parameter existiert der Knopf nicht
+     einmal im DOM. */
+  if(/[?&#]test=1/.test(location.href)){
+    const dl=(blob,name)=>{
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob); a.download=name;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+    };
+    const slug=()=>{
+      const p=window.WL_PRODUCT||'tafel';
+      if(p!=='kette') return 'tafel-105x148mm';
+      const sh=(typeof state!=='undefined'&&state.shape)||'circle';
+      return 'kette-'+sh;
+    };
+    /* Zwei getrennte Knoepfe — je EIN Download pro Klick, sonst blockt der
+       Browser den zweiten als "mehrere Downloads". */
+    const mkBtn=(label,fn)=>{
+      const b=document.createElement('button');
+      b.type='button'; b.className='linkbtn'; b.textContent=label;
+      b.setAttribute('data-testdl','1');
+      b.style.cssText='display:block;margin-top:14px;font-size:.82rem';
+      b.addEventListener('click',async()=>{
+        const t=b.textContent; b.disabled=true; b.textContent='… wird erzeugt';
+        try{ await fn(); }
+        catch(e){ console.error(e); alert('Test-Download fehlgeschlagen: '+e.message); }
+        b.disabled=false; b.textContent=t;
+      });
+      return b;
+    };
+    document.querySelectorAll('.config-controls').forEach(host=>{
+      if(host.querySelector('[data-testdl]')) return;
+      host.appendChild(mkBtn('⬇ design.svg herunterladen (Test)',async()=>{
+        if(typeof ensureExportFonts==='function'){ try{ await ensureExportFonts(); }catch(e){} }
+        dl(new Blob([pgDesignSVG()],{type:'image/svg+xml'}),'design-'+slug()+'.svg');
+      }));
+      host.appendChild(mkBtn('⬇ vorschau.png herunterladen (Test)',async()=>{
+        if(typeof ensureExportFonts==='function'){ try{ await ensureExportFonts(); }catch(e){} }
+        const url=await pgRenderPNG();
+        if(!url) throw new Error('PNG leer');
+        const bin=atob(url.split(',')[1]);
+        const buf=new Uint8Array(bin.length);
+        for(let i=0;i<bin.length;i++) buf[i]=bin.charCodeAt(i);
+        dl(new Blob([buf],{type:'image/png'}),'vorschau-'+slug()+'.png');
+      }));
+    });
+  }
 })();
 </script>
 </body>
