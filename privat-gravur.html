@@ -3523,21 +3523,58 @@ window.wlRedeemCoupon = async function(code, ref){
   function dataURLtoBlob(d){ const [h,b]=d.split(','); const mime=(h.match(/:(.*?);/)||[,'image/png'])[1];
     const bin=atob(b); const u=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i); return new Blob([u],{type:mime}); }
 
+  /* Der Anhaenger fuer die Gravurdatei — NICHT der Bildschirm-SVG geklont.
+     Der enthaelt alles, was nur fuer die Anzeige da ist: den mm-Massstab
+     (ragt weit ueber den Anhaenger hinaus), die 19,9-mm-Kontur
+     (.shape-outline, outerR 9.95), den 19,7-mm-Hilfskreis (.safe-outline /
+     .photo-frame-guide, safeR 9.85) und unsichtbare Klickflaechen
+     (.hit-outline mit stroke-width 14). Das alles musste bisher in LightBurn
+     von Hand geloescht werden.
+     pendant() kann das laengst: bei variant!=='preview' zeichnet es die
+     Hilfskreise gar nicht erst. Uebrig bleiben die 20-mm-Kontur und die
+     Gravur — sonst nichts. */
+  function pgKetteSVG(){
+    const NS='http://www.w3.org/2000/svg';
+    const svg=document.createElementNS(NS,'svg');
+    svg.setAttribute('xmlns',NS);
+    svg.setAttribute('xmlns:xlink','http://www.w3.org/1999/xlink');
+    svg.setAttribute('viewBox','0 0 300 300');
+    /* getBBox misst nur an einem eingehaengten Element — fitEngravings()
+       braucht das, sonst bleiben alle Schriftgroessen auf dem Rohwert 40. */
+    svg.setAttribute('style','position:absolute;left:-99999px;top:0;width:300px;height:300px');
+    const g=document.createElementNS(NS,'g');
+    g.innerHTML=pendant(state.shape, state.lines, CFG_CX, CFG_CY, CFG_MM, state.photo, 'export');
+    svg.appendChild(g);
+    document.body.appendChild(svg);
+    try{
+      fitEngravings(svg);
+      svg.querySelectorAll('.engPath,.hit-outline,.photo-hit,.photo-frame-guide,'
+                          +'.shape-outline,.safe-outline').forEach(n=>n.remove());
+      /* Glanzlicht ist reine Deko fuer den Bildschirm. */
+      svg.querySelectorAll('[fill^="url(#sheen"]').forEach(n=>n.remove());
+      /* Der Koerper: statt Silber-Verlauf eine saubere 20-mm-Kontur. */
+      svg.querySelectorAll('[fill^="url(#silver"]').forEach(n=>{
+        n.setAttribute('fill','none');
+        n.setAttribute('stroke','#000000');
+        n.setAttribute('stroke-width','0.4');
+        n.removeAttribute('stroke-opacity');
+      });
+      svg.querySelectorAll('text').forEach(n=>n.setAttribute('fill','#000000'));
+      svg.removeAttribute('style');
+      /* Massstabstreu: viewBox 300 bei CFG_MM=8 → 37,5 mm, damit ist der
+         ⌀20-mm-Anhaenger in der Datei exakt 20 mm. */
+      const mm=(n)=>(n/CFG_MM).toFixed(2)+'mm';
+      svg.setAttribute('width', mm(300));
+      svg.setAttribute('height', mm(300));
+      return '<?xml version="1.0" encoding="UTF-8"?>\n'+new XMLSerializer().serializeToString(svg);
+    } finally { svg.remove(); }
+  }
+
   function pgDesignSVG(){
     if(isTafel()) return '<?xml version="1.0" encoding="UTF-8"?>\n'+TAF().svg();
-    const el=document.getElementById('cfgSvg');
-    if(!el) return '<svg xmlns="http://www.w3.org/2000/svg"/>';
-    const clone=el.cloneNode(true);
-    clone.removeAttribute('style');
-    const g=clone.querySelector('#cfgGuides'); if(g) g.innerHTML='';
-    clone.setAttribute('xmlns','http://www.w3.org/2000/svg');
-    // Maßtreu exportieren: viewBox 0 0 300 300, mit CFG_MM=8 Einheiten/mm → 37,5 mm Kantenlänge,
-    // dadurch ist der ⌀20-mm-Anhänger in der Datei exakt 20 mm (kein manuelles Skalieren nötig).
-    const vb=(clone.getAttribute('viewBox')||'0 0 300 300').split(/\s+/).map(Number);
-    const mm=(n)=>(n/CFG_MM).toFixed(2)+'mm';
-    clone.setAttribute('width', mm(vb[2]||300));
-    clone.setAttribute('height', mm(vb[3]||300));
-    return '<?xml version="1.0" encoding="UTF-8"?>\n'+new XMLSerializer().serializeToString(clone);
+    if(typeof pendant!=='function' || typeof state==='undefined')
+      return '<svg xmlns="http://www.w3.org/2000/svg"/>';
+    return pgKetteSVG();
   }
   function pgRenderPNG(){
     return new Promise((resolve)=>{
