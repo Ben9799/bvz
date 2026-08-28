@@ -388,7 +388,7 @@ nav a:hover { color: #fff; background: rgba(255,255,255,0.04); }
   display: block; width: 22px; height: 2px;
   background: var(--muted2); border-radius: 2px; transition: all 0.3s;
 }
-@media(max-width:780px) {
+@media(max-width:980px) {
   nav {
     display: none; flex-direction: column;
     position: absolute; top: 100%; left: 0; right: 0;
@@ -407,9 +407,11 @@ nav a:hover { color: #fff; background: rgba(255,255,255,0.04); }
    HERO
    ======================== */
 .hero {
-  min-height: 92vh;
+  /* 92vh + 6rem Polster hiess: unter der Headline blieb ein leerer Bildschirm,
+     bevor der erste Inhalt kam. 76vh zeigt den naechsten Abschnitt schon an. */
+  min-height: 76vh;
   display: flex; align-items: center; justify-content: center;
-  padding: 6rem 2rem 5rem;
+  padding: 4.2rem 2rem 3.4rem;
   position: relative; overflow: hidden;
 }
 .hero::before {
@@ -1901,6 +1903,41 @@ body.mode-firmen #leistungen .leist-grid {
   box-shadow: 0 8px 28px rgba(0,0,0,0.4);
 }
 
+/* Zwei schwebende Elemente (Angebot-Leiste + WhatsApp) haben auf dem Handy
+   zusammen das untere Fuenftel verdeckt. Der Angebot-Launcher bleibt (er fuehrt
+   zur Kalkulation), die WhatsApp-Blase wird mobil ausgeblendet — erreichbar
+   bleibt sie im Kontaktbereich und im Footer. */
+@media(max-width:780px){ .float-wa { display: none; } }
+
+/* Nav-Untermenue "Mehr" — haelt die Leiste kurz, damit die CTA nie abgeschnitten wird */
+.nav-more { position: relative; display: inline-flex; align-items: center; }
+.nav-more-btn {
+  background: none; border: 0; color: inherit; font: inherit; cursor: pointer;
+  padding: 0; opacity: .85;
+}
+.nav-more-btn:hover { opacity: 1; color: var(--accent); }
+.nav-more-menu {
+  position: absolute; top: calc(100% + 12px); right: 0;
+  background: #14161a; border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 12px; padding: .5rem; min-width: 190px;
+  display: none; flex-direction: column; gap: .1rem;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.5); z-index: 600;
+}
+.nav-more:hover .nav-more-menu,
+.nav-more:focus-within .nav-more-menu { display: flex; }
+.nav-more-menu a { padding: .55rem .8rem; border-radius: 8px; white-space: nowrap; }
+.nav-more-menu a:hover { background: rgba(255,255,255,0.06); color: var(--accent); }
+/* Im Mobilmenue klappt alles flach auf — kein Hover auf dem Handy.
+   Der Breakpoint MUSS dem Hamburger entsprechen — beide stehen auf 980px.
+   Vorher: Hamburger bei 780, Untermenue bei 980 — dazwischen lief die
+   Navigation aus dem Bild. */
+@media(max-width:980px){
+  .nav-more { display: contents; }
+  .nav-more-btn { display: none; }
+  .nav-more-menu { position: static; display: flex; background: none; border: 0;
+                   box-shadow: none; padding: 0; min-width: 0; }
+}
+
 /* PRIVAT / FIRMEN visibility */
 body.mode-privat .firmen-only { display: none !important; }
 body.mode-firmen .privat-only { display: none !important; }
@@ -2851,16 +2888,21 @@ body.mode-firmen .privat-only { display: none !important; }
       <nav id="nav">
         <a href="#leistungen">Leistungen</a>
         <a href="#services">Beispiele</a>
-        <a href="#bewertungen">Stimmen</a>
-        <a href="#process">Ablauf</a>
-        <a href="#tech">Technologie</a>
-        <a href="#about">Über uns</a>
         <a href="laser-marking-guide.html">Kennzeichnung</a>
         <a href="laser-testservice.html">Testservice</a>
-        <a href="#faq">FAQ</a>
         <a href="nachbestellung.html" class="firmen-only">Nachbestellung</a>
         <a href="#contact">Kontakt</a>
-        <a href="typenschild.html" class="firmen-only">🏷️ Typenschild</a>
+        <div class="nav-more">
+          <button type="button" class="nav-more-btn" aria-expanded="false" aria-haspopup="true">Mehr ▾</button>
+          <div class="nav-more-menu">
+            <a href="#bewertungen">Stimmen</a>
+            <a href="#process">Ablauf</a>
+            <a href="#tech">Technologie</a>
+            <a href="#about">Über uns</a>
+            <a href="#faq">FAQ</a>
+            <a href="typenschild.html" class="firmen-only">🏷️ Typenschild</a>
+          </div>
+        </div>
         <a href="#contact" class="nav-cta privat-only">✨ Anfragen</a>
         <a href="bestellung.html" class="nav-cta firmen-only">🧮 Angebot kalkulieren</a>
       </nav>
