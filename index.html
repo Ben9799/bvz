@@ -1246,6 +1246,11 @@ body.mode-firmen #leistungen .leist-grid {
 .reviews-grid {
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;
 }
+/* Zwei echte Google-Rezensionen: mittig statt am Rand kleben. */
+.reviews-grid.few {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 760px; margin: 0 auto;
+}
 @media(max-width:780px) { .reviews-grid { grid-template-columns: 1fr; } }
 @media(min-width:500px) and (max-width:780px) {
   .reviews-grid { grid-template-columns: 1fr 1fr; }
@@ -3071,38 +3076,26 @@ body.mode-firmen .privat-only { display: none !important; }
   </section>
 
 
-  <!-- ====== STIMMEN (anonymisierte Rückmeldungen) ====== -->
+  <!-- ====== STIMMEN (echte Google-Rezensionen, ohne Klarnamen) ====== -->
   <section class="reviews reveal" id="bewertungen">
     <div class="reviews-inner">
       <div class="reviews-header">
         <div class="section-tag">💬 Stimmen</div>
-        <h2 class="section-title">Was wir oft <span>zu hören bekommen</span></h2>
-        <p class="section-sub">Anonymisierte Auszüge aus Anfragen, Mails und Gesprächen — ohne Klarnamen, unabhängig von Bewertungsportalen.</p>
+        <h2 class="section-title">Was Kunden <span>über uns sagen</span></h2>
+        <p class="section-sub">Echte Bewertungen aus unserem Google-Unternehmensprofil, wörtlich wiedergegeben und auf Wunsch ohne Namen. Jede Bewertung stammt von einem verifizierten Google-Konto und ist dort jederzeit nachprüfbar.</p>
       </div>
-      <div class="reviews-grid">
-        <div class="review-card privat-only">
-          <p class="review-text">Ich hatte ein personalisiertes Geschenk für meinen Mann bestellt – die Gravur war haargenau so wie ich mir das vorgestellt hatte. Schnelle Kommunikation, top Qualität.</p>
-          <div class="review-author">— sinngemäß, Privatkundin</div>
+      <div class="reviews-grid few">
+        <div class="review-card">
+          <p class="review-text">Ich bin sehr zufrieden! Die Gravur ist sehr schön geworden und die bestellten Stifte entsprechen genau meinen Vorstellungen. Vielen Dank!</p>
+          <div class="review-author">★★★★★ — Google-Rezension, Privatkundin</div>
         </div>
         <div class="review-card">
-          <p class="review-text">Wir haben Spannmittel und Vorrichtungen beschriften lassen – Seriennummern und QR-Codes auf gehärtetem Stahl. Saubere Gravur, präzise Positionierung, pünktliche Lieferung. Werden wir wieder beauftragen.</p>
-          <div class="review-author">— sinngemäß, Werkzeugbau-Betrieb, Bayern</div>
-        </div>
-        <div class="review-card firmen-only">
-          <p class="review-text">Typenschilder und DataMatrix-Codes für Automotive-Bauteile – hohe Stückzahl, gleichbleibende Qualität. Der Online-Kalkulator hat die Abstimmung deutlich vereinfacht. Direkte Kommunikation, keine langen Wartezeiten.</p>
-          <div class="review-author">— sinngemäß, Zulieferer Automobilindustrie</div>
-        </div>
-        <div class="review-card firmen-only">
-          <p class="review-text">Skalen und Beschriftungen auf Messbauteilen – auch für sicherheitskritische Teile. Präzise Ausführung, Erstmuster-Foto vor der Serienfertigung hat Vertrauen geschaffen. Empfehlenswert für anspruchsvolle Anwendungen.</p>
-          <div class="review-author">— sinngemäß, Produktionsbetrieb, Luft- und Raumfahrtzulieferer</div>
-        </div>
-        <div class="review-card privat-only">
-          <p class="review-text">Hochzeitsringe gravieren lassen – das Ergebnis war wunderschön und der Preis absolut fair. Sehr professionell und herzlich. Nur zu empfehlen!</p>
-          <div class="review-author">— sinngemäß, Privatkunden</div>
+          <p class="review-text">Ich wollte Namensschilder für die Tür und den Briefkasten gravieren lassen. Alles lief reibungslos und schnell. Ich kann es nur weiterempfehlen.</p>
+          <div class="review-author">★★★★★ — Google-Rezension, Privatkunde</div>
         </div>
       </div>
       <div class="reviews-badge">
-        <a href="https://www.instagram.com/wolf_lasermark" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px;"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>Mehr Eindrücke auf Instagram →</a>
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=Wolf+Lasermark+Bruckm%C3%BChl" target="_blank" rel="noopener">★ Alle Bewertungen bei Google ansehen →</a>
       </div>
     </div>
   </section>
