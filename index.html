@@ -1257,49 +1257,71 @@ body.mode-firmen #leistungen .leist-grid {
 }
 
 .review-card {
-  background: var(--s2);
-  border: 1px solid var(--border2);
-  border-radius: var(--radius-lg);
-  padding: 1.8rem;
-  display: flex; flex-direction: column; gap: 0.9rem;
-  transition: all 0.3s;
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 14px;
+  padding: 1.5rem 1.6rem 1.3rem;
+  display: flex; flex-direction: column; gap: 0.75rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.28);
+  transition: transform .25s, box-shadow .25s;
 }
 .review-card:hover {
-  border-color: rgba(0,200,255,0.15);
-  transform: translateY(-3px);
-  box-shadow: 0 16px 45px rgba(0,0,0,0.3);
+  transform: translateY(-4px);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.4);
 }
+/* Sternreihe wie bei Google: gold, nicht grau. */
+.review-stars { display: flex; gap: 2px; align-items: center; }
+.review-stars svg { width: 17px; height: 17px; display: block; }
 .review-text {
-  color: var(--muted2); font-size: 0.88rem;
-  line-height: 1.75; font-style: italic;
-  flex: 1; position: relative; padding-left: 1.2rem;
+  color: #3c4043; font-size: 0.94rem;
+  line-height: 1.65; font-style: normal;
+  flex: 1; padding: 0;
 }
-.review-text::before {
-  content: '"'; position: absolute; left: -2px; top: -6px;
-  font-size: 2.2rem; color: rgba(0,200,255,0.2);
-  font-style: normal; line-height: 1;
-}
+.review-text::before { content: none; }
 .review-author {
-  font-family: 'Space Mono', monospace;
-  font-size: 0.72rem; color: var(--muted);
-  letter-spacing: 0.04em;
-  border-top: 1px solid rgba(255,255,255,0.04);
-  padding-top: 0.9rem;
+  font-family: inherit;
+  font-size: 0.8rem; color: #5f6368;
+  letter-spacing: 0;
+  border-top: 1px solid rgba(0,0,0,0.07);
+  padding-top: 0.8rem;
   font-style: normal;
+  display: flex; align-items: center; gap: 0.4rem;
 }
+/* Google-Schriftzug in den Markenfarben — nur als Quellenangabe. */
+.g-logo { font-weight: 600; letter-spacing: -0.2px; }
+.g-logo .b { color:#4285F4 } .g-logo .r { color:#EA4335 }
+.g-logo .y { color:#FBBC04 } .g-logo .g { color:#34A853 }
+
+/* Zusammenfassung oben: grosse Note + Sterne */
+.g-summary {
+  display: inline-flex; align-items: center; gap: 1rem;
+  background: #ffffff; border-radius: 14px;
+  padding: 0.85rem 1.5rem; margin-bottom: 2.2rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.28);
+}
+.g-summary .score { font-size: 2.1rem; font-weight: 700; color: #202124; line-height: 1; }
+.g-summary .meta { text-align: left; }
+.g-summary .meta .stars { display: flex; gap: 2px; margin-bottom: 3px; }
+.g-summary .meta .stars svg { width: 16px; height: 16px; display: block; }
+.g-summary .meta .cnt { font-size: 0.78rem; color: #5f6368; }
+@media(max-width:520px){ .g-summary { gap: .8rem; padding: .75rem 1.1rem; } }
+
 .reviews-badge { text-align: center; margin-top: 2.5rem; }
 .reviews-badge a {
   display: inline-flex; align-items: center; gap: 0.5rem;
-  color: var(--muted2); font-size: 0.82rem;
+  color: #3c4043; font-size: 0.86rem; font-weight: 500;
   text-decoration: none;
-  border: 1px solid var(--border2);
-  padding: 0.5rem 1.2rem;
+  border: 1px solid rgba(0,0,0,0.08);
+  padding: 0.6rem 1.35rem;
   border-radius: 999px;
-  background: var(--s2);
-  transition: all 0.25s;
+  background: #ffffff;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+  transition: transform .2s, box-shadow .2s;
 }
 .reviews-badge a:hover {
-  border-color: rgba(0,200,255,0.2); color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.35);
+  color: #202124;
 }
 
 /* ========================
@@ -3082,20 +3104,29 @@ body.mode-firmen .privat-only { display: none !important; }
       <div class="reviews-header">
         <div class="section-tag">💬 Stimmen</div>
         <h2 class="section-title">Was Kunden <span>über uns sagen</span></h2>
-        <p class="section-sub">Echte Bewertungen aus unserem Google-Unternehmensprofil, wörtlich wiedergegeben und auf Wunsch ohne Namen. Jede Bewertung stammt von einem verifizierten Google-Konto und ist dort jederzeit nachprüfbar.</p>
+        <p class="section-sub">Echte Bewertungen aus unserem <span class="g-logo"><span class="b">G</span><span class="r">o</span><span class="y">o</span><span class="b">g</span><span class="g">l</span><span class="r">e</span></span>-Unternehmensprofil, wörtlich wiedergegeben und ohne Namen. Jede Bewertung stammt von einem verifizierten Konto und ist dort jederzeit nachprüfbar.</p>
+        <div class="g-summary">
+          <div class="score">5,0</div>
+          <div class="meta">
+            <div class="stars"><svg viewBox="0 0 24 24" fill="#FBBC04" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg><svg viewBox="0 0 24 24" fill="#FBBC04" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg><svg viewBox="0 0 24 24" fill="#FBBC04" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg><svg viewBox="0 0 24 24" fill="#FBBC04" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg><svg viewBox="0 0 24 24" fill="#FBBC04" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
+            <div class="cnt">2 Bewertungen auf <span class="g-logo"><span class="b">G</span><span class="r">o</span><span class="y">o</span><span class="b">g</span><span class="g">l</span><span class="r">e</span></span></div>
+          </div>
+        </div>
       </div>
       <div class="reviews-grid few">
         <div class="review-card">
+          <div class="review-stars" aria-label="5 von 5 Sternen"><svg viewBox="0 0 24 24" fill="#FBBC04" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg><svg viewBox="0 0 24 24" fill="#FBBC04" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg><svg viewBox="0 0 24 24" fill="#FBBC04" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg><svg viewBox="0 0 24 24" fill="#FBBC04" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg><svg viewBox="0 0 24 24" fill="#FBBC04" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
           <p class="review-text">Ich bin sehr zufrieden! Die Gravur ist sehr schön geworden und die bestellten Stifte entsprechen genau meinen Vorstellungen. Vielen Dank!</p>
-          <div class="review-author">★★★★★ — Google-Rezension, Privatkundin</div>
+          <div class="review-author">Privatkundin · Rezension auf <span class="g-logo"><span class="b">G</span><span class="r">o</span><span class="y">o</span><span class="b">g</span><span class="g">l</span><span class="r">e</span></span></div>
         </div>
         <div class="review-card">
+          <div class="review-stars" aria-label="5 von 5 Sternen"><svg viewBox="0 0 24 24" fill="#FBBC04" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg><svg viewBox="0 0 24 24" fill="#FBBC04" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg><svg viewBox="0 0 24 24" fill="#FBBC04" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg><svg viewBox="0 0 24 24" fill="#FBBC04" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg><svg viewBox="0 0 24 24" fill="#FBBC04" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
           <p class="review-text">Ich wollte Namensschilder für die Tür und den Briefkasten gravieren lassen. Alles lief reibungslos und schnell. Ich kann es nur weiterempfehlen.</p>
-          <div class="review-author">★★★★★ — Google-Rezension, Privatkunde</div>
+          <div class="review-author">Privatkunde · Rezension auf <span class="g-logo"><span class="b">G</span><span class="r">o</span><span class="y">o</span><span class="b">g</span><span class="g">l</span><span class="r">e</span></span></div>
         </div>
       </div>
       <div class="reviews-badge">
-        <a href="https://www.google.com/maps/search/?api=1&amp;query=Wolf+Lasermark+Bruckm%C3%BChl" target="_blank" rel="noopener">★ Alle Bewertungen bei Google ansehen →</a>
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=Wolf+Lasermark+Bruckm%C3%BChl" target="_blank" rel="noopener">Alle Bewertungen bei <span class="g-logo"><span class="b">G</span><span class="r">o</span><span class="y">o</span><span class="b">g</span><span class="g">l</span><span class="r">e</span></span> ansehen →</a>
       </div>
     </div>
   </section>
