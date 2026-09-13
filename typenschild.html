@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Typenschild-Generator – Typenschilder gravieren lassen | Wolf Lasermark</title>
-<meta name="description" content="Typenschilder lasergravieren: Maschinen- & Typenschilder aus Edelstahl und Aluminium mit Logo, Seriennummer & DataMatrix. ±0,01 mm, B2B aus Bruckmühl.">
+<meta name="description" content="Typenschilder online gestalten: schwarz eloxiertes Aluminium bis 85 × 55 mm mit Logo, Seriennummer & DataMatrix, lasergraviert. Andere Materialien und Formate auf Anfrage.">
 <link rel="canonical" href="https://wolf-lasermark.de/typenschild.html">
 <meta property="og:title" content="Typenschild-Generator – Typenschilder gravieren lassen">
-<meta property="og:description" content="Maschinen- und Typenschilder aus Edelstahl & Aluminium online gestalten und lasergravieren lassen – mit Logo, Seriennummer und DataMatrix.">
+<meta property="og:description" content="Typenschilder aus schwarz eloxiertem Aluminium online gestalten und lasergravieren lassen – mit Logo, Seriennummer und DataMatrix. Andere Materialien auf Anfrage.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://wolf-lasermark.de/typenschild.html">
 <meta property="og:site_name" content="Wolf Lasermark">
@@ -16,7 +16,7 @@
 <meta property="og:image:alt" content="Lasergraviertes Typenschild aus Metall von Wolf Lasermark">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Typenschild-Generator – Typenschilder gravieren lassen">
-<meta name="twitter:description" content="Maschinen- und Typenschilder aus Edelstahl & Aluminium online gestalten und lasergravieren lassen.">
+<meta name="twitter:description" content="Typenschilder aus schwarz eloxiertem Aluminium online gestalten und lasergravieren lassen – andere Materialien auf Anfrage.">
 <meta name="twitter:image" content="https://wolf-lasermark.de/images/werkzeugkennzeichnung.jpg">
 <script type="application/ld+json">
 {
@@ -50,7 +50,7 @@
   "@type": "Service",
   "serviceType": "Typenschild-Gravur",
   "name": "Typenschilder lasergravieren lassen",
-  "description": "Maschinen- und Typenschilder aus Edelstahl & Aluminium online gestalten und lasergravieren lassen – mit Logo, Seriennummer und DataMatrix, ±0,01 mm Präzision.",
+  "description": "Typenschilder aus schwarz eloxiertem Aluminium (bis 85 × 55 mm, ab Lager) online gestalten und lasergravieren lassen – mit Logo, Seriennummer und DataMatrix. Andere Materialien und Formate als Sonderanfrage.",
   "areaServed": ["Rosenheim", "Bayern", "DACH"],
   "provider": {
     "@type": "LocalBusiness",
@@ -79,7 +79,7 @@
       "name": "Aus welchem Material werden die Typenschilder gefertigt?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Typische Werkstoffe sind Edelstahl und Aluminium. Beide lassen sich dauerhaft und kontrastreich lasergravieren und eignen sich für den industriellen Einsatz."
+        "text": "Standard ist schwarz eloxiertes Aluminium bis Visitenkartengröße (85 × 55 mm) – die Gravur erscheint hell auf Schwarz und ist dauerhaft. Andere Materialien wie Edelstahl oder Messing sowie größere Formate fertigen wir als Sonderanfrage mit individuellem Angebot."
       }
     },
     {
@@ -123,7 +123,7 @@
     },
     {
       "@type": "HowToSupply",
-      "name": "Material- und Format-Angabe (Aluminium, Edelstahl, Messing, Titan, Alu schwarz oder Kunststoff; Breite/Höhe in mm; Stückzahl)"
+      "name": "Material- und Format-Angabe (Alu schwarz eloxiert bis 85 × 55 mm oder Sonderanfrage für andere Materialien/Formate; Breite/Höhe in mm; Stückzahl)"
     }
   ],
   "tool": [
@@ -144,7 +144,7 @@
       "@type": "HowToStep",
       "position": 2,
       "name": "Maße, Schrift, Layout und Material wählen",
-      "text": "Breite und Höhe in mm eintragen, Stückzahl angeben, LightBurn-kompatible Schriftart (Arial, Times New Roman, Courier New, Impact, Verdana) und Vorlage (Klassisch, Logo oben, 2-spaltig, Kompakt) auswählen. Material festlegen: Aluminium, Edelstahl, Messing, Titan, Alu schwarz oder Kunststoff.",
+      "text": "Breite und Höhe in mm eintragen, Stückzahl angeben, LightBurn-kompatible Schriftart (Arial, Times New Roman, Courier New, Impact, Verdana) und Vorlage (Klassisch, Logo oben, 2-spaltig, Kompakt) auswählen. Material: schwarz eloxiertes Aluminium bis 85 × 55 mm ab Lager – für andere Materialien oder größere Formate die Sonderanfrage wählen.",
       "url": "https://wolf-lasermark.de/typenschild.html"
     },
     {
@@ -193,7 +193,7 @@
   },
   "featureList": [
     "Live-Vorschau in Echtzeit, maßgenau in Millimeter",
-    "Materialien: Aluminium, Alu schwarz, Edelstahl, Messing, Titan, Kunststoff",
+    "Material: Alu schwarz eloxiert bis 85 × 55 mm; andere Materialien und Formate als Sonderanfrage",
     "Vorlagen: Klassisch, Logo oben, Zweispaltig, Kompakt",
     "Datenfelder frei per Drag & Drop sortierbar",
     "LightBurn-kompatible Schriften (Arial, Times New Roman, Courier New, Impact, Verdana)",
@@ -261,7 +261,10 @@
   input[type=range]{width:100%;accent-color:var(--accent);}
   .row{display:flex;gap:0.7rem;}
   .row>*{flex:1;}
-  .mat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;}
+  .mat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.5rem;}
+  .mat .ms{display:block;font-size:0.66rem;color:var(--muted);margin-top:0.15rem;}
+  .presets{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.6rem;}
+  .presets .btn{flex:0 1 auto;min-width:0;}
   .mat{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:0.7rem 0.3rem 0.6rem;text-align:center;cursor:pointer;transition:all .18s;position:relative;overflow:hidden;}
   .mat:hover{border-color:rgba(0,200,255,0.4);transform:translateY(-2px);box-shadow:0 10px 24px -14px rgba(0,200,255,0.5);}
   .mat.sel{border-color:var(--accent);background:rgba(0,200,255,0.08);box-shadow:0 0 0 1px var(--accent) inset;}
@@ -321,7 +324,7 @@
   </div>
   <div class="head">
     <h1>Typenschild <span>selbst gestalten</span></h1>
-    <p>Daten eingeben, Material wählen — Ihr graviertes Typenschild entsteht in Echtzeit, maßgenau in mm.</p>
+    <p>Daten eingeben — Ihr graviertes Typenschild aus schwarz eloxiertem Aluminium entsteht in Echtzeit, maßgenau in mm. Anderes Material oder Format? Einfach als Sonderanfrage senden.</p>
     <span class="badge-demo">Live-Vorschau</span>
   </div>
 
@@ -346,11 +349,17 @@
       <button class="addbtn" id="addField">+ Feld hinzufügen</button>
 
       <span class="lbl">3 · Maße & Schrift</span>
+      <div class="presets" id="sizePresets">
+        <button type="button" class="btn btn-ghost btn-sm" data-w="85" data-h="55">85 × 55 (Visitenkarte)</button>
+        <button type="button" class="btn btn-ghost btn-sm" data-w="70" data-h="40">70 × 40</button>
+        <button type="button" class="btn btn-ghost btn-sm" data-w="50" data-h="30">50 × 30</button>
+      </div>
       <div class="row">
-        <div class="field"><label>Breite (mm)</label><input type="number" id="wmm" value="100" min="20" max="600"></div>
-        <div class="field"><label>Höhe (mm)</label><input type="number" id="hmm" value="70" min="15" max="600"></div>
+        <div class="field"><label>Breite (mm)</label><input type="number" id="wmm" value="85" min="20" max="85"></div>
+        <div class="field"><label>Höhe (mm)</label><input type="number" id="hmm" value="55" min="15" max="55"></div>
         <div class="field"><label>Stückzahl</label><input type="number" id="menge" value="1" min="1" max="100000"></div>
       </div>
+      <p class="note" id="sizeNote" style="display:none;margin:-0.2rem 0 0.7rem;"></p>
       <div class="field" style="margin-bottom:0;">
         <label>Schriftart (LightBurn-kompatibel)</label>
         <select id="font">
@@ -390,6 +399,20 @@
 
       <span class="lbl">6 · Material</span>
       <div class="mat-grid" id="matGrid"></div>
+      <div id="customWrap" style="display:none;margin-top:0.6rem;">
+        <div class="field" style="margin-bottom:0.4rem;">
+          <label>Gewünschtes Material</label>
+          <select id="customMat">
+            <option value="Edelstahl">Edelstahl</option>
+            <option value="Aluminium">Aluminium (blank)</option>
+            <option value="Messing">Messing</option>
+            <option value="Titan">Titan</option>
+            <option value="Kunststoff">Kunststoff</option>
+            <option value="Alu schwarz">Alu schwarz eloxiert (größeres Format)</option>
+          </select>
+        </div>
+        <p class="note" style="margin:0;">Sonderanfrage: freie Maße bis 600 mm, Material nach Wunsch. Wir prüfen Material und Beschaffung und senden Ihnen ein individuelles Angebot.</p>
+      </div>
 
       <span class="lbl">7 · Optionen</span>
       <div class="opts">
@@ -432,7 +455,7 @@
 <!-- ANFRAGE MODAL -->
 <div id="anfrageOverlay" style="display:none;position:fixed;inset:0;background:rgba(4,6,15,.72);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center;padding:1rem;">
   <div class="card" style="max-width:440px;width:100%;max-height:92vh;overflow:auto;">
-    <span class="lbl">Anfrage senden</span>
+    <span class="lbl" id="anfrageTitle">Anfrage senden</span>
     <p class="hint" style="margin:.2rem 0 .5rem;">Wir erstellen Ihr Typenschild passgenau nach Ihrem Entwurf und melden uns mit einem Angebot.</p>
     <p id="anfragePreis" style="margin:0 0 .8rem;font-family:'Space Mono',monospace;font-weight:700;font-size:.9rem;color:var(--accent);"></p>
     <div class="field"><label>Name *</label><input type="text" id="cName" autocomplete="name"></div>
@@ -502,7 +525,9 @@ const MATERIALS = {
 
 const W=1000,H=1000;
 const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
-let state={ mat:'Aluminium', img:null,
+// Standard (ab Lager): schwarz eloxiertes Alu bis Visitenkartengröße. Alles andere = Sonderanfrage ohne Richtpreis.
+const STD_MAT='Alu schwarz', STD_MAX_W=85, STD_MAX_H=55;
+let state={ mode:'standard', mat:STD_MAT, img:null,
   fields:[
     {k:'Typ',         v:'WL-2000'},
     {k:'Serien-Nr.',  v:'SN-000123'},
@@ -513,17 +538,42 @@ let state={ mat:'Aluminium', img:null,
   ],
   codes:[]
 };
-let geo={ ox:0, oy:0, ppmm:1, wmm:100, hmm:70 };
+let geo={ ox:0, oy:0, ppmm:1, wmm:85, hmm:55 };
 
 // ---------- build UI ----------
 const matGrid=document.getElementById('matGrid');
-Object.entries(MATERIALS).forEach(([name,m])=>{
+const MODES=[
+  {mode:'standard', name:'Alu schwarz eloxiert', sub:'ab Lager · bis 85 × 55 mm', chip:`linear-gradient(135deg,${MATERIALS[STD_MAT].tint},${MATERIALS[STD_MAT].base})`},
+  {mode:'custom', name:'Anderes Material / Format', sub:'Sonderanfrage · Angebot', chip:`linear-gradient(135deg,${MATERIALS.Edelstahl.tint},${MATERIALS.Messing.base})`},
+];
+MODES.forEach(o=>{
   const d=document.createElement('div');
-  d.className='mat'+(name===state.mat?' sel':'');
-  d.innerHTML=`<div class="chip" style="background:linear-gradient(135deg,${m.tint},${m.base})"></div><span class="mn">${name}</span>`;
-  d.onclick=()=>{ state.mat=name; [...matGrid.children].forEach(c=>c.classList.remove('sel')); d.classList.add('sel'); render(); };
+  d.className='mat'+(o.mode===state.mode?' sel':'');
+  d.innerHTML=`<div class="chip" style="background:${o.chip}"></div><span class="mn">${o.name}</span><span class="ms">${o.sub}</span>`;
+  d.onclick=()=>setMode(o.mode);
+  d.dataset.mode=o.mode;
   matGrid.appendChild(d);
 });
+function isCustom(){ return state.mode==='custom'; }
+function setMode(mode){
+  state.mode=mode;
+  [...matGrid.children].forEach(c=>c.classList.toggle('sel',c.dataset.mode===mode));
+  document.getElementById('customWrap').style.display=isCustom()?'':'none';
+  state.mat=isCustom()? document.getElementById('customMat').value : STD_MAT;
+  const wI=document.getElementById('wmm'), hI=document.getElementById('hmm');
+  wI.max=isCustom()?600:STD_MAX_W; hI.max=isCustom()?600:STD_MAX_H;
+  render();
+}
+document.getElementById('customMat').addEventListener('change',()=>{ if(isCustom()){ state.mat=document.getElementById('customMat').value; render(); } });
+document.querySelectorAll('#sizePresets button').forEach(b=>b.onclick=()=>{
+  document.getElementById('wmm').value=b.dataset.w; document.getElementById('hmm').value=b.dataset.h; render();
+});
+// Standard-Format: längere Seite ≤ 85, kürzere ≤ 55 (Hochformat erlaubt). Größer → Hinweis + Sonderanfrage.
+function sizeLimits(w,h){
+  if(isCustom()) return {w:Math.min(600,w), h:Math.min(600,h), over:false};
+  const portrait=h>w, maxW=portrait?STD_MAX_H:STD_MAX_W, maxH=portrait?STD_MAX_W:STD_MAX_H;
+  return {w:Math.min(maxW,w), h:Math.min(maxH,h), over:w>maxW||h>maxH};
+}
 
 const fieldsList=document.getElementById('fieldsList');
 function renderFields(){
@@ -659,6 +709,10 @@ function computeLayout(){
   const ce=document.getElementById('optCE').checked, weee=document.getElementById('optWEEE').checked;
   const codes=state.codes.filter(c=>(c.text||'').trim());
   const logoAR=hasLogo? state.img.width/state.img.height : 1;
+  // Befestigungslöcher sitzen in den Ecken → Kopf- und Fußzeile seitlich davon freihalten (sonst Text im Loch bei kleinen Schildern)
+  const holesOn=document.getElementById('optHoles').checked, holeD=+document.getElementById('holeD').value;
+  const holeInset=document.getElementById('optFrame').checked ? m*0.55+holeD/2+m*0.55 : Math.max(m*0.9,holeD*0.9);
+  const hp=holesOn? Math.max(0, holeInset+holeD/2+1-cx) : 0;
 
   let cursorY=cy;
   // ---- HEADER ----
@@ -666,17 +720,17 @@ function computeLayout(){
     let headerH;
     if(tmpl==='kompakt'){
       headerH=Math.min(ch*0.20, 9);
-      if(firma) ops.push({t:'text',x:cx,y:cursorY+headerH/2,cap:fitCap(firma,headerH*0.62,cw,f),anchor:'start',str:firma});
+      if(firma) ops.push({t:'text',x:cx+hp,y:cursorY+headerH/2,cap:fitCap(firma,headerH*0.62,cw-2*hp,f),anchor:'start',str:firma});
     } else if(tmpl==='logo-top'){
       headerH=Math.min(ch*(fields.length?0.42:1.0), hmm*0.45);
       let yy=cursorY;
       if(hasLogo){ const box=headerH*0.55, ih=Math.min(box,box), iw=ih*logoAR; ops.push({t:'img',x:cx+cw/2-iw/2,y:yy,w:iw,h:ih}); yy+=ih+1.5; }
-      if(firma){ const zoneLeft=headerH-(yy-cursorY); ops.push({t:'text',x:cx+cw/2,y:yy+zoneLeft/2,cap:fitCap(firma,Math.min(zoneLeft*0.6,7),cw,f),anchor:'middle',str:firma}); }
+      if(firma){ const zoneLeft=headerH-(yy-cursorY); ops.push({t:'text',x:cx+cw/2,y:yy+zoneLeft/2,cap:fitCap(firma,Math.min(zoneLeft*0.6,7),cw-2*hp,f),anchor:'middle',str:firma}); }
     } else { // klassisch & zweispaltig
       headerH=Math.min(ch*0.30, 18);
-      if(hasLogo){ const box=headerH*0.92, ih=box, iw=ih*logoAR; ops.push({t:'img',x:cx,y:cursorY+(headerH-ih)/2,w:iw,h:ih});
-        if(firma) ops.push({t:'text',x:cx+iw+3,y:cursorY+headerH/2,cap:fitCap(firma,headerH*0.42,cw-iw-3,f),anchor:'start',str:firma}); }
-      else if(firma){ ops.push({t:'text',x:cx+cw/2,y:cursorY+headerH/2,cap:fitCap(firma,headerH*0.5,cw,f),anchor:'middle',str:firma}); }
+      if(hasLogo){ const box=headerH*0.92, ih=box, iw=ih*logoAR; ops.push({t:'img',x:cx+hp,y:cursorY+(headerH-ih)/2,w:iw,h:ih});
+        if(firma) ops.push({t:'text',x:cx+hp+iw+3,y:cursorY+headerH/2,cap:fitCap(firma,headerH*0.42,cw-2*hp-iw-3,f),anchor:'start',str:firma}); }
+      else if(firma){ ops.push({t:'text',x:cx+cw/2,y:cursorY+headerH/2,cap:fitCap(firma,headerH*0.5,cw-2*hp,f),anchor:'middle',str:firma}); }
     }
     cursorY+=headerH;
     if(fields.length){ const dy=cursorY+1.5; ops.push({t:'line',x1:cx,y1:dy,x2:cx+cw,y2:dy,w:0.4}); cursorY=dy+1.5; }
@@ -685,7 +739,7 @@ function computeLayout(){
   // ---- FOOTER ----
   let footBottom=cy+ch;
   if(footStr){ const footCapMM=Math.min(3.0,hmm*0.045), fH=footCapMM*1.7;
-    ops.push({t:'text',x:cx+cw/2,y:cy+ch-fH*0.55,cap:fitCap(footStr,footCapMM,cw,f),anchor:'middle',str:footStr});
+    ops.push({t:'text',x:cx+cw/2,y:cy+ch-fH*0.55,cap:fitCap(footStr,footCapMM,cw-2*hp,f),anchor:'middle',str:footStr});
     footBottom=cy+ch-fH-1.5; }
 
   // ---- CODES (QR / DataMatrix) right column + MARKS (CE / WEEE) ----
@@ -804,7 +858,12 @@ function stampEngrave(g,mask,mode,scalePx){
 
 // ---------- RENDER ----------
 function render(){
-  const wmm=clampNum('wmm',20,600,100), hmm=clampNum('hmm',15,600,70);
+  const lim=sizeLimits(clampNum('wmm',20,600,85), clampNum('hmm',15,600,55));
+  const wmm=lim.w, hmm=lim.h;
+  const sn=document.getElementById('sizeNote');
+  if(lim.over){ sn.innerHTML=`Ab Lager bis 85 × 55 mm (Vorschau: ${wmm} × ${hmm} mm). Größeres Format? <a href="#" id="toCustom" style="color:var(--accent);font-weight:700;">Sonderanfrage stellen →</a>`; sn.style.display='block';
+    document.getElementById('toCustom').onclick=e=>{ e.preventDefault(); document.getElementById('customMat').value=STD_MAT; setMode('custom'); }; }
+  else sn.style.display='none';
   const ppmm=Math.min(W*0.86/wmm, H*0.86/hmm);
   const ww=wmm*ppmm, hh=hmm*ppmm, ox=(W-ww)/2, oy=(H-hh)/2;
   geo={ox,oy,ppmm,wmm,hmm};
@@ -838,7 +897,7 @@ function strokeFillRound(c,x,y,w,h,r){ r=Math.min(r,w/2,h/2); c.beginPath(); c.m
 function updateReadout(){
   const n=state.fields.filter(f=>f.k||f.v).length;
   document.getElementById('readout').innerHTML=
-    `<span class="k">Material:</span> <b>${state.mat}</b> · <span class="k">Größe:</span> <b>${geo.wmm}×${geo.hmm} mm</b><br>`+
+    `<span class="k">Material:</span> <b>${matLabel()}</b> · <span class="k">Größe:</span> <b>${geo.wmm}×${geo.hmm} mm</b><br>`+
     `<span class="k">Datenfelder:</span> <b>${n}</b> · <span class="k">Löcher:</span> <b>${document.getElementById('optHoles').checked?('4 × Ø'+(+document.getElementById('holeD').value).toFixed(1)+' mm'):'—'}</b>`;
 }
 
@@ -885,8 +944,17 @@ function computePrice(){
   return {stk, areaCm2, pps, setup, disc, totalNetto, types};
 }
 function fmt(n){ return (n||0).toLocaleString('de-DE',{style:'currency',currency:'EUR'}); }
+function matLabel(){ return isCustom()? `${state.mat} (Sonderanfrage)` : 'Alu schwarz eloxiert'; }
+const CUSTOM_PRICE_TXT='Preis auf Anfrage — individuelles Angebot (Sondermaterial/-format)';
+function priceLine(p){ return isCustom()? CUSTOM_PRICE_TXT : `${fmt(p.totalNetto)} gesamt · ${fmt(p.pps)}/Stück (Richtwert, §19 UStG)`; }
 function updatePrice(){
   const p=computePrice();
+  if(isCustom()){
+    document.getElementById('pricebox').innerHTML=
+      `<div class="pb-top"><span class="pb-label">Sonderanfrage</span><span class="pb-total" style="font-size:1.05rem;">Preis auf Anfrage</span></div>`+
+      `<div class="pb-sub">${p.stk} Stk. · ${state.mat} · ${geo.wmm} × ${geo.hmm} mm<br>Wir prüfen Material &amp; Beschaffung und senden Ihnen ein individuelles Angebot.</div>`;
+    return;
+  }
   const discTxt=p.disc>0?` · <span style="color:#7CFFA0;">−${Math.round(p.disc*100)}% Mengenrabatt</span>`:'';
   document.getElementById('pricebox').innerHTML=
     `<div class="pb-top"><span class="pb-label">Richtpreis gesamt</span><span class="pb-total">${fmt(p.totalNetto)}</span></div>`+
@@ -912,7 +980,9 @@ document.getElementById('order').onclick=()=>{
   document.querySelector('#anfrageOverlay .actions').style.display='flex';
   const p=computePrice();
   document.getElementById('cQty').value=p.stk;
-  document.getElementById('anfragePreis').textContent=`${fmt(p.totalNetto)} gesamt · ${fmt(p.pps)}/Stück (Richtwert, §19 UStG)`;
+  document.getElementById('anfragePreis').textContent=priceLine(p);
+  document.getElementById('anfrageTitle').textContent=isCustom()?'Sonderanfrage senden':'Anfrage senden';
+  document.getElementById('cMsg').placeholder=isCustom()?'z. B. Materialstärke, Oberfläche, Einsatzbereich …':'';
   ov.style.display='flex';
   setTimeout(()=>document.getElementById('cName').focus(),50);
 };
@@ -923,7 +993,7 @@ document.getElementById('cQty').addEventListener('input',()=>{
   const q=parseInt(document.getElementById('cQty').value);
   if(q>0){ document.getElementById('menge').value=q; render();
     const p=computePrice();
-    document.getElementById('anfragePreis').textContent=`${fmt(p.totalNetto)} gesamt · ${fmt(p.pps)}/Stück (Richtwert, §19 UStG)`; }
+    document.getElementById('anfragePreis').textContent=priceLine(p); }
 });
 
 function canvasBlob(){ return new Promise(res=>{ try{ cv.toBlob(b=>res(b),'image/png'); }catch(e){ res(null); } }); }
@@ -954,11 +1024,13 @@ document.getElementById('anfrageSubmit').onclick=async()=>{
     firma:document.getElementById('cFirma').value.trim()||'–',
     stueckzahl:document.getElementById('cQty').value.trim()||'–',
     nachricht:document.getElementById('cMsg').value.trim()||'–',
-    richtpreis:`${fmt(pr.totalNetto)} gesamt / ${fmt(pr.pps)} pro Stück (§19 UStG, ohne MwSt., Richtwert)`,
+    richtpreis:isCustom()? CUSTOM_PRICE_TXT : `${fmt(pr.totalNetto)} gesamt / ${fmt(pr.pps)} pro Stück (§19 UStG, ohne MwSt., Richtwert)`,
+    material:matLabel(),
+    masse:`${geo.wmm} × ${geo.hmm} mm`,
     spezifikation:spec,
     lightburn_svg:svgUrl||'(Upload fehlgeschlagen)',
     vorschau_png:pngUrl||'(Upload fehlgeschlagen)',
-    _subject:`🏷️ Neue Typenschild-Anfrage – ${name}`
+    _subject:`🏷️ Neue Typenschild-${isCustom()?'Sonderanfrage':'Anfrage'} – ${name}`
   };
   try{
     const fd=new FormData();
@@ -989,12 +1061,14 @@ function buildSpec(){
   const syms=[]; if(document.getElementById('optCE').checked)syms.push('CE'); if(document.getElementById('optWEEE').checked)syms.push('WEEE');
   const codes=state.codes.filter(c=>(c.text||'').trim()).map(c=>`  ${c.type==='datamatrix'?'DataMatrix':'QR-Code'}: ${c.text}`).join('\n');
   const p=computePrice();
-  const txt=`Typenschild-Anfrage\n`+
+  const priceTxt=isCustom()? `\nPreis: auf Anfrage (Sondermaterial/-format — Angebot erstellen)`
+    : `\nRichtpreis (§19 UStG, ohne MwSt.): ${fmt(p.totalNetto)} gesamt für ${p.stk} Stk. (${fmt(p.pps)}/Stück, inkl. Einrichtung ${fmt(p.setup)}${p.disc>0?', −'+Math.round(p.disc*100)+'% Mengenrabatt':''}) — unverbindlicher Richtwert`;
+  const txt=`Typenschild-${isCustom()?'Sonderanfrage':'Anfrage'}\n`+
     `Firma/Kopf: ${state.firmaVal()||'—'}${state.img?' (+ Logo hochgeladen)':''}\n`+
     `Datenfelder:\n${fields||'  —'}\n`+
     `Codes:\n${codes||'  —'}\n`+
     `Fußzeile: ${document.getElementById('footer').value||'—'}\n`+
-    `Material: ${state.mat}\n`+
+    `Material: ${matLabel()}\n`+
     `Maße: ${geo.wmm} × ${geo.hmm} mm\n`+
     `Stückzahl: ${p.stk}\n`+
     `Schriftart: ${f.name}\n`+
@@ -1003,7 +1077,7 @@ function buildSpec(){
     `Symbole: ${syms.length?syms.join(', '):'keine'}\n`+
     `Rahmen: ${document.getElementById('optFrame').checked?'ja':'nein'}\n`+
     `Löcher: ${document.getElementById('optHoles').checked?('4 × Ø '+(+document.getElementById('holeD').value).toFixed(1)+' mm'):'nein'}\n`+
-    `\nRichtpreis (§19 UStG, ohne MwSt.): ${fmt(p.totalNetto)} gesamt für ${p.stk} Stk. (${fmt(p.pps)}/Stück, inkl. Einrichtung ${fmt(p.setup)}${p.disc>0?', −'+Math.round(p.disc*100)+'% Mengenrabatt':''}) — unverbindlicher Richtwert`;
+    priceTxt;
   return {text:txt, price:p};
 }
 
