@@ -2047,6 +2047,42 @@ body.mode-firmen #leistungen .leist-grid {
 body.mode-privat .firmen-only { display: none !important; }
 body.mode-firmen .privat-only { display: none !important; }
 
+/* ===== Hero-Video (nur Firmen): Desktop rechts neben der Headline, mobil als Button + Lightbox ===== */
+.hero-video, .hero-video-btn { display: none; }
+.hero-video { position: relative; z-index: 1; width: 290px; flex-shrink: 0; aspect-ratio: 9/16;
+  border-radius: 28px; overflow: hidden; background: #000;
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.55), 0 0 70px rgba(0,200,255,0.12);
+  animation: fadeUp 0.6s 0.35s ease both; }
+.hero-video video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hv-sound { position: absolute; right: 12px; bottom: 12px; width: 38px; height: 38px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.55); color: #fff; font-size: 1rem;
+  cursor: pointer; backdrop-filter: blur(6px); }
+.hv-sound:hover { border-color: var(--accent); }
+@media (min-width: 1000px) {
+  body.mode-firmen .hero { gap: 4rem; }
+  body.mode-firmen .hero-inner { text-align: left; max-width: 640px; }
+  body.mode-firmen .hero h1 { font-size: clamp(2.6rem, 4.3vw, 4rem); }
+  body.mode-firmen .hero-sub { margin-left: 0; }
+  body.mode-firmen .hero-ctas, body.mode-firmen .hero-trust { justify-content: flex-start; }
+  body.mode-firmen .hero-watermark { left: 34%; opacity: 0.35; }
+  body.mode-firmen .hero-video { display: block; }
+}
+@media (max-width: 999px) {
+  body.mode-firmen .hero-video-btn { display: inline-flex; }
+}
+.hero-video-btn { align-items: center; gap: 0.75rem; margin: 1.4rem auto 0; padding: 0.4rem 1.1rem 0.4rem 0.4rem;
+  border-radius: 999px; border: 1px solid rgba(0,200,255,0.25); background: rgba(0,200,255,0.06);
+  color: var(--text); font: inherit; font-size: 0.92rem; font-weight: 700; cursor: pointer; }
+.hero-video-btn img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; }
+.hero-video-btn .hvb-play { color: var(--accent); }
+.hv-lightbox { position: fixed; inset: 0; z-index: 9999; display: none; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.92); padding: 1rem; }
+.hv-lightbox.open { display: flex; }
+.hv-lightbox video { max-height: 92vh; max-width: 100%; aspect-ratio: 9/16; border-radius: 18px; background: #000; }
+.hv-lightbox-close { position: absolute; top: 14px; right: 14px; width: 42px; height: 42px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.25); background: rgba(0,0,0,0.6); color: #fff; font-size: 1.1rem; cursor: pointer; }
+
 /* PRIVATE DEVELOPMENT MODE */
 .ov-card.disabled {
   cursor: not-allowed;
@@ -2885,11 +2921,11 @@ body.mode-firmen .privat-only { display: none !important; }
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-.ratgeber-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1.2rem; margin-top:0.5rem; }
-.ratgeber-card { display:flex; flex-direction:column; gap:0.55rem; padding:1.6rem; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:18px; text-decoration:none; transition:transform .18s ease, border-color .18s ease, background .18s ease; }
+.ratgeber-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:0.7rem; margin-top:0.5rem; }
+.ratgeber-card { display:flex; flex-direction:row; align-items:center; gap:0.75rem; padding:0.9rem 1.1rem; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:18px; text-decoration:none; transition:transform .18s ease, border-color .18s ease, background .18s ease; }
 .ratgeber-card:hover { transform:translateY(-3px); border-color:rgba(0,200,255,0.25); background:rgba(0,200,255,0.03); }
-.ratgeber-card .rg-icon { font-size:1.6rem; }
-.ratgeber-card .rg-title { font-weight:800; font-size:1.05rem; color:var(--text); letter-spacing:-0.01em; line-height:1.25; }
+.ratgeber-card .rg-icon { font-size:1.25rem; flex-shrink:0; }
+.ratgeber-card .rg-title { font-weight:700; font-size:0.93rem; color:var(--text); letter-spacing:-0.01em; line-height:1.25; }
 .ratgeber-card .rg-desc { font-size:0.86rem; color:var(--muted2); line-height:1.6; flex:1; }
 .ratgeber-card .rg-arrow { font-size:0.85rem; font-weight:700; color:var(--accent); margin-top:0.3rem; }
 
@@ -3036,6 +3072,9 @@ body.mode-firmen .privat-only { display: none !important; }
         <a href="bestellung.html" class="btn-primary">🧮 Jetzt Angebot kalkulieren</a>
         <a href="#contact" class="btn-ghost">💬 Direkt anfragen →</a>
       </div>
+      <button type="button" class="hero-video-btn" id="heroVideoOpen" aria-label="Video ansehen (25 Sekunden)">
+        <img src="videos/b2b-reel-poster.jpg" alt="" width="46" height="46" loading="lazy"><span><span class="hvb-play">▶</span> So sieht's aus · 25 Sek.</span>
+      </button>
       <p class="hero-trial firmen-only">🎁 Neukunde? Testen Sie uns risikofrei mit einer <a href="kostenlose-probegravur.html">kostenlosen Probegravur&nbsp;→</a></p>
 
       <div class="hero-trust">
@@ -3045,6 +3084,19 @@ body.mode-firmen .privat-only { display: none !important; }
         <span class="trust-chip firmen-only"><span class="ic">✓</span> Express-Aufträge möglich</span>
         <span class="trust-chip"><span class="ic">✓</span> Keine Mindestmenge</span>
       </div>
+    </div>
+    <div class="hero-video firmen-only">
+      <video id="heroVideo" muted loop playsinline preload="none" poster="videos/b2b-reel-poster.jpg"
+             aria-label="Video: Typenschild, Seriennummer, QR-Code und Skala per Faserlaser auf Metall graviert">
+        <source src="videos/b2b-reel.mp4" type="video/mp4">
+      </video>
+      <button type="button" class="hv-sound" id="heroVideoSound" aria-label="Ton einschalten">🔇</button>
+    </div>
+    <div class="hv-lightbox" id="hvLightbox" aria-hidden="true">
+      <button type="button" class="hv-lightbox-close" id="hvLightboxClose" aria-label="Schließen">✕</button>
+      <video id="hvLightboxVideo" controls playsinline preload="none" poster="videos/b2b-reel-poster.jpg">
+        <source src="videos/b2b-reel.mp4" type="video/mp4">
+      </video>
     </div>
   </section>
 
@@ -3059,15 +3111,9 @@ body.mode-firmen .privat-only { display: none !important; }
       </div>
       <div class="quickstart-card">
         <div class="qs-icon">📍</div>
-        <h3 class="qs-title">Auftrag live verfolgen</h3>
-        <p class="qs-desc">Auftragsnummer eingeben und den aktuellen Bearbeitungsstatus Ihres Auftrags in Echtzeit einsehen.</p>
+        <h3 class="qs-title">Auftrag &amp; Erstmuster verfolgen</h3>
+        <p class="qs-desc">Status in Echtzeit einsehen und das Foto vom 1. Musterstück direkt freigeben oder Änderung anfordern – ohne Missverständnisse.</p>
         <a href="auftrag-status.html" class="qs-btn secondary">Auftrag verfolgen →</a>
-      </div>
-      <div class="quickstart-card">
-        <div class="qs-icon">📸</div>
-        <h3 class="qs-title">Erstmuster online prüfen</h3>
-        <p class="qs-desc">Sie erhalten ein Foto vom 1. Musterstück. Freigeben oder Änderung anfordern – ohne Wartezeit, ohne Missverständnisse, ohne Risiko.</p>
-        <a href="auftrag-status.html" class="qs-btn secondary">Muster prüfen →</a>
       </div>
       <div class="quickstart-card">
         <div class="qs-icon">🔁</div>
@@ -3127,56 +3173,19 @@ body.mode-firmen .privat-only { display: none !important; }
             <a href="bestellung.html">🧮 Jetzt Angebot kalkulieren →</a>
           </div>
         </div>
-        <div class="leist-card firmen-only" style="padding:2.1rem; justify-content:center;">
-          <div class="section-tag" style="margin-bottom:0.3rem;">⚡ Vorteile</div>
-          <h3 style="font-size:1.45rem;font-weight:800;letter-spacing:-0.02em;line-height:1.15;">Schnell. Präzise. <span style="color:var(--accent);">Wiederholbar.</span></h3>
-          <p style="color:var(--muted2);font-size:0.92rem;line-height:1.7;max-width:36ch;">Ideal für wiederkehrende Aufträge, klare Prozesse und eine professionelle Kennzeichnung ohne unnötige Abstimmung.</p>
-          <div style="display:grid;gap:0.85rem;margin-top:0.8rem;">
-            <div style="display:flex;gap:0.8rem;align-items:flex-start;padding:0.95rem 1rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:16px;">
-              <div style="width:34px;height:34px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(0,200,255,0.08);border:1px solid rgba(0,200,255,0.12);flex-shrink:0;">✓</div>
-              <div><div style="font-weight:700;font-size:0.92rem;">Saubere Prozesse</div><div style="font-size:0.8rem;color:var(--muted2);line-height:1.55;">Klare Abläufe von der Anfrage bis zur Ausführung.</div></div>
-            </div>
-            <div style="display:flex;gap:0.8rem;align-items:flex-start;padding:0.95rem 1rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:16px;">
-              <div style="width:34px;height:34px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(0,200,255,0.08);border:1px solid rgba(0,200,255,0.12);flex-shrink:0;">⚙️</div>
-              <div><div style="font-weight:700;font-size:0.92rem;">Für Serien geeignet</div><div style="font-size:0.8rem;color:var(--muted2);line-height:1.55;">Gleichbleibende Qualität auch bei wiederkehrenden Teilen.</div></div>
-            </div>
-            <div style="display:flex;gap:0.8rem;align-items:flex-start;padding:0.95rem 1rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:16px;">
-              <div style="width:34px;height:34px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(0,200,255,0.08);border:1px solid rgba(0,200,255,0.12);flex-shrink:0;">⚡</div>
-              <div><div style="font-weight:700;font-size:0.92rem;">Express nach Absprache</div><div style="font-size:0.8rem;color:var(--muted2);line-height:1.55;">Wenn es eilt, prüfen wir kurzfristige Lösungen.</div></div>
-            </div>
+        <div class="leist-card firmen-only">
+          <div class="leist-icon">🔬</div>
+          <div class="leist-title">Laser-Testservice</div>
+          <p class="leist-desc">Nicht sicher, ob sich Ihr Material oder Bauteil sauber lasern lässt? Wir testen es, bevor Sie sich festlegen.</p>
+          <ul class="leist-list">
+            <li>Material, Prototyp oder Zeichnung einsenden</li>
+            <li>Parameter-Studie auf dem 100&nbsp;W JPT-Faserlaser</li>
+            <li>Musterfoto, ehrliche Einschätzung und Serien-Angebot</li>
+          </ul>
+          <div class="leist-cta">
+            <a href="laser-testservice.html">🔬 Jetzt Test anfragen →</a>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ====== LASER-TESTSERVICE ====== -->
-  <section class="leistungen reveal" id="testservice">
-    <div class="leistungen-inner">
-      <div class="leistungen-header">
-        <div class="section-tag">🔬 Neu</div>
-        <h2 class="section-title">Laser-<span>Testservice</span></h2>
-        <p class="section-sub">Nicht sicher, ob sich Ihr Material oder Bauteil sauber lasern lässt? Schicken Sie es uns – wir testen es, bevor Sie sich festlegen.</p>
-      </div>
-      <div style="max-width:980px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:1rem;">
-        <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:18px;padding:1.4rem;">
-          <div style="width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-weight:800;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.18);color:var(--accent);margin-bottom:.8rem;">1</div>
-          <div style="font-weight:800;margin-bottom:.3rem;">Einsenden oder hochladen</div>
-          <p style="font-size:.88rem;color:var(--muted2);">Material, Prototyp oder ein Foto bzw. eine Zeichnung Ihres Bauteils.</p>
-        </div>
-        <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:18px;padding:1.4rem;">
-          <div style="width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-weight:800;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.18);color:var(--accent);margin-bottom:.8rem;">2</div>
-          <div style="font-weight:800;margin-bottom:.3rem;">Wir testen</div>
-          <p style="font-size:.88rem;color:var(--muted2);">Parameter-Studie auf dem 100&nbsp;W JPT-Faserlaser – für besten Kontrast, ±0,01&nbsp;mm.</p>
-        </div>
-        <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:18px;padding:1.4rem;">
-          <div style="width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-weight:800;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.18);color:var(--accent);margin-bottom:.8rem;">3</div>
-          <div style="font-weight:800;margin-bottom:.3rem;">Sie entscheiden</div>
-          <p style="font-size:.88rem;color:var(--muted2);">Musterfoto, ehrliche Einschätzung und Angebot für die Serienfertigung.</p>
-        </div>
-      </div>
-      <div style="text-align:center;margin-top:1.8rem;">
-        <a href="laser-testservice.html" style="display:inline-flex;align-items:center;gap:.5rem;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#021;font-weight:800;padding:.95rem 1.8rem;border-radius:14px;font-size:1rem;">🔬 Jetzt Test anfragen →</a>
       </div>
     </div>
   </section>
@@ -3220,31 +3229,6 @@ body.mode-firmen .privat-only { display: none !important; }
   </section>
 
   <!-- ====== NACHBESTELLUNG TEASER ====== -->
-  <section class="nachbestellung firmen-only reveal" id="nachbestellung">
-    <div class="nachbestellung-inner" style="grid-template-columns:1fr;">
-      <div class="nach-card nachbestellung-teaser">
-        <div>
-          <div class="section-tag">🔁 Nachbestellung</div>
-          <h2 class="section-title">Folgeaufträge <span>schnell und sicher nachbestellen</span></h2>
-          <p class="section-sub" style="max-width:100%;margin-bottom:1.2rem;">Bereits gefertigte Aufträge können mit nur einer Auftragsnummer erneut angefragt werden. Das spart Abstimmungszeit, verkürzt den Bestellprozess und reduziert Fehler bei wiederkehrenden Kennzeichnungen, Serienaufträgen und gespeicherten Layouts.</p>
-          <div class="nach-mini-list">
-            <div class="nach-mini-item"><span>1</span><div>Auftragsnummer eingeben.</div></div>
-            <div class="nach-mini-item"><span>2</span><div>Hinterlegte Auftragsdaten prüfen.</div></div>
-            <div class="nach-mini-item"><span>3</span><div>Neue Stückzahl anfragen und Folgeauftrag direkt absenden.</div></div>
-          </div>
-        </div>
-        <a href="nachbestellung.html" class="nach-card nach-link-card nachbestellung-cta">
-          <div class="section-tag">⚡ Für Bestandskunden</div>
-          <h3 style="font-size:1.4rem;margin-bottom:0.6rem;color:#fff;">Nachbestellung öffnen</h3>
-          <p style="margin-bottom:1.2rem;">Ideal für wiederkehrende Teile, gespeicherte Layouts und Serien mit identischer Kennzeichnung.</p>
-          <div class="btn-primary">Jetzt Folgeauftrag starten →</div>
-          <p class="nach-hint" style="margin-top:1rem;">Schneller, klarer und besonders praktisch für laufende Aufträge.</p>
-        </a>
-      </div>
-    </div>
-  </section>
-
-
   <!-- ====== STIMMEN (echte Google-Rezensionen, ohne Klarnamen) ====== -->
   <section class="reviews reveal" id="bewertungen">
     <div class="reviews-inner">
@@ -3398,56 +3382,39 @@ body.mode-firmen .privat-only { display: none !important; }
       <div class="leistungen-header">
         <div class="section-tag">📚 Ratgeber &amp; Wissen</div>
         <h2 class="section-title">Fachwissen zur <span>Laserkennzeichnung</span></h2>
-        <p class="section-sub">Praxisnahe Leitfäden zu Materialien, Codes und Normen – damit Ihre Kennzeichnung von Anfang an richtig geplant ist.</p>
       </div>
       <div class="ratgeber-grid">
         <a href="laser-marking-guide.html" class="ratgeber-card">
           <div class="rg-icon">📘</div>
           <div class="rg-title">Leitfaden Bauteilkennzeichnung</div>
-          <div class="rg-desc">Der komplette Überblick: Gravur vs. Beschriftung, Schriftgrößen, Normen und Rückverfolgbarkeit.</div>
-          <span class="rg-arrow">Mehr erfahren →</span>
         </a>
         <a href="seriennummern-kennzeichnung.html" class="ratgeber-card">
           <div class="rg-icon">🔢</div>
           <div class="rg-title">Seriennummern-Kennzeichnung</div>
-          <div class="rg-desc">Fortlaufende, rückverfolgbare Nummerierung für Industrie, Maschinenbau und CNC-Fertigung.</div>
-          <span class="rg-arrow">Mehr erfahren →</span>
         </a>
         <a href="qr-code-datamatrix-metall.html" class="ratgeber-card">
           <div class="rg-icon">📱</div>
           <div class="rg-title">QR-Code &amp; DataMatrix auf Metall</div>
-          <div class="rg-desc">Maschinenlesbare Codes direkt im Werkstück – für GS1, UDI und digitale Rückverfolgbarkeit.</div>
-          <span class="rg-arrow">Mehr erfahren →</span>
         </a>
         <a href="edelstahl-gravieren.html" class="ratgeber-card">
           <div class="rg-icon">🔩</div>
           <div class="rg-title">Edelstahl gravieren lassen</div>
-          <div class="rg-desc">Dauerhafte, korrosionsbeständige Lasergravur auf V2A und V4A – Anlassen oder Tiefengravur.</div>
-          <span class="rg-arrow">Mehr erfahren →</span>
         </a>
         <a href="aluminium-eloxiert-lasern.html" class="ratgeber-card">
           <div class="rg-icon">⬜</div>
           <div class="rg-title">Aluminium eloxiert lasern</div>
-          <div class="rg-desc">Brillanter, abriebfester Kontrast durch Eloxal-Abtrag – ideal für Frontplatten und Schilder.</div>
-          <span class="rg-arrow">Mehr erfahren →</span>
         </a>
         <a href="typenschild-lasern.html" class="ratgeber-card">
           <div class="rg-icon">🏷️</div>
           <div class="rg-title">Typenschild lasern lassen</div>
-          <div class="rg-desc">Pflichtangaben, Materialien und Normen für dauerhafte, normgerechte Typenschilder.</div>
-          <span class="rg-arrow">Mehr erfahren →</span>
         </a>
         <a href="barcode-auf-metall.html" class="ratgeber-card">
           <div class="rg-icon">📊</div>
           <div class="rg-title">Barcode auf Metall</div>
-          <div class="rg-desc">Maschinenlesbare 1D-Codes (Code 128, Code 39, EAN) dauerhaft im Werkstück.</div>
-          <span class="rg-arrow">Mehr erfahren →</span>
         </a>
         <a href="daten-anliefern.html" class="ratgeber-card">
           <div class="rg-icon">📐</div>
           <div class="rg-title">Daten richtig anliefern</div>
-          <div class="rg-desc">Format, Schrift, Maße &amp; Material – mit kostenloser Gravurvorlage und Checkliste zum Download.</div>
-          <span class="rg-arrow">Mehr erfahren →</span>
         </a>
       </div>
     </div>
@@ -3567,11 +3534,6 @@ body.mode-firmen .privat-only { display: none !important; }
         <div class="section-tag">👋 Über uns</div>
         <h2 class="section-title">Hinter jeder Gravur<br>steckt <span>ein Mensch</span></h2>
         <p class="section-sub">Wolf Lasermark sind wir zwei – meine Frau und ich. Die Website, das Design, die Ideen, die Gravuren: alles gemeinsam. Was wir machen, machen wir mit Überzeugung – egal ob ein Liebesring oder tausend Seriennummern.</p>
-        <div class="about-stats">
-          <div><div class="about-stat-num">100W</div><div class="about-stat-label">JPT Laser</div></div>
-          <div><div class="about-stat-num">≤8h</div><div class="about-stat-label">Antwortzeit</div></div>
-          <div><div class="about-stat-num">±0,01</div><div class="about-stat-label">mm Präzision</div></div>
-        </div>
       </div>
     </div>
   </section>
@@ -5118,6 +5080,23 @@ document.querySelectorAll('.faq-q').forEach(q=>{
 // SCROLL REVEAL
 // ========================
 const revealEls=document.querySelectorAll('.reveal');
+(function(){
+  const v=document.getElementById('heroVideo'), snd=document.getElementById('heroVideoSound');
+  if(v){
+    new IntersectionObserver(es=>es.forEach(e=>{
+      if(e.isIntersecting && v.offsetWidth){ v.play().catch(()=>{}); } else { v.pause(); }
+    }),{threshold:0.3}).observe(v);
+    snd.addEventListener('click',()=>{ v.muted=!v.muted; snd.textContent=v.muted?'🔇':'🔊';
+      snd.setAttribute('aria-label', v.muted?'Ton einschalten':'Ton ausschalten'); if(!v.muted) v.play(); });
+  }
+  const lb=document.getElementById('hvLightbox'), lv=document.getElementById('hvLightboxVideo');
+  const close=()=>{ lb.classList.remove('open'); lb.setAttribute('aria-hidden','true'); lv.pause(); };
+  document.getElementById('heroVideoOpen').addEventListener('click',()=>{
+    lb.classList.add('open'); lb.setAttribute('aria-hidden','false'); lv.currentTime=0; lv.play().catch(()=>{}); });
+  document.getElementById('hvLightboxClose').addEventListener('click',close);
+  lb.addEventListener('click',e=>{ if(e.target===lb) close(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape' && lb.classList.contains('open')) close(); });
+})();
 const revealObs=new IntersectionObserver((entries)=>{
   entries.forEach(en=>{
     if(en.isIntersecting){en.target.classList.add('visible');revealObs.unobserve(en.target);}
