@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Personalisierte Geschenke | Wolf Lasermark</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Great+Vibes&family=Instrument+Sans:wght@400;500;600&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  /* Layout + Farben nach ducett.com (Shopify Prestige): Karamell-Topbar, warmes Beige
+     im Kollektions-Kopf, weisse Seite, fast-schwarze Schrift, quadratisches Produktraster. */
+  :root{
+    --bg:#ffffff; --cream:#f3eeea; --blush:#f7f2f1; --img:#f4f1ee;
+    --ink:#1c1c1c; --soft:#6a6a6a; --mut:#7a7a7a; --line:#dddddd;
+    --caramel:#9c6b4e; --gold:#b08d57; --gold-lt:#ffe9c2;
+    --head:'Instrument Sans',system-ui,sans-serif; --body:'Nunito',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--body);background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+  .wrap{max-width:1500px;margin:0 auto;padding:0 48px}
+  @media(max-width:700px){.wrap{padding:0 16px}}
+  h1,h2,h3{font-family:var(--head);font-weight:400;line-height:1.15}
+  .btn{display:inline-block;padding:14px 28px;font:500 .72rem var(--head);letter-spacing:.18em;text-transform:uppercase;border:1px solid var(--ink);transition:.2s}
+  .btn-dark{background:var(--ink);color:#fff}.btn-dark:hover{background:#fff;color:var(--ink)}
+
+  /* TOPBAR */
+  .topbar{background:var(--caramel);color:#fff;font-size:.78rem}
+  .topbar .wrap{display:flex;justify-content:center;gap:42px;padding-top:9px;padding-bottom:9px;flex-wrap:wrap}
+  .topbar b{color:var(--gold-lt);font-weight:600}
+  .topbar span::before{content:"✓";margin-right:8px;color:var(--gold-lt)}
+  @media(max-width:700px){.topbar span:not(:first-child){display:none}}
+
+  /* HEADER */
+  header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid rgba(28,28,28,.15)}
+  .nav{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:76px}
+  .nav nav{display:flex;gap:30px;font:500 .74rem var(--head);letter-spacing:.14em;text-transform:uppercase}
+  .nav nav a:hover{opacity:.6}
+  .logo{font:600 1.7rem var(--head);letter-spacing:.32em;padding-left:.32em;text-transform:uppercase}
+  .icons{justify-self:end;display:flex;gap:22px}
+  .icons svg{width:21px;height:21px;fill:none;stroke:var(--ink);stroke-width:1.5}
+  @media(max-width:860px){.nav nav{display:none}.nav{grid-template-columns:40px 1fr auto;height:62px}.logo{justify-self:center;font-size:1.35rem}}
+  .burger{display:none}
+  @media(max-width:860px){.burger{display:block}}
+
+  /* KOLLEKTIONS-KOPF */
+  .chead{background:var(--cream) radial-gradient(ellipse 60% 75% at 50% 5%,#fbf8f5 0%,transparent 70%);text-align:center;padding:46px 0 40px}
+  .crumb{font-size:.76rem;color:var(--mut)}
+  .crumb a:hover{color:var(--ink)}
+  .chead h1{font-size:clamp(2rem,3.6vw,2.9rem);margin:10px 0 8px}
+  .chead p{color:var(--soft);max-width:52ch;margin:0 auto;font-size:.95rem}
+
+  /* FILTER-LEISTE */
+  .fbar{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:22px 0;border-bottom:1px solid var(--line)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chips .lab{white-space:nowrap;font:500 .72rem var(--head);letter-spacing:.14em;text-transform:uppercase;align-self:center;margin-right:8px}
+  .chips button{padding:8px 16px;border:1px solid var(--line);font-size:.82rem;transition:.15s}
+  .chips button:hover{border-color:var(--ink)}
+  .chips button.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  .count{font-size:.82rem;color:var(--mut);white-space:nowrap}
+  .count button{margin-left:14px;text-decoration:underline;color:var(--ink);display:none}
+  @media(max-width:700px){.fbar{flex-direction:column;align-items:flex-start}.chips{flex-wrap:nowrap;overflow-x:auto;width:100%;padding-bottom:4px}.chips button{white-space:nowrap}}
+
+  /* PRODUKT-RASTER */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:40px 24px;padding:36px 0 80px}
+  @media(max-width:999px){.grid{grid-template-columns:repeat(2,1fr);gap:28px 12px}}
+  .card{display:flex;flex-direction:column}
+  .card[hidden]{display:none}
+  .pimg{position:relative;aspect-ratio:1/1;background:var(--img);display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .pimg svg{width:42%;height:auto;transition:transform .5s ease}
+  .card:hover .pimg svg{transform:scale(1.07)}
+  .pimg img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
+  .card:hover .pimg img{transform:scale(1.05)}
+  .pimg img.alt{position:absolute;inset:0;opacity:0;transition:opacity .4s,transform .5s ease}
+  .card:hover .pimg img.alt{opacity:1}
+  .badge{position:absolute;top:12px;left:12px;background:var(--ink);color:#fff;font:500 .62rem var(--head);letter-spacing:.12em;text-transform:uppercase;padding:5px 9px}
+  .badge.gold{background:var(--gold)}
+  .pinfo{text-align:center;padding:16px 6px 0}
+  .pinfo h3{font-size:1rem;font-weight:500}
+  .pinfo p{font-size:.82rem;color:var(--mut);margin-top:2px}
+  .price{display:block;margin-top:6px;font-size:.92rem}
+  .card .btn{margin-top:14px;width:100%;text-align:center;padding:12px 10px;font-size:.66rem}
+  .card .btn:hover{background:var(--ink);color:#fff}
+  @media(max-width:700px){.pinfo h3{font-size:.9rem}.card .btn{font-size:.6rem;letter-spacing:.12em}}
+
+  /* USP-BLOCK IM RASTER (wie bei Ducett) */
+  .usp{order:5;grid-column:1/-1;background:var(--blush);display:grid;grid-template-columns:repeat(4,1fr);text-align:center;padding:34px 20px;gap:20px}
+  .usp div{font-size:.88rem}
+  .usp svg{width:30px;height:30px;fill:none;stroke:var(--caramel);stroke-width:1.4;display:block;margin:0 auto 10px}
+  @media(max-width:999px){.usp{order:7}}
+  @media(max-width:700px){.usp{grid-template-columns:1fr 1fr}}
+  .empty{order:99;grid-column:1/-1;text-align:center;color:var(--soft);padding:40px 0;display:none}
+
+
+  /* PRODUKT-KONFIGURATOR (Armreif): Gravur nur im Medaillon */
+  .pd{position:fixed;inset:0;z-index:50;background:rgba(28,28,28,.45);display:none;align-items:center;justify-content:center;padding:24px}
+  .pd.open{display:flex}
+  .pd-box{background:#fff;width:min(1120px,100%);max-height:100%;overflow:auto;display:grid;grid-template-columns:1.1fr 1fr;position:relative}
+  .pd-x{position:absolute;top:12px;right:14px;z-index:3;font-size:1.6rem;line-height:1;width:40px;height:40px}
+  .stage{position:relative;aspect-ratio:1/1;align-self:center;background:#fff;overflow:hidden}
+  .zoomer{position:absolute;inset:0}
+  .zoomer img,.zoomer svg{position:absolute;inset:0;width:100%;height:100%}
+  .zoomer svg text{font-kerning:normal}
+  .viewsw{position:absolute;left:14px;bottom:14px;z-index:2;display:flex;background:#fff;border:1px solid var(--line)}
+  .viewsw button{padding:7px 12px;font:500 .64rem var(--head);letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
+  .viewsw button.on{background:var(--ink);color:#fff}
+  .pd-info{padding:44px 40px 36px}
+  .pd-info .crumb{margin-bottom:6px}
+  .pd-info h2{font-size:clamp(1.5rem,2.4vw,2rem)}
+  .pd-info .price{font-size:1.05rem;margin:6px 0 18px;color:var(--soft)}
+  .facts{list-style:none;font-size:.86rem;color:var(--soft);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 0;margin-bottom:22px;display:grid;grid-template-columns:1fr 1fr;gap:4px 16px}
+  .facts li::before{content:"·";margin-right:6px;color:var(--gold)}
+  .fl{display:block;font:500 .7rem var(--head);letter-spacing:.14em;text-transform:uppercase;margin:16px 0 8px}
+  .lines input{display:block;width:100%;padding:11px 12px;border:1px solid var(--line);font:inherit;font-size:.95rem;margin-bottom:8px;border-radius:0;background:#fff}
+  .lines input:focus{outline:none;border-color:var(--ink)}
+  .fonts{display:flex;gap:8px;flex-wrap:wrap}
+  .fonts button{padding:8px 14px;border:1px solid var(--line);font-size:1rem;transition:.15s}
+  .fonts button.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+  .colors{display:flex;gap:10px;align-items:center}
+  .colors button{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);box-shadow:inset 0 0 0 3px #fff;transition:.15s}
+  .colors button.on{border-color:var(--ink);box-shadow:inset 0 0 0 3px #fff,0 0 0 1px var(--ink)}
+  .colors span{font-size:.86rem;color:var(--soft);margin-left:4px}
+  .hint{font-size:.8rem;color:var(--mut);margin-top:12px;min-height:1.3em}
+  .hint.warn{color:#8a5a2b}
+  .pd-info .btn{width:100%;text-align:center;margin-top:22px;opacity:.55;cursor:default}
+  .pd-info .note{font-size:.76rem;color:var(--mut);text-align:center;margin-top:8px}
+  @media(max-width:860px){.pd{padding:0}.pd-box{grid-template-columns:1fr;height:100%}.pd-info{padding:24px 18px 30px}}
+
+  /* GESCHICHTE */
+  .story{display:grid;grid-template-columns:1fr 1fr;background:var(--cream)}
+  .story .vis{background:var(--caramel);display:flex;align-items:center;justify-content:center;min-height:440px}
+  .story .vis svg{width:34%;stroke:#fff}
+  .story .txt{padding:70px 8%;display:flex;flex-direction:column;justify-content:center}
+  .story .kick{font:500 .72rem var(--head);letter-spacing:.18em;text-transform:uppercase;color:var(--caramel)}
+  .story h2{font-size:clamp(1.7rem,3vw,2.4rem);margin:12px 0 16px}
+  .story p{color:var(--soft);max-width:48ch;margin-bottom:12px}
+  .story .btn{align-self:flex-start;margin-top:16px}
+  @media(max-width:860px){.story{grid-template-columns:1fr}.story .vis{min-height:300px}.story .txt{padding:48px 20px}}
+
+  /* FAQ */
+  .faqsec{padding:80px 0}
+  .faqsec h2{text-align:center;font-size:clamp(1.6rem,2.6vw,2.1rem);margin-bottom:30px}
+  .faq{max-width:820px;margin:0 auto;border-top:1px solid var(--line)}
+  .faq details{border-bottom:1px solid var(--line)}
+  .faq summary{list-style:none;cursor:pointer;padding:20px 36px 20px 0;position:relative;font:500 1rem var(--head)}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary::after{content:"+";position:absolute;right:4px;top:50%;transform:translateY(-50%);font-size:1.3rem;font-weight:300}
+  .faq details[open] summary::after{content:"–"}
+  .faq details p{padding:0 0 20px;color:var(--soft);max-width:66ch}
+
+  /* FOOTER */
+  footer{background:var(--cream);border-top:1px solid var(--line);font-size:.86rem}
+  .fcols{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;padding:56px 0 40px}
+  .fcols h4{font:600 .74rem var(--head);letter-spacing:.16em;text-transform:uppercase;margin-bottom:14px}
+  .fcols a{display:block;color:var(--soft);margin-bottom:7px}
+  .fcols a:hover{color:var(--ink)}
+  .fcols p{color:var(--soft);max-width:38ch}
+  .fbot{border-top:1px solid var(--line);padding:18px 0 26px;font-size:.76rem;color:var(--mut)}
+  @media(max-width:700px){.fcols{grid-template-columns:1fr;gap:28px}}
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="wrap">
+  <span><b>Gravur inklusive</b> bei jedem Stück</span>
+  <span>Live-Vorschau vor dem Kauf</span>
+  <span>Einzeln gefertigt in Bayern</span>
+</div></div>
+
+<header>
+  <div class="wrap nav">
+    <button class="burger" aria-label="Menü"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#1c1c1c" stroke-width="1.5"><path d="M3 7h18M3 12h18M3 17h18"/></svg></button>
+    <nav><a href="#produkte">Kollektion</a><a href="#produkte">Für wen</a><a href="#geschichte">Über uns</a></nav>
+    <a href="#" class="logo">Wolf</a>
+    <div class="icons">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="chead">
+    <div class="wrap">
+      <div class="crumb"><a href="#">Start</a> / Geschenke</div>
+      <h1>Personalisierte Geschenke</h1>
+      <p>Ausgewählte Stücke, jedes einzeln für dich graviert. Mit Name, Datum oder einem Satz, der nur euch gehört.</p>
+    </div>
+  </section>
+
+  <div class="wrap" id="produkte">
+    <div class="fbar">
+      <div class="chips" id="whoPick">
+        <span class="lab">Für wen</span>
+        <button data-who="partner">Partner/in</button>
+        <button data-who="mama">Mama</button>
+        <button data-who="papa">Papa</button>
+        <button data-who="freunde">Freund/in</button>
+        <button data-who="kind">Kind &amp; Baby</button>
+        <button data-who="kollege">Kolleg/in</button>
+        <button data-who="ich">Für mich</button>
+      </div>
+      <div class="count"><span id="count"></span><button id="reset">Zurücksetzen</button></div>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <section class="story" id="geschichte">
+    <div class="vis" aria-hidden="true" id="storyVis"></div>
+    <div class="txt">
+      <span class="kick">Unsere Werkstatt</span>
+      <h2>Graviert in Bayern, gemacht für einen Menschen.</h2>
+      <p>Jedes Stück gravieren wir einzeln mit dem Laser, direkt ins Metall. Kein Druck, keine Folie, nichts blättert ab.</p>
+      <p>Vor dem Kauf siehst du in der Live-Vorschau genau, wie dein Geschenk aussehen wird.</p>
+      <a href="#produkte" class="btn btn-dark">Jetzt personalisieren</a>
+    </div>
+  </section>
+
+  <section class="faqsec" id="fragen">
+    <div class="wrap">
+      <h2>Häufige Fragen</h2>
+      <div class="faq">
+        <details><summary>Kann ich meine Gravur vorher sehen?</summary><p>Ja. Die Vorschau zeigt dein Motiv live und maßstabsgetreu. Genau diese Datei geht in die Gravur.</p></details>
+        <details><summary>Hält die Gravur dauerhaft?</summary><p>Ja. Der Laser bringt die Gravur direkt ins Metall ein. Sie ist wischfest und verblasst nicht.</p></details>
+        <details><summary>Wie lange dauert die Lieferung?</summary><p>Wir fertigen jedes Stück einzeln an. Die Anfertigung dauert in der Regel 3–5 Werktage, danach kommt der Versand innerhalb Deutschlands hinzu.</p></details>
+        <details><summary>Kann ich ein personalisiertes Geschenk umtauschen?</summary><p>Da jedes Stück nach deinen Angaben graviert wird, ist das Widerrufsrecht für personalisierte Waren ausgeschlossen. Bei einem Fehler unsererseits fertigen wir selbstverständlich neu.</p></details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="fcols">
+      <div><h4>Shop</h4><a href="#produkte">Alle Geschenke</a><a href="#produkte">Für wen</a><a href="#fragen">Häufige Fragen</a></div>
+      <div><h4>Rechtliches</h4><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a><a href="https://itrk.legal/Ipk.2Y.Cj6.html" target="_blank" rel="noopener">AGB</a><a href="https://itrk.legal/Ipk.2J.Cj6.html" target="_blank" rel="noopener">Widerrufsbelehrung</a></div>
+      <div><h4>Über Wolf</h4><p>Wir gravieren jedes Stück einzeln in unserer Werkstatt in Bayern, mit dem Laser direkt ins Metall.</p></div>
+    </div>
+    <div class="fbot">© Wolf Lasermark · Lasergravur aus Bayern</div>
+  </div>
+</footer>
+
+
+<div class="pd" id="pd" role="dialog" aria-modal="true" aria-labelledby="pdTitle">
+  <div class="pd-box">
+    <button class="pd-x" id="pdClose" aria-label="Schließen">×</button>
+    <div class="stage" id="stage">
+      <div class="zoomer">
+        <img id="stageImg" src="images/shop/armreif-oval-edelstahl.jpg" alt="Armreif aus Edelstahl mit ovalem Medaillon">
+        <svg viewBox="0 0 1200 1200" aria-hidden="true" text-rendering="geometricPrecision">
+          <defs>
+            <!-- Medaillon-Flaeche im Foto (23 x 14 mm = 414 x 252 px, ohne Fassungsrand) -->
+            <clipPath id="medal"><ellipse cx="0" cy="0" rx="196" ry="117"/></clipPath>
+          </defs>
+          <!-- Medaillon-Koordinaten (Mitte = 0,0); pro Ansicht per transform aufs jeweilige Foto gelegt -->
+          <g id="medT" transform="translate(604 679)"><g clip-path="url(#medal)">
+            <g id="hiTxt" fill="#ffffff" opacity=".55" transform="translate(1.3 1.3)"></g>
+            <g id="engTxt" fill="#46484c" opacity=".78"></g>
+          </g></g>
+        </svg>
+      </div>
+      <div class="viewsw"><button data-v="full" class="on">Produkt</button><button data-v="hand">Am Handgelenk</button></div>
+    </div>
+    <div class="pd-info">
+      <div class="crumb">Geschenke / Schmuck</div>
+      <h2 id="pdTitle">Armreif mit Gravur</h2>
+      <div class="price"><b style="color:var(--ink,#222);font-size:1.25rem;font-weight:600">35,00 €</b><br><small>Gravur inklusive · kostenloser Versand innerhalb Deutschlands<br>Endpreis, gem. § 19 UStG wird keine Umsatzsteuer ausgewiesen.</small></div>
+      <ul class="facts">
+        <li id="pdMat">Edelstahl 316L, silber</li><li>Hypoallergen, läuft nicht an</li>
+        <li>Medaillon 23 × 14 mm</li><li>Armreif ca. 65 mm</li>
+      </ul>
+      <span class="fl">Farbe</span>
+      <div class="colors" id="colors">
+        <button data-c="silber" class="on" style="background:linear-gradient(135deg,#f4f4f4,#b9bbbf)" aria-label="Silber"></button>
+        <button data-c="gold" style="background:linear-gradient(135deg,#f6dfa4,#c99a45)" aria-label="Gold"></button>
+        <span id="colorName">Silber</span>
+      </div>
+      <label class="fl">Deine Gravur</label>
+      <div class="lines">
+        <input id="l1" maxlength="18" placeholder="z. B. Anna &amp; Ben" value="Anna &amp; Ben" autocomplete="off">
+      </div>
+      <span class="fl">Schrift</span>
+      <div class="fonts" id="fonts">
+        <button data-f="serif" class="on" style="font-family:'Cormorant Garamond',serif;font-weight:600">Klassisch</button>
+        <button data-f="script" style="font-family:'Great Vibes',cursive;font-size:1.25rem">Schreibschrift</button>
+        <button data-f="sans" style="font-family:var(--head);font-weight:500">Modern</button>
+      </div>
+      <div class="hint" id="hint"></div>
+      <a class="btn btn-dark" aria-disabled="true">Bald bestellbar</a>
+      <div class="note">Die Gravur bleibt immer im Medaillon. Die Vorschau zeigt Größe und Lage maßstabsgetreu. Die Ansicht am Handgelenk ist eine Illustration.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Platzhalter-Sortiment: die echten Produkte (Fotos, Preise, Konfigurator) kommen spaeter. */
+const S='fill="none" stroke="#6f6a63" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"';
+const ICONS={
+  anhaenger:`<svg viewBox="0 0 100 100"><circle cx="50" cy="22" r="9" ${S}/><path d="M50 31v6" ${S}/><rect x="28" y="37" width="44" height="52" rx="10" ${S}/><path d="M38 58h24M42 67h16" ${S}/></svg>`,
+  kette:`<svg viewBox="0 0 100 100"><path d="M18 10c0 30 14 48 32 50 18-2 32-20 32-50" ${S} stroke-dasharray="3 4"/><circle cx="50" cy="72" r="16" ${S}/><path d="M43 72h14" ${S}/></svg>`,
+  besteck:`<svg viewBox="0 0 100 100"><path d="M30 10v24a6 6 0 0 0 12 0V10M36 10v80" ${S}/><path d="M64 10c-8 0-10 12-10 22s4 12 10 12V90" ${S}/></svg>`,
+  becher:`<svg viewBox="0 0 100 100"><rect x="30" y="16" width="40" height="10" rx="4" ${S}/><path d="M32 26l4 62h28l4-62" ${S}/><path d="M42 50h16" ${S}/></svg>`,
+  messer:`<svg viewBox="0 0 100 100"><rect x="14" y="52" width="58" height="18" rx="9" ${S}/><path d="M60 52c8-14 18-22 28-24-4 10-12 20-24 24" ${S}/><circle cx="24" cy="61" r="3" ${S}/></svg>`,
+  oeffner:`<svg viewBox="0 0 100 100"><path d="M36 14h28a6 6 0 0 1 6 6v62a6 6 0 0 1-6 6H36a6 6 0 0 1-6-6V20a6 6 0 0 1 6-6z" ${S}/><path d="M40 28a10 10 0 0 0 20 0" ${S}/><path d="M42 62h16M44 70h12" ${S}/></svg>`,
+};
+const PRODUCTS=[
+  {k:'armreif',img:'images/shop/armreif-oval-edelstahl.jpg',img2:'images/shop/armreif-oval-handgelenk.jpg',name:'Armreif mit Gravur',sub:'Ovales Medaillon, Silber oder Gold',badge:'Neu',price:'35,00 € · Versandkostenfrei',cfg:true,who:['partner','mama','freunde','kind','ich']},
+  {k:'kette',name:'Kette mit Gravur',sub:'Name, Initialen oder Datum',who:['partner','mama','freunde','kind','ich']},
+  {k:'anhaenger',name:'Schlüsselanhänger',sub:'Name, Datum oder Koordinaten',who:['partner','papa','freunde','kollege','ich']},
+  {k:'becher',name:'Thermobecher',sub:'Hält warm und kalt',who:['mama','papa','freunde','kollege','ich','partner']},
+  {k:'messer',name:'Taschenmesser',sub:'Name oder Spruch auf der Klinge',who:['papa','partner','freunde','ich']},
+  {k:'besteck',name:'Kinderbesteck',sub:'Mit Namen des Kindes',who:['kind']},
+  {k:'oeffner',name:'Flaschenöffner',sub:'Im Kartenformat',who:['papa','freunde','kollege','partner']},
+];
+const USP=`<div class="usp" id="usp">
+  <div><svg viewBox="0 0 32 32"><path d="M6 26l14-14M18 6l8 8-4 4-8-8z"/></svg>Gravur inklusive</div>
+  <div><svg viewBox="0 0 32 32"><path d="M3 16s5-9 13-9 13 9 13 9-5 9-13 9S3 16 3 16z"/><circle cx="16" cy="16" r="4"/></svg>Live-Vorschau</div>
+  <div><svg viewBox="0 0 32 32"><rect x="5" y="12" width="22" height="15"/><path d="M3 8h26v4H3zM16 8v19M16 8c-3-5-8-4-7 0M16 8c3-5 8-4 7 0"/></svg>Geschenkfertig verpackt</div>
+  <div><svg viewBox="0 0 32 32"><path d="M16 29s-9-8-9-15a9 9 0 0 1 18 0c0 7-9 15-9 15z"/><circle cx="16" cy="14" r="3"/></svg>Gefertigt in Bayern</div>
+</div>`;
+const $=id=>document.getElementById(id);
+const card=(p,i)=>`
+  <article class="card" data-i="${i}" style="order:${i*2}">
+    <div class="pimg">${p.badge?`<span class="badge gold">${p.badge}</span>`:''}${p.img?`<img src="${p.img}" alt="${p.name}" loading="lazy">`+(p.img2?`<img class="alt" src="${p.img2}" alt="" loading="lazy">`:''):ICONS[p.k]}</div>
+    <div class="pinfo"><h3>${p.name}</h3><p>${p.sub}</p><span class="price">${p.price||'Bald erhältlich'}</span></div>
+    <a href="#" class="btn"${p.cfg?' data-cfg':''}>Personalisieren</a>
+  </article>`;
+$('grid').innerHTML=PRODUCTS.slice(0,3).map(card).join('')+USP+PRODUCTS.slice(3).map((p,i)=>card(p,i+3)).join('')
+  +'<div class="empty" id="empty">Dafür haben wir gerade nichts Passendes.</div>';
+$('storyVis').innerHTML=ICONS.kette.replace(/#6f6a63/g,'#ffffff');
+let who=null;
+function apply(){
+  let n=0;
+  document.querySelectorAll('.card').forEach(el=>{
+    const ok=!who||PRODUCTS[el.dataset.i].who.includes(who);
+    el.hidden=!ok; if(ok) n++;
+  });
+  $('count').textContent=n===1?'1 Produkt':`${n} Produkte`;
+  $('reset').style.display=who?'inline':'none';
+  $('empty').style.display=n?'none':'block';
+}
+$('whoPick').addEventListener('click',e=>{const b=e.target.closest('[data-who]');if(!b)return;
+  who=(who===b.dataset.who)?null:b.dataset.who;
+  document.querySelectorAll('#whoPick button').forEach(x=>x.classList.toggle('on',x.dataset.who===who)); apply();});
+$('reset').addEventListener('click',()=>{who=null;document.querySelectorAll('#whoPick .on').forEach(b=>b.classList.remove('on'));apply();});
+apply();
+
+/* ---- Armreif-Konfigurator: Text wird so gesetzt, dass jede Zeile innerhalb der
+   Medaillon-Ellipse bleibt (Sicherheitsabstand zum Rand); der clipPath ist nur die Notbremse. ---- */
+const MED={cx:0,cy:0,rx:196*.84,ry:117*.80}, PX_PER_MM=414/23;
+const FONTS={
+  serif:{fam:"'Cormorant Garamond',serif",w:600,lh:1.08,max:92},
+  script:{fam:"'Great Vibes',cursive",w:400,lh:1.0,max:104},
+  sans:{fam:"'Instrument Sans',sans-serif",w:500,lh:1.12,max:78},
+};
+let font='serif';
+/* Pro Farbe eigene Fotos; t legt die Medaillon-Koordinaten aufs jeweilige Foto (viewBox 1200). */
+const COLORS={
+  silber:{name:'Silber',mat:'Edelstahl 316L, silber',views:{
+    full:{img:'images/shop/armreif-oval-edelstahl.jpg',alt:'Armreif aus Edelstahl mit ovalem Medaillon',t:'translate(604 679)'},
+    hand:{img:'images/shop/armreif-oval-handgelenk.jpg',alt:'Silberner Armreif mit Gravur am Handgelenk',t:'translate(618.5 583) rotate(-55) scale(.325 .375)'}}},
+  gold:{name:'Gold',mat:'Edelstahl 316L, vergoldet',views:{
+    full:{img:'images/shop/armreif-oval-gold.jpg',alt:'Goldener Armreif mit ovalem Medaillon',t:'translate(604 679)'},
+    hand:{img:'images/shop/armreif-oval-handgelenk-gold.jpg',alt:'Goldener Armreif mit Gravur am Handgelenk',t:'translate(605 578) rotate(61) scale(.375 .44)'}}},
+};
+let color='silber', view='full';
+function showView(){
+  const v=COLORS[color].views[view];
+  $('stageImg').src=v.img; $('stageImg').alt=v.alt; $('medT').setAttribute('transform',v.t);
+}
+const MIN_PX=Math.ceil(.9*PX_PER_MM/.7);   // unter ca. 0,9 mm Schrifthoehe nicht mehr sauber lesbar
+const mctx=document.createElement('canvas').getContext('2d');
+const tw=(t,f,px)=>{mctx.font=`${f.w} ${px}px ${f.fam}`;return mctx.measureText(t).width;};
+const esc=t=>t.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function layout(lines,f){
+  const n=lines.length;
+  for(let px=Math.min(f.max,MED.ry*2/(n*f.lh));px>=MIN_PX;px-=1){
+    const lh=px*f.lh, top=MED.cy-n*lh/2;
+    const ok=lines.every((t,i)=>{
+      const yc=top+lh*(i+.5), dy=Math.abs(yc-MED.cy)+px*.42;   // aeusserste Kante der Zeile
+      if(dy>=MED.ry) return false;
+      return tw(t,f,px)<=2*MED.rx*Math.sqrt(1-(dy/MED.ry)**2);
+    });
+    if(ok) return {px,lh,top};
+  }
+  return null;
+}
+function renderEngr(){
+  const f=FONTS[font], lines=[$('l1').value.trim()].filter(Boolean);
+  const hint=$('hint'); hint.classList.remove('warn');
+  if(!lines.length){$('engTxt').innerHTML=$('hiTxt').innerHTML='';hint.textContent='Schreib deinen Text, er erscheint direkt auf dem Medaillon.';return;}
+  const L=layout(lines,f);
+  if(!L){$('engTxt').innerHTML=$('hiTxt').innerHTML='';hint.classList.add('warn');hint.textContent='Zu viel Text für das Medaillon. Bitte kürze den Text.';return;}
+  const svg=lines.map((t,i)=>`<text x="${MED.cx}" y="${(L.top+L.lh*(i+.5)).toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-family="${f.fam.replace(/"/g,'')}" font-weight="${f.w}" font-size="${L.px}">${esc(t)}</text>`).join('');
+  $('engTxt').innerHTML=svg; $('hiTxt').innerHTML=svg;
+  const cap=(L.px*.7/PX_PER_MM).toFixed(1).replace('.',',');
+  const small=L.px*.7/PX_PER_MM<1.3;
+  hint.classList.toggle('warn',small);
+  hint.textContent=small?`Schrifthöhe nur ca. ${cap} mm, das wird sehr fein. Weniger Text macht die Gravur besser lesbar.`:`Schrifthöhe ca. ${cap} mm`;
+}
+$('l1').addEventListener('input',renderEngr);
+$('fonts').addEventListener('click',e=>{const b=e.target.closest('[data-f]');if(!b)return;font=b.dataset.f;
+  document.querySelectorAll('#fonts button').forEach(x=>x.classList.toggle('on',x===b));renderEngr();});
+document.querySelector('.viewsw').addEventListener('click',e=>{const b=e.target.closest('[data-v]');if(!b)return;
+  view=b.dataset.v; showView();
+  document.querySelectorAll('.viewsw button').forEach(x=>x.classList.toggle('on',x===b));});
+$('colors').addEventListener('click',e=>{const b=e.target.closest('[data-c]');if(!b)return;color=b.dataset.c;
+  $('colorName').textContent=COLORS[color].name; $('pdMat').textContent=COLORS[color].mat;
+  document.querySelectorAll('#colors button').forEach(x=>x.classList.toggle('on',x===b));showView();});
+const openPd=()=>{$('pd').classList.add('open');
+  Object.values(COLORS).forEach(c=>Object.values(c.views).forEach(v=>{new Image().src=v.img;}));   // Farbwechsel ohne Nachladen
+  document.body.style.overflow='hidden';renderEngr();$('l1').focus({preventScroll:true});};
+const closePd=()=>{$('pd').classList.remove('open');document.body.style.overflow='';};
+$('grid').addEventListener('click',e=>{const b=e.target.closest('[data-cfg]');if(!b)return;e.preventDefault();openPd();});
+$('pdClose').addEventListener('click',closePd);
+$('pd').addEventListener('click',e=>{if(e.target===$('pd'))closePd();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closePd();});
+Promise.all(Object.values(FONTS).map(f=>document.fonts.load(`${f.w} 40px ${f.fam}`))).then(renderEngr);
+</script>
+</body>
+</html>
