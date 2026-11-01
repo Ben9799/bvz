@@ -117,6 +117,7 @@
   .fl{display:block;font:500 .7rem var(--head);letter-spacing:.14em;text-transform:uppercase;margin:16px 0 8px}
   .lines input{display:block;width:100%;padding:11px 12px;border:1px solid var(--line);font:inherit;font-size:.95rem;margin-bottom:8px;border-radius:0;background:#fff}
   .lines input:focus{outline:none;border-color:var(--ink)}
+  .lines input[hidden],.viewsw[hidden]{display:none}
   .fonts{display:flex;gap:8px;flex-wrap:wrap}
   .fonts button{padding:8px 14px;border:1px solid var(--line);font-size:1rem;transition:.15s}
   .fonts button.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
@@ -253,8 +254,8 @@
         <img id="stageImg" src="images/shop/armreif-oval-edelstahl.jpg" alt="Armreif aus Edelstahl mit ovalem Medaillon">
         <svg viewBox="0 0 1200 1200" aria-hidden="true" text-rendering="geometricPrecision">
           <defs>
-            <!-- Medaillon-Flaeche im Foto (23 x 14 mm = 414 x 252 px, ohne Fassungsrand) -->
-            <clipPath id="medal"><ellipse cx="0" cy="0" rx="196" ry="117"/></clipPath>
+            <!-- Gravurflaeche des Medaillons (Form je Produkt, siehe CFG.clip) -->
+            <clipPath id="medal"></clipPath>
           </defs>
           <!-- Medaillon-Koordinaten (Mitte = 0,0); pro Ansicht per transform aufs jeweilige Foto gelegt -->
           <g id="medT" transform="translate(604 679)"><g clip-path="url(#medal)">
@@ -266,22 +267,18 @@
       <div class="viewsw"><button data-v="full" class="on">Produkt</button><button data-v="hand">Am Handgelenk</button></div>
     </div>
     <div class="pd-info">
-      <div class="crumb">Geschenke / Schmuck</div>
+      <div class="crumb" id="pdCrumb">Geschenke / Schmuck</div>
       <h2 id="pdTitle">Armreif mit Gravur</h2>
-      <div class="price"><b style="color:var(--ink,#222);font-size:1.25rem;font-weight:600">35,00 €</b><br><small>Gravur inklusive · kostenloser Versand innerhalb Deutschlands<br>Endpreis, gem. § 19 UStG wird keine Umsatzsteuer ausgewiesen.</small></div>
-      <ul class="facts">
-        <li id="pdMat">Edelstahl 316L, silber</li><li>Hypoallergen, läuft nicht an</li>
-        <li>Medaillon 23 × 14 mm</li><li>Armreif ca. 65 mm</li>
-      </ul>
+      <div class="price"><b id="pdPrice" style="color:var(--ink,#222);font-size:1.25rem;font-weight:600">35,00 €</b><br><small>Gravur inklusive · kostenloser Versand innerhalb Deutschlands<br>Endpreis, gem. § 19 UStG wird keine Umsatzsteuer ausgewiesen.</small></div>
+      <ul class="facts" id="pdFacts"></ul>
       <span class="fl">Farbe</span>
-      <div class="colors" id="colors">
-        <button data-c="silber" class="on" style="background:linear-gradient(135deg,#f4f4f4,#b9bbbf)" aria-label="Silber"></button>
-        <button data-c="gold" style="background:linear-gradient(135deg,#f6dfa4,#c99a45)" aria-label="Gold"></button>
-        <span id="colorName">Silber</span>
-      </div>
+      <div class="colors" id="colors"></div>
       <label class="fl">Deine Gravur</label>
       <div class="lines">
-        <input id="l1" maxlength="18" placeholder="z. B. Anna &amp; Ben" value="Anna &amp; Ben" autocomplete="off">
+        <input id="l1" maxlength="18" placeholder="z. B. Anna &amp; Ben" autocomplete="off">
+        <input id="l2" class="xl" maxlength="28" placeholder="Zeile 2" autocomplete="off" hidden>
+        <input id="l3" class="xl" maxlength="28" placeholder="Zeile 3" autocomplete="off" hidden>
+        <input id="l4" class="xl" maxlength="28" placeholder="Zeile 4" autocomplete="off" hidden>
       </div>
       <span class="fl">Schrift</span>
       <div class="fonts" id="fonts">
@@ -291,7 +288,7 @@
       </div>
       <div class="hint" id="hint"></div>
       <a class="btn btn-dark" aria-disabled="true">Bald bestellbar</a>
-      <div class="note">Die Gravur bleibt immer im Medaillon. Die Vorschau zeigt Größe und Lage maßstabsgetreu. Die Ansicht am Handgelenk ist eine Illustration.</div>
+      <div class="note"><span id="pdNote">Die Gravur bleibt immer im Medaillon.</span> Die Vorschau zeigt Größe und Lage maßstabsgetreu.<span id="pdNote2"> Die Ansicht am Handgelenk ist eine Illustration.</span></div>
     </div>
   </div>
 </div>
@@ -308,7 +305,9 @@ const ICONS={
   oeffner:`<svg viewBox="0 0 100 100"><path d="M36 14h28a6 6 0 0 1 6 6v62a6 6 0 0 1-6 6H36a6 6 0 0 1-6-6V20a6 6 0 0 1 6-6z" ${S}/><path d="M40 28a10 10 0 0 0 20 0" ${S}/><path d="M42 62h16M44 70h12" ${S}/></svg>`,
 };
 const PRODUCTS=[
-  {k:'armreif',img:'images/shop/armreif-oval-edelstahl.jpg',img2:'images/shop/armreif-oval-handgelenk.jpg',name:'Armreif mit Gravur',sub:'Ovales Medaillon, Silber oder Gold',badge:'Neu',price:'35,00 € · Versandkostenfrei',cfg:true,who:['partner','mama','freunde','kind','ich']},
+  {k:'tafel',img:'images/shop/erinnerungstafel-edelstahl.jpg',name:'Erinnerungstafel',sub:'Edelstahl, 130 × 180 mm, bis zu 4 Zeilen',badge:'Neu',cfg:'tafel',who:['partner','mama','papa','freunde','kollege']},
+  {k:'armreif',img:'images/shop/armreif-oval-edelstahl.jpg',img2:'images/shop/armreif-oval-handgelenk.jpg',name:'Armreif mit Gravur',sub:'Ovales Medaillon, Silber oder Gold',badge:'Neu',price:'35,00 € · Versandkostenfrei',cfg:'armreif',who:['partner','mama','freunde','kind','ich']},
+  {k:'herz',img:'images/shop/herz-armband-edelstahl.jpg',img2:'images/shop/herz-armband-handgelenk.jpg',name:'Herz-Armband mit Gravur',sub:'Schlangenkette mit Herz, 17 + 5 cm',badge:'Neu',price:'24,99 € · Versandkostenfrei',cfg:'herz',who:['partner','mama','freunde','kind','ich']},
   {k:'kette',name:'Kette mit Gravur',sub:'Name, Initialen oder Datum',who:['partner','mama','freunde','kind','ich']},
   {k:'anhaenger',name:'Schlüsselanhänger',sub:'Name, Datum oder Koordinaten',who:['partner','papa','freunde','kollege','ich']},
   {k:'becher',name:'Thermobecher',sub:'Hält warm und kalt',who:['mama','papa','freunde','kollege','ich','partner']},
@@ -327,7 +326,7 @@ const card=(p,i)=>`
   <article class="card" data-i="${i}" style="order:${i*2}">
     <div class="pimg">${p.badge?`<span class="badge gold">${p.badge}</span>`:''}${p.img?`<img src="${p.img}" alt="${p.name}" loading="lazy">`+(p.img2?`<img class="alt" src="${p.img2}" alt="" loading="lazy">`:''):ICONS[p.k]}</div>
     <div class="pinfo"><h3>${p.name}</h3><p>${p.sub}</p><span class="price">${p.price||'Bald erhältlich'}</span></div>
-    <a href="#" class="btn"${p.cfg?' data-cfg':''}>Personalisieren</a>
+    <a href="#" class="btn"${p.cfg?` data-cfg="${p.cfg}"`:''}>Personalisieren</a>
   </article>`;
 $('grid').innerHTML=PRODUCTS.slice(0,3).map(card).join('')+USP+PRODUCTS.slice(3).map((p,i)=>card(p,i+3)).join('')
   +'<div class="empty" id="empty">Dafür haben wir gerade nichts Passendes.</div>';
@@ -349,40 +348,82 @@ $('whoPick').addEventListener('click',e=>{const b=e.target.closest('[data-who]')
 $('reset').addEventListener('click',()=>{who=null;document.querySelectorAll('#whoPick .on').forEach(b=>b.classList.remove('on'));apply();});
 apply();
 
-/* ---- Armreif-Konfigurator: Text wird so gesetzt, dass jede Zeile innerhalb der
-   Medaillon-Ellipse bleibt (Sicherheitsabstand zum Rand); der clipPath ist nur die Notbremse. ---- */
-const MED={cx:0,cy:0,rx:196*.84,ry:117*.80}, PX_PER_MM=414/23;
+/* ---- Konfigurator: Text wird so gesetzt, dass jede Zeile innerhalb der Gravur-Ellipse
+   des Medaillons bleibt (Sicherheitsabstand zum Rand); der clipPath ist nur die Notbremse.
+   Je Produkt: Medaillon-Koordinaten (Mitte = 0,0), Fotos je Farbe, t legt sie aufs Foto (viewBox 1200). ---- */
+const SILBER_BG='linear-gradient(135deg,#f4f4f4,#b9bbbf)', GOLD_BG='linear-gradient(135deg,#f6dfa4,#c99a45)';
+const CFG={
+  armreif:{title:'Armreif mit Gravur',price:'35,00 €',value:'Anna & Ben',maxLen:18,
+    facts:['Hypoallergen, läuft nicht an','Medaillon 23 × 14 mm','Armreif ca. 65 mm'],
+    clip:'<ellipse cx="0" cy="0" rx="196" ry="117"/>',          // 23 x 14 mm = 414 x 252 px, ohne Fassungsrand
+    med:{cx:0,cy:0,rx:196*.84,ry:117*.80}, pxPerMm:414/23,
+    colors:{
+      silber:{name:'Silber',bg:SILBER_BG,mat:'Edelstahl 316L, silber',views:{
+        full:{img:'images/shop/armreif-oval-edelstahl.jpg',alt:'Armreif aus Edelstahl mit ovalem Medaillon',t:'translate(604 679)'},
+        hand:{img:'images/shop/armreif-oval-handgelenk.jpg',alt:'Silberner Armreif mit Gravur am Handgelenk',t:'translate(618.5 583) rotate(-55) scale(.325 .375)'}}},
+      gold:{name:'Gold',bg:GOLD_BG,mat:'Edelstahl 316L, vergoldet',views:{
+        full:{img:'images/shop/armreif-oval-gold.jpg',alt:'Goldener Armreif mit ovalem Medaillon',t:'translate(604 679)'},
+        hand:{img:'images/shop/armreif-oval-handgelenk-gold.jpg',alt:'Goldener Armreif mit Gravur am Handgelenk',t:'translate(605 578) rotate(61) scale(.375 .44)'}}}}},
+  herz:{title:'Herz-Armband mit Gravur',price:'24,99 €',value:'Anna',maxLen:14,
+    facts:['Hypoallergen, läuft nicht an','Herz-Anhänger, Schlangenkette','Länge 17 cm + 5 cm verstellbar'],
+    clip:'<path transform="scale(.94)" d="M0.0 -47.1 L0.0 -47.5 L0.1 -48.5 L0.4 -50.2 L0.9 -52.5 L1.7 -55.3 L3.0 -58.6 L4.6 -62.2 L6.7 -66.0 L9.4 -69.9 L12.5 -73.8 L16.2 -77.5 L20.3 -80.9 L24.9 -83.9 L30.0 -86.5 L35.4 -88.4 L41.0 -89.7 L46.9 -90.4 L53.0 -90.2 L59.0 -89.4 L65.0 -87.8 L70.7 -85.4 L76.2 -82.4 L81.4 -78.7 L86.0 -74.5 L90.1 -69.7 L93.6 -64.5 L96.4 -58.9 L98.4 -53.1 L99.6 -47.1 L100.0 -40.9 L99.6 -34.6 L98.4 -28.4 L96.4 -22.2 L93.6 -16.0 L90.1 -10.0 L86.0 -4.0 L81.4 1.8 L76.2 7.5 L70.7 13.0 L65.0 18.5 L59.0 23.8 L53.0 29.0 L46.9 34.2 L41.0 39.2 L35.4 44.2 L30.0 49.0 L24.9 53.7 L20.3 58.3 L16.2 62.7 L12.5 67.0 L9.4 71.0 L6.7 74.7 L4.6 78.2 L3.0 81.3 L1.7 83.9 L0.9 86.2 L0.4 88.0 L0.1 89.3 L0.0 90.1 L0.0 90.4 L-0.0 90.1 L-0.1 89.3 L-0.4 88.0 L-0.9 86.2 L-1.7 83.9 L-3.0 81.3 L-4.6 78.2 L-6.7 74.7 L-9.4 71.0 L-12.5 67.0 L-16.2 62.7 L-20.3 58.3 L-24.9 53.7 L-30.0 49.0 L-35.4 44.2 L-41.0 39.2 L-46.9 34.2 L-53.0 29.0 L-59.0 23.8 L-65.0 18.5 L-70.7 13.0 L-76.2 7.5 L-81.4 1.8 L-86.0 -4.0 L-90.1 -10.0 L-93.6 -16.0 L-96.4 -22.2 L-98.4 -28.4 L-99.6 -34.6 L-100.0 -40.9 L-99.6 -47.1 L-98.4 -53.1 L-96.4 -58.9 L-93.6 -64.5 L-90.1 -69.7 L-86.0 -74.5 L-81.4 -78.7 L-76.2 -82.4 L-70.7 -85.4 L-65.0 -87.8 L-59.0 -89.4 L-53.0 -90.2 L-46.9 -90.4 L-41.0 -89.7 L-35.4 -88.4 L-30.0 -86.5 L-24.9 -83.9 L-20.3 -80.9 L-16.2 -77.5 L-12.5 -73.8 L-9.4 -69.9 L-6.7 -66.0 L-4.6 -62.2 L-3.0 -58.6 L-1.7 -55.3 L-0.9 -52.5 L-0.4 -50.2 L-0.1 -48.5 L-0.0 -47.5Z"/>',          // Herz 200 x 180 px
+    med:{cx:0,cy:-14,rx:66,ry:40}, pxPerMm:200/20,
+    colors:{
+      silber:{name:'Silber',bg:SILBER_BG,mat:'Edelstahl, silber',views:{
+        full:{img:'images/shop/herz-armband-edelstahl.jpg',alt:'Armband aus Edelstahl mit Herz-Anhänger',t:'translate(665 814) rotate(-6) scale(1.12 .95)'},
+        hand:{img:'images/shop/herz-armband-handgelenk.jpg',alt:'Herz-Armband mit Gravur am Handgelenk',t:'translate(521 532) rotate(48) scale(1 .82)'}}}}},
+  /* Kontur = Kunden-DXF: 130 x 180 mm, oben R20, unten R6. Gravurfeld 106 x 150 mm (12 mm Rand, oben 18 mm).
+     Produktbild: WL_projekt/scripts/shop-render/tafel-render.py (gleicher Massstab 5,2 px/mm, Mitte 600/600). */
+  tafel:{title:'Erinnerungstafel',price:'Preis folgt',value:'Anna & Ben',maxLen:28,lines:4,box:true,fontK:3.2,
+    crumb:'Geschenke / Erinnerung',area:'Gravurfeld',noun:'die Tafel',
+    vals:['seit dem','14. Juni 2019',''],
+    facts:['130 × 180 mm, 2 mm stark','Kaltgewalzt, Oberfläche 2G, einseitig geschliffen (Korn 240)','Läuft nicht an, für drinnen und draußen'],
+    clip:'<rect x="-275.6" y="-374.4" width="551.2" height="780" rx="8"/>',
+    med:{cx:0,cy:15.6,rx:275.6,ry:390}, pxPerMm:5.2,
+    colors:{
+      silber:{name:'Edelstahl geschliffen',bg:SILBER_BG,mat:'Edelstahl 1.4301 (V2A)',views:{
+        full:{img:'images/shop/erinnerungstafel-edelstahl.jpg',alt:'Erinnerungstafel aus geschliffenem Edelstahl',t:'translate(600 600)'}}}}},
+};
+let cur=CFG.armreif, MED=cur.med, PX_PER_MM=cur.pxPerMm;
 const FONTS={
   serif:{fam:"'Cormorant Garamond',serif",w:600,lh:1.08,max:92},
   script:{fam:"'Great Vibes',cursive",w:400,lh:1.0,max:104},
   sans:{fam:"'Instrument Sans',sans-serif",w:500,lh:1.12,max:78},
 };
 let font='serif';
-/* Pro Farbe eigene Fotos; t legt die Medaillon-Koordinaten aufs jeweilige Foto (viewBox 1200). */
-const COLORS={
-  silber:{name:'Silber',mat:'Edelstahl 316L, silber',views:{
-    full:{img:'images/shop/armreif-oval-edelstahl.jpg',alt:'Armreif aus Edelstahl mit ovalem Medaillon',t:'translate(604 679)'},
-    hand:{img:'images/shop/armreif-oval-handgelenk.jpg',alt:'Silberner Armreif mit Gravur am Handgelenk',t:'translate(618.5 583) rotate(-55) scale(.325 .375)'}}},
-  gold:{name:'Gold',mat:'Edelstahl 316L, vergoldet',views:{
-    full:{img:'images/shop/armreif-oval-gold.jpg',alt:'Goldener Armreif mit ovalem Medaillon',t:'translate(604 679)'},
-    hand:{img:'images/shop/armreif-oval-handgelenk-gold.jpg',alt:'Goldener Armreif mit Gravur am Handgelenk',t:'translate(605 578) rotate(61) scale(.375 .44)'}}},
-};
 let color='silber', view='full';
 function showView(){
-  const v=COLORS[color].views[view];
+  const v=cur.colors[color].views[view];
   $('stageImg').src=v.img; $('stageImg').alt=v.alt; $('medT').setAttribute('transform',v.t);
 }
-const MIN_PX=Math.ceil(.9*PX_PER_MM/.7);   // unter ca. 0,9 mm Schrifthoehe nicht mehr sauber lesbar
+function setProduct(k){
+  cur=CFG[k]; MED=cur.med; PX_PER_MM=cur.pxPerMm; color=Object.keys(cur.colors)[0];
+  $('pdTitle').textContent=cur.title; $('pdPrice').textContent=cur.price;
+  $('medal').innerHTML=cur.clip;
+  $('l1').maxLength=cur.maxLen; $('l1').value=cur.value;
+  ['l2','l3','l4'].forEach((id,i)=>{const el=$(id);el.hidden=i+1>=(cur.lines||1);el.value=(cur.vals||[])[i]||'';});
+  $('pdNote2').hidden=!!cur.box;
+  $('pdCrumb').textContent=cur.crumb||'Geschenke / Schmuck';
+  $('pdNote').textContent=`Die Gravur bleibt immer ${cur.box?'im Gravurfeld':'im Medaillon'}.`;
+  view='full'; document.querySelectorAll('.viewsw button').forEach(x=>x.classList.toggle('on',x.dataset.v==='full'));
+  document.querySelector('.viewsw').hidden=Object.keys(cur.colors[color].views).length<2;
+  $('pdFacts').innerHTML=`<li id="pdMat">${cur.colors[color].mat}</li>`+cur.facts.map(f=>`<li>${f}</li>`).join('');
+  $('colors').innerHTML=Object.entries(cur.colors).map(([c,o])=>`<button data-c="${c}"${c===color?' class="on"':''} style="background:${o.bg}" aria-label="${o.name}"></button>`).join('')
+    +`<span id="colorName">${cur.colors[color].name}</span>`;
+  showView();
+}
+const minPx=()=>Math.ceil(.9*PX_PER_MM/.7);   // unter ca. 0,9 mm Schrifthoehe nicht mehr sauber lesbar
 const mctx=document.createElement('canvas').getContext('2d');
 const tw=(t,f,px)=>{mctx.font=`${f.w} ${px}px ${f.fam}`;return mctx.measureText(t).width;};
 const esc=t=>t.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 function layout(lines,f){
   const n=lines.length;
-  for(let px=Math.min(f.max,MED.ry*2/(n*f.lh));px>=MIN_PX;px-=1){
+  for(let px=Math.min(f.max*PX_PER_MM/18*(cur.fontK||1),MED.ry*2/(n*f.lh));px>=minPx();px-=1){
     const lh=px*f.lh, top=MED.cy-n*lh/2;
     const ok=lines.every((t,i)=>{
       const yc=top+lh*(i+.5), dy=Math.abs(yc-MED.cy)+px*.42;   // aeusserste Kante der Zeile
       if(dy>=MED.ry) return false;
+      if(cur.box) return tw(t,f,px)<=2*MED.rx;
       return tw(t,f,px)<=2*MED.rx*Math.sqrt(1-(dy/MED.ry)**2);
     });
     if(ok) return {px,lh,top};
@@ -390,11 +431,11 @@ function layout(lines,f){
   return null;
 }
 function renderEngr(){
-  const f=FONTS[font], lines=[$('l1').value.trim()].filter(Boolean);
+  const f=FONTS[font], lines=['l1','l2','l3','l4'].filter(id=>!$(id).hidden).map(id=>$(id).value.trim()).filter(Boolean);
   const hint=$('hint'); hint.classList.remove('warn');
-  if(!lines.length){$('engTxt').innerHTML=$('hiTxt').innerHTML='';hint.textContent='Schreib deinen Text, er erscheint direkt auf dem Medaillon.';return;}
+  if(!lines.length){$('engTxt').innerHTML=$('hiTxt').innerHTML='';hint.textContent=`Schreib deinen Text, er erscheint direkt auf ${cur.box?'der Tafel':'dem Medaillon'}.`;return;}
   const L=layout(lines,f);
-  if(!L){$('engTxt').innerHTML=$('hiTxt').innerHTML='';hint.classList.add('warn');hint.textContent='Zu viel Text für das Medaillon. Bitte kürze den Text.';return;}
+  if(!L){$('engTxt').innerHTML=$('hiTxt').innerHTML='';hint.classList.add('warn');hint.textContent=`Zu viel Text für ${cur.box?'das Gravurfeld':'das Medaillon'}. Bitte kürze den Text.`;return;}
   const svg=lines.map((t,i)=>`<text x="${MED.cx}" y="${(L.top+L.lh*(i+.5)).toFixed(1)}" text-anchor="middle" dominant-baseline="central" font-family="${f.fam.replace(/"/g,'')}" font-weight="${f.w}" font-size="${L.px}">${esc(t)}</text>`).join('');
   $('engTxt').innerHTML=svg; $('hiTxt').innerHTML=svg;
   const cap=(L.px*.7/PX_PER_MM).toFixed(1).replace('.',',');
@@ -402,20 +443,20 @@ function renderEngr(){
   hint.classList.toggle('warn',small);
   hint.textContent=small?`Schrifthöhe nur ca. ${cap} mm, das wird sehr fein. Weniger Text macht die Gravur besser lesbar.`:`Schrifthöhe ca. ${cap} mm`;
 }
-$('l1').addEventListener('input',renderEngr);
+['l1','l2','l3','l4'].forEach(id=>$(id).addEventListener('input',renderEngr));
 $('fonts').addEventListener('click',e=>{const b=e.target.closest('[data-f]');if(!b)return;font=b.dataset.f;
   document.querySelectorAll('#fonts button').forEach(x=>x.classList.toggle('on',x===b));renderEngr();});
 document.querySelector('.viewsw').addEventListener('click',e=>{const b=e.target.closest('[data-v]');if(!b)return;
   view=b.dataset.v; showView();
   document.querySelectorAll('.viewsw button').forEach(x=>x.classList.toggle('on',x===b));});
 $('colors').addEventListener('click',e=>{const b=e.target.closest('[data-c]');if(!b)return;color=b.dataset.c;
-  $('colorName').textContent=COLORS[color].name; $('pdMat').textContent=COLORS[color].mat;
+  $('colorName').textContent=cur.colors[color].name; $('pdMat').textContent=cur.colors[color].mat;
   document.querySelectorAll('#colors button').forEach(x=>x.classList.toggle('on',x===b));showView();});
-const openPd=()=>{$('pd').classList.add('open');
-  Object.values(COLORS).forEach(c=>Object.values(c.views).forEach(v=>{new Image().src=v.img;}));   // Farbwechsel ohne Nachladen
+const openPd=k=>{setProduct(k);$('pd').classList.add('open');
+  Object.values(cur.colors).forEach(c=>Object.values(c.views).forEach(v=>{new Image().src=v.img;}));   // Farbwechsel ohne Nachladen
   document.body.style.overflow='hidden';renderEngr();$('l1').focus({preventScroll:true});};
 const closePd=()=>{$('pd').classList.remove('open');document.body.style.overflow='';};
-$('grid').addEventListener('click',e=>{const b=e.target.closest('[data-cfg]');if(!b)return;e.preventDefault();openPd();});
+$('grid').addEventListener('click',e=>{const b=e.target.closest('[data-cfg]');if(!b)return;e.preventDefault();openPd(b.dataset.cfg);});
 $('pdClose').addEventListener('click',closePd);
 $('pd').addEventListener('click',e=>{if(e.target===$('pd'))closePd();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closePd();});
