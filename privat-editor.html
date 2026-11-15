@@ -144,6 +144,7 @@
           </feComponentTransfer>
         </filter>
       </defs>
+      <g id="cfgBg"></g>
       <g id="cfgRuler"></g>
       <g id="cfgPendant"></g>
       <g id="cfgGuides"></g>
@@ -462,7 +463,9 @@ function pendantBody(shape,cx,cy,MM,photo){
     const dog=shape==='dogtag', med=shape==='medaillon';
     const r=(dog?DOG.bodyR:(med?10.5:10))*MM;
     let s;
-    if(med){
+    if(med && photoBgKey()){
+      s='';                                   // Fassung, Oese, Kette und Scheibe kommen aus dem Produktfoto
+    }else if(med){
       /* Fassung Ø 25 mm mit Oese + Kette; darin die drehbare Scheibe Ø 21 mm (= Gravurflaeche) */
       const R=12.5*MM, Ri=11*MM, top=cy-R;
       s=`<path d="M ${cx-4.2*MM} -2 L ${cx-0.6*MM} ${top-3.7*MM} M ${cx+4.2*MM} -2 L ${cx+0.6*MM} ${top-3.7*MM}" stroke="#a9aeb5" stroke-width="2.4" stroke-dasharray="3.2 1.6" stroke-linecap="round" fill="none"/>`
@@ -498,14 +501,30 @@ function pendantBody(shape,cx,cy,MM,photo){
         +`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#c4c9cf" stroke-width="0.7"/>`;
     }else{
       const sy=dog ? cy-r*0.2 : cy-r*0.42, ry=dog ? r*0.2 : r*0.3;
-      s+=`<ellipse cx="${cx}" cy="${sy}" rx="${r*0.72}" ry="${ry}" fill="url(#sheen)"/>`;
+      if(!(med && photoBgKey())) s+=`<ellipse cx="${cx}" cy="${sy}" rx="${r*0.72}" ry="${ry}" fill="url(#sheen)"/>`;
     }
     if(dog) s+=holeRing(cx,cy,MM);
     return s;
   }
   const w=19.5*MM, h=18*MM, sx=w/100, sy=h/88, tx=cx-w/2, ty=cy-h/2;
-  return (state.bracelet ? braceletMarkup(cx,cy,w,h,MM) : '') + `<g transform="translate(${tx} ${ty}) scale(${sx} ${sy})"><path d="${UNIT_HEART}" fill="url(#metal)" stroke="#ffffff" stroke-opacity=".6"/></g>`
+  if(state.bracelet) return '';               // Herz, Oesen und Kette kommen aus dem Produktfoto
+  return `<g transform="translate(${tx} ${ty}) scale(${sx} ${sy})"><path d="${UNIT_HEART}" fill="url(#metal)" stroke="#ffffff" stroke-opacity=".6"/></g>`
        + `<ellipse cx="${cx}" cy="${cy-h*0.16}" rx="${w*0.3}" ry="${h*0.13}" fill="url(#sheen)"/>`;
+}
+
+/* Echtes Produktfoto als Hintergrund, auf die Gravurflaeche gezoomt.
+   x/y = Mitte des Anhaengers im Foto (px), w = Breite des Anhaengers im Foto (px) -> mm-Massstab des Editors;
+   sy = Ausgleich der Foto-Perspektive (Herz von schraeg oben fotografiert), rot = Foto gerade drehen. */
+const PHOTO_BG={
+  medaillon:{src:'images/shop/kette-medaillon-editor.jpg',size:1254,x:611.5,y:775,w:341,mm:25,sy:1,rot:0},
+  bracelet: {src:'images/shop/herz-armband-editor.jpg',   size:1254,x:648.5,y:847,w:245,mm:19.5,sy:1.12,rot:5}
+};
+const photoBgKey=()=>state.bracelet ? 'bracelet' : (state.shape==='medaillon' ? 'medaillon' : null);
+function photoBg(){
+  const k=photoBgKey(); if(!k) return '';
+  const b=PHOTO_BG[k], sc=b.mm*CFG_MM/b.w;
+  return `<image href="${b.src}" width="${b.size}" height="${b.size}" preserveAspectRatio="none" `
+       + `transform="translate(${CFG_CX} ${CFG_CY}) scale(${sc} ${sc*b.sy}) rotate(${b.rot}) translate(${-b.x} ${-b.y})"/>`;
 }
 
 /* Herz-Armband: Schlangenkette links/rechts, Endkappen + Oesen an den Herzbogen (nur Optik, nicht graviert) */
@@ -707,6 +726,7 @@ function syncPhotoUi(){
 function renderPreviewOnly(){
   syncShapeRules();
   syncPhotoCrop();
+  $('cfgBg').innerHTML = photoBg();
   $('cfgRuler').innerHTML = ruler(state.shape, CFG_CX, CFG_CY, CFG_MM);
   $('cfgPendant').innerHTML = pendant(state.shape, state.lines, CFG_CX, CFG_CY, CFG_MM, state.photo);
   const side = state.shape==='dogtag' ? dogTag.side : (sides.on ? sides.cur : '');
