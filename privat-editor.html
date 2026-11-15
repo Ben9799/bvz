@@ -104,6 +104,7 @@
   #dogFields{display:none} body.dog #dogFields{display:block}
   #sideField{display:none} body.two #sideField{display:block}
   body.fixshape #shapeField{display:none !important}
+  body.bracelet #modeField,body.bracelet #lenField{display:none !important}
   .dog-group{border:1px solid var(--line);padding:12px;margin-bottom:10px;background:#fff;transition:.15s}
   .dog-group.on{border-color:var(--ink)}
   .dog-group h3{font:500 .72rem var(--head);letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px;display:flex;justify-content:space-between;align-items:baseline}
@@ -503,8 +504,25 @@ function pendantBody(shape,cx,cy,MM,photo){
     return s;
   }
   const w=19.5*MM, h=18*MM, sx=w/100, sy=h/88, tx=cx-w/2, ty=cy-h/2;
-  return `<g transform="translate(${tx} ${ty}) scale(${sx} ${sy})"><path d="${UNIT_HEART}" fill="url(#metal)" stroke="#ffffff" stroke-opacity=".6"/></g>`
+  return (state.bracelet ? braceletMarkup(cx,cy,w,h,MM) : '') + `<g transform="translate(${tx} ${ty}) scale(${sx} ${sy})"><path d="${UNIT_HEART}" fill="url(#metal)" stroke="#ffffff" stroke-opacity=".6"/></g>`
        + `<ellipse cx="${cx}" cy="${cy-h*0.16}" rx="${w*0.3}" ry="${h*0.13}" fill="url(#sheen)"/>`;
+}
+
+/* Herz-Armband: Schlangenkette links/rechts, Endkappen + Oesen an den Herzbogen (nur Optik, nicht graviert) */
+function braceletMarkup(cx,cy,w,h,MM){
+  const ly=cy-h*0.22; let s='';
+  [-1,1].forEach(d=>{
+    const lx=cx+d*(w/2+0.45*MM), c0=cx+d*(w/2+1.2*MM), c1=cx+d*(w/2+4.2*MM);
+    const ex=d<0?-4:304, ey=ly-46;
+    const band=`M ${c1} ${ly} C ${c1+d*40} ${ly} ${ex-d*30} ${ey+8} ${ex} ${ey}`;
+    s+=`<path d="${band}" fill="none" stroke="#aeb3ba" stroke-width="${2.3*MM}"/>`
+     +`<path d="${band}" fill="none" stroke="url(#metal)" stroke-width="${2*MM}"/>`
+     +`<path d="${band}" fill="none" stroke="#7f858d" stroke-opacity=".28" stroke-width="${1.9*MM}" stroke-dasharray="1 2.4"/>`
+     +`<path d="M ${c0} ${ly-1.05*MM} L ${c1} ${ly-1.25*MM} L ${c1} ${ly+1.25*MM} L ${c0} ${ly+1.05*MM} Z" fill="url(#metal)" stroke="#9aa0a8" stroke-width=".7" stroke-linejoin="round"/>`
+     +`<circle cx="${lx}" cy="${ly}" r="${0.8*MM}" fill="none" stroke="url(#metal)" stroke-width="${0.4*MM}"/>`
+     +`<circle cx="${lx}" cy="${ly}" r="${0.8*MM}" fill="none" stroke="#9aa0a8" stroke-width=".5"/>`;
+  });
+  return s;
 }
 
 function plainArcText(text){ return (text||'').trim() || ' '; }
@@ -606,7 +624,7 @@ function tickRuler(dir,x,y,mm,MM,label){
 function ruler(shape,cx,cy,MM){
   const s=SHAPES[shape], w=s.w*MM, h=s.h*MM, left=cx-w/2, top=cy-h/2, bottom=cy+h/2;
   return tickRuler('h', left, bottom+24, s.w, MM, deDec(s.w)+' mm')
-       + tickRuler('v', left-26, top, s.h, MM, deDec(s.h)+' mm');
+       + (state.bracelet ? '' : tickRuler('v', left-26, top, s.h, MM, deDec(s.h)+' mm'));
 }
 
 /* ---- UI-Sync ---- */
@@ -692,8 +710,8 @@ function renderPreviewOnly(){
   $('cfgRuler').innerHTML = ruler(state.shape, CFG_CX, CFG_CY, CFG_MM);
   $('cfgPendant').innerHTML = pendant(state.shape, state.lines, CFG_CX, CFG_CY, CFG_MM, state.photo);
   const side = state.shape==='dogtag' ? dogTag.side : (sides.on ? sides.cur : '');
-  $('dimCaption').textContent = SHAPES[state.shape].cap + (side ? (side==='back' ? ' · Rückseite' : ' · Vorderseite') : '');
-  $('price').innerHTML = 'ab '+SHAPES[state.shape].price+'&nbsp;€';
+  $('dimCaption').textContent = (state.bracelet ? 'Herz-Armband · Edelstahl · Herz 19,5 × 18 mm · Schlangenkette 17 + 5 cm' : SHAPES[state.shape].cap) + (side ? (side==='back' ? ' · Rückseite' : ' · Vorderseite') : '');
+  $('price').innerHTML = state.bracelet ? '24,99&nbsp;€' : 'ab '+SHAPES[state.shape].price+'&nbsp;€';
   fitEngravings(document);
   keepAllLinesInside();
 }
@@ -1223,7 +1241,10 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape' && window.parent!==
 /* ---- Start: ?shape=dogtag|circle|heart ---- */
 (function init(){
   const p=new URLSearchParams(location.search).get('shape');
-  if(p && SHAPES[p]){
+  if(p==='herzarmband'){
+    state.shape='heart'; state.bracelet=true; state.lines[0].text='Anna';
+    document.body.classList.add('fixshape','bracelet'); $('edTitle').textContent='Herz-Armband gestalten';
+  }else if(p && SHAPES[p]){
     state.shape=p;
     if(p==='dogtag'){ document.body.classList.add('pet'); enterDog(); $('edTitle').textContent='Dog Tag gestalten'; }
     else if(p==='medaillon'){ document.body.classList.add('fixshape'); enterSides(); $('edTitle').textContent='Medaillon-Kette gestalten'; }
