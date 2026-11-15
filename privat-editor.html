@@ -173,7 +173,7 @@
   #sideField{display:none} body.two #sideField{display:block}
   body.fixshape #shapeField{display:none !important}
   body.bracelet #modeField,body.bracelet #lenField{display:none !important}
-  body.keyring #lenField{display:none !important}
+  body.keyring #lenField,body.coin #lenField{display:none !important}
   .dog-group{border:1px solid var(--line2);padding:14px;margin-bottom:10px;background:#fff;border-radius:2px;transition:border-color .15s,opacity .2s}
   .dog-group:not(.on){opacity:.72}
   .dog-group.on{border-color:var(--ink)}
@@ -472,6 +472,20 @@ const KEYS={
          lines:[{text:'Fahr vorsichtig', y:-10.5, w:LEDER_MM.w-6, h:4.2},{text:'Papa', y:0, w:LEDER_MM.w-6, h:9},{text:'Wir lieben dich', y:10.5, w:LEDER_MM.w-6, h:4.2}]}
 };
 const isKey=s=>!!KEYS[s];
+/* ---- Runde Plaettchen mit Loch/Oesen (Kette, Armband): Masse in mm, am Produktfoto vermessen (Lieferanten-Katalog: Ø 20 / Ø 13 mm).
+   holes = Bohrungen (Mitte x/y ab Plaettchen-Mitte, Radius r) – Sperrzone fuer die Gravur = Loch + HOLE_MARGIN.
+   arcMax = Kreistext darf mit seinem Rand hoechstens so weit (Grad) von seiner Grundlage (unten/oben) wegdrehen, damit er kein Loch beruehrt;
+   arcBottom = Kreistext am unteren Rand (Loch oben). textY/maxW/maxH = gerader Text: Lage ab Mitte, max. Textbox. ---- */
+const HOLE_MARGIN=0.8;
+const COINS={
+  kettenanhaenger:{d:20, holes:[{x:0, y:-8.24, r:1.15}], arcBottom:true, arcMax:156, textY:1, maxW:15, maxH:8.6,
+                   title:'Kette mit Plättchen gestalten', text:'Emma',
+                   help:'Im Bogen läuft der Text am unteren Rand – oben bleibt das Loch frei.'},
+  plaettchenarmband:{d:13, holes:[{x:-5.24, y:-.16, r:.55},{x:5.24, y:-.16, r:.55}], arcBottom:false, arcMax:64, textY:0, maxW:7.2, maxH:4.4,
+                   title:'Armband mit Plättchen gestalten', text:'Mia',
+                   help:'Im Bogen bleibt der Text zwischen den beiden Ösen.'}
+};
+const isCoin=s=>!!COINS[s];
 /* ---- Anhaenger-Katalog (mm) ---- */
 const SHAPES={
   katze:{label:'Katze', w:KATZE_MM.w, h:KATZE_MM.h, cap:'Katzen-Schlüsselanhänger · Edelstahl poliert · ca. '+String(KATZE_MM.w).replace('.',',')+' × '+String(KATZE_MM.h).replace('.',',')+' mm'},
@@ -480,12 +494,19 @@ const SHAPES={
   heart: {label:'Herz',   w:19.5, h:18, price:'19,99', cap:'19,5 × 18 mm · 1,8 mm stark'},
   dogtag:{label:'Dog Tag',w:24,   h:24, price:'19,99', cap:'Dog Tag · Ø 24 mm · Aluminium – leicht, stört dein Tier nicht'},
   medaillon:{label:'Medaillon',w:25,h:25, price:'19,99', cap:'Medaillon Ø 25 mm · drehbare Gravurscheibe Ø 21 mm · beidseitig gravierbar'},
+  kettenanhaenger:{label:'Plättchen', w:20, h:20, cap:'Edelstahl poliert · Plättchen Ø 20 mm · Ankerkette 45 + 5 cm'},
+  plaettchenarmband:{label:'Armband', w:13, h:13, cap:'Edelstahl poliert · Plättchen Ø 13 mm · Armband 16 + 5 cm'},
 };
 /* Dog Tag: Bohrung 3 mm, Oberkante 2 mm unter dem Rand -> Mitte 3,5 mm unter dem Rand = y -8,5 mm von der Mitte.
    Sperrzone fuer Gravur: Loch + 0,8 mm Rand (Radius 2,3 mm). */
 const DOG={holeY:-8.5, holeR:1.5, margin:0.8, bodyR:12};
 const KEEP_R=DOG.holeR+DOG.margin;
 const ARC_KEEP_DEG=26;   // Kreistext (unten) darf nie in die +-26 Grad um die Lochachse oben ragen
+/* Bohrungen einer runden Form (mm) und in Editor-Einheiten inkl. Sperrkreis (keep) */
+const holesOf=s=>s==='dogtag' ? [{x:0, y:DOG.holeY, r:DOG.holeR}] : (COINS[s] ? COINS[s].holes : []);
+const holesPx=(s,cx=CFG_CX,cy=CFG_CY,MM=CFG_MM)=>holesOf(s).map(h=>({x:cx+h.x*MM, y:cy+h.y*MM, r:h.r*MM, keep:(h.r+(s==='dogtag'?DOG.margin:HOLE_MARGIN))*MM}));
+const arcBottom=s=>s==='dogtag' || !!(COINS[s] && COINS[s].arcBottom);
+const arcMaxOf=s=>s==='dogtag' ? 180-ARC_KEEP_DEG : (COINS[s] ? COINS[s].arcMax : 0);
 const UNIT_HEART='M50 88 C 12 55 0 35 0 22 C 0 8 12 0 25 0 C 38 0 46 8 50 16 C 54 8 62 0 75 0 C 88 0 100 8 100 22 C 100 35 88 55 50 88 Z';
 const SVG_NS='http://www.w3.org/2000/svg';
 const CFG_MM=8, CFG_CX=168, CFG_CY=146;
@@ -536,16 +557,19 @@ const FRAMES={
   circle:{cx:0,cy:0,outerR:9.95,safeR:9.85},
   dogtag:{cx:0,cy:0,outerR:11.95,safeR:11.85},
   medaillon:{cx:0,cy:0,outerR:10.4,safeR:10.3},     // nur die drehbare Scheibe Ø 21 mm wird graviert
+  kettenanhaenger:{cx:0,cy:0,outerR:9.95,safeR:9.85},
+  plaettchenarmband:{cx:0,cy:0,outerR:6.45,safeR:6.35},
   heart:{cx:0,cy:0,outerScaleX:1,outerScaleY:1,safeScaleX:.98,safeScaleY:.98}
 };
 const frameOf=s=>FRAMES[s]||FRAMES.circle;
 const isRound=s=>s!=='heart' && !isKey(s);
-const roundKey=s=>(s==='dogtag'||s==='medaillon')?s:'circle';
+const roundKey=s=>(s==='dogtag'||s==='medaillon'||isCoin(s))?s:'circle';
 const rf=()=>frameOf(roundKey(state.shape));            // Rahmen der aktuellen runden Form
 function frameCenter(shape,cx,cy,MM){const f=frameOf(shape);return {x:cx+(f.cx||0)*MM,y:cy+(f.cy||0)*MM};}
 /* Standard-Lage des Textes: Herz leicht hoch, Dog Tag unterhalb des Lochs */
 function textAnchor(shape,cx,cy,MM){
   if(isKey(shape)) return {x:cx, y:cy+KEYS[shape].textY*MM};
+  if(isCoin(shape)) return {x:cx, y:cy+COINS[shape].textY*MM};
   const c=frameCenter(shape==='heart'?'heart':roundKey(shape),cx,cy,MM);
   return {x:c.x,y:c.y+(shape==='heart'?-1.4*MM:(shape==='dogtag'?2.2*MM:0))};
 }
@@ -605,7 +629,7 @@ function overlayOutlines(shape,cx,cy,MM){
   const f=frameOf(shape), c=frameCenter(shape,cx,cy,MM);
   if(isRound(shape)){
     let s=`<circle class="shape-outline" cx="${c.x}" cy="${c.y}" r="${f.outerR*MM}"/>`;
-    if(shape==='dogtag'){ const h=holePx(cx,cy,MM); s+=`<circle class="keepout" cx="${h.x}" cy="${h.y}" r="${h.keep}"/>`; }
+    holesPx(shape,cx,cy,MM).forEach(h=>{ s+=`<circle class="keepout" cx="${h.x}" cy="${h.y}" r="${h.keep}"/>`; });
     return s;
   }
   return heartPathMarkup(c.x,c.y,MM,f.outerScaleX,f.outerScaleY,'shape-outline');
@@ -638,7 +662,8 @@ function photoGuideCircle(cx,cy,MM){
 
 /* Beschnitt fuer Foto/Karte: Kreis, beim Dog Tag mit ausgeschnittener Sperrzone um das Loch (evenodd) */
 function clipMarkup(id,cx,cy,R,MM,shape){
-  if(shape==='dogtag'){ const h=holePx(cx,cy,MM); return `<clipPath id="${id}"><path clip-rule="evenodd" d="${ringPath(cx,cy,R)} ${ringPath(h.x,h.y,h.keep)}"/></clipPath>`; }
+  const hs=holesPx(shape,cx,cy,MM);
+  if(hs.length) return `<clipPath id="${id}"><path clip-rule="evenodd" d="${ringPath(cx,cy,R)}${hs.map(h=>' '+ringPath(h.x,h.y,h.keep)).join('')}"/></clipPath>`;
   return `<clipPath id="${id}"><circle cx="${cx}" cy="${cy}" r="${R}"/></clipPath>`;
 }
 function holeRing(cx,cy,MM){
@@ -671,8 +696,8 @@ function pendantBody(shape,cx,cy,MM,photo){
     const dog=shape==='dogtag', med=shape==='medaillon';
     const r=(dog?DOG.bodyR:(med?10.5:10))*MM;
     let s;
-    if(med && photoBgKey()){
-      s='';                                   // Fassung, Oese, Kette und Scheibe kommen aus dem Produktfoto
+    if((med || isCoin(shape)) && photoBgKey()){
+      s='';                                   // Fassung/Plaettchen, Oese, Kette und Scheibe kommen aus dem Produktfoto
     }else if(med){
       /* Fassung Ø 25 mm mit Oese + Kette; darin die drehbare Scheibe Ø 21 mm (= Gravurflaeche) */
       const R=12.5*MM, Ri=11*MM, top=cy-R;
@@ -726,26 +751,32 @@ const SCENES={
      zum Bildrand, sonst haetten Lineal + Ansicht-Schalter keinen Platz. ovc = Bildmitte der Gesamtansicht (px). */
   katze:         {src:'images/shop/schluesselanhaenger-katze-editor.jpg',size:1254,x:603.3,y:623.5,w:694,mm:KATZE_MM.w,sy:+((28/26.5)/(29/30)).toFixed(4),rot:2,stage:'#dfb089'},
   lederanhaenger:{src:'images/shop/schluesselanhaenger-leder-editor.jpg',size:1894,h:1504,x:946.5,y:859,w:330,mm:LEDER_MM.w,sy:+((50/28)/(43/25)).toFixed(4),rot:0,stage:'#e0b28e',ovc:[947,690],maxW:790},
+  /* Runde Plaettchen: Gesichtsflaeche als Ellipse vermessen (Mitte x/y, w = waagrechter Durchmesser in px). Kette: Scheibe von der Seite
+     fotografiert (senkrecht 401 px, waagrecht 372 px) -> sq = Stauchung entlang der Foto-Senkrechten VOR dem Drehen; rot = Loch nach oben drehen.
+     Armband: Flaeche 207 x 204 px (sy), Oesen-Achse um 2,4 Grad schraeg.
+     Das Ketten-Foto ist unten um 250 px gespiegelt erweitert (size x h), sonst haette das Lineal keinen Platz. */
+  kettenanhaenger:  {src:'images/shop/kette-rund-anhaenger-editor.jpg',size:1254,h:1504,x:582.3,y:878.5,w:372.4,mm:20,sy:1,rot:-15,sq:.929,stage:'#e7b48b'},
+  plaettchenarmband:{src:'images/shop/armband-rund-plaettchen.jpg',     size:1254,x:617.5,y:945,w:207,mm:13,sy:1.015,rot:-2.4,stage:'#e0ad88'},
   wrist:    {src:'images/shop/herz-armband-handgelenk-beige.jpg',size:1000,x:497,y:540,w:140,mm:19.5,sy:1,rot:0,stage:'#d8b79c',
              eng:`rotate(24 ${CFG_CX} ${CFG_CY})`, maxW:470}
 };
 const PHOTO_BG=SCENES;
 const view={mode:'detail', vb:null, raf:0, bgKey:'', fitKey:''};
-const photoBgKey=()=>state.bracelet ? 'bracelet' : ((state.shape==='medaillon' || isKey(state.shape)) ? state.shape : null);
+const photoBgKey=()=>state.bracelet ? 'bracelet' : ((state.shape==='medaillon' || isKey(state.shape) || isCoin(state.shape)) ? state.shape : null);
 const sceneKey=()=>{ const k=photoBgKey(); return (k==='bracelet' && view.mode==='wrist') ? 'wrist' : k; };
 const sceneScale=b=>b.mm*CFG_MM/b.w;
 function sceneImage(k){
   const b=SCENES[k], sc=sceneScale(b);
   return `<image href="${b.src}" width="${b.size}" height="${b.h||b.size}" preserveAspectRatio="none" `
-       + `transform="translate(${CFG_CX} ${CFG_CY}) scale(${sc} ${sc*b.sy}) rotate(${b.rot}) translate(${-b.x} ${-b.y})"/>`;
+       + `transform="translate(${CFG_CX} ${CFG_CY}) scale(${sc} ${sc*b.sy}) rotate(${b.rot})${b.sq ? ` scale(1 ${b.sq})` : ''} translate(${-b.x} ${-b.y})"/>`;
 }
 /* Editor-Einheiten <-> Foto-Pixel (fuer "deckt das Foto den sichtbaren Ausschnitt?") */
 function unitsToPx(b,ux,uy){
   const sc=sceneScale(b), x=(ux-CFG_CX)/sc, y=(uy-CFG_CY)/(sc*b.sy), a=-b.rot*Math.PI/180;
-  return {x:x*Math.cos(a)-y*Math.sin(a)+b.x, y:x*Math.sin(a)+y*Math.cos(a)+b.y};
+  return {x:x*Math.cos(a)-y*Math.sin(a)+b.x, y:(x*Math.sin(a)+y*Math.cos(a))/(b.sq||1)+b.y};
 }
 function pxToUnits(b,px,py){
-  const sc=sceneScale(b), a=b.rot*Math.PI/180, x=px-b.x, y=py-b.y;
+  const sc=sceneScale(b), a=b.rot*Math.PI/180, x=px-b.x, y=(py-b.y)*(b.sq||1);
   return {x:CFG_CX+(x*Math.cos(a)-y*Math.sin(a))*sc, y:CFG_CY+(x*Math.sin(a)+y*Math.cos(a))*sc*b.sy};
 }
 function vbCovered(b,v){
@@ -868,11 +899,11 @@ function lineMarkup(line, shape, cx, cy, MM){
     const r=radiusMm*MM;
     const pathId='arcTextPath'+(clipSeq++);
     /* Rund: obere Halbkreis-Bahn. Dog Tag: UNTERE Bahn (Sweep 0), oben sitzt das Loch. */
-    const d = shape==='dogtag' ? `M ${c.x-r} ${c.y} A ${r} ${r} 0 0 0 ${c.x+r} ${c.y}` : `M ${c.x-r} ${c.y} A ${r} ${r} 0 0 1 ${c.x+r} ${c.y}`;
+    const d = arcBottom(shape) ? `M ${c.x-r} ${c.y} A ${r} ${r} 0 0 0 ${c.x+r} ${c.y}` : `M ${c.x-r} ${c.y} A ${r} ${r} 0 0 1 ${c.x+r} ${c.y}`;
     return `<g class="engGroup${selClass}" data-line-id="${line.id}" data-shape="${shape}" data-mode="${mode}" data-angle="${line.angle}" data-cx="${c.x}" data-cy="${c.y}" transform="rotate(${line.angle} ${c.x} ${c.y})">`
          + `<path class="engPath" id="${pathId}" d="${d}"/>`
          + `<path class="hit-outline" d="${d}"/>`
-         + `<text class="eng" data-line-id="${line.id}" data-mode="arc" data-shape="${shape}" data-font-scale="${line.fontScale}" data-path-radius="${r}" data-safe-radius="${f.safeR*MM}" `
+         + `<text class="eng" data-line-id="${line.id}" data-mode="arc" data-shape="${shape}" data-font-scale="${line.fontScale}" data-path-radius="${r}" data-safe-radius="${f.safeR*MM}" ${isCoin(shape) ? `data-arc-max="${arcMaxOf(shape)}" ` : ''}`
          + `text-anchor="middle" dominant-baseline="central" ${fontAttr}>`
          + `<textPath href="#${pathId}" startOffset="50%">${escapeHtml(plainArcText(line.text))}</textPath>`
          + `</text></g>`;
@@ -880,6 +911,7 @@ function lineMarkup(line, shape, cx, cy, MM){
   let maxw, maxh;
   if((shape==='dogtag' || isKey(shape)) && line.maxW){ maxw=line.maxW*MM; maxh=line.maxH*MM; }
   else if(isKey(shape)){ maxw=KEYS[shape].maxW*MM; maxh=KEYS[shape].maxH*MM; }
+  else if(isCoin(shape)){ maxw=COINS[shape].maxW*MM; maxh=COINS[shape].maxH*MM; }
   else if(shape==='dogtag'){ maxw=frameOf('dogtag').safeR*1.5*MM; maxh=frameOf('dogtag').safeR*.75*MM; }
   else if(shape==='circle'||shape==='medaillon'){ maxw=Math.max(10,frameOf(shape).safeR*1.55*MM); maxh=Math.max(8,frameOf(shape).safeR*.95*MM); }
   else { maxw=SHAPES.heart.w*MM*frameOf('heart').safeScaleX*.72; maxh=SHAPES.heart.h*MM*frameOf('heart').safeScaleY*.45; }
@@ -920,7 +952,9 @@ function fittedFontSizeForArc(el){
   try{ textLen=el.getComputedTextLength(); }catch(e){ textLen=0; }
   try{ pathLen=path.getTotalLength(); }catch(e){ pathLen=0; }
   const lenPerFs=textLen ? textLen/FS0 : 1;
-  const maxByLength=pathLen ? (pathLen*0.84)/Math.max(lenPerFs,0.01) : 18;
+  /* Plaettchen mit seitlichen Oesen: Bogen darf nur so lang sein, dass er zwischen die Loecher passt (arcMax, inkl. Groessen-Regler bis 120 %) */
+  const am=+el.dataset.arcMax, lenFrac=am ? Math.min(.84, 2*am/180/1.06) : .84;
+  const maxByLength=pathLen ? (pathLen*lenFrac)/Math.max(lenPerFs,0.01) : 18;
   const r=+el.dataset.pathRadius||60;
   const safeR=+el.dataset.safeRadius||0;
   const outwardClearance=safeR ? Math.max(4, safeR-r) : r*0.24;
@@ -1002,7 +1036,7 @@ function renderLineEditor(){
 /* erlaubter Dreh-Bereich des Kreistexts am Dog Tag (Textbreite + Lochsperre oben) */
 function arcLimit(line){
   const half=(line._span||60)/2;
-  return Math.max(0, Math.floor(180-ARC_KEEP_DEG-half));
+  return Math.max(0, Math.floor(arcMaxOf(state.shape)-half));
 }
 function renderFontChips(){
   $('fontChips').innerHTML=Object.entries(FONTS).map(([k,f])=>
@@ -1019,12 +1053,12 @@ function syncSelectedControls(){
   document.querySelectorAll('#textModeChips .chip').forEach(x=>x.classList.toggle('on', arc ? x.dataset.mode==='arc' : x.dataset.mode==='straight'));
   $('textModeRow').style.display = (!round || dogBack) ? 'none' : '';
   const help=$('textModeHelp');
-  help.textContent = dog ? 'Im Bogen läuft der Text am unteren Rand – oben bleibt das Loch frei.' : '';
+  help.textContent = dog ? 'Im Bogen läuft der Text am unteren Rand – oben bleibt das Loch frei.' : (isCoin(state.shape) ? COINS[state.shape].help : '');
   help.style.display = help.textContent ? '' : 'none';
   const fs=$('fontSizeRange'), ar=$('angleRange'), vr=$('verticalRange');
   const pct=Math.round(Math.min(1.2,line.fontScale)*100);
   fs.value=pct; $('fontSizeValue').textContent=pct+'%';
-  if(dog && arc){ const lim=arcLimit(line); ar.min=-lim; ar.max=lim; } else { ar.min=-180; ar.max=180; }
+  if(arcMaxOf(state.shape) && arc){ const lim=arcLimit(line); ar.min=-lim; ar.max=lim; } else { ar.min=-180; ar.max=180; }
   ar.value=normAngle(line.angle); $('angleValue').textContent=normAngle(line.angle)+'°';
   $('angleLabel').textContent = arc ? 'Position am Rand' : 'Drehung';
   $('verticalLabel').textContent = arc ? 'Abstand zum Rand' : 'Höhe';
@@ -1080,7 +1114,7 @@ function drawSelection(){
     /* Band entlang des Kreistexts (statt Rechteck): innen/aussen um die Schrift, so breit wie der Text */
     const c=frameCenter(roundKey(state.shape),CFG_CX,CFG_CY,CFG_MM), r=+t.dataset.pathRadius||40, fs=+t.getAttribute('font-size')||10;
     let len=0; try{ len=t.getComputedTextLength(); }catch(e){}
-    const half=Math.min(Math.PI*.98, len/r/2+fs*.35/r), mid=(state.shape==='dogtag'?90:-90)*Math.PI/180+line.angle*Math.PI/180;
+    const half=Math.min(Math.PI*.98, len/r/2+fs*.35/r), mid=(arcBottom(state.shape)?90:-90)*Math.PI/180+line.angle*Math.PI/180;
     const ro=r+fs*.62, ri=Math.max(2,r-fs*.62), a0=mid-half, a1=mid+half, big=half*2>Math.PI?1:0;
     const pt=(rad,a)=>`${(c.x+rad*Math.cos(a)).toFixed(2)} ${(c.y+rad*Math.sin(a)).toFixed(2)}`;
     const d=`M ${pt(ro,a0)} A ${ro} ${ro} 0 ${big} 1 ${pt(ro,a1)} L ${pt(ri,a1)} A ${ri} ${ri} 0 ${big} 0 ${pt(ri,a0)} Z`;
@@ -1129,13 +1163,15 @@ function rectExtentsFromText(lineId){
   const line=state.lines.find(l=>l.id===lineId);
   return {hw:Math.max(1,bb.width/2*fontOf(line).pad), hh:Math.max(1,bb.height/2)};
 }
-/* Schneidet das (gedrehte) Text-Rechteck die Sperrkreisscheibe um das Loch? */
+/* Schneidet das (gedrehte) Text-Rechteck eine Sperrkreisscheibe um ein Loch? */
 function rectHitsHole(ext,cx,cy,angleDeg){
-  const h=holePx(), a=angleDeg*Math.PI/180, c=Math.cos(a), s=Math.sin(a);
-  const dx=h.x-cx, dy=h.y-cy;
-  const lx=dx*c+dy*s, ly=-dx*s+dy*c;
-  const nx=clampNumber(lx,-ext.hw,ext.hw), ny=clampNumber(ly,-ext.hh,ext.hh);
-  return (lx-nx)**2+(ly-ny)**2 < h.keep*h.keep;
+  const a=angleDeg*Math.PI/180, c=Math.cos(a), s=Math.sin(a);
+  return holesPx(state.shape).some(h=>{
+    const dx=h.x-cx, dy=h.y-cy;
+    const lx=dx*c+dy*s, ly=-dx*s+dy*c;
+    const nx=clampNumber(lx,-ext.hw,ext.hw), ny=clampNumber(ly,-ext.hh,ext.hh);
+    return (lx-nx)**2+(ly-ny)**2 < h.keep*h.keep;
+  });
 }
 function heartPolygon(cx,cy,MM,scaleX=0.82,scaleY=scaleX){
   const w=19.5*MM*scaleX, h=18*MM*scaleY, sx=w/100, sy=h/88, tx=cx-w/2, ty=cy-h/2;
@@ -1171,7 +1207,7 @@ function isStraightLineInside(line, cx, cy){
   if(isRound(state.shape)){
     const f=rf(), c=frameCenter(roundKey(state.shape),CFG_CX,CFG_CY,CFG_MM), R=f.outerR*CFG_MM;
     if(!corners.every(p => ((p.x-c.x)**2 + (p.y-c.y)**2) <= R*R)) return false;
-    if(state.shape==='dogtag' && rectHitsHole(ext,cx,cy,line.angle)) return false;
+    if(rectHitsHole(ext,cx,cy,line.angle)) return false;
     return true;
   }
   const f=frameOf('heart'), c=frameCenter('heart',CFG_CX,CFG_CY,CFG_MM);
@@ -1209,9 +1245,9 @@ function shrinkToFit(line){
   }
   return n>0;
 }
-/* Dog Tag: Kreistext (unten) nie in die +-26 Grad oben um das Loch drehen */
+/* Dog Tag / Plaettchen: Kreistext nie in die Sperrwinkel um die Loecher drehen */
 function clampArcAngles(){
-  if(state.shape!=='dogtag') return;
+  if(!arcMaxOf(state.shape)) return;
   state.lines.forEach(line=>{
     if(line.textMode!=='arc') return;
     const t=getPreviewText(line.id); if(!t) return;
@@ -1229,7 +1265,7 @@ function keepLineInside(line){
   let changed=false;
   const clamped=clampLineOffsetToShape(line, line.offX*CFG_MM, line.offY*CFG_MM, 0, 0);
   if(clamped.changed){ line.offX=clamped.x/CFG_MM; line.offY=clamped.y/CFG_MM; updateSingleGroup(line.id); changed=true; }
-  if((state.shape==='dogtag' || isKey(state.shape)) && shrinkToFit(line)) changed=true;
+  if((state.shape==='dogtag' || isKey(state.shape) || isCoin(state.shape)) && shrinkToFit(line)) changed=true;
   return changed;
 }
 function keepAllLinesInside(){
@@ -1501,7 +1537,7 @@ cfgSvgEl.addEventListener('pointermove',e=>{
   }
   if(drag.mode==='arc'){
     let ang=normAngle(drag.startAngle + pointerAngleFromCenter(p)-drag.pointerAngle);
-    if(state.shape==='dogtag'){ const lim=arcLimit(line); ang=clampNumber(ang,-lim,lim); }
+    if(arcMaxOf(state.shape)){ const lim=arcLimit(line); ang=clampNumber(ang,-lim,lim); }
     line.angle=ang;
     updateSingleGroup(line.id);
     syncSelectedControls();
@@ -1755,7 +1791,7 @@ document.addEventListener('focusout',e=>{
   if(e.target.matches && e.target.matches('.line-input,.txt')){ clearTimeout(typingTimer); typingTimer=setTimeout(()=>document.body.classList.remove('typing'),180); }
 });
 
-/* ---- Start: ?shape=medaillon|herzarmband|dogtag|circle|heart|katze|lederanhaenger ---- */
+/* ---- Start: ?shape=medaillon|herzarmband|dogtag|circle|heart|katze|lederanhaenger|kettenanhaenger|plaettchenarmband ---- */
 (function init(){
   const p=new URLSearchParams(location.search).get('shape');
   if(p==='herzarmband'){
@@ -1765,6 +1801,9 @@ document.addEventListener('focusout',e=>{
     state.shape=p; document.body.classList.add('fixshape','keyring'); $('edTitle').textContent=KEYS[p].title;
     state.lines=KEYS[p].lines.map(l=>createLine(l.text, l.w ? {offY:l.y, maxW:l.w, maxH:l.h} : {offY:l.y}));
     state.selectedLineId=state.lines[0].id;
+  }else if(p && COINS[p]){
+    state.shape=p; document.body.classList.add('fixshape','coin'); $('edTitle').textContent=COINS[p].title;
+    state.lines[0].text=COINS[p].text;
   }else if(p && SHAPES[p]){
     state.shape=p;
     if(p==='dogtag'){ document.body.classList.add('pet'); enterDog(); $('edTitle').textContent='Dog Tag gestalten'; }
