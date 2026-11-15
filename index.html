@@ -2983,7 +2983,7 @@ body.mode-firmen .privat-only { display: none !important; }
     <h1>Willkommen bei Wolf Lasermark</h1>
     <p>Professionelle Lasergravur aus Bruckmühl bei Rosenheim.<br>Für wen darf es sein?</p>
     <div class="ov-cards">
-      <button class="ov-card disabled" type="button" aria-disabled="true" title="Privatkundenbereich in Entwicklung">
+      <button id="ov-card-privat" class="ov-card disabled" type="button" aria-disabled="true" title="Privatkundenbereich in Entwicklung">
         <span class="ov-card-icon">👤</span>
         <span class="ov-card-title">Privatkunde</span>
         <span class="ov-card-desc">Personalisierte Geschenke, Schmuck, Erinnerungsstücke & besondere Anlässe</span>
@@ -5031,20 +5031,43 @@ function resetMode(){
   togglePrivateDevelopmentCurtain(false);
 }
 
-// Init on load — kein Auswahl-Gate mehr: direkt in Firmenansicht starten.
+// Privat-Vorschau (nur Inhaber): index.html?vorschau=privat aktiviert, ?vorschau=aus deaktiviert.
+// Öffentlich bleibt die Privatkunde-Karte "In Entwicklung"; privat.html bleibt noindex & unverlinkt.
+function privatPreviewActive(){
+  try {
+    const v=(new URLSearchParams(location.search).get('vorschau')||'').toLowerCase();
+    if(v==='privat') localStorage.setItem('wl_privat_vorschau','1');
+    if(v==='aus') localStorage.removeItem('wl_privat_vorschau');
+    return localStorage.getItem('wl_privat_vorschau')==='1';
+  } catch(e){ return false; }
+}
+
+// Init on load — Auswahl-Gate: Privatkunde / Firmenkunde (wieder aktiv seit 2026-11-15).
 window.addEventListener('DOMContentLoaded',()=>{
+  const preview=privatPreviewActive();
+  if(preview){
+    const card=document.getElementById('ov-card-privat');
+    if(card){
+      card.classList.remove('disabled');
+      card.removeAttribute('aria-disabled');
+      card.title='Vorschau (nur für Sie sichtbar)';
+      const note=card.querySelector('.ov-card-note');
+      if(note) note.textContent='👁️ Vorschau';
+      card.addEventListener('click',()=>{ location.href='privat.html'; });
+    }
+  }
   let saved=localStorage.getItem('kundenMode');
   if(saved==='privat' && !PRIVATE_MODE_ENABLED){
     localStorage.removeItem('kundenMode');
     saved=null;
   }
+  const p=new URLSearchParams(location.search);
+  const skipGate = saved || location.hash.length>1 || p.has('angebot') || p.has('chat');
   applyMode(saved || 'firmen');
-  document.getElementById('overlay').style.display='none';
   document.getElementById('main').style.display='block';
-  if(PRIVATE_MODE_ENABLED){
-    const mb=document.querySelector('.mode-bar');
-    if(mb) mb.style.display='';
-  }
+  document.getElementById('overlay').style.display = skipGate ? 'none' : 'flex';
+  const mb=document.querySelector('.mode-bar');
+  if(mb) mb.style.display='';
 });
 
 // ========================
