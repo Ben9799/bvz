@@ -456,20 +456,20 @@
 
 <script>
 /* ---- Schluesselanhaenger: Masse in mm. NUR HIER anpassen – Kontur, Lineal, Gravurflaeche und Foto-Massstab rechnen daraus. ---- */
-const KATZE_MM={w:24, h:21.2};                  // Katzenkopf: Breite x Hoehe bis zu den Ohrspitzen (ohne Oese)
-const LEDER_MM={w:25, h:40, rx:8.3, ry:5.67};    // Platte mit Lederschlaufe: Breite x Hoehe, Eckrundung (am Foto gemessen)
-/* Katzenkopf-Kontur in mm (Mitte = 0/0), am Produktfoto vermessen, gezeichnet fuer 30 x 26,5 mm (d0) – skaliert auf KATZE_MM; Masse lt. Lieferantenkatalog: Katze 24 mm breit, Leder-Platte 40 x 25 mm */
+const KATZE_MM={w:29, h:28};                  // Katzenkopf: Breite x Hoehe bis zu den Ohrspitzen (ohne Oese)
+const LEDER_MM={w:28, h:50, rx:9.3, ry:7.09};    // Platte mit Lederschlaufe: Breite x Hoehe, Eckrundung (am Foto gemessen)
+/* Katzenkopf-Kontur in mm (Mitte = 0/0), am Produktfoto vermessen, gezeichnet fuer 30 x 26,5 mm (d0) – skaliert auf KATZE_MM; Masse von Bence gemessen: Katze 29 x 28 mm (inkl. Ohren), Leder-Platte 50 x 28 mm; Foto-Abweichung gleicht SCENES.sy aus */
 const CAT_D='M 10.14 -13.25 C 10.27 -13.04 10.71 -12.38 10.94 -12 C 11.16 -11.61 11.33 -11.3 11.5 -10.96 C 11.67 -10.61 11.82 -10.27 11.97 -9.92 C 12.13 -9.57 12.3 -9.23 12.45 -8.88 C 12.6 -8.54 12.71 -8.36 12.88 -7.85 C 13.05 -7.33 13.29 -6.46 13.49 -5.77 C 13.69 -5.08 13.93 -4.3 14.09 -3.7 C 14.26 -3.09 14.37 -2.66 14.48 -2.14 C 14.59 -1.62 14.66 -1.1 14.74 -0.58 C 14.82 -0.06 14.91 0.45 14.96 0.97 C 15 1.49 15.03 1.92 15 2.53 C 14.97 3.13 14.86 4.09 14.78 4.6 C 14.7 5.12 14.63 5.3 14.52 5.64 C 14.42 5.99 14.31 6.33 14.14 6.68 C 13.96 7.02 13.7 7.37 13.49 7.72 C 13.27 8.06 13.1 8.41 12.84 8.75 C 12.58 9.1 12.3 9.45 11.93 9.79 C 11.56 10.14 10.99 10.57 10.63 10.83 C 10.27 11.09 10.1 11.17 9.77 11.35 C 9.44 11.52 9.1 11.69 8.65 11.87 C 8.19 12.04 7.72 12.21 7.05 12.38 C 6.38 12.56 5.44 12.77 4.63 12.9 C 3.81 13.04 2.93 13.12 2.16 13.18 C 1.39 13.23 0.72 13.25 0 13.25 C -0.72 13.25 -1.39 13.23 -2.16 13.18 C -2.93 13.12 -3.81 13.04 -4.63 12.9 C -5.44 12.77 -6.38 12.56 -7.05 12.38 C -7.72 12.21 -8.19 12.04 -8.65 11.87 C -9.1 11.69 -9.44 11.52 -9.77 11.35 C -10.1 11.17 -10.27 11.09 -10.63 10.83 C -10.99 10.57 -11.56 10.14 -11.93 9.79 C -12.3 9.45 -12.58 9.1 -12.84 8.75 C -13.1 8.41 -13.27 8.06 -13.49 7.72 C -13.7 7.37 -13.96 7.02 -14.14 6.68 C -14.31 6.33 -14.42 5.99 -14.52 5.64 C -14.63 5.3 -14.7 5.12 -14.78 4.6 C -14.86 4.09 -14.97 3.13 -15 2.53 C -15.03 1.92 -15 1.49 -14.96 0.97 C -14.91 0.45 -14.82 -0.06 -14.74 -0.58 C -14.66 -1.1 -14.59 -1.62 -14.48 -2.14 C -14.37 -2.66 -14.26 -3.09 -14.09 -3.7 C -13.93 -4.3 -13.69 -5.08 -13.49 -5.77 C -13.29 -6.46 -13.05 -7.33 -12.88 -7.85 C -12.71 -8.36 -12.6 -8.54 -12.45 -8.88 C -12.3 -9.23 -12.13 -9.57 -11.97 -9.92 C -11.82 -10.27 -11.67 -10.61 -11.5 -10.96 C -11.33 -11.3 -11.16 -11.61 -10.94 -12 C -10.71 -12.38 -10.27 -13.04 -10.14 -13.25 L -6.18 -8.67 L 6.18 -8.67 Z';
 /* inset = Sicherheitsrand der Gravur; keep = Sperrzone (abgerundetes Rechteck, Mitte x/y, Groesse w/h, Radius r);
    textY = Standard-Lage des Textes ab Mitte; lines = Startzeilen (y ab textY, w/h = max. Textbox) – alles in mm */
 const KEYS={
-  katze:{w:KATZE_MM.w, h:KATZE_MM.h, d:CAT_D, d0:{w:30,h:26.5}, inset:.6, textY:2.56, maxW:16, maxH:6.8,
-         keep:{x:0, y:-6.55*KATZE_MM.h/26.5, w:4, h:4, r:2},            // Loch Ø ca. 2,7 mm + 0,65 mm Rand
+  katze:{w:KATZE_MM.w, h:KATZE_MM.h, d:CAT_D, d0:{w:30,h:26.5}, inset:.7, textY:3.4, maxW:19.3, maxH:9,
+         keep:{x:0, y:-6.55*KATZE_MM.h/26.5, w:4.8, h:4.8, r:2.4},      // Loch Ø ca. 3,3 mm + 0,75 mm Rand
          title:'Katzen-Anhänger gestalten', lines:[{text:'Luna', y:0}]},
   lederanhaenger:{w:LEDER_MM.w, h:LEDER_MM.h, rx:LEDER_MM.rx, ry:LEDER_MM.ry, inset:.8, textY:3, maxW:LEDER_MM.w-6, maxH:8,
-         keep:{x:0, y:-LEDER_MM.h/2+2.47, w:13.4, h:5.9, r:1},           // Lederschlaufe liegt oben auf der Platte
+         keep:{x:0, y:-LEDER_MM.h/2+3.08, w:15, h:7.33, r:1.1},           // Lederschlaufe liegt oben auf der Platte
          title:'Schlüsselanhänger gestalten',
-         lines:[{text:'Fahr vorsichtig', y:-8.4, w:LEDER_MM.w-6, h:4.2},{text:'Papa', y:0, w:LEDER_MM.w-6, h:8},{text:'Wir lieben dich', y:8.4, w:LEDER_MM.w-6, h:4.2}]}
+         lines:[{text:'Fahr vorsichtig', y:-10.5, w:LEDER_MM.w-6, h:4.2},{text:'Papa', y:0, w:LEDER_MM.w-6, h:9},{text:'Wir lieben dich', y:10.5, w:LEDER_MM.w-6, h:4.2}]}
 };
 const isKey=s=>!!KEYS[s];
 /* ---- Anhaenger-Katalog (mm) ---- */
@@ -724,8 +724,8 @@ const SCENES={
   /* Schluesselanhaenger: x/y = Mitte der Kontur (Katze: nach dem Geradedrehen um rot), w = Breite der Platte im Foto.
      Das Leder-Foto (1254 px) ist gespiegelt erweitert: links/rechts je 320 px, unten 250 px (size x h) – die Platte reicht fast bis
      zum Bildrand, sonst haetten Lineal + Ansicht-Schalter keinen Platz. ovc = Bildmitte der Gesamtansicht (px). */
-  katze:         {src:'images/shop/schluesselanhaenger-katze-editor.jpg',size:1254,x:603.3,y:623.5,w:694,mm:KATZE_MM.w,sy:1,rot:2,stage:'#dfb089'},
-  lederanhaenger:{src:'images/shop/schluesselanhaenger-leder-editor.jpg',size:1894,h:1504,x:946.5,y:859,w:330,mm:LEDER_MM.w,sy:+(40/43).toFixed(4),rot:0,stage:'#e0b28e',ovc:[947,690],maxW:790},
+  katze:         {src:'images/shop/schluesselanhaenger-katze-editor.jpg',size:1254,x:603.3,y:623.5,w:694,mm:KATZE_MM.w,sy:+((28/26.5)/(29/30)).toFixed(4),rot:2,stage:'#dfb089'},
+  lederanhaenger:{src:'images/shop/schluesselanhaenger-leder-editor.jpg',size:1894,h:1504,x:946.5,y:859,w:330,mm:LEDER_MM.w,sy:+((50/28)/(43/25)).toFixed(4),rot:0,stage:'#e0b28e',ovc:[947,690],maxW:790},
   wrist:    {src:'images/shop/herz-armband-handgelenk-beige.jpg',size:1000,x:497,y:540,w:140,mm:19.5,sy:1,rot:0,stage:'#d8b79c',
              eng:`rotate(24 ${CFG_CX} ${CFG_CY})`, maxW:470}
 };
