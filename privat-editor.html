@@ -66,6 +66,8 @@
   .preview.onphoto.dragging #cfgPendant .shape-outline,.preview.onphoto.cropping #cfgPendant .shape-outline{opacity:.9}
   #cfgPendant .keepout{fill:none;stroke:rgba(120,100,84,.8);stroke-width:1px;vector-effect:non-scaling-stroke;stroke-dasharray:4 4;pointer-events:none;opacity:0;transition:opacity .2s}
   .preview.dragging #cfgPendant .keepout{opacity:1}
+  #cfgPendant .area-outline{fill:none;stroke:rgba(255,255,255,.9);stroke-width:1.25px;vector-effect:non-scaling-stroke;stroke-dasharray:4 4;pointer-events:none;opacity:.55;transition:opacity .2s}
+  .preview.dragging #cfgPendant .area-outline{opacity:1}
   .preview .guide{stroke:#c08a5c;stroke-width:1px;vector-effect:non-scaling-stroke;stroke-dasharray:5 4;opacity:.95;pointer-events:none}
   #cfgSel .selbox{fill:none;stroke:rgba(255,255,255,.85);stroke-width:3px;vector-effect:non-scaling-stroke;stroke-linejoin:round;pointer-events:none}
   #cfgSel .selbox2{fill:none;stroke:rgba(38,30,24,.82);stroke-width:1px;vector-effect:non-scaling-stroke;stroke-linejoin:round;pointer-events:none}
@@ -507,9 +509,11 @@ const KEYS={
   ovalkette:{w:12, h:16, d:'M 6 0 C 6 4.42 3.31 8 0 8 C -3.31 8 -6 4.42 -6 0 C -6 -4.42 -3.31 -8 0 -8 C 3.31 -8 6 -4.42 6 0 Z', d0:{w:12,h:16},
          inset:.5, textY:1, maxW:9, maxH:9, keeps:[{x:0, y:-6.4, w:3.2, h:3.2, r:1.6}],
          title:'Oval-Kette gestalten', lines:[{text:'Emma', y:0, w:9, h:4.5}]},
-  doktorhutkette:{w:25, h:16, d:HUT_D, d0:{w:24.87,h:16.03}, inset:.4, textY:-3.85, maxW:10, maxH:2,
+  /* Doktorhut: graviert wird NUR das mittlere Band zwischen den zwei Schlitzen (Bence 2026-11-15) -> area = erlaubte Flaeche (mm ab Mitte, Rand schon abgezogen) */
+  doktorhutkette:{w:25, h:16, d:HUT_D, d0:{w:24.87,h:16.03}, inset:.4, textY:2.3, maxW:11, maxH:2.4,
+         area:'M -5.77 2.5 L -4.37 1.74 L -1.83 1.07 L 0.71 0.51 L 3.25 0.24 L 5.8 0.11 L 7.32 0.24 L 7.45 3.88 L 5.8 3.68 L 3.25 3.58 L 0.71 3.78 L -1.83 4.26 L -3.86 5.01 L -5.26 5.77 Z',
          keeps:[{x:3.15, y:-1.02, w:10.04, h:3.45, r:1.73},{x:-1.78, y:0.21, w:9.33, h:2.83, r:1.42},{x:-4.98, y:1.09, w:5.36, h:2.94, r:1.47},{x:3.1, y:4.74, w:10.96, h:3.66, r:1.83},{x:-0.61, y:6.08, w:12.89, h:3.04, r:1.52}],
-         title:'Doktorhut-Kette gestalten', lines:[{text:'2026', y:0, x:1, w:10, h:2}]},
+         title:'Doktorhut-Kette gestalten', lines:[{text:'2026', y:0, x:1.5, w:7, h:2.2}]},
   fischgratarmband:{w:21, h:5, rx:1.2, ry:1.2, inset:.4, textY:0, maxW:14, maxH:3.4,
          keeps:[{x:-8.9, y:0, w:2.9, h:4.2, r:.9},{x:8.9, y:0, w:2.9, h:4.2, r:.9}],
          title:'Fischgrät-Armband gestalten', lines:[{text:'Emma', y:0, w:14, h:3.4}]}
@@ -646,6 +650,8 @@ function keyD(shape,cx,cy,MM,inset=0){
   if(k.d){ const f=1-2*inset/k.w; return scaleD(k.d, k.w/k.d0.w*f*MM, k.h/k.d0.h*f*MM, cx, cy); }
   return rrD(cx,cy,(k.w-2*inset)*MM,(k.h-2*inset)*MM,Math.max(.5,k.rx-inset)*MM,Math.max(.5,k.ry-inset)*MM);
 }
+/* erlaubte Gravurflaeche: area (falls definiert) sonst die nach innen versetzte Kontur */
+function keyAreaD(shape,cx,cy,MM){ const k=KEYS[shape]; return k.area ? scaleD(k.area,MM,MM,cx,cy) : keyD(shape,cx,cy,MM,k.inset); }
 function keyKeepD(shape,cx,cy,MM){ return keepsOf(shape).map(z=>rrD(cx+z.x*MM,cy+z.y*MM,z.w*MM,z.h*MM,z.r*MM,z.r*MM)).join(' '); }
 function inKeep(shape,px,py){
   const MM=CFG_MM;
@@ -658,7 +664,7 @@ const keyPolyCache={};
 function keyPolygon(shape){
   if(keyPolyCache[shape]) return keyPolyCache[shape];
   const path=document.createElementNS(SVG_NS,'path');
-  path.setAttribute('d', keyD(shape,CFG_CX,CFG_CY,CFG_MM,KEYS[shape].inset));
+  path.setAttribute('d', keyAreaD(shape,CFG_CX,CFG_CY,CFG_MM));
   $('cfgSvg').appendChild(path);
   const total=path.getTotalLength(), pts=[];
   for(let i=0;i<220;i++){ const p=path.getPointAtLength(total*i/220); pts.push({x:p.x,y:p.y}); }
@@ -668,7 +674,7 @@ function keyPolygon(shape){
 /* Beschnitt fuer Foto/Karte: Gravurflaeche ohne Sperrzone (Schnittmenge zweier clipPaths) */
 function keyClip(id,shape,cx,cy,MM){
   return `<clipPath id="${id}k"><path clip-rule="evenodd" d="M -4000 -4000 H 4000 V 4000 H -4000 Z ${keyKeepD(shape,cx,cy,MM)}"/></clipPath>`
-       + `<clipPath id="${id}" clip-path="url(#${id}k)"><path d="${keyD(shape,cx,cy,MM,KEYS[shape].inset)}"/></clipPath>`;
+       + `<clipPath id="${id}" clip-path="url(#${id}k)"><path d="${keyAreaD(shape,cx,cy,MM)}"/></clipPath>`;
 }
 const ringPath=(cx,cy,r)=>`M ${cx-r} ${cy} a ${r} ${r} 0 1 0 ${2*r} 0 a ${r} ${r} 0 1 0 ${-2*r} 0 Z`;
 
@@ -687,7 +693,7 @@ function heartPathMarkup(cx,cy,MM,scaleX,scaleY,cls){
   return `<g class="${cls}" transform="translate(${tx} ${ty}) scale(${sx} ${sy})"><path d="${UNIT_HEART}"/></g>`;
 }
 function overlayOutlines(shape,cx,cy,MM){
-  if(isKey(shape)) return `<path class="shape-outline" d="${keyD(shape,cx,cy,MM)}"/>` + (keepsOf(shape).length ? `<path class="keepout" d="${keyKeepD(shape,cx,cy,MM)}"/>` : '');
+  if(isKey(shape)) return `<path class="shape-outline" d="${keyD(shape,cx,cy,MM)}"/>` + (KEYS[shape].area ? `<path class="area-outline" d="${keyAreaD(shape,cx,cy,MM)}"/>` : '') + (keepsOf(shape).length ? `<path class="keepout" d="${keyKeepD(shape,cx,cy,MM)}"/>` : '');
   const f=frameOf(shape), c=frameCenter(shape,cx,cy,MM);
   if(isRound(shape)){
     let s=`<circle class="shape-outline" cx="${c.x}" cy="${c.y}" r="${f.outerR*MM}"/>`;
