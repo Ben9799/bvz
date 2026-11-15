@@ -102,6 +102,8 @@
   body.pet #shapeField,body.pet #lenField{display:none !important}
   body.dog #modeField,body.dog #lineField,body.dog #selLineField{display:none !important}
   #dogFields{display:none} body.dog #dogFields{display:block}
+  #sideField{display:none} body.two #sideField{display:block}
+  body.fixshape #shapeField{display:none !important}
   .dog-group{border:1px solid var(--line);padding:12px;margin-bottom:10px;background:#fff;transition:.15s}
   .dog-group.on{border-color:var(--ink)}
   .dog-group h3{font:500 .72rem var(--head);letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px;display:flex;justify-content:space-between;align-items:baseline}
@@ -153,6 +155,15 @@
     <h1 id="edTitle">Anhänger gestalten</h1>
     <p class="lead">Was du in der Vorschau siehst, wird genau so graviert.</p>
 
+    <div class="field" id="sideField">
+      <label>Seite der Gravurscheibe</label>
+      <div class="chips" id="sideChips">
+        <button type="button" class="chip on" data-side="front">Vorderseite</button>
+        <button type="button" class="chip" data-side="back">Rückseite</button>
+      </div>
+      <p class="mini-help">Die Scheibe (Ø 21 mm) dreht sich in der Fassung – beide Seiten können graviert werden, beide sind optional. Leer gelassen bleibt die Seite blank.</p>
+    </div>
+
     <div class="field" id="modeField">
       <label>Was möchtest du gravieren?</label>
       <div class="mode-cards" id="modeCards">
@@ -195,6 +206,7 @@
         <button type="button" class="chip on" data-shape="circle">● Kreis · Ø 20 mm</button>
         <button type="button" class="chip" data-shape="heart">♥ Herz · 19,5 × 18 mm</button>
         <button type="button" class="chip" data-shape="dogtag" id="dogChip" hidden>◉ Dog Tag · Ø 24 mm</button>
+        <button type="button" class="chip" data-shape="medaillon">◎ Medaillon · Ø 25 mm</button>
       </div>
     </div>
 
@@ -325,6 +337,7 @@ const SHAPES={
   circle:{label:'Kreis',  w:20,   h:20, price:'19,99', cap:'Ø 20 mm · 1,2 mm stark'},
   heart: {label:'Herz',   w:19.5, h:18, price:'19,99', cap:'19,5 × 18 mm · 1,8 mm stark'},
   dogtag:{label:'Dog Tag',w:24,   h:24, price:'19,99', cap:'Dog Tag · Ø 24 mm · Aluminium – leicht, stört Ihr Haustier nicht'},
+  medaillon:{label:'Medaillon',w:25,h:25, price:'19,99', cap:'Medaillon Ø 25 mm · drehbare Gravurscheibe Ø 21 mm · beidseitig gravierbar'},
 };
 /* Dog Tag: Bohrung 3 mm, Oberkante 2 mm unter dem Rand -> Mitte 3,5 mm unter dem Rand = y -8,5 mm von der Mitte.
    Sperrzone fuer Gravur: Loch + 0,8 mm Rand (Radius 2,3 mm). */
@@ -333,7 +346,7 @@ const KEEP_R=DOG.holeR+DOG.margin;
 const ARC_KEEP_DEG=26;   // Kreistext (unten) darf nie in die +-26 Grad um die Lochachse oben ragen
 const UNIT_HEART='M50 88 C 12 55 0 35 0 22 C 0 8 12 0 25 0 C 38 0 46 8 50 16 C 54 8 62 0 75 0 C 88 0 100 8 100 22 C 100 35 88 55 50 88 Z';
 const SVG_NS='http://www.w3.org/2000/svg';
-const CFG_MM=8, CFG_CX=168, CFG_CY=118;
+const CFG_MM=8, CFG_CX=168, CFG_CY=146;
 let clipSeq=0;
 let nextLineId=2;
 
@@ -369,11 +382,12 @@ let state={
 const FRAMES={
   circle:{cx:0,cy:0,outerR:9.95,safeR:9.85},
   dogtag:{cx:0,cy:0,outerR:11.95,safeR:11.85},
+  medaillon:{cx:0,cy:0,outerR:10.4,safeR:10.3},     // nur die drehbare Scheibe Ø 21 mm wird graviert
   heart:{cx:0,cy:0,outerScaleX:1,outerScaleY:1,safeScaleX:.98,safeScaleY:.98}
 };
 const frameOf=s=>FRAMES[s]||FRAMES.circle;
 const isRound=s=>s!=='heart';
-const roundKey=s=>s==='dogtag'?'dogtag':'circle';
+const roundKey=s=>(s==='dogtag'||s==='medaillon')?s:'circle';
 const rf=()=>frameOf(roundKey(state.shape));            // Rahmen der aktuellen runden Form
 function frameCenter(shape,cx,cy,MM){const f=frameOf(shape);return {x:cx+(f.cx||0)*MM,y:cy+(f.cy||0)*MM};}
 /* Standard-Lage des Textes: Herz leicht hoch, Dog Tag unterhalb des Lochs */
@@ -444,10 +458,19 @@ function holeRing(cx,cy,MM){
 
 function pendantBody(shape,cx,cy,MM,photo){
   if(isRound(shape)){
-    const dog=shape==='dogtag';
-    const r=(dog?DOG.bodyR:10)*MM;
+    const dog=shape==='dogtag', med=shape==='medaillon';
+    const r=(dog?DOG.bodyR:(med?10.5:10))*MM;
     let s;
-    if(dog){
+    if(med){
+      /* Fassung Ø 25 mm mit Oese + Kette; darin die drehbare Scheibe Ø 21 mm (= Gravurflaeche) */
+      const R=12.5*MM, Ri=11*MM, top=cy-R;
+      s=`<path d="M ${cx-4.2*MM} -2 L ${cx-0.6*MM} ${top-3.7*MM} M ${cx+4.2*MM} -2 L ${cx+0.6*MM} ${top-3.7*MM}" stroke="#a9aeb5" stroke-width="2.4" stroke-dasharray="3.2 1.6" stroke-linecap="round" fill="none"/>`
+       +`<ellipse cx="${cx}" cy="${top-2.1*MM}" rx="${1.05*MM}" ry="${1.8*MM}" fill="none" stroke="url(#metal)" stroke-width="${0.55*MM}"/>`
+       +`<ellipse cx="${cx}" cy="${top-2.1*MM}" rx="${1.05*MM}" ry="${1.8*MM}" fill="none" stroke="#9aa0a8" stroke-width=".6"/>`
+       +`<path d="${ringPath(cx,cy,R)} ${ringPath(cx,cy,Ri)}" fill-rule="evenodd" fill="url(#metal)" stroke="#9aa0a8" stroke-width=".8"/>`
+       +`<circle cx="${cx}" cy="${cy}" r="${(Ri+r)/2}" fill="none" stroke="#7d838b" stroke-opacity=".55" stroke-width="${Ri-r}"/>`
+       +`<circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#metal)" stroke="#ffffff" stroke-opacity=".7"/>`;
+    }else if(dog){
       const h=holePx(cx,cy,MM);
       s=`<path d="${ringPath(cx,cy,r)} ${ringPath(h.x,h.y,h.r)}" fill-rule="evenodd" fill="url(#metal)" stroke="#ffffff" stroke-opacity=".6"/>`;
     }else{
@@ -513,7 +536,7 @@ function lineMarkup(line, shape, cx, cy, MM){
   let maxw, maxh;
   if(shape==='dogtag' && line.maxW){ maxw=line.maxW*MM; maxh=line.maxH*MM; }
   else if(shape==='dogtag'){ maxw=frameOf('dogtag').safeR*1.5*MM; maxh=frameOf('dogtag').safeR*.75*MM; }
-  else if(shape==='circle'){ maxw=Math.max(10,frameOf('circle').safeR*1.55*MM); maxh=Math.max(8,frameOf('circle').safeR*.95*MM); }
+  else if(shape==='circle'||shape==='medaillon'){ maxw=Math.max(10,frameOf(shape).safeR*1.55*MM); maxh=Math.max(8,frameOf(shape).safeR*.95*MM); }
   else { maxw=SHAPES.heart.w*MM*frameOf('heart').safeScaleX*.72; maxh=SHAPES.heart.h*MM*frameOf('heart').safeScaleY*.45; }
   return `<g class="engGroup${selClass}" ${common} transform="translate(${ax} ${ay}) rotate(${line.angle})">`
        + `<text class="eng" x="0" y="0" text-anchor="middle" dominant-baseline="central" data-line-id="${line.id}" `
@@ -668,7 +691,8 @@ function renderPreviewOnly(){
   syncPhotoCrop();
   $('cfgRuler').innerHTML = ruler(state.shape, CFG_CX, CFG_CY, CFG_MM);
   $('cfgPendant').innerHTML = pendant(state.shape, state.lines, CFG_CX, CFG_CY, CFG_MM, state.photo);
-  $('dimCaption').textContent = SHAPES[state.shape].cap + (state.shape==='dogtag' ? (dogTag.side==='back' ? ' · Rückseite' : ' · Vorderseite') : '');
+  const side = state.shape==='dogtag' ? dogTag.side : (sides.on ? sides.cur : '');
+  $('dimCaption').textContent = SHAPES[state.shape].cap + (side ? (side==='back' ? ' · Rückseite' : ' · Vorderseite') : '');
   $('price').innerHTML = 'ab '+SHAPES[state.shape].price+'&nbsp;€';
   fitEngravings(document);
   keepAllLinesInside();
@@ -872,6 +896,38 @@ $('verticalRange').addEventListener('input',e=>{
   render();
 });
 document.querySelectorAll('#modeCards .mode-card').forEach(c=>c.addEventListener('click',()=>setContentMode(c.dataset.mode)));
+/* ---- Medaillon: Vorder- und Rueckseite, beide optional (je eigene Zeilen / Foto / Karte) ---- */
+const SIDE_KEYS=['lines','contentMode','photo','photoWidth','photoHeight','photoScale','photoOffX','photoOffY','mapPaths','mapLabel','mapCenter','selectedLineId'];
+const sides={on:false, cur:'front', front:null, back:null};
+const snapSide=()=>{ const o={}; SIDE_KEYS.forEach(k=>o[k]=state[k]); return o; };
+function emptySide(){ const l=createLine(''); return {lines:[l],contentMode:'text',photo:null,photoWidth:0,photoHeight:0,photoScale:1,photoOffX:0,photoOffY:0,mapPaths:null,mapLabel:'',mapCenter:null,selectedLineId:l.id}; }
+function syncSideUi(){
+  document.querySelectorAll('#sideChips .chip').forEach(x=>x.classList.toggle('on', x.dataset.side===sides.cur));
+  $('photoInput').value='';
+  uploadLabel.textContent = state.photo ? 'Foto gewählt – ersetzen …' : 'Foto auswählen …';
+  photoMsg.className='photo-msg'; photoMsg.textContent='';
+  photoActions.style.display = state.photo ? 'flex' : 'none';
+  mapMsgEl.className='photo-msg'; mapMsgEl.textContent='';
+  mapActionsEl.style.display = state.mapPaths ? 'flex' : 'none';
+  syncContentMode();
+}
+function setSide(side){
+  if(!sides.on || sides.cur===side) return;
+  sides[sides.cur]=snapSide(); sides.cur=side;
+  Object.assign(state, sides[side]);
+  syncSideUi(); render();
+}
+function enterSides(){
+  sides.on=true; sides.cur='front'; if(!sides.back) sides.back=emptySide();
+  document.body.classList.add('two'); syncSideUi();
+}
+function leaveSides(){
+  if(sides.cur==='back'){ sides.back=snapSide(); Object.assign(state, sides.front); }
+  sides.on=false; sides.cur='front';
+  document.body.classList.remove('two'); syncSideUi();
+}
+document.querySelectorAll('#sideChips .chip').forEach(c=>c.addEventListener('click',()=>setSide(c.dataset.side)));
+
 /* ---- Dog Tag: feste Felder, zwei Seiten ---- */
 function syncDogUi(){
   document.querySelectorAll('#dogSideChips .chip').forEach(x=>x.classList.toggle('on', x.dataset.side===dogTag.side));
@@ -909,8 +965,10 @@ document.querySelectorAll('[data-dog]').forEach(inp=>{
 document.querySelectorAll('#shapeChips .chip').forEach(c=>c.addEventListener('click',()=>{
   const prev=state.shape;
   state.shape=c.dataset.shape;
+  if(prev==='medaillon' && state.shape!=='medaillon') leaveSides();
   if(state.shape==='dogtag' && prev!=='dogtag') enterDog();
   else if(prev==='dogtag' && state.shape!=='dogtag') leaveDog();
+  if(state.shape==='medaillon' && prev!=='medaillon') enterSides();
   if(state.shape==='heart'){ state.lines.forEach(l=>{ l.textMode='straight'; l.offX=0; }); }
   if((prev==='dogtag')!==(state.shape==='dogtag')) state.lines.forEach(l=>{ if(l.textMode==='arc') l.angle=0; });
   syncShapeChips();
@@ -1168,6 +1226,7 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape' && window.parent!==
   if(p && SHAPES[p]){
     state.shape=p;
     if(p==='dogtag'){ document.body.classList.add('pet'); enterDog(); $('edTitle').textContent='Dog Tag gestalten'; }
+    else if(p==='medaillon'){ document.body.classList.add('fixshape'); enterSides(); $('edTitle').textContent='Medaillon-Kette gestalten'; }
     else $('edTitle').textContent='Kette mit Gravur gestalten';
   }else{
     $('dogChip').hidden=false;
