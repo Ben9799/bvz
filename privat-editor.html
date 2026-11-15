@@ -478,7 +478,15 @@ const KEYS={
   herzstabkette:{w:35, h:6, rx:.5, ry:.5, inset:.5, textY:0, maxW:20.6, maxH:4.2,
          keeps:[{x:-10.79, y:0, w:6.7, h:6.2, r:1.6},                    // Herz-Ausschnitt ca. 5,1 x 4,6 mm + 0,8 mm Rand
                 {x:-15.8, y:-.85, w:2.9, h:2.9, r:1.45},{x:15.8, y:-.85, w:2.9, h:2.9, r:1.45}],   // Oesen Ø ca. 1,3 mm + 0,8 mm
-         title:'Stab-Kette mit Herz gestalten', lines:[{text:'Emma', y:0, x:3.45, w:20.6, h:4.2}]}
+         title:'Stab-Kette mit Herz gestalten', lines:[{text:'Emma', y:0, x:3.45, w:20.6, h:4.2}]},
+  /* Stab-Armbaender (Katalog S. 17: 32 x 5 mm mit Herz-Ausschnitt, 16 + 5 cm; S. 15: 40 x 6 mm, leicht gewoelbt, 17 + 5 cm) – am Foto vermessen */
+  herzstabarmband:{w:32, h:5, rx:2.2, ry:2.2, inset:.5, textY:0, maxW:19.9, maxH:3.4,
+         keeps:[{x:-9.56, y:0, w:4.65, h:4.1, r:1.2},                    // Herz-Ausschnitt ca. 3 x 2,5 mm + 0,8 mm Rand
+                {x:-14.17, y:0, w:2.8, h:2.8, r:1.4},{x:14.17, y:0, w:2.8, h:2.8, r:1.4}],   // Oesen Ø ca. 1,2 mm + 0,8 mm
+         title:'Stab-Armband mit Herz gestalten', lines:[{text:'Mia', y:0, x:2.8, w:19.9, h:3.4}]},
+  stabarmband:{w:40, h:6, rx:2.5, ry:2.5, inset:.5, textY:0, maxW:30, maxH:4.4,
+         keeps:[{x:-17.8, y:0, w:3.1, h:3.1, r:1.55},{x:17.8, y:0, w:3.1, h:3.1, r:1.55}],   // Oesen Ø ca. 1,5 mm + 0,8 mm
+         title:'Stab-Armband gestalten', lines:[{text:'Emma', y:0, w:30, h:4.4}]}
 };
 const keepsOf=s=>{ const k=KEYS[s]; return k.keeps || (k.keep ? [k.keep] : []); };
 const isKey=s=>!!KEYS[s];
@@ -508,6 +516,8 @@ const SHAPES={
   plaettchenarmband:{label:'Armband', w:13, h:13, cap:'Edelstahl poliert · Plättchen Ø 13 mm · Armband 16 + 5 cm'},
   stabkette:{label:'Stab', w:5, h:40, cap:'Edelstahl poliert · Stab 40 × 5 × 5 mm · Kette 45 + 5 cm'},
   herzstabkette:{label:'Stab mit Herz', w:35, h:6, cap:'Edelstahl poliert · Stab 35 × 6 mm mit Herz-Ausschnitt · Kette 45 + 5 cm'},
+  herzstabarmband:{label:'Stab-Armband mit Herz', w:32, h:5, cap:'Edelstahl poliert · Stab 32 × 5 mm mit Herz-Ausschnitt · Armband 16 + 5 cm'},
+  stabarmband:{label:'Stab-Armband', w:40, h:6, cap:'Edelstahl poliert · Stab 40 × 6 mm, leicht gewölbt · Armband 17 + 5 cm'},
 };
 /* Dog Tag: Bohrung 3 mm, Oberkante 2 mm unter dem Rand -> Mitte 3,5 mm unter dem Rand = y -8,5 mm von der Mitte.
    Sperrzone fuer Gravur: Loch + 0,8 mm Rand (Radius 2,3 mm). */
@@ -775,6 +785,10 @@ const SCENES={
      statt 5 : 40 -> sy gleicht die Perspektive aus; Editor-Foto gespiegelt erweitert (oben 200, unten 320, links/rechts je 300 px) (Lineal-Platz). Herz-Stab: 548 x 94 px = 35 : 6, gerade. */
   stabkette:        {src:'images/shop/kette-stab-editor.jpg',size:1453,h:1800,x:718.75,y:938.5,w:82.5,mm:5,sy:+((40/5)/(737/82.5)).toFixed(4),rot:0,stage:'#d9a77c'},
   herzstabkette:    {src:'images/shop/kette-stab-herz.jpg', size:1254,x:603.5,y:748.5,w:548,mm:35,sy:1,rot:0,stage:'#e2b48f'},
+  /* Stab-Armbaender: Herz-Stab 388 x 66,7 px, um 2,1 Grad schraeg; gewoelbter Stab 438 x 60 px – Mitte in der Stabmitte gemessen
+     (die Woelbung hebt die Enden im Foto ca. 0,9 mm an, die Gravur bleibt in der Mitte). Editor-Fotos weich erweitert (Herz: unten +300; gewoelbt: links/rechts +150, unten +350) */
+  herzstabarmband:  {src:'images/shop/armband-stab-herz-editor.jpg',size:1254,h:1554,x:614.5,y:1000.9,w:388.3,mm:32,sy:+((5/32)/(66.7/388.3)).toFixed(4),rot:-2.08,stage:'#e3b590'},
+  stabarmband:      {src:'images/shop/armband-stab-editor.jpg',size:1100,h:1150,x:565,y:527.5,w:438,mm:40,sy:+((6/40)/(60/438)).toFixed(4),rot:0,stage:'#dcbf98'},
   wrist:    {src:'images/shop/herz-armband-handgelenk-beige.jpg',size:1000,x:497,y:540,w:140,mm:19.5,sy:1,rot:0,stage:'#d8b79c',
              eng:`rotate(24 ${CFG_CX} ${CFG_CY})`, maxW:470}
 };
@@ -1809,7 +1823,7 @@ document.addEventListener('focusout',e=>{
   if(e.target.matches && e.target.matches('.line-input,.txt')){ clearTimeout(typingTimer); typingTimer=setTimeout(()=>document.body.classList.remove('typing'),180); }
 });
 
-/* ---- Start: ?shape=medaillon|herzarmband|dogtag|circle|heart|katze|lederanhaenger|kettenanhaenger|plaettchenarmband|stabkette|herzstabkette ---- */
+/* ---- Start: ?shape=medaillon|herzarmband|dogtag|circle|heart|katze|lederanhaenger|kettenanhaenger|plaettchenarmband|stabkette|herzstabkette|herzstabarmband|stabarmband ---- */
 (function init(){
   const p=new URLSearchParams(location.search).get('shape');
   if(p==='herzarmband'){
