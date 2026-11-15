@@ -475,7 +475,8 @@ const openPd=k=>{setProduct(k);$('pd').classList.add('open');
   document.body.style.overflow='hidden';renderEngr();$('l1').focus({preventScroll:true});};
 const closePd=()=>{$('pd').classList.remove('open');document.body.style.overflow='';};
 $('grid').addEventListener('click',e=>{const b=e.target.closest('[data-cfg]');if(!b)return;e.preventDefault();openPd(b.dataset.cfg);});
-const openEd=shape=>{const f=$('edFrame'),u='privat-editor.html?shape='+encodeURIComponent(shape);
+const ED_V=Date.now().toString(36);   // Editor nie aus dem Browser-Cache (GitHub Pages: max-age 600)
+const openEd=shape=>{const f=$('edFrame'),u='privat-editor.html?shape='+encodeURIComponent(shape)+'&v='+ED_V;
   if(f.dataset.shape!==shape){f.src=u;f.dataset.shape=shape;}
   $('ed').classList.add('open');document.body.style.overflow='hidden';};
 const closeEd=()=>{$('ed').classList.remove('open');document.body.style.overflow='';};
