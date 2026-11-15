@@ -131,6 +131,14 @@
   .pd-info .note{font-size:.76rem;color:var(--mut);text-align:center;margin-top:8px}
   @media(max-width:860px){.pd{padding:0}.pd-box{grid-template-columns:1fr;height:100%}.pd-info{padding:24px 18px 30px}}
 
+  /* EDITOR-FENSTER (Kette / Dog Tag): privat-editor.html im iframe */
+  .ed{position:fixed;inset:0;z-index:60;background:rgba(28,28,28,.45);display:none;align-items:center;justify-content:center;padding:24px}
+  .ed.open{display:flex}
+  .ed-box{position:relative;background:#fff;width:min(1240px,100%);height:min(900px,100%);overflow:hidden}
+  .ed-box iframe{display:block;width:100%;height:100%;border:0;background:#fff}
+  .ed-x{position:absolute;top:8px;right:10px;z-index:3;font-size:1.6rem;line-height:1;width:40px;height:40px;background:#fff;border:1px solid var(--line)}
+  @media(max-width:860px){.ed{padding:0}.ed-box{width:100%;height:100%}}
+
   /* GESCHICHTE */
   .story{display:grid;grid-template-columns:1fr 1fr;background:var(--cream)}
   .story .vis{background:var(--caramel);display:flex;align-items:center;justify-content:center;min-height:440px}
@@ -204,6 +212,7 @@
         <button data-who="kind">Kind &amp; Baby</button>
         <button data-who="kollege">Kolleg/in</button>
         <button data-who="ich">Für mich</button>
+        <button data-who="haustier">Haustier</button>
       </div>
       <div class="count"><span id="count"></span><button id="reset">Zurücksetzen</button></div>
     </div>
@@ -293,22 +302,31 @@
   </div>
 </div>
 
+<div class="ed" id="ed" role="dialog" aria-modal="true" aria-label="Gravur gestalten">
+  <div class="ed-box">
+    <button class="ed-x" id="edClose" aria-label="Schließen">×</button>
+    <iframe id="edFrame" title="Anhänger-Editor" loading="lazy"></iframe>
+  </div>
+</div>
+
 <script>
 /* Platzhalter-Sortiment: die echten Produkte (Fotos, Preise, Konfigurator) kommen spaeter. */
 const S='fill="none" stroke="#6f6a63" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"';
 const ICONS={
   anhaenger:`<svg viewBox="0 0 100 100"><circle cx="50" cy="22" r="9" ${S}/><path d="M50 31v6" ${S}/><rect x="28" y="37" width="44" height="52" rx="10" ${S}/><path d="M38 58h24M42 67h16" ${S}/></svg>`,
   kette:`<svg viewBox="0 0 100 100"><path d="M18 10c0 30 14 48 32 50 18-2 32-20 32-50" ${S} stroke-dasharray="3 4"/><circle cx="50" cy="72" r="16" ${S}/><path d="M43 72h14" ${S}/></svg>`,
+  dogtag:`<svg viewBox="0 0 100 100"><circle cx="50" cy="54" r="34" ${S}/><circle cx="50" cy="31" r="4.5" ${S}/><path d="M36 58h28M41 67h18" ${S}/></svg>`,
   besteck:`<svg viewBox="0 0 100 100"><path d="M30 10v24a6 6 0 0 0 12 0V10M36 10v80" ${S}/><path d="M64 10c-8 0-10 12-10 22s4 12 10 12V90" ${S}/></svg>`,
   becher:`<svg viewBox="0 0 100 100"><rect x="30" y="16" width="40" height="10" rx="4" ${S}/><path d="M32 26l4 62h28l4-62" ${S}/><path d="M42 50h16" ${S}/></svg>`,
   messer:`<svg viewBox="0 0 100 100"><rect x="14" y="52" width="58" height="18" rx="9" ${S}/><path d="M60 52c8-14 18-22 28-24-4 10-12 20-24 24" ${S}/><circle cx="24" cy="61" r="3" ${S}/></svg>`,
   oeffner:`<svg viewBox="0 0 100 100"><path d="M36 14h28a6 6 0 0 1 6 6v62a6 6 0 0 1-6 6H36a6 6 0 0 1-6-6V20a6 6 0 0 1 6-6z" ${S}/><path d="M40 28a10 10 0 0 0 20 0" ${S}/><path d="M42 62h16M44 70h12" ${S}/></svg>`,
 };
 const PRODUCTS=[
+  {k:'dogtag',name:'Dog Tag mit Gravur',sub:'Ø 24 mm Aluminium – auch fürs Haustier',badge:'Neu',price:'ab 19,99 €',ed:'dogtag',who:['partner','mama','papa','freunde','kind','kollege','ich','haustier']},
   {k:'tafel',img:'images/shop/erinnerungstafel-edelstahl.jpg',name:'Erinnerungstafel',sub:'Edelstahl, 130 × 180 mm, bis zu 4 Zeilen',badge:'Neu',cfg:'tafel',who:['partner','mama','papa','freunde','kollege']},
   {k:'armreif',img:'images/shop/armreif-oval-edelstahl.jpg',img2:'images/shop/armreif-oval-handgelenk.jpg',name:'Armreif mit Gravur',sub:'Ovales Medaillon, Silber oder Gold',badge:'Neu',price:'35,00 € · Versandkostenfrei',cfg:'armreif',who:['partner','mama','freunde','kind','ich']},
   {k:'herz',img:'images/shop/herz-armband-edelstahl.jpg',img2:'images/shop/herz-armband-handgelenk.jpg',name:'Herz-Armband mit Gravur',sub:'Schlangenkette mit Herz, 17 + 5 cm',badge:'Neu',price:'24,99 € · Versandkostenfrei',cfg:'herz',who:['partner','mama','freunde','kind','ich']},
-  {k:'kette',name:'Kette mit Gravur',sub:'Name, Initialen oder Datum',who:['partner','mama','freunde','kind','ich']},
+  {k:'kette',name:'Kette mit Gravur',sub:'Name, Initialen oder Datum',price:'ab 19,99 €',ed:'circle',who:['partner','mama','freunde','kind','ich']},
   {k:'anhaenger',name:'Schlüsselanhänger',sub:'Name, Datum oder Koordinaten',who:['partner','papa','freunde','kollege','ich']},
   {k:'becher',name:'Thermobecher',sub:'Hält warm und kalt',who:['mama','papa','freunde','kollege','ich','partner']},
   {k:'messer',name:'Taschenmesser',sub:'Name oder Spruch auf der Klinge',who:['papa','partner','freunde','ich']},
@@ -326,7 +344,7 @@ const card=(p,i)=>`
   <article class="card" data-i="${i}" style="order:${i*2}">
     <div class="pimg">${p.badge?`<span class="badge gold">${p.badge}</span>`:''}${p.img?`<img src="${p.img}" alt="${p.name}" loading="lazy">`+(p.img2?`<img class="alt" src="${p.img2}" alt="" loading="lazy">`:''):ICONS[p.k]}</div>
     <div class="pinfo"><h3>${p.name}</h3><p>${p.sub}</p><span class="price">${p.price||'Bald erhältlich'}</span></div>
-    <a href="#" class="btn"${p.cfg?` data-cfg="${p.cfg}"`:''}>Personalisieren</a>
+    <a href="#" class="btn"${p.cfg?` data-cfg="${p.cfg}"`:''}${p.ed?` data-ed="${p.ed}"`:''}>Personalisieren</a>
   </article>`;
 $('grid').innerHTML=PRODUCTS.slice(0,3).map(card).join('')+USP+PRODUCTS.slice(3).map((p,i)=>card(p,i+3)).join('')
   +'<div class="empty" id="empty">Dafür haben wir gerade nichts Passendes.</div>';
@@ -457,9 +475,17 @@ const openPd=k=>{setProduct(k);$('pd').classList.add('open');
   document.body.style.overflow='hidden';renderEngr();$('l1').focus({preventScroll:true});};
 const closePd=()=>{$('pd').classList.remove('open');document.body.style.overflow='';};
 $('grid').addEventListener('click',e=>{const b=e.target.closest('[data-cfg]');if(!b)return;e.preventDefault();openPd(b.dataset.cfg);});
+const openEd=shape=>{const f=$('edFrame'),u='privat-editor.html?shape='+encodeURIComponent(shape);
+  if(f.dataset.shape!==shape){f.src=u;f.dataset.shape=shape;}
+  $('ed').classList.add('open');document.body.style.overflow='hidden';};
+const closeEd=()=>{$('ed').classList.remove('open');document.body.style.overflow='';};
+$('grid').addEventListener('click',e=>{const b=e.target.closest('[data-ed]');if(!b)return;e.preventDefault();openEd(b.dataset.ed);});
+$('edClose').addEventListener('click',closeEd);
+$('ed').addEventListener('click',e=>{if(e.target===$('ed'))closeEd();});
+window.addEventListener('message',e=>{if(e.origin===location.origin&&e.data&&e.data.wlEditor==='close')closeEd();});
 $('pdClose').addEventListener('click',closePd);
 $('pd').addEventListener('click',e=>{if(e.target===$('pd'))closePd();});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closePd();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closePd();closeEd();}});
 Promise.all(Object.values(FONTS).map(f=>document.fonts.load(`${f.w} 40px ${f.fam}`))).then(renderEngr);
 </script>
 </body>

@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Anhänger-Editor | Wolf Lasermark</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Great+Vibes&family=Instrument+Sans:wght@400;500;600&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  /* Anhaenger-Editor (Kette / Dog Tag) im hellen Ducett-Look. Laeuft standalone oder im iframe von privat-shop-ducett.html. */
+  :root{
+    --bg:#ffffff; --cream:#f3eeea; --blush:#f7f2f1; --img:#f4f1ee;
+    --ink:#1c1c1c; --soft:#6a6a6a; --mut:#7a7a7a; --line:#dddddd;
+    --caramel:#9c6b4e; --gold:#b08d57;
+    --head:'Instrument Sans',system-ui,sans-serif; --body:'Nunito',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:var(--body);background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+  .app{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(340px,.85fr);height:100vh}
+  .app > *{min-width:0}
+
+  /* VORSCHAU */
+  .preview{position:relative;background:radial-gradient(110% 90% at 50% 2%,#ffffff,#f1f2f4 62%,#e6e8eb);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:44px 22px 22px;min-height:0}
+  .preview svg{flex:1;min-height:0;width:100%;max-width:100%}
+  .preview-tag{position:absolute;top:16px;left:18px;font:500 .62rem var(--head);letter-spacing:.18em;text-transform:uppercase;color:var(--mut)}
+  .dim-caption{margin-top:8px;font-size:.8rem;color:var(--soft);letter-spacing:.02em;text-align:center}
+  .drag-hint{margin-top:3px;font-size:.68rem;color:var(--mut);text-align:center}
+  .preview .rul line{stroke:#aeb3b9;stroke-width:1;stroke-linecap:round}
+  .preview .rlbl{font-family:var(--head);font-size:8.5px;fill:#7d838a;letter-spacing:.05em;font-weight:500}
+  #cfgSvg{touch-action:none}
+  #cfgPendant text.eng,#cfgPendant .engGroup{cursor:grab}
+  #cfgPendant .engPath{fill:none;stroke:none;pointer-events:none}
+  .preview .guide{stroke:#8fa3b8;stroke-width:1;stroke-dasharray:5 4;opacity:.75;pointer-events:none}
+  #cfgPendant .photo-hit{fill:transparent;cursor:grab}
+  #cfgPendant .photo-frame-guide{fill:none;stroke:#8fa3b8;stroke-width:1;stroke-dasharray:5 4;opacity:.72;pointer-events:none}
+  #cfgPendant .engGroup.selected text.eng{paint-order:stroke;stroke:rgba(143,163,184,.7);stroke-width:1.35px}
+  #cfgPendant .shape-outline{fill:none;stroke:rgba(60,64,70,.28);stroke-width:1.1;pointer-events:none}
+  #cfgPendant .keepout{fill:none;stroke:#8fa3b8;stroke-width:.8;stroke-dasharray:3 3;opacity:.7;pointer-events:none}
+  #cfgPendant .hit-outline{fill:none;stroke:transparent;stroke-width:14;pointer-events:stroke}
+
+  /* STEUERUNG */
+  .controls{overflow:auto;padding:30px 32px 40px;border-left:1px solid var(--line);background:#fff}
+  .controls h1{font:400 1.5rem var(--head);margin-bottom:4px}
+  .controls .lead{font-size:.86rem;color:var(--soft);margin-bottom:22px}
+  .field{margin-bottom:22px}
+  .field > label,.controls label.fl{display:block;font:500 .7rem var(--head);letter-spacing:.14em;text-transform:uppercase;margin:0 0 9px}
+  .mini-help{font-size:.72rem;color:var(--mut);margin-top:7px;line-height:1.45}
+  .hint{font-size:.74rem;color:var(--mut);margin-top:8px;line-height:1.5}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{padding:8px 16px;border:1px solid var(--line);font-size:.82rem;background:#fff;transition:.15s}
+  .chip:hover{border-color:var(--ink)}
+  .chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  .chip[disabled]{opacity:.4;cursor:not-allowed}
+  .mode-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  .mode-card{border:1px solid var(--line);background:#fff;padding:8px 6px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px;transition:.15s}
+  .mode-card:hover{border-color:var(--ink)}
+  .mode-card.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+  .mode-card svg{width:100%;height:auto;display:block;background:var(--img)}
+  .mc-title{font:500 .84rem var(--head)}
+  .mc-sub{font-size:.66rem;color:var(--mut);line-height:1.25}
+  .line-item{border:1px solid var(--line);padding:11px;background:#fff;cursor:pointer;margin-bottom:8px;transition:.15s}
+  .line-item:hover{border-color:var(--mut)}
+  .line-item.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+  .line-item-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:7px}
+  .line-item-title{font:500 .72rem var(--head);letter-spacing:.12em;text-transform:uppercase;color:var(--caramel)}
+  .line-badge,.line-chip{font-size:.7rem;color:var(--soft);background:var(--cream);padding:.18rem .55rem}
+  .line-input,.txt{width:100%;border:1px solid var(--line);padding:10px 12px;background:#fff;font:inherit;font-size:.95rem;border-radius:0}
+  .line-input:focus,.txt:focus{outline:none;border-color:var(--ink)}
+  .line-mini{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .line-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+  .line-selected-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:.7rem .9rem;border:1px solid var(--line);background:var(--blush)}
+  .line-selected-bar strong{font-size:.9rem;font-weight:600}
+  .linkbtn{background:none;border:none;color:var(--caramel);font-size:.76rem;cursor:pointer;text-decoration:underline;padding:0}
+  .range-line{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
+  .range-line output{font-size:.78rem;color:var(--soft);min-width:54px;text-align:right;font-variant-numeric:tabular-nums}
+  input[type=range]{width:100%;accent-color:var(--ink);cursor:pointer}
+  .upload{display:flex;align-items:center;gap:.55rem;border:1px dashed var(--mut);padding:.75rem 1rem;font-size:.84rem;color:var(--soft);cursor:pointer;background:#fff;width:100%}
+  .upload:hover{border-color:var(--ink);color:var(--ink)}
+  .upload svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.5;flex:none}
+  .upload input{display:none}
+  .photo-msg{font-size:.74rem;margin-top:9px;line-height:1.5;display:none}
+  .photo-msg.ok{display:block;color:#2f7a4d}
+  .photo-msg.warn{display:block;color:#a35a22}
+  .photo-actions{display:flex;gap:14px;align-items:center;margin-top:10px;flex-wrap:wrap}
+  .photo-tools{margin-top:12px;padding:12px;border:1px solid var(--line);background:var(--blush);display:none}
+  .photo-tools.on{display:block}
+  .photo-tools .range-line{margin-top:8px}
+  #photoField,#mapField{display:none}
+  .map-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
+  .map-zoom-line{margin-top:12px}
+  .map-zoom-line label{margin:0;font-size:.78rem;color:var(--soft);text-transform:none;letter-spacing:0;font-family:var(--body);font-weight:400}
+  .price-row{display:flex;align-items:baseline;justify-content:space-between;border-top:1px solid var(--line);margin-top:6px;padding-top:18px;gap:12px}
+  .price-row .lbl{font-size:.8rem;color:var(--mut)}
+  .price-row .val{font:500 1.5rem var(--head)}
+  .btn-off{display:block;width:100%;text-align:center;margin-top:16px;padding:14px;border:1px solid var(--ink);background:var(--ink);color:#fff;font:500 .72rem var(--head);letter-spacing:.18em;text-transform:uppercase;opacity:.55;cursor:default}
+  .assure{list-style:none;margin-top:14px;font-size:.78rem;color:var(--soft)}
+  .assure li::before{content:"·";margin-right:6px;color:var(--gold)}
+  body.pet #shapeField,body.pet #lenField{display:none !important}
+
+  @media(max-width:820px){
+    html,body{height:auto}
+    .app{display:block;height:auto}
+    .preview{position:sticky;top:0;z-index:5;height:42vh;min-height:250px;padding:30px 10px 8px;border-bottom:1px solid var(--line)}
+    .drag-hint{display:none}
+    .controls{overflow:visible;border-left:0;padding:22px 16px 34px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="preview">
+    <span class="preview-tag">Vorschau · Maßstab in mm</span>
+    <svg id="cfgSvg" viewBox="0 0 300 300" aria-label="Live-Vorschau des gravierten Anhängers mit mm-Maßstab">
+      <defs>
+        <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#fbfcfd"/><stop offset=".28" stop-color="#e6e8eb"/>
+          <stop offset=".52" stop-color="#c8cdd3"/><stop offset=".74" stop-color="#e1e4e8"/>
+          <stop offset="1" stop-color="#b3b9c1"/>
+        </linearGradient>
+        <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#ffffff" stop-opacity=".9"/><stop offset=".4" stop-color="#ffffff" stop-opacity="0"/>
+        </linearGradient>
+        <filter id="photoeng" x="0" y="0" width="100%" height="100%">
+          <feColorMatrix type="saturate" values="0"/>
+          <feComponentTransfer>
+            <feFuncR type="linear" slope="1.25" intercept="-0.08"/>
+            <feFuncG type="linear" slope="1.25" intercept="-0.08"/>
+            <feFuncB type="linear" slope="1.25" intercept="-0.08"/>
+          </feComponentTransfer>
+        </filter>
+      </defs>
+      <g id="cfgRuler"></g>
+      <g id="cfgPendant"></g>
+      <g id="cfgGuides"></g>
+    </svg>
+    <span class="dim-caption" id="dimCaption"></span>
+    <span class="drag-hint">Tipp: Text ziehen · bei Kreistext drehst du ihn am Rand entlang</span>
+  </div>
+
+  <div class="controls">
+    <h1 id="edTitle">Anhänger gestalten</h1>
+    <p class="lead">Was du in der Vorschau siehst, wird genau so graviert.</p>
+
+    <div class="field" id="modeField">
+      <label>Was möchtest du gravieren?</label>
+      <div class="mode-cards" id="modeCards">
+        <button type="button" class="mode-card on" data-mode="text" aria-label="Text gravieren">
+          <svg viewBox="0 0 120 84" role="img">
+            <defs><linearGradient id="mcAlu" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#fbfcfd"/><stop offset=".3" stop-color="#e6e8eb"/><stop offset=".6" stop-color="#c8cdd3"/><stop offset="1" stop-color="#b3b9c1"/>
+            </linearGradient></defs>
+            <circle cx="60" cy="42" r="34" fill="url(#mcAlu)" stroke="#ffffff" stroke-opacity=".7"/>
+            <text x="60" y="50" text-anchor="middle" font-family="Cormorant Garamond, serif" font-size="21" font-weight="600" fill="#5b6068">Anna</text>
+          </svg>
+          <span class="mc-title">Text</span><span class="mc-sub">Name · Datum · Worte</span>
+        </button>
+        <button type="button" class="mode-card" data-mode="photo" aria-label="Foto gravieren">
+          <svg viewBox="0 0 120 84" role="img">
+            <defs><clipPath id="mcFoto"><circle cx="60" cy="42" r="34"/></clipPath></defs>
+            <circle cx="60" cy="42" r="34" fill="url(#mcAlu)" stroke="#ffffff" stroke-opacity=".7"/>
+            <g clip-path="url(#mcFoto)"><circle cx="60" cy="36" r="11" fill="#9aa1aa"/><path d="M40 80 C40 63 51 57 60 57 C69 57 80 63 80 80 Z" fill="#9aa1aa"/></g>
+          </svg>
+          <span class="mc-title">Foto</span><span class="mc-sub">Dein Foto gravieren</span>
+        </button>
+        <button type="button" class="mode-card" data-mode="map" aria-label="Karte gravieren">
+          <svg viewBox="0 0 120 84" role="img">
+            <defs><clipPath id="mcMap"><circle cx="60" cy="42" r="34"/></clipPath></defs>
+            <circle cx="60" cy="42" r="34" fill="url(#mcAlu)" stroke="#ffffff" stroke-opacity=".7"/>
+            <g clip-path="url(#mcMap)" fill="none" stroke="#3b3f45" stroke-linecap="round">
+              <path d="M20 30 L52 36 L100 22" stroke-width="2.2"/><path d="M30 64 L58 44 L96 58" stroke-width="2.2"/><path d="M52 10 L58 44 L66 80" stroke-width="1.6"/><path d="M24 48 L44 52 M74 30 L90 40" stroke-width="1.1"/>
+            </g>
+            <path d="M60 52 C50 44 47 40 47 36 C47 32 50 30 53 30 C56 30 59 32 60 34 C61 32 64 30 67 30 C70 30 73 32 73 36 C73 40 70 44 60 52 Z" fill="#1c1c1c" stroke="#fff" stroke-width="1.6"/>
+          </svg>
+          <span class="mc-title">Karte</span><span class="mc-sub">z. B. Marienplatz</span>
+        </button>
+      </div>
+      <p class="mini-help">Du kannst jederzeit wechseln.</p>
+    </div>
+
+    <div class="field" id="shapeField">
+      <label>Anhänger-Form</label>
+      <div class="chips" id="shapeChips">
+        <button type="button" class="chip on" data-shape="circle">● Kreis · Ø 20 mm</button>
+        <button type="button" class="chip" data-shape="heart">♥ Herz · 19,5 × 18 mm</button>
+        <button type="button" class="chip" data-shape="dogtag" id="dogChip" hidden>◉ Dog Tag · Ø 24 mm</button>
+      </div>
+    </div>
+
+    <div id="textFields">
+      <div class="field">
+        <label>Gravur-Zeilen</label>
+        <div id="lineEditor"></div>
+        <div class="line-actions"><button type="button" class="chip" id="addLineBtn">+ Zeile hinzufügen</button></div>
+        <p class="mini-help">Jede Zeile ist ein eigenes Textelement und kann separat bearbeitet und verschoben werden.</p>
+      </div>
+      <div class="field">
+        <label>Ausgewählte Zeile</label>
+        <div class="line-selected-bar">
+          <strong id="selectedLineLabel">Zeile 1</strong>
+          <button type="button" class="linkbtn" id="removeLineBtn">Ausgewählte Zeile entfernen</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Textform</label>
+        <div class="chips" id="textModeChips">
+          <button type="button" class="chip on" data-mode="straight">Gerade</button>
+          <button type="button" class="chip" data-mode="arc">Kreisförmig</button>
+        </div>
+        <p class="mini-help" id="textModeHelp"></p>
+      </div>
+      <div class="field">
+        <label>Schriftgröße</label>
+        <div class="range-line"><input type="range" id="fontSizeRange" min="40" max="140" step="1" value="100"><output id="fontSizeValue">100%</output></div>
+      </div>
+      <div class="field">
+        <label>Winkel / Position</label>
+        <div class="range-line"><input type="range" id="angleRange" min="-180" max="180" step="1" value="0"><output id="angleValue">0°</output></div>
+        <p class="mini-help" id="angleHelp">Gerader Text wird gedreht. Kreistext wird entlang des Rands verschoben.</p>
+      </div>
+      <div class="field">
+        <label>Höhe / Abstand zur Kante</label>
+        <div class="range-line"><input type="range" id="verticalRange" min="-6" max="6" step="0.1" value="0"><output id="verticalValue">0 mm</output></div>
+        <p class="mini-help" id="verticalHelp"></p>
+      </div>
+    </div>
+
+    <div class="field" id="photoField">
+      <label id="photoLabel">Foto-Gravur · nur runde Form</label>
+      <label class="upload">
+        <svg viewBox="0 0 24 24"><path d="M4 16l4-5 3 4 3-4 6 8H4zM3 5h18v14H3z"/><circle cx="8.5" cy="8.5" r="1.6"/></svg>
+        <span id="uploadLabel">Foto auswählen …</span>
+        <input type="file" id="photoInput" accept="image/*">
+      </label>
+      <p class="hint">Nur scharfe, hochauflösende Fotos (mind. 800&nbsp;px). Am besten 1&ndash;2 Personen oder ein Tier, gut sichtbar und hell ausgeleuchtet.</p>
+      <div class="photo-msg" id="photoMsg"></div>
+      <div class="photo-actions" id="photoActions" style="display:none">
+        <button type="button" class="linkbtn" id="photoRemove">Foto entfernen</button>
+        <button type="button" class="linkbtn" id="photoReset">Foto zentrieren</button>
+      </div>
+      <div class="photo-tools" id="photoTools">
+        <label>Foto-Zoom</label>
+        <div class="range-line"><input type="range" id="photoZoomRange" min="100" max="220" step="1" value="100"><output id="photoZoomValue">100%</output></div>
+        <p class="mini-help">Tipp: Das Foto in der Vorschau ziehen, um den sichtbaren Ausschnitt festzulegen.</p>
+      </div>
+    </div>
+
+    <div class="field" id="mapField">
+      <label id="mapLabelTitle">Karten-Gravur · nur runde Form</label>
+      <div class="map-row">
+        <input type="text" class="txt" id="mapQuery" placeholder="Ort oder Koordinaten, z. B. Marienplatz München">
+        <button type="button" class="chip" id="mapGenBtn">Karte erzeugen</button>
+      </div>
+      <div class="range-line map-zoom-line">
+        <label>Zoom</label>
+        <input type="range" id="mapZoom" min="250" max="1200" step="50" value="550">
+        <output id="mapZoomValue">mittel</output>
+      </div>
+      <p class="hint">Gib eine Adresse oder GPS-Koordinaten ein (z.&nbsp;B. <em>48.137, 11.575</em>). Wir erzeugen daraus automatisch die Straßenkarte mit Herz-Markierung an deinem Ort. Kartendaten © OpenStreetMap.</p>
+      <div class="photo-msg" id="mapMsg"></div>
+      <div class="photo-actions" id="mapActions" style="display:none">
+        <button type="button" class="linkbtn" id="mapRemove">Karte entfernen</button>
+      </div>
+    </div>
+
+    <div class="field" id="lenField">
+      <label>Kettenlänge</label>
+      <div class="chips" id="lenChips">
+        <button type="button" class="chip" data-len="40">40 cm</button>
+        <button type="button" class="chip on" data-len="45">45 cm</button>
+        <button type="button" class="chip" data-len="50">50 cm</button>
+      </div>
+    </div>
+
+    <div class="price-row">
+      <span class="lbl">inkl. Gravur &amp; Verpackung</span>
+      <span class="val" id="price">ab 19,99&nbsp;€</span>
+    </div>
+    <a class="btn-off" aria-disabled="true">Bald bestellbar</a>
+    <ul class="assure">
+      <li>Was du in der Vorschau siehst, wird genau so graviert</li>
+      <li>Sorgfältige Qualitätskontrolle von Hand in Bayern</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+/* ---- Anhaenger-Katalog (mm) ---- */
+const SHAPES={
+  circle:{label:'Kreis',  w:20,   h:20, price:'19,99', cap:'Ø 20 mm · 1,2 mm stark'},
+  heart: {label:'Herz',   w:19.5, h:18, price:'19,99', cap:'19,5 × 18 mm · 1,8 mm stark'},
+  dogtag:{label:'Dog Tag',w:24,   h:24, price:'19,99', cap:'Dog Tag · Ø 24 mm · Aluminium – leicht, stört Ihr Haustier nicht'},
+};
+/* Dog Tag: Bohrung 3 mm, Oberkante 2 mm unter dem Rand -> Mitte 3,5 mm unter dem Rand = y -8,5 mm von der Mitte.
+   Sperrzone fuer Gravur: Loch + 0,8 mm Rand (Radius 2,3 mm). */
+const DOG={holeY:-8.5, holeR:1.5, margin:0.8, bodyR:12};
+const KEEP_R=DOG.holeR+DOG.margin;
+const ARC_KEEP_DEG=26;   // Kreistext (unten) darf nie in die +-26 Grad um die Lochachse oben ragen
+const UNIT_HEART='M50 88 C 12 55 0 35 0 22 C 0 8 12 0 25 0 C 38 0 46 8 50 16 C 54 8 62 0 75 0 C 88 0 100 8 100 22 C 100 35 88 55 50 88 Z';
+const SVG_NS='http://www.w3.org/2000/svg';
+const CFG_MM=8, CFG_CX=168, CFG_CY=118;
+let clipSeq=0;
+let nextLineId=2;
+
+function escapeHtml(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function clampNumber(v,min,max){ if(max<min) return (min+max)/2; return Math.max(min, Math.min(max, v)); }
+function normAngle(a){ a=((a+180)%360+360)%360-180; return Math.round(a); }
+function fmt(n,unit=''){return (Math.round(n*100)/100).toFixed(2).replace(/\.00$/,'').replace('.',',')+unit;}
+function deDec(n){return String(n).replace('.',',')}
+const $=id=>document.getElementById(id);
+
+function createLine(text='Emma', patch={}){
+  return Object.assign({id:nextLineId++, text, offX:0, offY:0, fontScale:1, angle:0, textMode:'straight'}, patch||{});
+}
+let state={
+  shape:'circle', contentMode:'text', len:45,
+  photo:null, photoWidth:0, photoHeight:0, photoScale:1, photoOffX:0, photoOffY:0,
+  selectedLineId:1, mapPaths:null, mapLabel:'', mapCenter:null,
+  lines:[{id:1,text:'Emma',offX:0,offY:0,fontScale:1,angle:0,textMode:'straight'}]
+};
+const FRAMES={
+  circle:{cx:0,cy:0,outerR:9.95,safeR:9.85},
+  dogtag:{cx:0,cy:0,outerR:11.95,safeR:11.85},
+  heart:{cx:0,cy:0,outerScaleX:1,outerScaleY:1,safeScaleX:.98,safeScaleY:.98}
+};
+const frameOf=s=>FRAMES[s]||FRAMES.circle;
+const isRound=s=>s!=='heart';
+const roundKey=s=>s==='dogtag'?'dogtag':'circle';
+const rf=()=>frameOf(roundKey(state.shape));            // Rahmen der aktuellen runden Form
+function frameCenter(shape,cx,cy,MM){const f=frameOf(shape);return {x:cx+(f.cx||0)*MM,y:cy+(f.cy||0)*MM};}
+/* Standard-Lage des Textes: Herz leicht hoch, Dog Tag unterhalb des Lochs */
+function textAnchor(shape,cx,cy,MM){
+  const c=frameCenter(shape==='heart'?'heart':roundKey(shape),cx,cy,MM);
+  return {x:c.x,y:c.y+(shape==='heart'?-1.4*MM:(shape==='dogtag'?2.2*MM:0))};
+}
+const holePx=(cx=CFG_CX,cy=CFG_CY,MM=CFG_MM)=>({x:cx,y:cy+DOG.holeY*MM,r:DOG.holeR*MM,keep:KEEP_R*MM});
+const ringPath=(cx,cy,r)=>`M ${cx-r} ${cy} a ${r} ${r} 0 1 0 ${2*r} 0 a ${r} ${r} 0 1 0 ${-2*r} 0 Z`;
+
+function getSelectedLine(){ return state.lines.find(l=>l.id===state.selectedLineId) || state.lines[0] || null; }
+function ensureSelectedLine(){
+  if(!state.lines.length){ const line=createLine(''); state.lines=[line]; state.selectedLineId=line.id; }
+  if(!state.lines.some(l=>l.id===state.selectedLineId)) state.selectedLineId=state.lines[0].id;
+}
+function syncShapeRules(){
+  if(state.shape==='heart') state.lines.forEach(l=>{ if(l.textMode==='arc') l.textMode='straight'; });
+  ensureSelectedLine();
+}
+
+function heartPathMarkup(cx,cy,MM,scaleX,scaleY,cls){
+  const w=19.5*MM*scaleX, h=18*MM*scaleY, sx=w/100, sy=h/88, tx=cx-w/2, ty=cy-h/2;
+  return `<g class="${cls}" transform="translate(${tx} ${ty}) scale(${sx} ${sy})"><path d="${UNIT_HEART}"/></g>`;
+}
+function overlayOutlines(shape,cx,cy,MM){
+  const f=frameOf(shape), c=frameCenter(shape,cx,cy,MM);
+  if(isRound(shape)){
+    let s=`<circle class="shape-outline" cx="${c.x}" cy="${c.y}" r="${f.outerR*MM}"/>`;
+    if(shape==='dogtag'){ const h=holePx(cx,cy,MM); s+=`<circle class="keepout" cx="${h.x}" cy="${h.y}" r="${h.keep}"/>`; }
+    return s;
+  }
+  return heartPathMarkup(c.x,c.y,MM,f.outerScaleX,f.outerScaleY,'shape-outline');
+}
+
+/* ---- Foto ---- */
+function getPhotoDisplayMetrics(MM){
+  if(!state.photo || !state.photoWidth || !state.photoHeight) return null;
+  const frameR=rf().safeR*MM, diameter=frameR*2;
+  const cover=Math.max(diameter/state.photoWidth, diameter/state.photoHeight);
+  const scale=cover*(state.photoScale||1);
+  return {frameR, diameter, width:state.photoWidth*scale, height:state.photoHeight*scale};
+}
+function clampPhotoOffset(MM, offXmm=state.photoOffX||0, offYmm=state.photoOffY||0){
+  const m=getPhotoDisplayMetrics(MM);
+  if(!m) return {x:0,y:0};
+  const maxX=Math.max(0,(m.width/2 - m.frameR))/MM;
+  const maxY=Math.max(0,(m.height/2 - m.frameR))/MM;
+  return {x:clampNumber(offXmm,-maxX,maxX), y:clampNumber(offYmm,-maxY,maxY)};
+}
+function syncPhotoCrop(){
+  if(!state.photo) return;
+  const c=clampPhotoOffset(CFG_MM, state.photoOffX, state.photoOffY);
+  state.photoOffX=c.x; state.photoOffY=c.y;
+}
+function photoGuideCircle(cx,cy,MM){
+  return `<circle class="photo-frame-guide" cx="${cx}" cy="${cy}" r="${rf().safeR*MM}"/>`;
+}
+
+/* Beschnitt fuer Foto/Karte: Kreis, beim Dog Tag mit ausgeschnittener Sperrzone um das Loch (evenodd) */
+function clipMarkup(id,cx,cy,R,MM,shape){
+  if(shape==='dogtag'){ const h=holePx(cx,cy,MM); return `<clipPath id="${id}"><path clip-rule="evenodd" d="${ringPath(cx,cy,R)} ${ringPath(h.x,h.y,h.keep)}"/></clipPath>`; }
+  return `<clipPath id="${id}"><circle cx="${cx}" cy="${cy}" r="${R}"/></clipPath>`;
+}
+function holeRing(cx,cy,MM){
+  const h=holePx(cx,cy,MM);
+  return `<circle cx="${h.x}" cy="${h.y}" r="${h.r}" fill="none" stroke="#8d949c" stroke-width=".9"/>`;
+}
+
+function pendantBody(shape,cx,cy,MM,photo){
+  if(isRound(shape)){
+    const dog=shape==='dogtag';
+    const r=(dog?DOG.bodyR:10)*MM;
+    let s;
+    if(dog){
+      const h=holePx(cx,cy,MM);
+      s=`<path d="${ringPath(cx,cy,r)} ${ringPath(h.x,h.y,h.r)}" fill-rule="evenodd" fill="url(#metal)" stroke="#ffffff" stroke-opacity=".6"/>`;
+    }else{
+      s=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#metal)" stroke="#ffffff" stroke-opacity=".6"/>`;
+    }
+    const R=frameOf(shape).safeR*MM;
+    if(state.mapPaths){
+      const id='mc'+(clipSeq++), scl=(2*R)/1000;
+      s+=clipMarkup(id,cx,cy,R,MM,shape)
+        +`<g clip-path="url(#${id})"><g transform="translate(${cx-R} ${cy-R}) scale(${scl})">${state.mapPaths}</g></g>`
+        +`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#c4c9cf" stroke-width="0.7"/>`;
+    }else if(photo){
+      const id='pc'+(clipSeq++);
+      const metrics=getPhotoDisplayMetrics(MM);
+      const clamp=clampPhotoOffset(MM, state.photoOffX, state.photoOffY);
+      const offX=clamp.x*MM, offY=clamp.y*MM;
+      const imgW=metrics ? metrics.width : R*2, imgH=metrics ? metrics.height : R*2;
+      const imgX=cx-imgW/2+offX, imgY=cy-imgH/2+offY;
+      s+=clipMarkup(id,cx,cy,R,MM,shape)
+        +`<g class="photoGroup" data-cx="${cx}" data-cy="${cy}" data-r="${R}">`
+        +`<image class="photo-img" href="${photo}" x="${imgX}" y="${imgY}" width="${imgW}" height="${imgH}" preserveAspectRatio="none" clip-path="url(#${id})" filter="url(#photoeng)"/>`
+        +`<circle class="photo-hit" cx="${cx}" cy="${cy}" r="${R}"/>`
+        +`</g>`
+        +`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#c4c9cf" stroke-width="0.7"/>`;
+    }else{
+      const sy=dog ? cy-r*0.2 : cy-r*0.42, ry=dog ? r*0.2 : r*0.3;
+      s+=`<ellipse cx="${cx}" cy="${sy}" rx="${r*0.72}" ry="${ry}" fill="url(#sheen)"/>`;
+    }
+    if(dog) s+=holeRing(cx,cy,MM);
+    return s;
+  }
+  const w=19.5*MM, h=18*MM, sx=w/100, sy=h/88, tx=cx-w/2, ty=cy-h/2;
+  return `<g transform="translate(${tx} ${ty}) scale(${sx} ${sy})"><path d="${UNIT_HEART}" fill="url(#metal)" stroke="#ffffff" stroke-opacity=".6"/></g>`
+       + `<ellipse cx="${cx}" cy="${cy-h*0.16}" rx="${w*0.3}" ry="${h*0.13}" fill="url(#sheen)"/>`;
+}
+
+function plainArcText(text){ return (text||'').trim() || ' '; }
+
+function lineMarkup(line, shape, cx, cy, MM){
+  const selClass = line.id===state.selectedLineId ? ' selected' : '';
+  const mode = (shape==='heart') ? 'straight' : (line.textMode||'straight');
+  const anchor = textAnchor(shape,cx,cy,MM);
+  const ax = anchor.x + line.offX*MM, ay = anchor.y + line.offY*MM;
+  const common = `data-line-id="${line.id}" data-shape="${shape}" data-mode="${mode}" data-angle="${line.angle}" data-cx="${ax}" data-cy="${ay}"`;
+
+  if(mode==='arc' && isRound(shape)){
+    const f=frameOf(roundKey(shape)), c=frameCenter(roundKey(shape),cx,cy,MM);
+    const maxInset=Math.max(0, f.safeR-4.7);
+    const inset=clampNumber(Number(line.offY||0), 0, maxInset);
+    const radiusMm=clampNumber(f.safeR-1.35-inset, 3.25, f.safeR-1.35);
+    const r=radiusMm*MM;
+    const pathId='arcTextPath'+(clipSeq++);
+    /* Rund: obere Halbkreis-Bahn. Dog Tag: UNTERE Bahn (Sweep 0), oben sitzt das Loch. */
+    const d = shape==='dogtag' ? `M ${c.x-r} ${c.y} A ${r} ${r} 0 0 0 ${c.x+r} ${c.y}` : `M ${c.x-r} ${c.y} A ${r} ${r} 0 0 1 ${c.x+r} ${c.y}`;
+    return `<g class="engGroup${selClass}" data-line-id="${line.id}" data-shape="${shape}" data-mode="${mode}" data-angle="${line.angle}" data-cx="${c.x}" data-cy="${c.y}" transform="rotate(${line.angle} ${c.x} ${c.y})">`
+         + `<path class="engPath" id="${pathId}" d="${d}"/>`
+         + `<path class="hit-outline" d="${d}"/>`
+         + `<text class="eng" data-line-id="${line.id}" data-mode="arc" data-shape="${shape}" data-font-scale="${line.fontScale}" data-path-radius="${r}" data-safe-radius="${f.safeR*MM}" `
+         + `text-anchor="middle" dominant-baseline="central" font-family="Cormorant Garamond, serif" font-weight="600" font-size="40" fill="#555a62">`
+         + `<textPath href="#${pathId}" startOffset="50%">${escapeHtml(plainArcText(line.text))}</textPath>`
+         + `</text></g>`;
+  }
+  let maxw, maxh;
+  if(shape==='dogtag'){ maxw=frameOf('dogtag').safeR*1.5*MM; maxh=frameOf('dogtag').safeR*.75*MM; }
+  else if(shape==='circle'){ maxw=Math.max(10,frameOf('circle').safeR*1.55*MM); maxh=Math.max(8,frameOf('circle').safeR*.95*MM); }
+  else { maxw=SHAPES.heart.w*MM*frameOf('heart').safeScaleX*.72; maxh=SHAPES.heart.h*MM*frameOf('heart').safeScaleY*.45; }
+  return `<g class="engGroup${selClass}" ${common} transform="translate(${ax} ${ay}) rotate(${line.angle})">`
+       + `<text class="eng" x="0" y="0" text-anchor="middle" dominant-baseline="central" data-line-id="${line.id}" `
+       + `data-mode="straight" data-shape="${shape}" data-font-scale="${line.fontScale}" data-maxw="${maxw}" data-maxh="${maxh}" `
+       + `font-family="Cormorant Garamond, serif" font-weight="600" font-size="40" fill="#555a62">${escapeHtml(line.text || ' ')}</text>`
+       + `</g>`;
+}
+
+function pendant(shape, lines, cx, cy, MM, photo){
+  const body = pendantBody(shape,cx,cy,MM,photo);
+  const overlays = overlayOutlines(shape,cx,cy,MM) + ((isRound(shape) && photo && !state.mapPaths) ? photoGuideCircle(cx,cy,MM) : '');
+  const hideText = state.contentMode==='photo' || state.contentMode==='map' || (isRound(shape) && (photo || state.mapPaths));
+  const text = hideText ? '' : lines.map(line=>lineMarkup(line, shape, cx, cy, MM)).join('');
+  return body + overlays + text;
+}
+
+function fittedFontSizeForStraight(el){
+  const FS0=40;
+  el.setAttribute('font-size', FS0);
+  let bb; try{ bb=el.getBBox(); }catch(e){ return 16; }
+  if(!bb || bb.width===0) return 16;
+  const wPerFs=bb.width/FS0, hPerFs=(bb.height||FS0)/FS0;
+  const maxW=+el.dataset.maxw || 80, maxH=+el.dataset.maxh || 50;
+  const maxFs=Math.min(maxW/Math.max(wPerFs,0.01), maxH/Math.max(hPerFs,0.01));
+  const userScale=(+el.dataset.fontScale||1);
+  return Math.max(4, Math.min(maxFs, maxFs*0.82*userScale));
+}
+function fittedFontSizeForArc(el){
+  const FS0=40;
+  el.setAttribute('font-size', FS0);
+  const group=el.closest('.engGroup');
+  const path=group && group.querySelector('.engPath');
+  let textLen=0, pathLen=0;
+  try{ textLen=el.getComputedTextLength(); }catch(e){ textLen=0; }
+  try{ pathLen=path.getTotalLength(); }catch(e){ pathLen=0; }
+  const lenPerFs=textLen ? textLen/FS0 : 1;
+  const maxByLength=pathLen ? (pathLen*0.84)/Math.max(lenPerFs,0.01) : 18;
+  const r=+el.dataset.pathRadius||60;
+  const safeR=+el.dataset.safeRadius||0;
+  const outwardClearance=safeR ? Math.max(4, safeR-r) : r*0.24;
+  const maxByHeight=Math.max(6, outwardClearance*1.45);
+  const maxFs=Math.min(maxByLength, maxByHeight);
+  const userScale=(+el.dataset.fontScale||1);
+  return Math.max(4, Math.min(maxFs, maxFs*0.88*userScale));
+}
+function fitEngravings(scope=document){
+  scope.querySelectorAll('text.eng').forEach(el=>{
+    const fs=el.dataset.mode==='arc' ? fittedFontSizeForArc(el) : fittedFontSizeForStraight(el);
+    el.setAttribute('font-size', fs);
+  });
+}
+
+/* ---- mm-Lineal ---- */
+function tickRuler(dir,x,y,mm,MM,label){
+  const len=mm*MM, n=Math.floor(mm+1e-6); let g='<g class="rul">';
+  if(dir==='h'){
+    g+=`<line x1="${x}" y1="${y}" x2="${x+len}" y2="${y}"/>`;
+    for(let i=0;i<=n;i++){const tx=x+i*MM,big=i%5===0;g+=`<line x1="${tx}" y1="${y}" x2="${tx}" y2="${y-(big?7:4)}"/>`;}
+    g+=`<text x="${x+len/2}" y="${y+15}" text-anchor="middle" class="rlbl">${label}</text>`;
+  }else{
+    g+=`<line x1="${x}" y1="${y}" x2="${x}" y2="${y+len}"/>`;
+    for(let i=0;i<=n;i++){const ty=y+i*MM,big=i%5===0;g+=`<line x1="${x}" y1="${ty}" x2="${x+(big?7:4)}" y2="${ty}"/>`;}
+    g+=`<text x="${x-11}" y="${y+len/2}" text-anchor="middle" transform="rotate(-90 ${x-11} ${y+len/2})" class="rlbl">${label}</text>`;
+  }
+  return g+'</g>';
+}
+function ruler(shape,cx,cy,MM){
+  const s=SHAPES[shape], w=s.w*MM, h=s.h*MM, left=cx-w/2, top=cy-h/2, bottom=cy+h/2;
+  return tickRuler('h', left, bottom+24, s.w, MM, deDec(s.w)+' mm')
+       + tickRuler('v', left-26, top, s.h, MM, deDec(s.h)+' mm');
+}
+
+/* ---- UI-Sync ---- */
+function syncShapeChips(){
+  document.querySelectorAll('#shapeChips .chip').forEach(x=>x.classList.toggle('on', x.dataset.shape===state.shape));
+}
+function syncContentMode(){
+  const m=state.contentMode||'text';
+  document.querySelectorAll('#modeCards .mode-card').forEach(c=>c.classList.toggle('on', c.dataset.mode===m));
+  const show=(id,on)=>{ const el=$(id); if(el) el.style.display = on ? 'block' : 'none'; };
+  show('shapeField', m==='text');
+  show('textFields', m==='text');
+  show('photoField', m==='photo');
+  show('mapField', m==='map');
+}
+function setContentMode(m){
+  if(state.contentMode===m){ syncContentMode(); return; }
+  state.contentMode=m;
+  if((m==='photo'||m==='map') && state.shape==='heart'){ state.shape='circle'; syncShapeChips(); }
+  if(m!=='photo') clearPhoto();
+  if(m!=='map') clearMap();
+  syncContentMode();
+  render();
+}
+function renderLineEditor(){
+  $('lineEditor').innerHTML = state.lines.map((line,idx)=>{
+    const active = line.id===state.selectedLineId ? ' on' : '';
+    const modeLabel = (state.shape==='heart') ? 'Gerade' : (line.textMode==='arc' ? 'Kreisförmig' : 'Gerade');
+    return `<div class="line-item${active}" data-line-id="${line.id}">`
+         + `<div class="line-item-head"><span class="line-item-title">Zeile ${idx+1}</span><span class="line-badge">${modeLabel}</span></div>`
+         + `<input class="line-input" type="text" maxlength="28" value="${escapeHtml(line.text)}" data-line-input="${line.id}" placeholder="Text eingeben …">`
+         + `<div class="line-mini"><span class="line-chip">Größe ${Math.round(line.fontScale*100)}%</span><span class="line-chip">Winkel ${normAngle(line.angle)}°</span><span class="line-chip">Höhe ${fmt(line.offY||0,' mm')}</span></div>`
+         + `</div>`;
+  }).join('');
+}
+/* erlaubter Dreh-Bereich des Kreistexts am Dog Tag (Textbreite + Lochsperre oben) */
+function arcLimit(line){
+  const half=(line._span||60)/2;
+  return Math.max(0, Math.floor(180-ARC_KEEP_DEG-half));
+}
+function syncSelectedControls(){
+  ensureSelectedLine();
+  const line=getSelectedLine();
+  const round=isRound(state.shape), dog=state.shape==='dogtag';
+  const arcBtn=document.querySelector('#textModeChips [data-mode="arc"]');
+  const help=$('textModeHelp');
+  const fs=$('fontSizeRange'), fv=$('fontSizeValue');
+  const ar=$('angleRange'), av=$('angleValue'), ah=$('angleHelp');
+  const vr=$('verticalRange'), vv=$('verticalValue'), vh=$('verticalHelp');
+  $('selectedLineLabel').textContent = `Zeile ${Math.max(1, state.lines.findIndex(x=>x.id===line.id)+1)}`;
+  $('removeLineBtn').style.visibility = state.lines.length>1 ? 'visible' : 'hidden';
+  document.querySelectorAll('#textModeChips .chip').forEach(x=>x.classList.toggle('on', x.dataset.mode===line.textMode || (state.shape==='heart' && x.dataset.mode==='straight')));
+  if(arcBtn) arcBtn.disabled = !round;
+  help.textContent = dog ? 'Kreistext läuft am unteren Rand entlang – oben bleibt das Loch frei.'
+    : (round ? 'Kreisförmig funktioniert nur beim runden Anhänger und wird pro Zeile separat eingestellt.' : 'Beim Herz-Anhänger ist Kreistext deaktiviert, damit die Gestaltung sauber bleibt.');
+  fs.value=Math.round(line.fontScale*100); fv.textContent=Math.round(line.fontScale*100)+'%';
+  const arcDog = dog && line.textMode==='arc';
+  if(arcDog){ const lim=arcLimit(line); ar.min=-lim; ar.max=lim; } else { ar.min=-180; ar.max=180; }
+  ar.value=normAngle(line.angle); av.textContent=normAngle(line.angle)+'°';
+  ah.textContent = arcDog ? 'Kreistext lässt sich am unteren Rand verschieben, aber nie in die Sperrzone um das Loch.' : 'Gerader Text wird gedreht. Kreistext wird entlang des Rands verschoben.';
+  if(round && line.textMode==='arc'){
+    vr.min=0; vr.max=Math.round(Math.max(0, rf().safeR-4.7)*10)/10; vr.step=0.1;
+    vr.value=clampNumber(Number(line.offY||0), +vr.min, +vr.max);
+    vv.textContent=fmt(+vr.value,' mm');
+    vh.textContent='Kreistext: größerer Wert setzt den Text weiter nach innen, aber immer innerhalb des Anhängers.';
+  }else{
+    vr.min=-6; vr.max=6; vr.step=0.1; vr.value=clampNumber(Number(line.offY||0), -6, 6);
+    vv.textContent=fmt(+vr.value,' mm');
+    vh.textContent='Gerader Text: damit verschiebst du die ausgewählte Zeile nach oben oder unten.';
+  }
+}
+function syncPhotoUi(){
+  const has=!!state.photo;
+  $('photoTools').classList.toggle('on', has && isRound(state.shape));
+  $('photoActions').style.display = has ? 'flex' : 'none';
+  $('photoZoomRange').value=Math.round((state.photoScale||1)*100);
+  $('photoZoomValue').textContent=Math.round((state.photoScale||1)*100)+'%';
+}
+
+function renderPreviewOnly(){
+  syncShapeRules();
+  syncPhotoCrop();
+  $('cfgRuler').innerHTML = ruler(state.shape, CFG_CX, CFG_CY, CFG_MM);
+  $('cfgPendant').innerHTML = pendant(state.shape, state.lines, CFG_CX, CFG_CY, CFG_MM, state.photo);
+  $('dimCaption').textContent = SHAPES[state.shape].cap;
+  $('price').innerHTML = 'ab '+SHAPES[state.shape].price+'&nbsp;€';
+  fitEngravings(document);
+  keepAllLinesInside();
+}
+function render(){
+  renderPreviewOnly();
+  renderLineEditor();
+  syncSelectedControls();
+  syncPhotoUi();
+}
+
+const getPreviewGroup=id=>document.querySelector(`#cfgPendant .engGroup[data-line-id="${id}"]`);
+const getPreviewText=id=>document.querySelector(`#cfgPendant text.eng[data-line-id="${id}"]`);
+function updateSingleGroup(lineId){
+  const line=state.lines.find(l=>l.id===lineId);
+  const g=getPreviewGroup(lineId); if(!line || !g) return;
+  const mode=(state.shape==='heart') ? 'straight' : line.textMode;
+  const anchor=textAnchor(state.shape,CFG_CX,CFG_CY,CFG_MM);
+  const ay=anchor.y + line.offY*CFG_MM, ax=anchor.x + line.offX*CFG_MM;
+  if(mode==='arc'){
+    const c=frameCenter(roundKey(state.shape),CFG_CX,CFG_CY,CFG_MM);
+    g.setAttribute('transform', `rotate(${line.angle} ${c.x} ${c.y})`);
+  } else g.setAttribute('transform', `translate(${ax} ${ay}) rotate(${line.angle})`);
+}
+
+/* ---- Geometrie: bleibt die Zeile im Anhaenger (und beim Dog Tag ausserhalb der Lochsperre)? ---- */
+function rotatedCorners(ext, cx, cy, angleDeg){
+  const a=angleDeg*Math.PI/180, c=Math.cos(a), s=Math.sin(a);
+  return [[-ext.hw,-ext.hh],[ext.hw,-ext.hh],[ext.hw,ext.hh],[-ext.hw,ext.hh]].map(([x,y])=>({x:cx + x*c - y*s, y:cy + x*s + y*c}));
+}
+function rectExtentsFromText(lineId){
+  const t=getPreviewText(lineId); if(!t) return {hw:12,hh:8};
+  let bb; try{ bb=t.getBBox(); }catch(e){ return {hw:12,hh:8}; }
+  return {hw:Math.max(1,bb.width/2), hh:Math.max(1,bb.height/2)};
+}
+/* Schneidet das (gedrehte) Text-Rechteck die Sperrkreisscheibe um das Loch? */
+function rectHitsHole(ext,cx,cy,angleDeg){
+  const h=holePx(), a=angleDeg*Math.PI/180, c=Math.cos(a), s=Math.sin(a);
+  const dx=h.x-cx, dy=h.y-cy;
+  const lx=dx*c+dy*s, ly=-dx*s+dy*c;
+  const nx=clampNumber(lx,-ext.hw,ext.hw), ny=clampNumber(ly,-ext.hh,ext.hh);
+  return (lx-nx)**2+(ly-ny)**2 < h.keep*h.keep;
+}
+function heartPolygon(cx,cy,MM,scaleX=0.82,scaleY=scaleX){
+  const w=19.5*MM*scaleX, h=18*MM*scaleY, sx=w/100, sy=h/88, tx=cx-w/2, ty=cy-h/2;
+  const path=document.createElementNS(SVG_NS,'path');
+  path.setAttribute('d', UNIT_HEART);
+  $('cfgSvg').appendChild(path);
+  const total=path.getTotalLength(), pts=[];
+  for(let i=0;i<150;i++){ const p=path.getPointAtLength(total*i/150); pts.push({x:tx + p.x*sx, y:ty + p.y*sy}); }
+  path.remove();
+  return pts;
+}
+function pointInPolygon(point, polygon){
+  let inside=false;
+  for(let i=0,j=polygon.length-1;i<polygon.length;j=i++){
+    const xi=polygon[i].x, yi=polygon[i].y, xj=polygon[j].x, yj=polygon[j].y;
+    if(((yi>point.y)!==(yj>point.y)) && (point.x < (xj-xi)*(point.y-yi)/(yj-yi+1e-9)+xi)) inside=!inside;
+  }
+  return inside;
+}
+function isStraightLineInside(line, cx, cy){
+  const ext=rectExtentsFromText(line.id);
+  const corners=rotatedCorners(ext, cx, cy, line.angle);
+  if(isRound(state.shape)){
+    const f=rf(), c=frameCenter(roundKey(state.shape),CFG_CX,CFG_CY,CFG_MM), R=f.outerR*CFG_MM;
+    if(!corners.every(p => ((p.x-c.x)**2 + (p.y-c.y)**2) <= R*R)) return false;
+    if(state.shape==='dogtag' && rectHitsHole(ext,cx,cy,line.angle)) return false;
+    return true;
+  }
+  const f=frameOf('heart'), c=frameCenter('heart',CFG_CX,CFG_CY,CFG_MM);
+  const poly=heartPolygon(c.x, c.y, CFG_MM, f.outerScaleX, f.outerScaleY);
+  return corners.every(p => pointInPolygon(p, poly));
+}
+function clampLineOffsetToShape(line, desiredOx, desiredOy, fallbackOx, fallbackOy){
+  if(line.textMode!=='arc'){
+    const anchor=textAnchor(state.shape,CFG_CX,CFG_CY,CFG_MM);
+    const targetCx = anchor.x + desiredOx, targetCy = anchor.y + desiredOy;
+    if(isStraightLineInside(line, targetCx, targetCy)) return {x:desiredOx,y:desiredOy,changed:false};
+    let insideX = anchor.x + fallbackOx, insideY = anchor.y + fallbackOy;
+    if(!isStraightLineInside(line, insideX, insideY)){
+      insideX = anchor.x + line.offX*CFG_MM; insideY = anchor.y + line.offY*CFG_MM;
+      if(!isStraightLineInside(line, insideX, insideY)){ insideX = anchor.x; insideY = anchor.y; }
+    }
+    let ax=insideX, ay=insideY, bx=targetCx, by=targetCy;
+    for(let i=0;i<18;i++){
+      const mx=(ax+bx)/2, my=(ay+by)/2;
+      if(isStraightLineInside(line, mx, my)){ ax=mx; ay=my; } else { bx=mx; by=my; }
+    }
+    return {x:ax-anchor.x, y:ay-anchor.y, changed:true};
+  }
+  return {x:desiredOx,y:desiredOy,changed:false};
+}
+/* Dog Tag: passt eine (gedrehte) Zeile selbst am Anker nicht, wird sie nur in der Vorschau verkleinert (nicht dauerhaft) */
+function shrinkToFit(line){
+  const t=getPreviewText(line.id); if(!t) return false;
+  const a=textAnchor(state.shape,CFG_CX,CFG_CY,CFG_MM);
+  const cx=a.x+line.offX*CFG_MM, cy=a.y+line.offY*CFG_MM;
+  let sc=line.fontScale, n=0;
+  while(!isStraightLineInside(line,cx,cy) && n<18 && sc>.15){
+    sc*=.9; t.dataset.fontScale=sc;
+    t.setAttribute('font-size', fittedFontSizeForStraight(t)); n++;
+  }
+  return n>0;
+}
+/* Dog Tag: Kreistext (unten) nie in die +-26 Grad oben um das Loch drehen */
+function clampArcAngles(){
+  if(state.shape!=='dogtag') return;
+  state.lines.forEach(line=>{
+    if(line.textMode!=='arc') return;
+    const t=getPreviewText(line.id); if(!t) return;
+    const r=+t.dataset.pathRadius; let len=0;
+    try{ len=t.getComputedTextLength(); }catch(e){}
+    line._span = r ? len/r*180/Math.PI : 60;
+    const lim=arcLimit(line);
+    const na=clampNumber(normAngle(line.angle),-lim,lim);
+    if(na!==line.angle){ line.angle=na; updateSingleGroup(line.id); }
+  });
+}
+function keepLineInside(line){
+  if(line.textMode==='arc') return false;
+  let changed=false;
+  const clamped=clampLineOffsetToShape(line, line.offX*CFG_MM, line.offY*CFG_MM, 0, 0);
+  if(clamped.changed){ line.offX=clamped.x/CFG_MM; line.offY=clamped.y/CFG_MM; updateSingleGroup(line.id); changed=true; }
+  if(state.shape==='dogtag' && shrinkToFit(line)) changed=true;
+  return changed;
+}
+function keepAllLinesInside(){
+  clampArcAngles();
+  state.lines.forEach(line=>keepLineInside(line));
+}
+
+/* ---- Zeilen-Editor ---- */
+function updateLineEditorSelectionOnly(){
+  document.querySelectorAll('.line-item').forEach(item=>item.classList.toggle('on', +item.dataset.lineId===state.selectedLineId));
+}
+function selectLine(id){
+  state.selectedLineId=id;
+  updateLineEditorSelectionOnly();
+  syncSelectedControls();
+  renderPreviewOnly();
+}
+$('lineEditor').addEventListener('click',e=>{
+  const inp=e.target.closest('[data-line-input]');
+  if(inp){ selectLine(+inp.dataset.lineInput); return; }
+  const item=e.target.closest('.line-item');
+  if(item) selectLine(+item.dataset.lineId);
+});
+$('lineEditor').addEventListener('focusin',e=>{
+  const inp=e.target.closest('[data-line-input]');
+  if(inp && +inp.dataset.lineInput!==state.selectedLineId) selectLine(+inp.dataset.lineInput);
+});
+$('lineEditor').addEventListener('input',e=>{
+  const inp=e.target.closest('[data-line-input]'); if(!inp) return;
+  const id=+inp.dataset.lineInput;
+  const line=state.lines.find(l=>l.id===id); if(!line) return;
+  line.text=inp.value;
+  state.selectedLineId=id;
+  updateLineEditorSelectionOnly();
+  renderPreviewOnly();
+  syncSelectedControls();
+});
+$('addLineBtn').addEventListener('click',()=>{
+  const base=createLine('');
+  base.offY = state.lines.length ? Math.min(state.lines.length*0.9, 4) : 0;
+  state.lines.push(base);
+  state.selectedLineId=base.id;
+  render();
+  const inp=document.querySelector(`[data-line-input="${base.id}"]`); if(inp) inp.focus();
+});
+$('removeLineBtn').addEventListener('click',()=>{
+  if(state.lines.length<=1) return;
+  state.lines=state.lines.filter(l=>l.id!==state.selectedLineId);
+  ensureSelectedLine();
+  render();
+});
+document.querySelectorAll('#textModeChips .chip').forEach(btn=>btn.addEventListener('click',()=>{
+  if(btn.disabled) return;
+  const line=getSelectedLine(); if(!line) return;
+  line.textMode=btn.dataset.mode;
+  if(line.textMode==='arc'){ line.offX=0; line.offY=0; line.angle=0; }
+  render();
+}));
+$('fontSizeRange').addEventListener('input',e=>{
+  const line=getSelectedLine(); if(!line) return;
+  line.fontScale=(+e.target.value)/100;
+  $('fontSizeValue').textContent=e.target.value+'%';
+  render();
+});
+$('angleRange').addEventListener('input',e=>{
+  const line=getSelectedLine(); if(!line) return;
+  line.angle=+e.target.value;
+  $('angleValue').textContent=line.angle+'°';
+  render();
+});
+$('verticalRange').addEventListener('input',e=>{
+  const line=getSelectedLine(); if(!line) return;
+  line.offY=+e.target.value;
+  $('verticalValue').textContent=fmt(line.offY,' mm');
+  render();
+});
+document.querySelectorAll('#modeCards .mode-card').forEach(c=>c.addEventListener('click',()=>setContentMode(c.dataset.mode)));
+document.querySelectorAll('#shapeChips .chip').forEach(c=>c.addEventListener('click',()=>{
+  const prev=state.shape;
+  state.shape=c.dataset.shape;
+  if(state.shape==='heart'){ state.lines.forEach(l=>{ l.textMode='straight'; l.offX=0; }); }
+  if((prev==='dogtag')!==(state.shape==='dogtag')) state.lines.forEach(l=>{ if(l.textMode==='arc') l.angle=0; });
+  syncShapeChips();
+  render();
+}));
+
+/* ---- Ziehen ---- */
+const cfgSvgEl=$('cfgSvg');
+let drag=null;
+function clientToSvg(x,y){ const p=cfgSvgEl.createSVGPoint(); p.x=x; p.y=y; return p.matrixTransform(cfgSvgEl.getScreenCTM().inverse()); }
+function drawGuides(v,h){
+  let s='';
+  const a=textAnchor(state.shape,CFG_CX,CFG_CY,CFG_MM), c=frameCenter(roundKey(state.shape),CFG_CX,CFG_CY,CFG_MM);
+  const sh=SHAPES[state.shape], hw=sh.w/2*CFG_MM+12, hh=sh.h/2*CFG_MM+12;
+  if(v) s+=`<line class="guide" x1="${c.x}" y1="${c.y-hh}" x2="${c.x}" y2="${c.y+hh}"/>`;
+  if(h) s+=`<line class="guide" x1="${c.x-hw}" y1="${a.y}" x2="${c.x+hw}" y2="${a.y}"/>`;
+  $('cfgGuides').innerHTML=s;
+}
+function pointerAngleFromCenter(p){ const c=frameCenter(roundKey(state.shape),CFG_CX,CFG_CY,CFG_MM); return Math.atan2(p.y-c.y, p.x-c.x)*180/Math.PI + 90; }
+
+cfgSvgEl.addEventListener('pointerdown',e=>{
+  const photoHit=e.target.closest('.photoGroup');
+  if(photoHit && state.photo && isRound(state.shape)){
+    const p=clientToSvg(e.clientX,e.clientY);
+    drag={id:e.pointerId, mode:'photo', px:p.x, py:p.y, ox:(state.photoOffX||0)*CFG_MM, oy:(state.photoOffY||0)*CFG_MM};
+    try{ cfgSvgEl.setPointerCapture(e.pointerId); }catch(_){}
+    cfgSvgEl.style.cursor='grabbing';
+    e.preventDefault();
+    return;
+  }
+  const group=e.target.closest('.engGroup');
+  if(!group) return;
+  const lineId=+group.dataset.lineId;
+  const line=state.lines.find(l=>l.id===lineId); if(!line) return;
+  state.selectedLineId=lineId;
+  render();
+  const p=clientToSvg(e.clientX,e.clientY);
+  if(isRound(state.shape) && line.textMode==='arc'){
+    drag={id:e.pointerId, mode:'arc', lineId, startAngle:line.angle, pointerAngle:pointerAngleFromCenter(p)};
+  }else{
+    drag={id:e.pointerId, mode:'straight', lineId, px:p.x, py:p.y, ox:line.offX*CFG_MM, oy:line.offY*CFG_MM};
+  }
+  try{ cfgSvgEl.setPointerCapture(e.pointerId); }catch(_){}
+  cfgSvgEl.style.cursor='grabbing';
+  e.preventDefault();
+});
+cfgSvgEl.addEventListener('pointermove',e=>{
+  if(!drag) return;
+  const p=clientToSvg(e.clientX,e.clientY);
+  if(drag.mode==='photo'){
+    const c=clampPhotoOffset(CFG_MM, (drag.ox+(p.x-drag.px))/CFG_MM, (drag.oy+(p.y-drag.py))/CFG_MM);
+    state.photoOffX=c.x; state.photoOffY=c.y;
+    renderPreviewOnly(); syncPhotoUi();
+    e.preventDefault();
+    return;
+  }
+  const line=state.lines.find(l=>l.id===drag.lineId); if(!line) return;
+  if(drag.mode==='arc'){
+    let ang=normAngle(drag.startAngle + pointerAngleFromCenter(p)-drag.pointerAngle);
+    if(state.shape==='dogtag'){ const lim=arcLimit(line); ang=clampNumber(ang,-lim,lim); }
+    line.angle=ang;
+    updateSingleGroup(line.id);
+    syncSelectedControls();
+    e.preventDefault();
+    return;
+  }
+  let desiredOx=drag.ox+(p.x-drag.px), desiredOy=drag.oy+(p.y-drag.py);
+  const SNAP=4.5; let gV=false,gH=false;
+  if(Math.abs(desiredOx)<SNAP){ desiredOx=0; gV=true; }
+  if(Math.abs(desiredOy)<SNAP){ desiredOy=0; gH=true; }
+  const clamped=clampLineOffsetToShape(line, desiredOx, desiredOy, line.offX*CFG_MM, line.offY*CFG_MM);
+  line.offX=clamped.x/CFG_MM; line.offY=clamped.y/CFG_MM;
+  updateSingleGroup(line.id);
+  drawGuides(gV,gH);
+  e.preventDefault();
+});
+function endDrag(){ if(!drag) return; try{ cfgSvgEl.releasePointerCapture(drag.id); }catch(_){ } drag=null; cfgSvgEl.style.cursor=''; drawGuides(false,false); renderLineEditor(); syncSelectedControls(); }
+cfgSvgEl.addEventListener('pointerup',endDrag);
+cfgSvgEl.addEventListener('pointercancel',endDrag);
+
+document.querySelectorAll('#lenChips .chip').forEach(c=>c.addEventListener('click',()=>{
+  document.querySelectorAll('#lenChips .chip').forEach(x=>x.classList.remove('on'));
+  c.classList.add('on'); state.len=+c.dataset.len;
+}));
+
+/* ---- Foto (nur runde Formen) ---- */
+const photoMsg=$('photoMsg'), photoActions=$('photoActions'), uploadLabel=$('uploadLabel');
+function setPhotoMsg(kind,txt){ photoMsg.className='photo-msg '+kind; photoMsg.textContent=txt; }
+function downscale(img,max){
+  const w=img.naturalWidth, h=img.naturalHeight, s=Math.min(1, max/Math.max(w,h));
+  const cw=Math.round(w*s), ch=Math.round(h*s);
+  const c=document.createElement('canvas'); c.width=cw; c.height=ch;
+  c.getContext('2d').drawImage(img,0,0,cw,ch);
+  return {src:c.toDataURL('image/jpeg',0.9), width:cw, height:ch};
+}
+function loadPhotoFile(file){
+  if(!file) return;
+  if(!file.type.startsWith('image/')){ setPhotoMsg('warn','Bitte eine Bilddatei auswählen.'); return; }
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const img=new Image();
+    img.onload=()=>{
+      const w=img.naturalWidth, h=img.naturalHeight;
+      if(Math.min(w,h)<800){
+        setPhotoMsg('warn','Auflösung zu niedrig ('+w+'×'+h+' px). Für eine saubere Foto-Gravur bitte ein schärferes Foto mit mind. 800 px wählen.');
+        state.photo=null; photoActions.style.display='none'; uploadLabel.textContent='Foto auswählen …'; renderPreviewOnly();
+        return;
+      }
+      const prepared=downscale(img,700);
+      state.photo=prepared.src; state.photoWidth=prepared.width; state.photoHeight=prepared.height;
+      state.photoScale=1; state.photoOffX=0; state.photoOffY=0;
+      uploadLabel.textContent=file.name.length>22 ? file.name.slice(0,20)+'…' : file.name;
+      setPhotoMsg('ok','Foto übernommen ('+w+'×'+h+' px). Ziehe das Foto in der Vorschau, um den sichtbaren Ausschnitt festzulegen.');
+      photoActions.style.display='flex';
+      clearMap();
+      if(state.shape==='heart'){ state.shape='circle'; syncShapeChips(); }
+      render();
+    };
+    img.onerror=()=>setPhotoMsg('warn','Bild konnte nicht gelesen werden. Bitte ein anderes Foto wählen.');
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+$('photoInput').addEventListener('change',e=>loadPhotoFile(e.target.files && e.target.files[0]));
+$('photoRemove').addEventListener('click',()=>{ clearPhoto(true); render(); });
+$('photoReset').addEventListener('click',()=>{
+  if(!state.photo) return;
+  state.photoScale=1; state.photoOffX=0; state.photoOffY=0; render();
+});
+$('photoZoomRange').addEventListener('input',e=>{
+  if(!state.photo) return;
+  state.photoScale=(+e.target.value)/100;
+  const c=clampPhotoOffset(CFG_MM, state.photoOffX, state.photoOffY);
+  state.photoOffX=c.x; state.photoOffY=c.y;
+  $('photoZoomValue').textContent=e.target.value+'%';
+  renderPreviewOnly(); syncPhotoUi();
+});
+
+/* ---- Karte (nur runde Formen) ---- */
+const mapMsgEl=$('mapMsg'), mapActionsEl=$('mapActions'), mapGenBtn=$('mapGenBtn');
+function setMapMsg(kind,txt){ mapMsgEl.className='photo-msg '+kind; mapMsgEl.textContent=txt; }
+function mapBusy(b){ mapGenBtn.disabled=b; mapGenBtn.textContent=b?'…':'Karte erzeugen'; }
+function clearPhoto(force){
+  if(!state.photo && !force) return;
+  state.photo=null; state.photoWidth=0; state.photoHeight=0; state.photoScale=1; state.photoOffX=0; state.photoOffY=0;
+  $('photoInput').value='';
+  uploadLabel.textContent='Foto auswählen …';
+  photoMsg.className='photo-msg'; photoMsg.textContent='';
+  photoActions.style.display='none';
+}
+function clearMap(){
+  state.mapPaths=null; state.mapLabel=''; state.mapCenter=null;
+  mapActionsEl.style.display='none';
+  mapMsgEl.className='photo-msg'; mapMsgEl.textContent='';
+}
+function parseLatLon(str){
+  const m=String(str).trim().match(/^(-?\d{1,3}(?:\.\d+)?)[,;\s]+(-?\d{1,3}(?:\.\d+)?)$/);
+  if(!m) return null;
+  const lat=parseFloat(m[1]), lon=parseFloat(m[2]);
+  if(isNaN(lat)||isNaN(lon)||Math.abs(lat)>90||Math.abs(lon)>180) return null;
+  return {lat,lon};
+}
+async function geocode(q){
+  const enc=encodeURIComponent(q);
+  try{
+    const r=await fetch('https://photon.komoot.io/api/?limit=1&lang=de&q='+enc);
+    if(r.ok){ const j=await r.json(); const f=j.features&&j.features[0];
+      if(f&&f.geometry&&f.geometry.coordinates){ return {lat:+f.geometry.coordinates[1], lon:+f.geometry.coordinates[0]}; } }
+  }catch(_){ }
+  try{
+    const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+enc);
+    if(r.ok){ const j=await r.json(); if(j.length){ return {lat:parseFloat(j[0].lat), lon:parseFloat(j[0].lon)}; } }
+  }catch(_){ }
+  throw new Error('notfound');
+}
+function roadWidth(hw){
+  if(/motorway|trunk|primary/.test(hw)) return 4;
+  if(/secondary|tertiary/.test(hw)) return 2.6;
+  if(/residential|unclassified|living_street|pedestrian|road/.test(hw)) return 1.7;
+  return 1.05;
+}
+async function mapRender(center){
+  const R_m=+$('mapZoom').value;
+  mapBusy(true); setMapMsg('','Karte wird erzeugt …');
+  try{
+    const q=`[out:json][timeout:25];(way["highway"](around:${R_m},${center.lat},${center.lon}););out geom;`;
+    const body='data='+encodeURIComponent(q);
+    const EPS=['https://maps.mail.ru/osm/tools/overpass/api/interpreter','https://overpass.private.coffee/api/interpreter','https://overpass.kumi.systems/api/interpreter','https://overpass.osm.ch/api/interpreter'];
+    const attempt=ep=>fetch(ep,{method:'POST',body}).then(r=>{ if(!r.ok) throw new Error('bad'); return r.json(); }).then(d=>{ if(d&&d.elements&&d.elements.length) return d; throw new Error('empty-ep'); });
+    const timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),22000));
+    let j=null;
+    try{ j=await Promise.race([Promise.any(EPS.map(attempt)), timeout]); }catch(_){ j=null; }
+    if(!j) throw new Error('overpass');
+    const lat=center.lat, lon=center.lon;
+    const dLat=R_m/111320, dLon=R_m/(111320*Math.cos(lat*Math.PI/180));
+    const n=lat+dLat, sB=lat-dLat, w=lon-dLon, e=lon+dLon;
+    const px=lo=>(lo-w)/(e-w)*1000, py=la=>(n-la)/(n-sB)*1000;
+    let paths='';
+    (j.elements||[]).forEach(el=>{
+      if(el.type!=='way'||!el.geometry) return;
+      const pts=el.geometry.map(g=>px(g.lon).toFixed(1)+','+py(g.lat).toFixed(1)).join(' ');
+      const hw=(el.tags&&el.tags.highway)||'';
+      paths+=`<polyline points="${pts}" fill="none" stroke="#1c1a17" stroke-width="${roadWidth(hw)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+    });
+    if(!paths) throw new Error('empty');
+    const k=1.25, tx=(500-50*k), ty=(500-88*k);
+    const pin=`<path d="${UNIT_HEART}" transform="translate(${tx.toFixed(1)} ${ty.toFixed(1)}) scale(${k})" fill="#1c1a17" stroke="#faf8f5" stroke-width="7"/>`;
+    const rawLbl=String(center.label||'').trim();
+    let labelSvg='';
+    if(rawLbl){
+      const up=rawLbl.toUpperCase().replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+      const fs=Math.max(22, Math.min(42, 650/rawLbl.length));
+      const half=Math.min(300, fs*rawLbl.length*0.32);
+      labelSvg=`<line x1="${(500-half).toFixed(0)}" y1="820" x2="${(500+half).toFixed(0)}" y2="820" stroke="#1c1a17" stroke-width="2.4"/>`
+        +`<text x="500" y="886" text-anchor="middle" font-family="'Cormorant Garamond', Georgia, serif" font-size="${fs.toFixed(0)}" font-weight="600" letter-spacing="2" fill="#1c1a17" stroke="#faf8f5" stroke-width="6" style="paint-order:stroke">${up}</text>`;
+    }
+    state.mapPaths=paths+pin+labelSvg;
+    state.mapCenter=center;
+    state.mapLabel=center.label||(center.lat.toFixed(4)+', '+center.lon.toFixed(4));
+    clearPhoto();
+    if(state.shape==='heart'){ state.shape='circle'; syncShapeChips(); }
+    mapActionsEl.style.display='flex';
+    setMapMsg('ok','Karte erzeugt: '+state.mapLabel);
+    render();
+  }catch(err){
+    const m=String(err&&err.message||err);
+    if(m==='empty') setMapMsg('warn','Keine Straßen in diesem Bereich. Bitte Zoom vergrößern.');
+    else setMapMsg('warn','Karte konnte nicht erzeugt werden. Bitte erneut versuchen.');
+  }finally{ mapBusy(false); }
+}
+async function mapGenerate(){
+  const q=$('mapQuery').value.trim();
+  if(!q){ setMapMsg('warn','Bitte Ort oder Koordinaten eingeben.'); return; }
+  const ll=parseLatLon(q);
+  if(ll){ mapRender({lat:ll.lat,lon:ll.lon,label:q}); return; }
+  mapBusy(true); setMapMsg('','Ort wird gesucht …');
+  try{ const g=await geocode(q); mapRender({lat:g.lat,lon:g.lon,label:q}); }
+  catch(err){
+    mapBusy(false);
+    setMapMsg('warn', String(err&&err.message)==='notfound' ? 'Ort nicht gefunden. Bitte genauer eingeben (Straße, Stadt).' : 'Suche fehlgeschlagen. Bitte erneut versuchen.');
+  }
+}
+mapGenBtn.addEventListener('click',mapGenerate);
+$('mapQuery').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); mapGenerate(); }});
+$('mapRemove').addEventListener('click',()=>{ clearMap(); render(); });
+$('mapZoom').addEventListener('input',e=>{ const v=+e.target.value; $('mapZoomValue').textContent = v<450?'eng':(v<800?'mittel':'weit'); });
+$('mapZoom').addEventListener('change',()=>{ if(state.mapCenter) mapRender(state.mapCenter); });
+
+/* im iframe (Shop): Esc im Editor schliesst das Shop-Fenster */
+document.addEventListener('keydown',e=>{ if(e.key==='Escape' && window.parent!==window){ try{ window.parent.postMessage({wlEditor:'close'}, location.origin); }catch(_){} }});
+
+/* ---- Start: ?shape=dogtag|circle|heart ---- */
+(function init(){
+  const p=new URLSearchParams(location.search).get('shape');
+  if(p && SHAPES[p]){
+    state.shape=p;
+    if(p==='dogtag'){ document.body.classList.add('pet'); state.lines[0].text='Bello'; $('edTitle').textContent='Dog Tag gestalten'; }
+    else $('edTitle').textContent='Kette mit Gravur gestalten';
+  }else{
+    $('dogChip').hidden=false;
+    $('edTitle').textContent='Anhänger gestalten';
+  }
+  syncShapeChips();
+  syncContentMode();
+  render();
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>{ renderPreviewOnly(); syncSelectedControls(); });
+})();
+</script>
+</body>
+</html>
