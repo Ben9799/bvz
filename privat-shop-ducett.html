@@ -502,6 +502,10 @@ $('pdClose').addEventListener('click',closePd);
 $('pd').addEventListener('click',e=>{if(e.target===$('pd'))closePd();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closePd();closeEd();}});
 Promise.all(Object.values(FONTS).map(f=>document.fonts.load(`${f.w} 40px ${f.fam}`))).then(renderEngr);
+/* Deep-Links von der Landing: ?who=<empfänger> filtert, ?p=<produkt-k> öffnet direkt */
+{const q=new URLSearchParams(location.search),w=q.get('who'),p=q.get('p');
+ if(w){const b=document.querySelector('#whoPick [data-who="'+CSS.escape(w)+'"]');if(b)b.click();}
+ if(p){const i=PRODUCTS.findIndex(x=>x.k===p),a=i<0?null:document.querySelector('.card[data-i="'+i+'"] .btn');if(a)a.click();}}
 </script>
 </body>
 </html>
