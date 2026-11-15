@@ -173,6 +173,7 @@
   #sideField{display:none} body.two #sideField{display:block}
   body.fixshape #shapeField{display:none !important}
   body.bracelet #modeField,body.bracelet #lenField{display:none !important}
+  body.keyring #lenField{display:none !important}
   .dog-group{border:1px solid var(--line2);padding:14px;margin-bottom:10px;background:#fff;border-radius:2px;transition:border-color .15s,opacity .2s}
   .dog-group:not(.on){opacity:.72}
   .dog-group.on{border-color:var(--ink)}
@@ -454,8 +455,27 @@
 </div>
 
 <script>
+/* ---- Schluesselanhaenger: Masse in mm. NUR HIER anpassen – Kontur, Lineal, Gravurflaeche und Foto-Massstab rechnen daraus. ---- */
+const KATZE_MM={w:30, h:26.5};                  // Katzenkopf: Breite x Hoehe bis zu den Ohrspitzen (ohne Oese)
+const LEDER_MM={w:25, h:43, rx:8.3, ry:6.1};    // Platte mit Lederschlaufe: Breite x Hoehe, Eckrundung (am Foto gemessen)
+/* Katzenkopf-Kontur in mm (Mitte = 0/0), am Produktfoto vermessen, gezeichnet fuer 30 x 26,5 mm */
+const CAT_D='M 10.14 -13.25 C 10.27 -13.04 10.71 -12.38 10.94 -12 C 11.16 -11.61 11.33 -11.3 11.5 -10.96 C 11.67 -10.61 11.82 -10.27 11.97 -9.92 C 12.13 -9.57 12.3 -9.23 12.45 -8.88 C 12.6 -8.54 12.71 -8.36 12.88 -7.85 C 13.05 -7.33 13.29 -6.46 13.49 -5.77 C 13.69 -5.08 13.93 -4.3 14.09 -3.7 C 14.26 -3.09 14.37 -2.66 14.48 -2.14 C 14.59 -1.62 14.66 -1.1 14.74 -0.58 C 14.82 -0.06 14.91 0.45 14.96 0.97 C 15 1.49 15.03 1.92 15 2.53 C 14.97 3.13 14.86 4.09 14.78 4.6 C 14.7 5.12 14.63 5.3 14.52 5.64 C 14.42 5.99 14.31 6.33 14.14 6.68 C 13.96 7.02 13.7 7.37 13.49 7.72 C 13.27 8.06 13.1 8.41 12.84 8.75 C 12.58 9.1 12.3 9.45 11.93 9.79 C 11.56 10.14 10.99 10.57 10.63 10.83 C 10.27 11.09 10.1 11.17 9.77 11.35 C 9.44 11.52 9.1 11.69 8.65 11.87 C 8.19 12.04 7.72 12.21 7.05 12.38 C 6.38 12.56 5.44 12.77 4.63 12.9 C 3.81 13.04 2.93 13.12 2.16 13.18 C 1.39 13.23 0.72 13.25 0 13.25 C -0.72 13.25 -1.39 13.23 -2.16 13.18 C -2.93 13.12 -3.81 13.04 -4.63 12.9 C -5.44 12.77 -6.38 12.56 -7.05 12.38 C -7.72 12.21 -8.19 12.04 -8.65 11.87 C -9.1 11.69 -9.44 11.52 -9.77 11.35 C -10.1 11.17 -10.27 11.09 -10.63 10.83 C -10.99 10.57 -11.56 10.14 -11.93 9.79 C -12.3 9.45 -12.58 9.1 -12.84 8.75 C -13.1 8.41 -13.27 8.06 -13.49 7.72 C -13.7 7.37 -13.96 7.02 -14.14 6.68 C -14.31 6.33 -14.42 5.99 -14.52 5.64 C -14.63 5.3 -14.7 5.12 -14.78 4.6 C -14.86 4.09 -14.97 3.13 -15 2.53 C -15.03 1.92 -15 1.49 -14.96 0.97 C -14.91 0.45 -14.82 -0.06 -14.74 -0.58 C -14.66 -1.1 -14.59 -1.62 -14.48 -2.14 C -14.37 -2.66 -14.26 -3.09 -14.09 -3.7 C -13.93 -4.3 -13.69 -5.08 -13.49 -5.77 C -13.29 -6.46 -13.05 -7.33 -12.88 -7.85 C -12.71 -8.36 -12.6 -8.54 -12.45 -8.88 C -12.3 -9.23 -12.13 -9.57 -11.97 -9.92 C -11.82 -10.27 -11.67 -10.61 -11.5 -10.96 C -11.33 -11.3 -11.16 -11.61 -10.94 -12 C -10.71 -12.38 -10.27 -13.04 -10.14 -13.25 L -6.18 -8.67 L 6.18 -8.67 Z';
+/* inset = Sicherheitsrand der Gravur; keep = Sperrzone (abgerundetes Rechteck, Mitte x/y, Groesse w/h, Radius r);
+   textY = Standard-Lage des Textes ab Mitte; lines = Startzeilen (y ab textY, w/h = max. Textbox) – alles in mm */
+const KEYS={
+  katze:{w:KATZE_MM.w, h:KATZE_MM.h, d:CAT_D, d0:{w:30,h:26.5}, inset:.7, textY:3.2, maxW:20, maxH:8.5,
+         keep:{x:0, y:-6.55*KATZE_MM.h/26.5, w:5, h:5, r:2.5},          // Loch Ø ca. 3,4 mm + 0,8 mm Rand
+         title:'Katzen-Anhänger gestalten', lines:[{text:'Luna', y:0}]},
+  lederanhaenger:{w:LEDER_MM.w, h:LEDER_MM.h, rx:LEDER_MM.rx, ry:LEDER_MM.ry, inset:.8, textY:3, maxW:LEDER_MM.w-6, maxH:8,
+         keep:{x:0, y:-LEDER_MM.h/2+2.65, w:13.4, h:6.3, r:1},           // Lederschlaufe liegt oben auf der Platte
+         title:'Schlüsselanhänger gestalten',
+         lines:[{text:'Fahr vorsichtig', y:-9, w:LEDER_MM.w-6, h:4.2},{text:'Papa', y:0, w:LEDER_MM.w-6, h:8},{text:'Wir lieben dich', y:9, w:LEDER_MM.w-6, h:4.2}]}
+};
+const isKey=s=>!!KEYS[s];
 /* ---- Anhaenger-Katalog (mm) ---- */
 const SHAPES={
+  katze:{label:'Katze', w:KATZE_MM.w, h:KATZE_MM.h, cap:'Katzen-Schlüsselanhänger · Edelstahl poliert · ca. '+String(KATZE_MM.w).replace('.',',')+' × '+String(KATZE_MM.h).replace('.',',')+' mm'},
+  lederanhaenger:{label:'Schlüsselanhänger', w:LEDER_MM.w, h:LEDER_MM.h, cap:'Edelstahl gebürstet · ca. '+String(LEDER_MM.w).replace('.',',')+' × '+String(LEDER_MM.h).replace('.',',')+' mm · mit Lederschlaufe'},
   circle:{label:'Kreis',  w:20,   h:20, price:'19,99', cap:'Ø 20 mm · 1,2 mm stark'},
   heart: {label:'Herz',   w:19.5, h:18, price:'19,99', cap:'19,5 × 18 mm · 1,8 mm stark'},
   dogtag:{label:'Dog Tag',w:24,   h:24, price:'19,99', cap:'Dog Tag · Ø 24 mm · Aluminium – leicht, stört dein Tier nicht'},
@@ -519,16 +539,51 @@ const FRAMES={
   heart:{cx:0,cy:0,outerScaleX:1,outerScaleY:1,safeScaleX:.98,safeScaleY:.98}
 };
 const frameOf=s=>FRAMES[s]||FRAMES.circle;
-const isRound=s=>s!=='heart';
+const isRound=s=>s!=='heart' && !isKey(s);
 const roundKey=s=>(s==='dogtag'||s==='medaillon')?s:'circle';
 const rf=()=>frameOf(roundKey(state.shape));            // Rahmen der aktuellen runden Form
 function frameCenter(shape,cx,cy,MM){const f=frameOf(shape);return {x:cx+(f.cx||0)*MM,y:cy+(f.cy||0)*MM};}
 /* Standard-Lage des Textes: Herz leicht hoch, Dog Tag unterhalb des Lochs */
 function textAnchor(shape,cx,cy,MM){
+  if(isKey(shape)) return {x:cx, y:cy+KEYS[shape].textY*MM};
   const c=frameCenter(shape==='heart'?'heart':roundKey(shape),cx,cy,MM);
   return {x:c.x,y:c.y+(shape==='heart'?-1.4*MM:(shape==='dogtag'?2.2*MM:0))};
 }
 const holePx=(cx=CFG_CX,cy=CFG_CY,MM=CFG_MM)=>({x:cx,y:cy+DOG.holeY*MM,r:DOG.holeR*MM,keep:KEEP_R*MM});
+/* ---- Schluesselanhaenger-Geometrie (Editor-Einheiten) ---- */
+function scaleD(d,sx,sy,tx,ty){ return d.replace(/(-?[\d.]+) (-?[\d.]+)/g,(m,x,y)=>`${+(tx+x*sx).toFixed(2)} ${+(ty+y*sy).toFixed(2)}`); }
+function rrD(cx,cy,w,h,rx,ry){
+  rx=Math.min(rx,w/2); ry=Math.min(ry,h/2); const x0=cx-w/2, x1=cx+w/2, y0=cy-h/2, y1=cy+h/2;
+  return `M ${x0+rx} ${y0} L ${x1-rx} ${y0} A ${rx} ${ry} 0 0 1 ${x1} ${y0+ry} L ${x1} ${y1-ry} A ${rx} ${ry} 0 0 1 ${x1-rx} ${y1} L ${x0+rx} ${y1} A ${rx} ${ry} 0 0 1 ${x0} ${y1-ry} L ${x0} ${y0+ry} A ${rx} ${ry} 0 0 1 ${x0+rx} ${y0} Z`;
+}
+/* Kontur; inset (mm) = nach innen versetzt (Sicherheitsrand der Gravur) */
+function keyD(shape,cx,cy,MM,inset=0){
+  const k=KEYS[shape];
+  if(k.d){ const f=1-2*inset/k.w; return scaleD(k.d, k.w/k.d0.w*f*MM, k.h/k.d0.h*f*MM, cx, cy); }
+  return rrD(cx,cy,(k.w-2*inset)*MM,(k.h-2*inset)*MM,Math.max(.5,k.rx-inset)*MM,Math.max(.5,k.ry-inset)*MM);
+}
+function keyKeepD(shape,cx,cy,MM){ const z=KEYS[shape].keep; return rrD(cx+z.x*MM,cy+z.y*MM,z.w*MM,z.h*MM,z.r*MM,z.r*MM); }
+function inKeep(shape,px,py){
+  const z=KEYS[shape].keep, MM=CFG_MM;
+  const dx=Math.abs(px-(CFG_CX+z.x*MM))-(z.w/2-z.r)*MM, dy=Math.abs(py-(CFG_CY+z.y*MM))-(z.h/2-z.r)*MM;
+  return Math.hypot(Math.max(dx,0),Math.max(dy,0)) < z.r*MM;
+}
+const keyPolyCache={};
+function keyPolygon(shape){
+  if(keyPolyCache[shape]) return keyPolyCache[shape];
+  const path=document.createElementNS(SVG_NS,'path');
+  path.setAttribute('d', keyD(shape,CFG_CX,CFG_CY,CFG_MM,KEYS[shape].inset));
+  $('cfgSvg').appendChild(path);
+  const total=path.getTotalLength(), pts=[];
+  for(let i=0;i<220;i++){ const p=path.getPointAtLength(total*i/220); pts.push({x:p.x,y:p.y}); }
+  path.remove();
+  return keyPolyCache[shape]=pts;
+}
+/* Beschnitt fuer Foto/Karte: Gravurflaeche ohne Sperrzone (Schnittmenge zweier clipPaths) */
+function keyClip(id,shape,cx,cy,MM){
+  return `<clipPath id="${id}k"><path clip-rule="evenodd" d="M -4000 -4000 H 4000 V 4000 H -4000 Z ${keyKeepD(shape,cx,cy,MM)}"/></clipPath>`
+       + `<clipPath id="${id}" clip-path="url(#${id}k)"><path d="${keyD(shape,cx,cy,MM,KEYS[shape].inset)}"/></clipPath>`;
+}
 const ringPath=(cx,cy,r)=>`M ${cx-r} ${cy} a ${r} ${r} 0 1 0 ${2*r} 0 a ${r} ${r} 0 1 0 ${-2*r} 0 Z`;
 
 function getSelectedLine(){ return state.lines.find(l=>l.id===state.selectedLineId) || state.lines[0] || null; }
@@ -537,7 +592,7 @@ function ensureSelectedLine(){
   if(!state.lines.some(l=>l.id===state.selectedLineId)) state.selectedLineId=state.lines[0].id;
 }
 function syncShapeRules(){
-  if(state.shape==='heart') state.lines.forEach(l=>{ if(l.textMode==='arc') l.textMode='straight'; });
+  if(!isRound(state.shape)) state.lines.forEach(l=>{ if(l.textMode==='arc') l.textMode='straight'; });
   ensureSelectedLine();
 }
 
@@ -546,6 +601,7 @@ function heartPathMarkup(cx,cy,MM,scaleX,scaleY,cls){
   return `<g class="${cls}" transform="translate(${tx} ${ty}) scale(${sx} ${sy})"><path d="${UNIT_HEART}"/></g>`;
 }
 function overlayOutlines(shape,cx,cy,MM){
+  if(isKey(shape)) return `<path class="shape-outline" d="${keyD(shape,cx,cy,MM)}"/><path class="keepout" d="${keyKeepD(shape,cx,cy,MM)}"/>`;
   const f=frameOf(shape), c=frameCenter(shape,cx,cy,MM);
   if(isRound(shape)){
     let s=`<circle class="shape-outline" cx="${c.x}" cy="${c.y}" r="${f.outerR*MM}"/>`;
@@ -558,16 +614,17 @@ function overlayOutlines(shape,cx,cy,MM){
 /* ---- Foto ---- */
 function getPhotoDisplayMetrics(MM){
   if(!state.photo || !state.photoWidth || !state.photoHeight) return null;
-  const frameR=rf().safeR*MM, diameter=frameR*2;
-  const cover=Math.max(diameter/state.photoWidth, diameter/state.photoHeight);
+  const k=KEYS[state.shape];
+  const frameR=(k ? k.w/2-k.inset : rf().safeR)*MM, frameH=(k ? k.h/2-k.inset : rf().safeR)*MM, diameter=frameR*2;
+  const cover=Math.max(diameter/state.photoWidth, frameH*2/state.photoHeight);
   const scale=cover*(state.photoScale||1);
-  return {frameR, diameter, width:state.photoWidth*scale, height:state.photoHeight*scale};
+  return {frameR, frameH, diameter, width:state.photoWidth*scale, height:state.photoHeight*scale};
 }
 function clampPhotoOffset(MM, offXmm=state.photoOffX||0, offYmm=state.photoOffY||0){
   const m=getPhotoDisplayMetrics(MM);
   if(!m) return {x:0,y:0};
   const maxX=Math.max(0,(m.width/2 - m.frameR))/MM;
-  const maxY=Math.max(0,(m.height/2 - m.frameR))/MM;
+  const maxY=Math.max(0,(m.height/2 - m.frameH))/MM;
   return {x:clampNumber(offXmm,-maxX,maxX), y:clampNumber(offYmm,-maxY,maxY)};
 }
 function syncPhotoCrop(){
@@ -589,7 +646,27 @@ function holeRing(cx,cy,MM){
   return `<circle cx="${h.x}" cy="${h.y}" r="${h.r}" fill="none" stroke="#8d949c" stroke-width=".9"/>`;
 }
 
+function keyBody(shape,cx,cy,MM,photo){
+  const k=KEYS[shape];
+  /* Platte, Oese, Leder und Ring kommen aus dem Produktfoto; gezeichnet wird nur ohne Foto-Buehne */
+  let s = photoBgKey() ? '' : `<g filter="url(#drop)"><path d="${keyD(shape,cx,cy,MM)}" fill="url(#metal)" stroke="url(#rim)" stroke-width="1"/></g>`;
+  if(state.mapPaths){
+    const id='mc'+(clipSeq++), S=Math.max(k.w,k.h)*MM, scl=S/1000;
+    s+=keyClip(id,shape,cx,cy,MM)
+      +`<g class="mapLayer" opacity=".74" clip-path="url(#${id})"><g transform="translate(${cx-S/2} ${cy-S/2}) scale(${scl})">${state.mapPaths}</g></g>`;
+  }else if(photo){
+    const id='pc'+(clipSeq++), m=getPhotoDisplayMetrics(MM), cl=clampPhotoOffset(MM, state.photoOffX, state.photoOffY);
+    const imgW=m ? m.width : k.w*MM, imgH=m ? m.height : k.h*MM;
+    s+=keyClip(id,shape,cx,cy,MM)
+      +`<g class="photoGroup" data-cx="${cx}" data-cy="${cy}">`
+      +`<image class="photo-img" href="${photo}" x="${cx-imgW/2+cl.x*MM}" y="${cy-imgH/2+cl.y*MM}" width="${imgW}" height="${imgH}" preserveAspectRatio="none" clip-path="url(#${id})" filter="url(#photoeng)" opacity=".92"/>`
+      +`<path class="photo-hit" d="${keyD(shape,cx,cy,MM)}"/>`
+      +`</g>`;
+  }
+  return s;
+}
 function pendantBody(shape,cx,cy,MM,photo){
+  if(isKey(shape)) return keyBody(shape,cx,cy,MM,photo);
   if(isRound(shape)){
     const dog=shape==='dogtag', med=shape==='medaillon';
     const r=(dog?DOG.bodyR:(med?10.5:10))*MM;
@@ -644,17 +721,22 @@ function pendantBody(shape,cx,cy,MM,photo){
 const SCENES={
   medaillon:{src:'images/shop/kette-medaillon-editor.jpg',size:1254,x:611.5,y:775,w:341,mm:25,sy:1,rot:0,stage:'#d9b596'},
   bracelet: {src:'images/shop/herz-armband-editor.jpg',   size:1254,x:648.5,y:847,w:245,mm:19.5,sy:1.12,rot:5,stage:'#dcb793'},
+  /* Schluesselanhaenger: x/y = Mitte der Kontur (Katze: nach dem Geradedrehen um rot), w = Breite der Platte im Foto.
+     Das Leder-Foto (1254 px) ist gespiegelt erweitert: links/rechts je 320 px, unten 250 px (size x h) – die Platte reicht fast bis
+     zum Bildrand, sonst haetten Lineal + Ansicht-Schalter keinen Platz. ovc = Bildmitte der Gesamtansicht (px). */
+  katze:         {src:'images/shop/schluesselanhaenger-katze-editor.jpg',size:1254,x:603.3,y:623.5,w:694,mm:KATZE_MM.w,sy:1,rot:2,stage:'#dfb089'},
+  lederanhaenger:{src:'images/shop/schluesselanhaenger-leder-editor.jpg',size:1894,h:1504,x:946.5,y:859,w:330,mm:LEDER_MM.w,sy:1,rot:0,stage:'#e0b28e',ovc:[947,690],maxW:790},
   wrist:    {src:'images/shop/herz-armband-handgelenk-beige.jpg',size:1000,x:497,y:540,w:140,mm:19.5,sy:1,rot:0,stage:'#d8b79c',
              eng:`rotate(24 ${CFG_CX} ${CFG_CY})`, maxW:470}
 };
 const PHOTO_BG=SCENES;
 const view={mode:'detail', vb:null, raf:0, bgKey:'', fitKey:''};
-const photoBgKey=()=>state.bracelet ? 'bracelet' : (state.shape==='medaillon' ? 'medaillon' : null);
+const photoBgKey=()=>state.bracelet ? 'bracelet' : ((state.shape==='medaillon' || isKey(state.shape)) ? state.shape : null);
 const sceneKey=()=>{ const k=photoBgKey(); return (k==='bracelet' && view.mode==='wrist') ? 'wrist' : k; };
 const sceneScale=b=>b.mm*CFG_MM/b.w;
 function sceneImage(k){
   const b=SCENES[k], sc=sceneScale(b);
-  return `<image href="${b.src}" width="${b.size}" height="${b.size}" preserveAspectRatio="none" `
+  return `<image href="${b.src}" width="${b.size}" height="${b.h||b.size}" preserveAspectRatio="none" `
        + `transform="translate(${CFG_CX} ${CFG_CY}) scale(${sc} ${sc*b.sy}) rotate(${b.rot}) translate(${-b.x} ${-b.y})"/>`;
 }
 /* Editor-Einheiten <-> Foto-Pixel (fuer "deckt das Foto den sichtbaren Ausschnitt?") */
@@ -668,12 +750,12 @@ function pxToUnits(b,px,py){
 }
 function vbCovered(b,v){
   return [[v.x,v.y],[v.x+v.w,v.y],[v.x+v.w,v.y+v.h],[v.x,v.y+v.h]].every(([x,y])=>{
-    const p=unitsToPx(b,x,y); return p.x>=1 && p.y>=1 && p.x<=b.size-1 && p.y<=b.size-1;
+    const p=unitsToPx(b,x,y); return p.x>=1 && p.y>=1 && p.x<=b.size-1 && p.y<=(b.h||b.size)-1;
   });
 }
 /* groesster vom Foto gedeckter Ausschnitt im Seitenverhaeltnis der Buehne, moeglichst mit dem ganzen Anhaenger */
 function coverRect(b,aspect,maxW){
-  const pc=pxToUnits(b,b.size/2,b.size/2), half=SHAPES[state.shape].w*CFG_MM*0.75;
+  const pc=b.ovc ? pxToUnits(b,b.ovc[0],b.ovc[1]) : pxToUnits(b,b.size/2,b.size/2), half=Math.max(SHAPES[state.shape].w*0.75, SHAPES[state.shape].h*0.55)*CFG_MM;
   let best=null;
   for(const t of [0,.2,.4,.6,.8,1]){
     const cx=pc.x+(CFG_CX-pc.x)*t, cy=pc.y+(CFG_CY-pc.y)*t;
@@ -772,7 +854,7 @@ function plainArcText(text){ return (text||'').trim() || ' '; }
 
 function lineMarkup(line, shape, cx, cy, MM){
   const selClass = line.id===state.selectedLineId ? ' selected' : '';
-  const mode = (shape==='heart') ? 'straight' : (line.textMode||'straight');
+  const mode = !isRound(shape) ? 'straight' : (line.textMode||'straight');
   const anchor = textAnchor(shape,cx,cy,MM);
   const ax = anchor.x + line.offX*MM, ay = anchor.y + line.offY*MM;
   const common = `data-line-id="${line.id}" data-shape="${shape}" data-mode="${mode}" data-angle="${line.angle}" data-cx="${ax}" data-cy="${ay}"`;
@@ -796,7 +878,8 @@ function lineMarkup(line, shape, cx, cy, MM){
          + `</text></g>`;
   }
   let maxw, maxh;
-  if(shape==='dogtag' && line.maxW){ maxw=line.maxW*MM; maxh=line.maxH*MM; }
+  if((shape==='dogtag' || isKey(shape)) && line.maxW){ maxw=line.maxW*MM; maxh=line.maxH*MM; }
+  else if(isKey(shape)){ maxw=KEYS[shape].maxW*MM; maxh=KEYS[shape].maxH*MM; }
   else if(shape==='dogtag'){ maxw=frameOf('dogtag').safeR*1.5*MM; maxh=frameOf('dogtag').safeR*.75*MM; }
   else if(shape==='circle'||shape==='medaillon'){ maxw=Math.max(10,frameOf(shape).safeR*1.55*MM); maxh=Math.max(8,frameOf(shape).safeR*.95*MM); }
   else { maxw=SHAPES.heart.w*MM*frameOf('heart').safeScaleX*.72; maxh=SHAPES.heart.h*MM*frameOf('heart').safeScaleY*.45; }
@@ -811,7 +894,7 @@ function lineMarkup(line, shape, cx, cy, MM){
 function pendant(shape, lines, cx, cy, MM, photo){
   const body = pendantBody(shape,cx,cy,MM,photo);
   const overlays = overlayOutlines(shape,cx,cy,MM);
-  const hideText = state.contentMode==='photo' || state.contentMode==='map' || (isRound(shape) && (photo || state.mapPaths));
+  const hideText = state.contentMode==='photo' || state.contentMode==='map' || (shape!=='heart' && (photo || state.mapPaths));
   const text = hideText ? '' : lines.filter(l=>!(l.key && !(l.text||'').trim())).map(line=>lineMarkup(line, shape, cx, cy, MM)).join('');
   /* Gravur-Ebene: halbtransparent (Licht und Verlauf des Metalls scheinen durch) + Gravur-Filter (matt, Kanten) */
   return body + overlays + (text ? `<g class="engLayer" filter="url(#engrave)" opacity=".8">${text}</g>` : '');
@@ -906,7 +989,7 @@ function renderLineEditor(){
   const many=state.lines.length>1;
   $('lineEditor').innerHTML = state.lines.map((line,idx)=>{
     const active = line.id===state.selectedLineId ? ' on' : '';
-    const arc = state.shape!=='heart' && line.textMode==='arc';
+    const arc = isRound(state.shape) && line.textMode==='arc';
     return `<div class="line-item${active}" data-line-id="${line.id}">`
          + (many ? `<span class="line-no">${idx+1}</span>` : '')
          + `<input class="line-input" type="text" maxlength="28" value="${escapeHtml(line.text)}" data-line-input="${line.id}" autocomplete="off" `
@@ -949,13 +1032,14 @@ function syncSelectedControls(){
     vr.min=0; vr.max=Math.round(Math.max(0, rf().safeR-4.7)*10)/10; vr.step=0.1;
     vr.value=clampNumber(Number(line.offY||0), +vr.min, +vr.max);
   }else{
-    vr.min=-6; vr.max=6; vr.step=0.1; vr.value=clampNumber(Number(line.offY||0), -6, 6);
+    const lim=isKey(state.shape) ? Math.round(KEYS[state.shape].h/2) : 6;
+    vr.min=-lim; vr.max=lim; vr.step=0.1; vr.value=clampNumber(Number(line.offY||0), -lim, lim);
   }
   $('verticalValue').textContent=fmt(+vr.value,' mm');
 }
 function syncPhotoUi(){
   const has=!!state.photo;
-  $('photoTools').classList.toggle('on', has && isRound(state.shape));
+  $('photoTools').classList.toggle('on', has && state.shape!=='heart');
   $('photoActions').style.display = has ? 'flex' : 'none';
   $('photoZoomRange').value=Math.round((state.photoScale||1)*100);
   $('photoZoomValue').textContent=Math.round((state.photoScale||1)*100)+'%';
@@ -969,7 +1053,7 @@ function renderPreviewOnly(){
   $('cfgPendant').innerHTML = pendant(state.shape, state.lines, CFG_CX, CFG_CY, CFG_MM, state.photo);
   const side = state.shape==='dogtag' ? dogTag.side : (sides.on ? sides.cur : '');
   $('dimCaption').textContent = (state.bracelet ? 'Herz-Armband · Edelstahl · Herz ca. 19,5 mm breit · Schlangenkette 17 + 5 cm' : SHAPES[state.shape].cap) + (side ? (side==='back' ? ' · Rückseite' : ' · Vorderseite') : '');
-  $('price').innerHTML = state.bracelet ? '24,99&nbsp;€' : 'ab '+SHAPES[state.shape].price+'&nbsp;€';
+  $('price').innerHTML = state.bracelet ? '24,99&nbsp;€' : (SHAPES[state.shape].price ? 'ab '+SHAPES[state.shape].price+'&nbsp;€' : 'Preis folgt');
   fitEngravings(document);
   keepAllLinesInside();
   const fk=state.shape+'|'+sceneKey();
@@ -1024,7 +1108,7 @@ const getPreviewText=id=>document.querySelector(`#cfgPendant text.eng[data-line-
 function updateSingleGroup(lineId){
   const line=state.lines.find(l=>l.id===lineId);
   const g=getPreviewGroup(lineId); if(!line || !g) return;
-  const mode=(state.shape==='heart') ? 'straight' : line.textMode;
+  const mode=!isRound(state.shape) ? 'straight' : line.textMode;
   const anchor=textAnchor(state.shape,CFG_CX,CFG_CY,CFG_MM);
   const ay=anchor.y + line.offY*CFG_MM, ax=anchor.x + line.offX*CFG_MM;
   if(mode==='arc'){
@@ -1074,6 +1158,16 @@ function pointInPolygon(point, polygon){
 function isStraightLineInside(line, cx, cy){
   const ext=rectExtentsFromText(line.id);
   const corners=rotatedCorners(ext, cx, cy, line.angle);
+  if(isKey(state.shape)){
+    /* Raster ueber die Textbox: alles in der Gravurflaeche (auch zwischen den Katzenohren) und nichts in der Sperrzone */
+    const poly=keyPolygon(state.shape), a=line.angle*Math.PI/180, c=Math.cos(a), s=Math.sin(a);
+    for(let i=0;i<=8;i++) for(let j=0;j<=4;j++){
+      const x=(i/4-1)*ext.hw, y=(j/2-1)*ext.hh, px=cx+x*c-y*s, py=cy+x*s+y*c;
+      if(inKeep(state.shape,px,py)) return false;
+      if((i%8===0 || j%4===0) && !pointInPolygon({x:px,y:py}, poly)) return false;
+    }
+    return true;
+  }
   if(isRound(state.shape)){
     const f=rf(), c=frameCenter(roundKey(state.shape),CFG_CX,CFG_CY,CFG_MM), R=f.outerR*CFG_MM;
     if(!corners.every(p => ((p.x-c.x)**2 + (p.y-c.y)**2) <= R*R)) return false;
@@ -1135,7 +1229,7 @@ function keepLineInside(line){
   let changed=false;
   const clamped=clampLineOffsetToShape(line, line.offX*CFG_MM, line.offY*CFG_MM, 0, 0);
   if(clamped.changed){ line.offX=clamped.x/CFG_MM; line.offY=clamped.y/CFG_MM; updateSingleGroup(line.id); changed=true; }
-  if(state.shape==='dogtag' && shrinkToFit(line)) changed=true;
+  if((state.shape==='dogtag' || isKey(state.shape)) && shrinkToFit(line)) changed=true;
   return changed;
 }
 function keepAllLinesInside(){
@@ -1364,7 +1458,7 @@ cfgSvgEl.addEventListener('pointerdown',e=>{
     return;
   }
   const photoHit=e.target.closest('.photoGroup');
-  if(photoHit && state.photo && isRound(state.shape)){
+  if(photoHit && state.photo && state.shape!=='heart'){
     beginDrag(e,{mode:'photo', px:p.x, py:p.y, ox:(state.photoOffX||0)*CFG_MM, oy:(state.photoOffY||0)*CFG_MM},'cropping');
     return;
   }
@@ -1661,12 +1755,16 @@ document.addEventListener('focusout',e=>{
   if(e.target.matches && e.target.matches('.line-input,.txt')){ clearTimeout(typingTimer); typingTimer=setTimeout(()=>document.body.classList.remove('typing'),180); }
 });
 
-/* ---- Start: ?shape=medaillon|herzarmband|dogtag|circle|heart ---- */
+/* ---- Start: ?shape=medaillon|herzarmband|dogtag|circle|heart|katze|lederanhaenger ---- */
 (function init(){
   const p=new URLSearchParams(location.search).get('shape');
   if(p==='herzarmband'){
     state.shape='heart'; state.bracelet=true; state.lines[0].text='Anna';
     document.body.classList.add('fixshape','bracelet'); $('edTitle').textContent='Herz-Armband gestalten';
+  }else if(p && KEYS[p]){
+    state.shape=p; document.body.classList.add('fixshape','keyring'); $('edTitle').textContent=KEYS[p].title;
+    state.lines=KEYS[p].lines.map(l=>createLine(l.text, l.w ? {offY:l.y, maxW:l.w, maxH:l.h} : {offY:l.y}));
+    state.selectedLineId=state.lines[0].id;
   }else if(p && SHAPES[p]){
     state.shape=p;
     if(p==='dogtag'){ document.body.classList.add('pet'); enterDog(); $('edTitle').textContent='Dog Tag gestalten'; }
