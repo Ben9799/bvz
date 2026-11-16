@@ -1000,6 +1000,17 @@ function lineMarkup(line, shape, cx, cy, MM){
   else if(shape==='dogtag'){ maxw=frameOf('dogtag').safeR*1.5*MM; maxh=frameOf('dogtag').safeR*.75*MM; }
   else if(shape==='circle'||shape==='medaillon'){ maxw=Math.max(10,frameOf(shape).safeR*1.55*MM); maxh=Math.max(8,frameOf(shape).safeR*.95*MM); }
   else { maxw=SHAPES.heart.w*MM*frameOf('heart').safeScaleX*.72; maxh=SHAPES.heart.h*MM*frameOf('heart').safeScaleY*.45; }
+  /* maxW/maxH gelten im gedrehten Textrahmen. Die gedrehte Textbox muss aber in die Flaeche des
+     Schmucks passen - sonst ragt z.B. quer gestellte Schrift seitlich ueber einen schmalen Stab. */
+  const fitBox = isKey(shape)
+    ? {w:Math.max(1,KEYS[shape].w-(KEYS[shape].inset||0)*2)*MM, h:Math.max(1,KEYS[shape].h-(KEYS[shape].inset||0)*2)*MM}
+    : (isCoin(shape)||shape==='dogtag'||shape==='circle'||shape==='medaillon') ? null   /* rund: Drehung aendert nichts */
+    : {w:maxw, h:maxh};                                                                 /* Herz / Herz-Armband */
+  if(fitBox){
+    const rad=line.angle*Math.PI/180, ca=Math.abs(Math.cos(rad)), sa=Math.abs(Math.sin(rad));
+    const k=Math.min(1, fitBox.w/(maxw*ca+maxh*sa), fitBox.h/(maxw*sa+maxh*ca));
+    maxw*=k; maxh*=k;
+  }
   return `<g class="engGroup${selClass}" ${common} transform="translate(${ax} ${ay}) rotate(${line.angle})">`
        + `<rect class="hit" x="0" y="0" width="0" height="0"/>`
        + `<text class="eng" x="0" y="0" text-anchor="middle" dominant-baseline="central" data-line-id="${line.id}" `
@@ -1026,7 +1037,8 @@ function fittedFontSizeForStraight(el){
   const maxW=+el.dataset.maxw || 80, maxH=+el.dataset.maxh || 50;
   const maxFs=Math.min(maxW/Math.max(wPerFs,0.01), maxH/Math.max(hPerFs,0.01));
   const userScale=(+el.dataset.fontScale||1);
-  return Math.max(4, Math.min(maxFs, maxFs*0.82*userScale));
+  /* Mindestgroesse nie ueber das geometrische Maximum heben - sonst ragt der Text aus dem Schmuck */
+  return Math.min(maxFs, Math.max(4, maxFs*0.82*userScale));
 }
 function fittedFontSizeForArc(el){
   const FS0=40;
@@ -1046,7 +1058,7 @@ function fittedFontSizeForArc(el){
   const maxByHeight=Math.max(6, outwardClearance*1.45);
   const maxFs=Math.min(maxByLength, maxByHeight);
   const userScale=(+el.dataset.fontScale||1);
-  return Math.max(4, Math.min(maxFs, maxFs*0.88*userScale));
+  return Math.min(maxFs, Math.max(4, maxFs*0.88*userScale));
 }
 function fitEngravings(scope=document){
   scope.querySelectorAll('text.eng').forEach(el=>{
@@ -1258,7 +1270,14 @@ function rectHitsHole(ext,cx,cy,angleDeg){
     return (lx-nx)**2+(ly-ny)**2 < h.keep*h.keep;
   });
 }
+const _heartPolyCache={};
 function heartPolygon(cx,cy,MM,scaleX=0.82,scaleY=scaleX){
+  /* teuer (DOM-Pfad + 150 Messpunkte) und rein von den Argumenten abhaengig -> zwischenspeichern */
+  const key=cx+'|'+cy+'|'+MM+'|'+scaleX+'|'+scaleY;
+  if(_heartPolyCache[key]) return _heartPolyCache[key];
+  return (_heartPolyCache[key]=heartPolygonRaw(cx,cy,MM,scaleX,scaleY));
+}
+function heartPolygonRaw(cx,cy,MM,scaleX,scaleY){
   const w=19.5*MM*scaleX, h=18*MM*scaleY, sx=w/100, sy=h/88, tx=cx-w/2, ty=cy-h/2;
   const path=document.createElementNS(SVG_NS,'path');
   path.setAttribute('d', UNIT_HEART);
@@ -1276,16 +1295,24 @@ function pointInPolygon(point, polygon){
   }
   return inside;
 }
+/* Rasterpunkte ueber der (gedrehten) Textbox, dicht genug auch fuer schmale Staebe */
+function boxGridPoints(ext, cx, cy, angleDeg){
+  const a=angleDeg*Math.PI/180, c=Math.cos(a), s=Math.sin(a), pts=[];
+  for(let i=0;i<=12;i++) for(let j=0;j<=8;j++){
+    const x=(i/6-1)*ext.hw, y=(j/4-1)*ext.hh;
+    pts.push({x:cx+x*c-y*s, y:cy+x*s+y*c});
+  }
+  return pts;
+}
 function isStraightLineInside(line, cx, cy){
   const ext=rectExtentsFromText(line.id);
   const corners=rotatedCorners(ext, cx, cy, line.angle);
   if(isKey(state.shape)){
     /* Raster ueber die Textbox: alles in der Gravurflaeche (auch zwischen den Katzenohren) und nichts in der Sperrzone */
-    const poly=keyPolygon(state.shape), a=line.angle*Math.PI/180, c=Math.cos(a), s=Math.sin(a);
-    for(let i=0;i<=8;i++) for(let j=0;j<=4;j++){
-      const x=(i/4-1)*ext.hw, y=(j/2-1)*ext.hh, px=cx+x*c-y*s, py=cy+x*s+y*c;
-      if(inKeep(state.shape,px,py)) return false;
-      if((i%8===0 || j%4===0) && !pointInPolygon({x:px,y:py}, poly)) return false;
+    const poly=keyPolygon(state.shape);
+    for(const p of boxGridPoints(ext, cx, cy, line.angle)){
+      if(inKeep(state.shape,p.x,p.y)) return false;
+      if(!pointInPolygon(p, poly)) return false;
     }
     return true;
   }
@@ -1297,7 +1324,8 @@ function isStraightLineInside(line, cx, cy){
   }
   const f=frameOf('heart'), c=frameCenter('heart',CFG_CX,CFG_CY,CFG_MM);
   const poly=heartPolygon(c.x, c.y, CFG_MM, f.outerScaleX, f.outerScaleY);
-  return corners.every(p => pointInPolygon(p, poly));
+  /* Herz ist konkav (Kerbe oben): die vier Ecken allein lassen gedrehte Boxen durchrutschen */
+  return boxGridPoints(ext, cx, cy, line.angle).every(p => pointInPolygon(p, poly));
 }
 function clampLineOffsetToShape(line, desiredOx, desiredOy, fallbackOx, fallbackOy){
   if(line.textMode!=='arc'){
