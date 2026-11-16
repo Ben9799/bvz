@@ -357,7 +357,7 @@ const SHOP={
   herzarmband:  {price:24.99, mat:'Edelstahl', schmuck:true},
   dogtag:       {price:19.99, mat:'Aluminium', schmuck:true},
   medaillon:    {price:19.99, mat:null, schmuck:true},          // Material noch offen
-  tafel:        {price:89.00, mat:'Edelstahl 1.4301 (V2A)', schmuck:false},
+  tafel:        {price:89.00, mat:'Edelstahl', schmuck:false},
 };
 const sellable=k=>{const o=SHOP[k];return !!(o&&o.price>0&&o.mat);};
 const eur=n=>n.toFixed(2).replace('.',',')+' €';
@@ -427,7 +427,7 @@ const CFG={
     clip:'<rect x="-275.6" y="-374.4" width="551.2" height="780" rx="8"/>',
     med:{cx:0,cy:15.6,rx:275.6,ry:390}, pxPerMm:5.2,
     colors:{
-      silber:{name:'Edelstahl geschliffen',bg:SILBER_BG,mat:'Edelstahl 1.4301 (V2A)',views:{
+      silber:{name:'Edelstahl geschliffen',bg:SILBER_BG,mat:'Edelstahl',views:{
         full:{img:'images/shop/erinnerungstafel-edelstahl.jpg',alt:'Erinnerungstafel aus geschliffenem Edelstahl',t:'translate(600 600)'}}}}},
 };
 let cur=CFG.armreif, MED=cur.med, PX_PER_MM=cur.pxPerMm;
