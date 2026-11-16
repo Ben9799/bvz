@@ -318,7 +318,6 @@
             <g clip-path="url(#mcMap)" fill="none" stroke="#5b6068" stroke-linecap="round">
               <path d="M20 30 L52 36 L100 22" stroke-width="2.2"/><path d="M30 64 L58 44 L96 58" stroke-width="2.2"/><path d="M52 10 L58 44 L66 80" stroke-width="1.6"/><path d="M24 48 L44 52 M74 30 L90 40" stroke-width="1.1"/>
             </g>
-            <path d="M60 52 C50 44 47 40 47 36 C47 32 50 30 53 30 C56 30 59 32 60 34 C61 32 64 30 67 30 C70 30 73 32 73 36 C73 40 70 44 60 52 Z" fill="#3c4047" stroke="#e9e9ea" stroke-width="1.6"/>
           </svg>
           <span class="mc-title">Karte</span><span class="mc-sub">Dein Lieblingsort</span>
         </button>
@@ -428,7 +427,7 @@
         <input type="range" id="mapZoom" min="250" max="1200" step="50" value="550">
         <output id="mapZoomValue">mittel</output>
       </div>
-      <p class="hint">Adresse oder GPS-Koordinaten (z.&nbsp;B. <em>48.137, 11.575</em>) eingeben – wir zeichnen daraus die Straßenkarte mit Herz an deinem Ort. Kartendaten © OpenStreetMap.</p>
+      <p class="hint">Adresse oder GPS-Koordinaten (z.&nbsp;B. <em>48.137, 11.575</em>) eingeben – wir zeichnen daraus die Straßenkarte rund um deinen Ort. Kartendaten © OpenStreetMap.</p>
       <div class="photo-msg" id="mapMsg"></div>
       <div class="photo-actions" id="mapActions" style="display:none">
         <button type="button" class="linkbtn" id="mapRemove">Karte entfernen</button>
@@ -998,7 +997,7 @@ function lineMarkup(line, shape, cx, cy, MM){
   else if(isKey(shape)){ maxw=KEYS[shape].maxW*MM; maxh=KEYS[shape].maxH*MM; }
   else if(isCoin(shape)){ maxw=COINS[shape].maxW*MM; maxh=COINS[shape].maxH*MM; }
   else if(shape==='dogtag'){ maxw=frameOf('dogtag').safeR*1.5*MM; maxh=frameOf('dogtag').safeR*.75*MM; }
-  else if(shape==='circle'||shape==='medaillon'){ maxw=Math.max(10,frameOf(shape).safeR*1.55*MM); maxh=Math.max(8,frameOf(shape).safeR*.95*MM); }
+  else if(shape==='circle'||shape==='medaillon'){ maxw=frameOf(shape).safeR*1.9*MM; maxh=frameOf(shape).safeR*1.6*MM; }
   else { maxw=SHAPES.heart.w*MM*frameOf('heart').safeScaleX*.72; maxh=SHAPES.heart.h*MM*frameOf('heart').safeScaleY*.45; }
   /* maxW/maxH gelten im gedrehten Textrahmen. Die gedrehte Textbox muss aber in die Flaeche des
      Schmucks passen - sonst ragt z.B. quer gestellte Schrift seitlich ueber einen schmalen Stab. */
@@ -1013,8 +1012,9 @@ function lineMarkup(line, shape, cx, cy, MM){
   }
   return `<g class="engGroup${selClass}" ${common} transform="translate(${ax} ${ay}) rotate(${line.angle})">`
        + `<rect class="hit" x="0" y="0" width="0" height="0"/>`
-       + `<text class="eng" x="0" y="0" text-anchor="middle" dominant-baseline="central" data-line-id="${line.id}" `
-       + `data-mode="straight" data-shape="${shape}" data-font-scale="${line.fontScale}" data-maxw="${maxw/fnt.pad}" data-maxh="${maxh}" `
+       + `<text class="eng" x="0" y="0" text-anchor="middle" data-line-id="${line.id}" `
+       + `data-mode="straight" data-shape="${shape}" data-font-scale="${line.fontScale}" data-maxw="${maxw}" data-pad="${fnt.pad}" data-maxh="${maxh}" `
+       + `${(shape==='circle'||shape==='medaillon') ? `data-fit-r="${frameOf(shape).safeR*.97*MM}" ` : ''}`
        + `${fontAttr}>${escapeHtml(line.text || ' ')}</text>`
        + `</g>`;
 }
@@ -1028,14 +1028,36 @@ function pendant(shape, lines, cx, cy, MM, photo){
   return body + overlays + (text ? `<g class="engLayer" filter="url(#engrave)" opacity=".8">${text}</g>` : '');
 }
 
+/* Tinten-Box: die echten Glyphen (ohne Ober-/Unterlaengen-Reserve der Schriftzeile), relativ zum Anker.
+   SVG-Text steht auf der alphabetischen Grundlinie, genau wie canvas.measureText -> deckungsgleich. */
+const _inkCtx=document.createElement('canvas').getContext('2d');
+function inkBox(el, fs){
+  const txt=el.textContent||'';
+  if(!txt.trim() || !_inkCtx) return null;
+  _inkCtx.font=`${el.getAttribute('font-weight')||400} ${fs}px ${el.getAttribute('font-family')}`;
+  _inkCtx.textAlign='center'; _inkCtx.textBaseline='alphabetic';
+  const m=_inkCtx.measureText(txt);
+  if(m.actualBoundingBoxAscent===undefined) return null;
+  const l=-m.actualBoundingBoxLeft, r=m.actualBoundingBoxRight, t=-m.actualBoundingBoxAscent, b=m.actualBoundingBoxDescent;
+  if(!(r-l>0 && b-t>0)) return null;
+  return {w:r-l, h:b-t, cx:(l+r)/2, cy:(t+b)/2};
+}
 function fittedFontSizeForStraight(el){
   const FS0=40;
   el.setAttribute('font-size', FS0);
-  let bb; try{ bb=el.getBBox(); }catch(e){ return 16; }
-  if(!bb || bb.width===0) return 16;
-  const wPerFs=bb.width/FS0, hPerFs=(bb.height||FS0)/FS0;
-  const maxW=+el.dataset.maxw || 80, maxH=+el.dataset.maxh || 50;
-  const maxFs=Math.min(maxW/Math.max(wPerFs,0.01), maxH/Math.max(hPerFs,0.01));
+  let wPerFs, hPerFs, maxW=+el.dataset.maxw || 80;
+  const ink=inkBox(el,FS0);
+  if(ink){ wPerFs=ink.w/FS0; hPerFs=ink.h/FS0; }
+  else {
+    let bb; try{ bb=el.getBBox(); }catch(e){ return 16; }
+    if(!bb || bb.width===0) return 16;
+    wPerFs=bb.width/FS0; hPerFs=(bb.height||FS0)/FS0; maxW/=(+el.dataset.pad||1);
+  }
+  const maxH=+el.dataset.maxh || 50;
+  let maxFs=Math.min(maxW/Math.max(wPerFs,0.01), maxH/Math.max(hPerFs,0.01));
+  /* Kreis/Medaillon: die Buchstaben-Ecken duerfen bis knapp an den Rand */
+  const fitR=+el.dataset.fitR;
+  if(fitR) maxFs=Math.min(maxFs, 2*fitR/Math.hypot(wPerFs,hPerFs));
   const userScale=(+el.dataset.fontScale||1);
   /* Mindestgroesse nie ueber das geometrische Maximum heben - sonst ragt der Text aus dem Schmuck */
   return Math.min(maxFs, Math.max(4, maxFs*0.82*userScale));
@@ -1061,15 +1083,26 @@ function fittedFontSizeForArc(el){
   return Math.min(maxFs, Math.max(4, maxFs*0.88*userScale));
 }
 function fitEngravings(scope=document){
-  scope.querySelectorAll('text.eng').forEach(el=>{
-    const fs=el.dataset.mode==='arc' ? fittedFontSizeForArc(el) : fittedFontSizeForStraight(el);
+  scope.querySelectorAll('text.eng').forEach(el=>fitOne(el));
+}
+function fitOne(el, fsFixed){
+  {
+    const fs=fsFixed!=null ? fsFixed : el.dataset.mode==='arc' ? fittedFontSizeForArc(el) : fittedFontSizeForStraight(el);
     el.setAttribute('font-size', fs);
+    const ink=el.dataset.mode==='arc' ? null : inkBox(el,fs);
+    if(ink){
+      /* Glyphen exakt um den Anker zentrieren */
+      el.setAttribute('x',(-ink.cx).toFixed(3)); el.setAttribute('y',(-ink.cy).toFixed(3));
+      el.dataset.inkw=ink.w; el.dataset.inkh=ink.h;
+    } else if(el.dataset.mode!=='arc'){ el.setAttribute('y',(fs*.34).toFixed(3)); delete el.dataset.inkw; delete el.dataset.inkh; }
     const hit=el.previousElementSibling;
     if(hit && hit.classList.contains('hit')){
-      let bb; try{ bb=el.getBBox(); }catch(e){ bb=null; }
+      let bb=null;
+      if(ink) bb={x:-ink.w/2, y:-ink.h/2, width:ink.w, height:ink.h};
+      else { try{ bb=el.getBBox(); }catch(e){ bb=null; } }
       if(bb){ hit.setAttribute('x',bb.x-3); hit.setAttribute('y',bb.y-2); hit.setAttribute('width',bb.width+6); hit.setAttribute('height',bb.height+4); }
     }
-  });
+  }
 }
 
 /* ---- mm-Lineal ---- */
@@ -1256,6 +1289,7 @@ function rotatedCorners(ext, cx, cy, angleDeg){
 }
 function rectExtentsFromText(lineId){
   const t=getPreviewText(lineId); if(!t) return {hw:12,hh:8};
+  if(+t.dataset.inkw) return {hw:+t.dataset.inkw/2, hh:+t.dataset.inkh/2};
   let bb; try{ bb=t.getBBox(); }catch(e){ return {hw:12,hh:8}; }
   const line=state.lines.find(l=>l.id===lineId);
   return {hw:Math.max(1,bb.width/2*fontOf(line).pad), hh:Math.max(1,bb.height/2)};
@@ -1354,7 +1388,7 @@ function shrinkToFit(line){
   let sc=line.fontScale, n=0;
   while(!isStraightLineInside(line,cx,cy) && n<18 && sc>.15){
     sc*=.9; t.dataset.fontScale=sc;
-    t.setAttribute('font-size', fittedFontSizeForStraight(t)); n++;
+    fitOne(t); n++;
   }
   return n>0;
 }
@@ -1780,32 +1814,93 @@ function roadWidth(hw){
   if(/residential|unclassified|living_street|pedestrian|road/.test(hw)) return 1.7;
   return 1.05;
 }
+/* Strassen holen: 1) OpenFreeMap-Vektorkacheln (CDN, zuverlaessig), 2) Overpass als Reserve.
+   Vereinfacht: nur befahrbare Strassen + Fussgaengerzonen, keine Feld-/Fusswege. Ergebnis: <polyline> im 1000er-Raster. */
+const ROAD_W={motorway:4,trunk:4,primary:4,secondary:2.6,tertiary:2.6,minor:1.7,pedestrian:1.7};
+const roadClass=(cls,sub)=>ROAD_W[cls] ? cls : ((cls==='path'&&sub==='pedestrian') ? 'pedestrian' : '');
+let _ofmTpl=null;
+function pbFields(u8,s,e){ const out=[]; let p=s;
+  const vi=()=>{ let r=0,m=1,b; do{ b=u8[p++]; r+=(b&127)*m; m*=128; }while(b&128); return r; };
+  while(p<e){ const k=vi(), f=Math.floor(k/8), w=k&7;
+    if(w===0) out.push({f,v:vi()});
+    else if(w===2){ const l=vi(); out.push({f,s:p,e:p+l}); p+=l; }
+    else if(w===1){ p+=8; } else if(w===5){ p+=4; } else throw new Error('pbf');
+  } return out; }
+function pbPacked(u8,s,e){ const out=[]; let p=s; while(p<e){ let r=0,m=1,b; do{ b=u8[p++]; r+=(b&127)*m; m*=128; }while(b&128); out.push(r); } return out; }
+const _td=new TextDecoder();
+const pbStr=(u8,x)=>_td.decode(u8.subarray(x.s,x.e));
+function mvtRoads(u8,tx,ty,z,out){
+  for(const L of pbFields(u8,0,u8.length)){ if(L.f!==3) continue;
+    const lf=pbFields(u8,L.s,L.e), nm=lf.find(x=>x.f===1);
+    if(!nm || pbStr(u8,nm)!=='transportation') continue;
+    const keys=lf.filter(x=>x.f===3).map(x=>pbStr(u8,x));
+    const vals=lf.filter(x=>x.f===4).map(x=>{ const v=pbFields(u8,x.s,x.e).find(y=>y.f===1); return v ? pbStr(u8,v) : ''; });
+    const ext=(lf.find(x=>x.f===5)||{v:4096}).v, kC=keys.indexOf('class'), kS=keys.indexOf('subclass'), N=2**z;
+    for(const F of lf){ if(F.f!==2) continue;
+      const ff=pbFields(u8,F.s,F.e), ty3=ff.find(x=>x.f===3), tg=ff.find(x=>x.f===2), gm=ff.find(x=>x.f===4);
+      if(!ty3 || ty3.v!==2 || !tg || !gm) continue;
+      const tags=pbPacked(u8,tg.s,tg.e); let cls='', sub='';
+      for(let i=0;i<tags.length;i+=2){ if(tags[i]===kC) cls=vals[tags[i+1]]; else if(tags[i]===kS) sub=vals[tags[i+1]]; }
+      const rc=roadClass(cls,sub); if(!rc) continue;
+      const g=pbPacked(u8,gm.s,gm.e); let i=0,x=0,y=0,cur=null;
+      while(i<g.length){ const c=g[i++], id=c&7, n=c>>>3;
+        if(id===7) continue;
+        for(let k=0;k<n;k++){ const dx=g[i++], dy=g[i++]; x+=(dx>>>1)^-(dx&1); y+=(dy>>>1)^-(dy&1);
+          if(id===1){ cur=[]; out.push({rc,pts:cur}); }
+          cur.push([(tx+x/ext)/N,(ty+y/ext)/N]); } }
+    }
+  }
+}
+async function roadsFromTiles(center,R_m){
+  if(!_ofmTpl){ const r=await fetch('https://tiles.openfreemap.org/planet'); if(!r.ok) throw new Error('tj'); _ofmTpl=(await r.json()).tiles[0]; }
+  const z=14, N=2**z, lat=center.lat*Math.PI/180;
+  const wx=(center.lon+180)/360, wy=(1-Math.asinh(Math.tan(lat))/Math.PI)/2;     // Web-Mercator 0..1
+  const k=500/R_m*40075016.686*Math.cos(lat);                                      // Welt-Einheit -> 1000er-Raster
+  const d=R_m/(40075016.686*Math.cos(lat));
+  const lines=[];
+  const jobs=[];
+  for(let tx=Math.floor((wx-d)*N); tx<=Math.floor((wx+d)*N); tx++)
+    for(let ty=Math.floor((wy-d)*N); ty<=Math.floor((wy+d)*N); ty++)
+      jobs.push(fetch(_ofmTpl.replace('{z}',z).replace('{x}',tx).replace('{y}',ty)).then(r=>{ if(!r.ok) throw new Error('tile'); return r.arrayBuffer(); })
+        .then(b=>mvtRoads(new Uint8Array(b),tx,ty,z,lines)));
+  await Promise.all(jobs);
+  let paths='';
+  lines.forEach(l=>{
+    const pts=l.pts.map(([x,y])=>[500+(x-wx)*k, 500+(y-wy)*k]);
+    if(pts.every(([x,y])=>x<-50||x>1050||y<-50||y>1050)) return;
+    paths+=`<polyline points="${pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')}" fill="none" stroke="#1c1a17" stroke-width="${ROAD_W[l.rc]}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  });
+  return paths;
+}
+async function roadsFromOverpass(center,R_m){
+  const q=`[out:json][timeout:20];way["highway"~"^(motorway|trunk|primary|secondary|tertiary|unclassified|residential|living_street|pedestrian|road)(_link)?$"](around:${R_m},${center.lat},${center.lon});out geom;`;
+  const body='data='+encodeURIComponent(q);
+  const EPS=['https://overpass-api.de/api/interpreter','https://maps.mail.ru/osm/tools/overpass/api/interpreter','https://overpass.private.coffee/api/interpreter','https://overpass.kumi.systems/api/interpreter'];
+  const attempt=ep=>fetch(ep,{method:'POST',body}).then(r=>{ if(!r.ok) throw new Error('bad'); return r.json(); }).then(d=>{ if(d&&d.elements&&d.elements.length) return d; throw new Error('empty-ep'); });
+  const timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),20000));
+  const j=await Promise.race([Promise.any(EPS.map(attempt)), timeout]);
+  const lat=center.lat, lon=center.lon;
+  const dLat=R_m/111320, dLon=R_m/(111320*Math.cos(lat*Math.PI/180));
+  const n=lat+dLat, sB=lat-dLat, w=lon-dLon, e=lon+dLon;
+  const px=lo=>(lo-w)/(e-w)*1000, py=la=>(n-la)/(n-sB)*1000;
+  let paths='';
+  (j.elements||[]).forEach(el=>{
+    if(el.type!=='way'||!el.geometry) return;
+    const pts=el.geometry.map(g=>px(g.lon).toFixed(1)+','+py(g.lat).toFixed(1)).join(' ');
+    paths+=`<polyline points="${pts}" fill="none" stroke="#1c1a17" stroke-width="${roadWidth((el.tags&&el.tags.highway)||'')}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  });
+  return paths;
+}
+async function mapRoadPaths(center,R_m){
+  try{ const p=await Promise.race([roadsFromTiles(center,R_m), new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),15000))]); if(p) return p; }catch(_){ }
+  try{ return await roadsFromOverpass(center,R_m); }catch(_){ throw new Error('overpass'); }
+}
 async function mapRender(center){
   const R_m=+$('mapZoom').value;
   mapBusy(true); setMapMsg('','Karte wird erzeugt …');
   try{
-    const q=`[out:json][timeout:25];(way["highway"](around:${R_m},${center.lat},${center.lon}););out geom;`;
-    const body='data='+encodeURIComponent(q);
-    const EPS=['https://maps.mail.ru/osm/tools/overpass/api/interpreter','https://overpass.private.coffee/api/interpreter','https://overpass.kumi.systems/api/interpreter','https://overpass.osm.ch/api/interpreter'];
-    const attempt=ep=>fetch(ep,{method:'POST',body}).then(r=>{ if(!r.ok) throw new Error('bad'); return r.json(); }).then(d=>{ if(d&&d.elements&&d.elements.length) return d; throw new Error('empty-ep'); });
-    const timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),22000));
-    let j=null;
-    try{ j=await Promise.race([Promise.any(EPS.map(attempt)), timeout]); }catch(_){ j=null; }
-    if(!j) throw new Error('overpass');
-    const lat=center.lat, lon=center.lon;
-    const dLat=R_m/111320, dLon=R_m/(111320*Math.cos(lat*Math.PI/180));
-    const n=lat+dLat, sB=lat-dLat, w=lon-dLon, e=lon+dLon;
-    const px=lo=>(lo-w)/(e-w)*1000, py=la=>(n-la)/(n-sB)*1000;
-    let paths='';
-    (j.elements||[]).forEach(el=>{
-      if(el.type!=='way'||!el.geometry) return;
-      const pts=el.geometry.map(g=>px(g.lon).toFixed(1)+','+py(g.lat).toFixed(1)).join(' ');
-      const hw=(el.tags&&el.tags.highway)||'';
-      paths+=`<polyline points="${pts}" fill="none" stroke="#1c1a17" stroke-width="${roadWidth(hw)}" stroke-linecap="round" stroke-linejoin="round"/>`;
-    });
+    const paths=await mapRoadPaths(center, R_m);
     if(!paths) throw new Error('empty');
-    const k=1.25, tx=(500-50*k), ty=(500-88*k);
-    const pin=`<path d="${UNIT_HEART}" transform="translate(${tx.toFixed(1)} ${ty.toFixed(1)}) scale(${k})" fill="#1c1a17" stroke="#faf8f5" stroke-width="7"/>`;
     const rawLbl=String(center.label||'').trim();
     let labelSvg='';
     if(rawLbl){
@@ -1816,7 +1911,7 @@ async function mapRender(center){
         +`<text x="500" y="886" text-anchor="middle" font-family="'Cormorant Garamond', Georgia, serif" font-size="${fs.toFixed(0)}" font-weight="600" letter-spacing="2" fill="#1c1a17" stroke="#faf8f5" stroke-width="6" style="paint-order:stroke">${up}</text>`;
     }
     mark();
-    state.mapPaths=paths+pin+labelSvg;
+    state.mapPaths=paths+labelSvg;
     state.mapCenter=center;
     state.mapLabel=center.label||(center.lat.toFixed(4)+', '+center.lon.toFixed(4));
     clearPhoto();
