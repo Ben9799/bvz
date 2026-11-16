@@ -6,6 +6,11 @@
   "name": "wolf-lasermark",
   "main": "_worker.js",
   "compatibility_date": "2026-11-01",
+  "workers_dev": true,
+  "preview_urls": false,
+  "routes": [
+    { "pattern": "wolf-lasermark.de", "custom_domain": true }
+  ],
   "assets": {
     "directory": ".",
     "binding": "ASSETS",
