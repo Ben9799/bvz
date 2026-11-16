@@ -833,7 +833,7 @@
       <details class="faq-item"><summary>Kann ich meine Gravur vorher sehen?</summary><p>Ja. Die Vorschau zeigt dein Motiv live und maßstabsgetreu – genau diese Datei geht in die Gravur. Was du siehst, bekommst du.</p></details>
       <details class="faq-item"><summary>Hält die Gravur dauerhaft?</summary><p>Die Gravur wird mit dem Präzisionslaser dauerhaft in das Metall eingebracht. Sie ist wischfest und verblasst nicht – anders als aufgedruckte oder oberflächliche Beschriftungen.</p></details>
       <details class="faq-item"><summary>Läuft Silber nicht mit der Zeit an?</summary><p>Echtes Silber kann bei Kontakt mit Luft nachdunkeln – das ist normal und lässt sich mit einem weichen Silbertuch leicht wieder aufpolieren. Bewahre die Kette trocken auf und lege sie vor Sport, Duschen oder Parfum ab.</p></details>
-      <details class="faq-item"><summary>Wie lange dauert die Lieferung?</summary><p>Wir fertigen jedes Stück individuell an – die Anfertigung dauert in der Regel 3–5 Werktage, danach kommt der Versand innerhalb Deutschlands hinzu.</p></details>
+      <details class="faq-item"><summary>Wie lange dauert die Lieferung?</summary><p>Wir fertigen jedes Stück individuell an – die Lieferzeit beträgt 5–10 Werktage, Anfertigung und Versand eingeschlossen. Der Versand innerhalb Deutschlands ist kostenlos.</p></details>
       <details class="faq-item"><summary>Kann ich die Kette umtauschen?</summary><p>Da jedes Schmuckstück nach deinen persönlichen Angaben graviert und damit ein Unikat ist, ist das gesetzliche Widerrufsrecht für personalisierte Waren ausgeschlossen. Sollte einmal etwas nicht stimmen oder ein Mangel vorliegen, kümmern wir uns selbstverständlich darum – schreib uns einfach.</p></details>
     </div>
   </div>
@@ -3515,6 +3515,13 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
 .pg-msg.ok{color:#2f8a57}
 #paypal-button-container{margin-top:.8rem;min-height:48px}
 .pg-x{position:absolute;top:12px;right:14px;background:none;border:0;color:#8c8378;font-size:1.5rem;cursor:pointer;line-height:1}
+.pg-legal{background:#fbf8f4;border:1px solid #ebe4da;border-radius:10px;padding:.65rem .8rem;font-size:.78rem;color:#5f5850;line-height:1.45;margin:.4rem 0 .6rem}
+.pg-legal ul{margin:0 0 .45rem;padding-left:1.1rem}
+.pg-legal p{margin:0}
+.pg-legal a{color:#8c2f39}
+.pg-order{display:block;width:100%;border:0;border-radius:10px;background:#8c2f39;color:#fff;font-weight:700;font-size:1rem;padding:.85rem 1rem;cursor:pointer;font-family:inherit}
+.pg-order:hover{background:#74252f}
+.pg-pay-intro{font-size:.88rem;color:#2b2724;margin:.2rem 0 .2rem}
 .pg-note{font-size:.72rem;color:#8c8378;margin-top:.7rem;line-height:1.4}
 .pg-gravur{background:#f4efe9;border:1px solid #ebe4da;border-radius:10px;padding:.55rem .7rem;font-size:.8rem;color:#5f5850;margin-bottom:.9rem}
 .pg-gravur b{color:#2b2724}
@@ -3535,6 +3542,7 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
         <div><div id="pgSumProd" style="font-weight:700"></div><div id="pgSumBreak" style="font-size:.78rem;color:#8a7f70"></div><div id="pgSumRabatt" style="font-size:.78rem;color:#1e874b;display:none"></div></div>
         <b id="pgSumTotal">–</b>
       </div>
+      <div id="pgStep1">
       <div class="pg-fld">
         <label>Menge</label>
         <div class="pg-qty"><button type="button" id="pgQtyMinus">−</button>
@@ -3553,15 +3561,28 @@ document.querySelectorAll('.fade').forEach(el=>io.observe(el));
         <div class="pg-fld"><label>Name *</label><input id="pgName" autocomplete="name"></div>
         <div class="pg-fld"><label>E-Mail *</label><input id="pgEmail" type="email" autocomplete="email"></div>
         <div class="pg-fld"><label>Telefon</label><input id="pgTel" autocomplete="tel"></div>
-        <div class="pg-fld"><label>Land</label><input id="pgLand" value="Deutschland" autocomplete="country-name"></div>
+        <div class="pg-fld"><label>Land</label><input id="pgLand" value="Deutschland" readonly title="Lieferung nur innerhalb Deutschlands"></div>
         <div class="pg-fld full"><label>Straße & Hausnummer *</label><input id="pgStrasse" autocomplete="street-address"></div>
         <div class="pg-fld"><label>PLZ *</label><input id="pgPlz" autocomplete="postal-code"></div>
         <div class="pg-fld"><label>Ort *</label><input id="pgOrt" autocomplete="address-level2"></div>
         <div class="pg-fld full"><label>Anmerkung (optional)</label><textarea id="pgNote" rows="2"></textarea></div>
       </div>
+      <div class="pg-legal">
+        <ul>
+          <li>Versandkostenfrei innerhalb Deutschlands (Lieferung nur innerhalb Deutschlands)</li>
+          <li>Lieferzeit: 5–10 Werktage</li>
+          <li>Gesamtpreis inkl. Versand – gemäß § 19 UStG wird keine Umsatzsteuer berechnet</li>
+        </ul>
+        <p>Es gelten unsere <a href="https://itrk.legal/Ipk.2Y.Cj6.html" target="_blank" rel="noopener">AGB</a>. Da jedes Stück nach deinen persönlichen Vorgaben graviert wird, besteht für diese Ware kein Widerrufsrecht (§ 312g Abs. 2 Nr. 1 BGB) – siehe <a href="https://itrk.legal/Ipk.2J.Cj6.html" target="_blank" rel="noopener">Widerrufsbelehrung</a>. Hinweise zur Verarbeitung deiner Daten findest du in unserer <a href="datenschutz.html" target="_blank" rel="noopener">Datenschutzerklärung</a>.</p>
+      </div>
+      </div>
       <div class="pg-msg" id="pgMsg"></div>
-      <div id="paypal-button-container"></div>
-      <p class="pg-note">Mit dem Klick auf Bezahlen wird dein gestaltetes Design an uns übermittelt. Endpreis gemäß §19 UStG – keine MwSt. ausweisbar. Versand innerhalb Deutschlands.</p>
+      <button type="button" class="pg-order" id="pgOrderBtn">Zahlungspflichtig bestellen</button>
+      <div id="pgStep2" style="display:none">
+        <p class="pg-pay-intro"><b>Bitte schließe deine Bestellung jetzt mit der Zahlung ab.</b> Wähle PayPal oder Kredit-/Debitkarte.</p>
+        <div id="paypal-button-container"></div>
+        <p class="pg-note"><a href="#" id="pgEdit" style="color:#8c8378">Angaben ändern</a></p>
+      </div>
     </div>
     <div id="pgSuccess" class="pg-success" style="display:none">
       <div class="pg-check">✅</div>
@@ -3932,9 +3953,14 @@ window.wlRedeemCoupon = async function(code, ref){
     document.head.appendChild(s);
   }
 
+  function pgStep(n){
+    $('pgStep1').style.display=n===1?'block':'none';
+    $('pgOrderBtn').style.display=n===1?'block':'none';
+    $('pgStep2').style.display=n===2?'block':'none';
+  }
   function pgOpen(){
     $('pgForm').style.display='block'; $('pgSuccess').style.display='none';
-    pgMsg(''); pgUpdateSummary();
+    pgStep(1); pgMsg(''); pgUpdateSummary();
     $('pgBack').classList.add('show'); document.body.style.overflow='hidden';
     pgLoadPaypal();
   }
@@ -3943,6 +3969,10 @@ window.wlRedeemCoupon = async function(code, ref){
   $('bestellBtn') && ($('bestellBtn').onclick=pgOpen);
   $('tafBestellBtn') && ($('tafBestellBtn').onclick=pgOpen);
   $('pgClose') && ($('pgClose').onclick=pgCloseModal);
+  /* §312j BGB: der Bestell-Button selbst muss "zahlungspflichtig bestellen" heissen.
+     Die PayPal-/Karten-Buttons kommen erst danach als Zahlungsschritt (AGB 2.4). */
+  $('pgOrderBtn') && ($('pgOrderBtn').onclick=()=>{ if(!pgValidate()) return; pgUpdateSummary(); pgStep(2); });
+  $('pgEdit') && ($('pgEdit').onclick=e=>{ e.preventDefault(); pgStep(1); });
   $('pgDone') && ($('pgDone').onclick=pgCloseModal);
   $('pgBack') && $('pgBack').addEventListener('click',e=>{ if(e.target===$('pgBack')) pgCloseModal(); });
   $('pgQty') && $('pgQty').addEventListener('input',pgUpdateSummary);
