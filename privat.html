@@ -170,6 +170,24 @@ dialog.lb::backdrop{background:rgba(20,16,13,.92)}
 .lb-btn{position:absolute;background:rgba(255,255,255,.12);color:#fff;border:0;width:46px;height:46px;border-radius:50%;font-size:1.4rem;cursor:pointer}
 .lb-close{top:14px;right:14px}.lb-prev{left:10px;top:50%;transform:translateY(-50%)}.lb-next{right:10px;top:50%;transform:translateY(-50%)}
 
+/* EIGENES STUECK */
+#eigenes{background:var(--ink);color:#fff}
+#eigenes .kicker{color:var(--gold)}
+#eigenes em{color:var(--gold-lt)}
+.own{display:grid;gap:40px}
+.own h2{font-size:clamp(2.1rem,6vw,3.4rem);margin:12px 0 14px;line-height:1.08}
+.own-lead{color:rgba(255,255,255,.78);max-width:52ch}
+.own-tags{display:flex;flex-wrap:wrap;gap:10px;margin:26px 0 8px;padding:0;list-style:none}
+.own-tags li{border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:.5rem 1rem;font-size:.86rem;color:#fff}
+.own-tags li.more{border-color:var(--gold);color:var(--gold-lt)}
+.own-steps{display:grid;gap:22px;margin:0;padding:0;list-style:none}
+.own-steps li{display:grid;grid-template-columns:3.2rem 1fr;gap:16px;padding-top:22px;border-top:1px solid rgba(255,255,255,.16)}
+.own-steps b{font-family:var(--disp);font-weight:500;font-size:2.4rem;line-height:.9;color:var(--gold)}
+.own-steps h3{font-size:1.25rem;margin-bottom:2px}
+.own-steps p{color:rgba(255,255,255,.7);font-size:.92rem}
+.own .btn-gold{margin-top:22px}
+.own-note{font-size:.8rem;color:rgba(255,255,255,.55);margin-top:14px}
+
 /* ABLAUF */
 .steps{display:grid;gap:34px;counter-reset:s}
 .step{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:start}
@@ -235,6 +253,7 @@ footer{background:var(--bg);border-top:1px solid var(--line);padding:36px 0 40px
   .prods{grid-template-columns:repeat(4,minmax(0,1fr));gap:22px}
   .prod .btn{letter-spacing:.18em}
   .live{grid-template-columns:1fr 1fr;gap:70px}
+  .own{grid-template-columns:1.15fr 1fr;gap:70px;align-items:center}
   .demo{margin:0}
   .why{grid-template-columns:repeat(4,1fr);gap:34px}
   .why>div,.why>div:last-child{border:0;border-top:1px solid var(--line);padding-top:28px}
@@ -321,6 +340,26 @@ footer{background:var(--bg);border-top:1px solid var(--line);padding:36px 0 40px
   </div>
 </section>
 
+<section id="eigenes">
+  <div class="wrap own">
+    <div class="rv">
+      <div class="kicker">Dein eigenes Stück</div>
+      <h2>Du hast schon etwas, das dir <em>am Herzen liegt?</em></h2>
+      <p class="own-lead">Wir gravieren auch Dinge, die du bereits besitzt. Ob Erbstück, Lieblingsuhr oder dein täglicher Begleiter: Wenn es eine Metalloberfläche hat, machen wir es mit deinem Text, Datum, Motiv oder Logo zu einem Unikat. Ganz nach deinen Wünschen.</p>
+      <ul class="own-tags">
+        <li>Bierkrug</li><li>Schmuck</li><li>Uhr</li><li>Taschenmesser</li><li>AirPods-Hülle</li><li>Laptop</li><li>Feuerzeug</li><li>Flachmann</li><li class="more">und alles aus Metall</li>
+      </ul>
+      <a class="btn btn-gold" href="mailto:info@wolf-lasermark.de?subject=Gravur%20auf%20meinem%20eigenen%20St%C3%BCck&body=Hallo%2C%0A%0Aich%20m%C3%B6chte%20folgendes%20St%C3%BCck%20gravieren%20lassen%3A%0A%0AGegenstand%3A%20%0AMaterial%20(falls%20bekannt)%3A%20%0AWunschgravur%20(Text%2C%20Motiv%2C%20Logo)%3A%20%0A%0AFotos%20h%C3%A4nge%20ich%20an.%0A%0AViele%20Gr%C3%BC%C3%9Fe">Stück anfragen <span class="arr">→</span></a>
+      <p class="own-note">Am Foto prüfen wir vorab, ob dein Stück sicher graviert werden kann. Die Anfrage ist unverbindlich.</p>
+    </div>
+    <ol class="own-steps rv" style="--i:1">
+      <li><b>01</b><div><h3>Foto schicken</h3><p>Ein Bild vom Stück und deine Wunschgravur genügen.</p></div></li>
+      <li><b>02</b><div><h3>Vorschau &amp; Angebot</h3><p>Du bekommst eine Gravurvorschau und einen festen Preis.</p></div></li>
+      <li><b>03</b><div><h3>Gravieren &amp; zurück</h3><p>Du schickst uns dein Stück, wir gravieren es sorgfältig und senden es dir sicher verpackt zurück.</p></div></li>
+    </ol>
+  </div>
+</section>
+
 <section id="live">
   <div class="wrap live">
     <div class="rv">
@@ -383,6 +422,7 @@ footer{background:var(--bg);border-top:1px solid var(--line);padding:36px 0 40px
       <details><summary>Kann ich meine Gravur vorher sehen?</summary><div class="ans"><div><p>Ja. Die Vorschau zeigt dein Motiv live und maßstabsgetreu. Genau diese Datei geht in die Gravur.</p></div></div></details>
       <details><summary>Hält die Gravur dauerhaft?</summary><div class="ans"><div><p>Ja. Der Laser bringt die Gravur direkt ins Metall ein. Sie ist wischfest und verblasst nicht.</p></div></div></details>
       <details><summary>Aus welchem Material sind die Stücke?</summary><div class="ans"><div><p>Überwiegend aus Edelstahl, je nach Stück poliert, gebürstet oder vergoldet. Die genauen Angaben stehen beim jeweiligen Produkt.</p></div></div></details>
+      <details><summary>Könnt ihr auch mein eigenes Stück gravieren?</summary><div class="ans"><div><p>Ja. Ob Bierkrug, Schmuck, Uhr, Taschenmesser, AirPods-Hülle oder Laptop: Alles mit Metalloberfläche gravieren wir nach deinen Wünschen. Schick uns einfach ein Foto an <a href="mailto:info@wolf-lasermark.de">info@wolf-lasermark.de</a>, wir melden uns mit Vorschau und Preis.</p></div></div></details>
       <details><summary>Wie lange dauert es?</summary><div class="ans"><div><p>Die Anfertigung dauert in der Regel 3–5 Werktage, danach kommt der Versand innerhalb Deutschlands hinzu.</p></div></div></details>
       <details><summary>Was kostet der Versand?</summary><div class="ans"><div><p>Bei Armreif und Herz-Armband ist der Versand innerhalb Deutschlands kostenlos. Bei allen anderen Stücken siehst du die Versandkosten vor dem Bestellen.</p></div></div></details>
       <details><summary>Kann ich umtauschen?</summary><div class="ans"><div><p>Da jedes Stück nach deinen Angaben graviert wird, ist das Widerrufsrecht für personalisierte Waren ausgeschlossen. Bei einem Fehler unsererseits fertigen wir selbstverständlich neu.</p></div></div></details>
