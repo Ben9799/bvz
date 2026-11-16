@@ -165,6 +165,9 @@
   .price-row{display:flex;align-items:baseline;justify-content:space-between;border-top:1px solid var(--line);margin-top:6px;padding-top:20px;gap:12px}
   .price-row .lbl{font-size:.8rem;color:var(--mut)}
   .price-row .val{font:500 1.55rem var(--head);letter-spacing:-.01em}
+  .btn-buy{display:block;width:100%;text-align:center;margin-top:16px;padding:15px;border:1px solid var(--ink);background:var(--ink);color:#fff;font:500 .72rem var(--head);letter-spacing:.2em;text-transform:uppercase;cursor:pointer;border-radius:2px}
+  .btn-buy:hover{background:#fff;color:var(--ink)}
+  .btn-buy:disabled{opacity:.5;cursor:wait}
   .btn-off{display:block;width:100%;text-align:center;margin-top:16px;padding:15px;border:1px solid var(--ink);background:var(--ink);color:#fff;font:500 .72rem var(--head);letter-spacing:.2em;text-transform:uppercase;opacity:.5;cursor:default;border-radius:2px}
   .assure{list-style:none;margin-top:16px;font-size:.78rem;color:var(--soft);display:grid;gap:5px}
   .assure li{display:flex;gap:8px;align-items:baseline}
@@ -581,6 +584,7 @@ function normAngle(a){ a=((a+180)%360+360)%360-180; return Math.round(a); }
 function fmt(n,unit=''){return (Math.round(n*100)/100).toFixed(2).replace(/\.00$/,'').replace('.',',')+unit;}
 function deDec(n){return String(n).replace('.',',')}
 const $=id=>document.getElementById(id);
+const SHOP_PRICE=parseFloat(new URLSearchParams(location.search).get('price')||'');   // vom Shop, nur wenn bestellbar
 
 /* Gravur-Schriften (Google Fonts). pad = Sicherheitszuschlag auf die Textbreite (Schwuenge von Schreibschriften) */
 const FONTS={
@@ -1217,6 +1221,7 @@ function renderPreviewOnly(){
   $('cfgPendant').innerHTML = pendant(state.shape, state.lines, CFG_CX, CFG_CY, CFG_MM, state.photo);
   const side = state.shape==='dogtag' ? dogTag.side : (sides.on ? sides.cur : '');
   $('dimCaption').textContent = (state.bracelet ? 'Herz-Armband · Edelstahl · Herz ca. 19,5 mm breit · Schlangenkette 17 + 5 cm' : SHAPES[state.shape].cap) + (side ? (side==='back' ? ' · Rückseite' : ' · Vorderseite') : '');
+  if(SHOP_PRICE>0) $('price').innerHTML = SHOP_PRICE.toFixed(2).replace('.',',')+'&nbsp;€'; else
   $('price').innerHTML = state.bracelet ? '24,99&nbsp;€' : (SHAPES[state.shape].price ? 'ab '+SHAPES[state.shape].price+'&nbsp;€' : 'Preis folgt');
   fitEngravings(document);
   keepAllLinesInside();
@@ -1998,6 +2003,75 @@ document.addEventListener('focusin',e=>{
 document.addEventListener('focusout',e=>{
   if(e.target.matches && e.target.matches('.line-input,.txt')){ clearTimeout(typingTimer); typingTimer=setTimeout(()=>document.body.classList.remove('typing'),180); }
 });
+
+/* ---- Bestellung (2026-11-16): nur im Shop-iframe mit ?buy=1 (der Shop kennt Preis + Material).
+   Der Editor schickt Gravurtext, Design-Daten, eine saubere Gravurdatei (SVG, mm-genau) und eine
+   PNG-Vorschau per postMessage an privat-shop-ducett.html, dort laeuft die Kasse (privat-checkout.js). */
+function orderTexts(){
+  const out=[];
+  const push=(label,lines)=>{ const t=(lines||[]).map(l=>(l.text||'').trim()).filter(Boolean).join(' / '); if(t) out.push(label?label+': '+t:t); };
+  if(state.shape==='dogtag'){ push('Vorderseite',dogTag.front); push('Rückseite',dogTag.back); }
+  else if(sides.on){
+    const other=sides.cur==='front'?'back':'front', o=sides[other];
+    const cur=state.contentMode==='text'?state.lines:[], oth=(o&&o.contentMode==='text')?o.lines:[];
+    push(sides.cur==='front'?'Vorderseite':'Rückseite',cur); push(other==='front'?'Vorderseite':'Rückseite',oth);
+  }
+  else if(state.contentMode==='text') push('',state.lines);
+  return out.join(' | ');
+}
+function orderSVG(){
+  /* Bildschirm-SVG ohne alles, was nur zur Anzeige da ist: Foto-Hintergrund, Massstab, Auswahl,
+     Hilfslinien, Klickflaechen, Filter. Kontur = rot (nur Referenz), Gravur = schwarz. */
+  const c=$('cfgSvg').cloneNode(true);
+  ['cfgBg','cfgRuler','cfgSel','cfgGuides'].forEach(id=>{ const n=c.querySelector('#'+id); if(n) n.remove(); });
+  c.querySelectorAll('.hit,.hit-outline,.photo-hit,.area-outline,[fill^="url(#sheen"]').forEach(n=>n.remove());
+  c.querySelectorAll('[filter]').forEach(n=>n.removeAttribute('filter'));
+  c.querySelectorAll('.engPath').forEach(n=>{ n.setAttribute('fill','none'); n.setAttribute('stroke','none'); });
+  c.querySelectorAll('[fill^="url(#metal"],[stroke^="url(#metal"],[stroke^="url(#rim"]').forEach(n=>{
+    n.setAttribute('fill','none'); n.setAttribute('stroke','#ff0000'); n.setAttribute('stroke-width','1.6'); n.removeAttribute('stroke-opacity'); n.removeAttribute('vector-effect'); });
+  c.querySelectorAll('text').forEach(n=>{ n.setAttribute('fill','#000000'); n.removeAttribute('opacity'); });
+  c.querySelectorAll('.engLayer').forEach(n=>n.removeAttribute('opacity'));
+  c.removeAttribute('id'); c.removeAttribute('style'); c.removeAttribute('aria-label');
+  c.setAttribute('xmlns','http://www.w3.org/2000/svg'); c.setAttribute('xmlns:xlink','http://www.w3.org/1999/xlink');
+  c.setAttribute('viewBox','0 0 300 300');
+  c.setAttribute('width',(300/CFG_MM)+'mm'); c.setAttribute('height',(300/CFG_MM)+'mm');
+  const t=document.createElementNS('http://www.w3.org/2000/svg','desc');
+  t.textContent='Wolf Lasermark · '+($('edTitle').textContent||state.shape)+' · Massstab 1:1 (mm). Rot = Kontur (nur Referenz), Schwarz = Gravur.';
+  c.insertBefore(t,c.firstChild);
+  return '<?xml version="1.0" encoding="UTF-8"?>\n'+new XMLSerializer().serializeToString(c);
+}
+function orderPNG(svg){
+  return new Promise(res=>{
+    const img=new Image();
+    img.onload=()=>{ try{ const cv=document.createElement('canvas'); cv.width=cv.height=900; const x=cv.getContext('2d');
+      x.fillStyle='#ffffff'; x.fillRect(0,0,900,900); x.drawImage(img,0,0,900,900); res(cv.toDataURL('image/png')); }catch(e){ res(''); } };
+    img.onerror=()=>res('');
+    img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+  });
+}
+async function collectOrder(){
+  const svg=orderSVG(), png=await orderPNG(svg);
+  const shapeParam=new URLSearchParams(location.search).get('shape')||state.shape;
+  const details={};
+  if(SHAPES[state.shape] && !state.bracelet && !isKey(state.shape) && !isCoin(state.shape) && state.shape!=='dogtag') details['Kettenlänge']=state.len+' cm';
+  if(state.mapPaths) details['Karte']=state.mapLabel||'ja';
+  if(state.photo) details['Foto-Gravur']='ja';
+  return { shape:shapeParam, title:$('edTitle').textContent.replace(/\s*gestalten$/,''),
+    gravurText:orderTexts(), details, designDaten:snapshot(), svg, png,
+    foto:state.photo||'', mitFoto:!!state.photo, mitKarte:!!state.mapPaths, karteOrt:state.mapLabel||'' };
+}
+(function(){
+  const q=new URLSearchParams(location.search), off=document.querySelector('.btn-off');
+  if(q.get('buy')!=='1' || window.parent===window || !off) return;
+  const b=document.createElement('button'); b.type='button'; b.className='btn-buy'; b.id='buyBtn'; b.textContent='Weiter zur Bestellung';
+  off.replaceWith(b);
+  b.addEventListener('click',async()=>{
+    b.disabled=true;
+    try{ const order=await collectOrder(); window.parent.postMessage({wlEditor:'order', order}, location.origin); }
+    catch(e){ console.error(e); }
+    finally{ b.disabled=false; }
+  });
+})();
 
 /* ---- Start: ?shape=medaillon|herzarmband|dogtag|circle|heart|katze|lederanhaenger|kettenanhaenger|plaettchenarmband|stabkette|herzstabkette|herzstabarmband|stabarmband|dogtagkette|pfotenkette|herzkette|ovalkette|doktorhutkette|fischgratarmband|muenzkette ---- */
 (function init(){

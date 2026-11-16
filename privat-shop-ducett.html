@@ -127,7 +127,9 @@
   .colors span{font-size:.86rem;color:var(--soft);margin-left:4px}
   .hint{font-size:.8rem;color:var(--mut);margin-top:12px;min-height:1.3em}
   .hint.warn{color:#8a5a2b}
-  .pd-info .btn{width:100%;text-align:center;margin-top:22px;opacity:.55;cursor:default}
+  .pd-info .btn{width:100%;text-align:center;margin-top:22px;cursor:pointer}
+  .pd-info .btn[aria-disabled=true]{opacity:.55;cursor:default}
+  .pd-info .btn[aria-disabled=true]:hover{background:var(--ink);color:#fff}
   .pd-info .note{font-size:.76rem;color:var(--mut);text-align:center;margin-top:8px}
   @media(max-width:860px){.pd{padding:0}.pd-box{grid-template-columns:1fr;height:100%}.pd-info{padding:24px 18px 30px}}
 
@@ -237,6 +239,7 @@
         <details><summary>Kann ich meine Gravur vorher sehen?</summary><p>Ja. Die Vorschau zeigt dein Motiv live und maßstabsgetreu. Genau diese Datei geht in die Gravur.</p></details>
         <details><summary>Hält die Gravur dauerhaft?</summary><p>Ja. Der Laser bringt die Gravur direkt ins Metall ein. Sie ist wischfest und verblasst nicht.</p></details>
         <details><summary>Wie lange dauert die Lieferung?</summary><p>Wir fertigen jedes Stück einzeln an. Die Anfertigung dauert in der Regel 3–5 Werktage, danach kommt der Versand innerhalb Deutschlands hinzu.</p></details>
+        <details id="gpsr"><summary>Herstellerangaben &amp; Produktsicherheit</summary><p><b>Hersteller:</b> <!--GPSR:BEGIN (generiert aus WL_projekt/store/seller-legal.json – scripts/shop-legal/inject-gpsr.py, nicht von Hand ändern)--><span id="gpsrHersteller">Wolf Lasermark, Inh. Bence Farkas, Münchner Straße 3, 83052 Bruckmühl, Deutschland · <a href="mailto:info@wolf-lasermark.de">info@wolf-lasermark.de</a></span><!--GPSR:END--><br>Jedes Stück wird von uns individuell graviert und unter unserem Namen in Verkehr gebracht (Verordnung (EU) 2023/988, GPSR). Das Material steht bei jedem Produkt und in der Bestellbestätigung. <b>Produktidentifikation:</b> Produktbezeichnung und Bestellnummer stehen auf der beiliegenden Produktkarte und in der Bestellbestätigung.<br><b>Sicherheitshinweise für Schmuck:</b> Enthält Kleinteile – nicht für Kinder unter 3 Jahren geeignet, Erstickungsgefahr. Schmuck nicht von Kleinkindern unbeaufsichtigt tragen lassen. Bei bekannter Metallallergie bitte die Materialangabe beachten und bei Hautreizungen nicht weiter tragen.</p></details>
         <details><summary>Kann ich ein personalisiertes Geschenk umtauschen?</summary><p>Da jedes Stück nach deinen Angaben graviert wird, ist das Widerrufsrecht für personalisierte Waren ausgeschlossen. Bei einem Fehler unsererseits fertigen wir selbstverständlich neu.</p></details>
       </div>
     </div>
@@ -246,7 +249,7 @@
 <footer>
   <div class="wrap">
     <div class="fcols">
-      <div><h4>Shop</h4><a href="#produkte">Alle Geschenke</a><a href="#produkte">Für wen</a><a href="#fragen">Häufige Fragen</a></div>
+      <div><h4>Shop</h4><a href="#produkte">Alle Geschenke</a><a href="#produkte">Für wen</a><a href="#fragen">Häufige Fragen</a><a href="#gpsr" onclick="document.getElementById('gpsr').open=true">Herstellerangaben</a></div>
       <div><h4>Rechtliches</h4><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a><a href="https://itrk.legal/Ipk.2Y.Cj6.html" target="_blank" rel="noopener">AGB</a><a href="https://itrk.legal/Ipk.2J.Cj6.html" target="_blank" rel="noopener">Widerrufsbelehrung</a></div>
       <div><h4>Über Wolf</h4><p>Wir gravieren jedes Stück einzeln in unserer Werkstatt in Bayern, mit dem Laser direkt ins Metall.</p></div>
     </div>
@@ -296,7 +299,7 @@
         <button data-f="sans" style="font-family:var(--head);font-weight:500">Modern</button>
       </div>
       <div class="hint" id="hint"></div>
-      <a class="btn btn-dark" aria-disabled="true">Bald bestellbar</a>
+      <button type="button" class="btn btn-dark" id="pdBuy" aria-disabled="true">Bald bestellbar</button>
       <div class="note"><span id="pdNote">Die Gravur bleibt immer im Medaillon.</span> Die Vorschau zeigt Größe und Lage maßstabsgetreu.<span id="pdNote2"> Die Ansicht am Handgelenk ist eine Illustration.</span></div>
     </div>
   </div>
@@ -323,7 +326,7 @@ const ICONS={
 };
 const PRODUCTS=[
   {k:'dogtag',name:'Dog Tag mit Gravur',sub:'Ø 24 mm Aluminium – auch fürs Haustier',badge:'Neu',price:'ab 19,99 €',ed:'dogtag',who:['partner','mama','papa','freunde','kind','kollege','ich','haustier']},
-  {k:'tafel',img:'images/shop/erinnerungstafel-edelstahl.jpg',name:'Erinnerungstafel',sub:'Edelstahl, 130 × 180 mm, bis zu 4 Zeilen',badge:'Neu',cfg:'tafel',who:['partner','mama','papa','freunde','kollege']},
+  {k:'tafel',img:'images/shop/erinnerungstafel-edelstahl.jpg',name:'Erinnerungstafel',sub:'Edelstahl, 130 × 180 mm, mit Vorlagen und Porträt',badge:'Neu',ed:'tafel',who:['partner','mama','papa','freunde','kollege']},
   {k:'armreif',img:'images/shop/armreif-oval-edelstahl.jpg',img2:'images/shop/armreif-oval-handgelenk.jpg',name:'Armreif mit Gravur',sub:'Ovales Medaillon, Silber oder Gold',badge:'Neu',price:'35,00 € · Versandkostenfrei',cfg:'armreif',who:['partner','mama','freunde','kind','ich']},
   {k:'herz',img:'images/shop/herz-armband-beige.jpg',img2:'images/shop/herz-armband-handgelenk-beige.jpg',name:'Herz-Armband mit Gravur',sub:'Schlangenkette mit Herz, 17 + 5 cm',badge:'Neu',price:'24,99 € · Versandkostenfrei',ed:'herzarmband',who:['partner','mama','freunde','kind','ich']},
   {k:'kette',img:'images/shop/kette-medaillon-rund.jpg',name:'Kette mit rundem Medaillon',sub:'Ø 25 mm, drehbare Scheibe – beidseitig gravierbar',badge:'Neu',price:'ab 19,99 €',ed:'medaillon',who:['partner','mama','freunde','kind','ich']},
@@ -347,6 +350,17 @@ const PRODUCTS=[
   {k:'besteck',name:'Kinderbesteck',sub:'Mit Namen des Kindes',who:['kind']},
   {k:'oeffner',name:'Flaschenöffner',sub:'Im Kartenformat',who:['papa','freunde','kollege','partner']},
 ];
+/* ---- Bestellbar ist nur, was Preis UND Material hat (GPSR + nur echte Angaben).
+   Schluessel = data-cfg / data-ed. null = noch offen -> "Bald bestellbar". ---- */
+const SHOP={
+  armreif:      {price:35.00, mat:{silber:'Edelstahl 316L, silber',gold:'Edelstahl 316L, vergoldet'}, schmuck:true},
+  herzarmband:  {price:24.99, mat:'Edelstahl', schmuck:true},
+  dogtag:       {price:19.99, mat:'Aluminium', schmuck:true},
+  medaillon:    {price:19.99, mat:null, schmuck:true},          // Material noch offen
+  tafel:        {price:null,  mat:'Edelstahl 1.4301 (V2A)', schmuck:false},   // Preis noch offen
+};
+const sellable=k=>{const o=SHOP[k];return !!(o&&o.price>0&&o.mat);};
+const eur=n=>n.toFixed(2).replace('.',',')+' €';
 const USP=`<div class="usp" id="usp">
   <div><svg viewBox="0 0 32 32"><path d="M6 26l14-14M18 6l8 8-4 4-8-8z"/></svg>Gravur inklusive</div>
   <div><svg viewBox="0 0 32 32"><path d="M3 16s5-9 13-9 13 9 13 9-5 9-13 9S3 16 3 16z"/><circle cx="16" cy="16" r="4"/></svg>Live-Vorschau</div>
@@ -357,7 +371,7 @@ const $=id=>document.getElementById(id);
 const card=(p,i)=>`
   <article class="card" data-i="${i}" style="order:${i*2}">
     <div class="pimg">${p.badge?`<span class="badge gold">${p.badge}</span>`:''}${p.img?`<img src="${p.img}" alt="${p.name}" loading="lazy">`+(p.img2?`<img class="alt" src="${p.img2}" alt="" loading="lazy">`:''):ICONS[p.k]}</div>
-    <div class="pinfo"><h3>${p.name}</h3><p>${p.sub}</p><span class="price">${p.price||'Bald erhältlich'}</span></div>
+    <div class="pinfo"><h3>${p.name}</h3><p>${p.sub}</p><span class="price">${sellable(p.ed||p.cfg)?eur(SHOP[p.ed||p.cfg].price)+' · Versandkostenfrei':'Bald erhältlich'}</span></div>
     <a href="#" class="btn"${p.cfg?` data-cfg="${p.cfg}"`:''}${p.ed?` data-ed="${p.ed}"`:''}>Personalisieren</a>
   </article>`;
 $('grid').innerHTML=PRODUCTS.slice(0,3).map(card).join('')+USP+PRODUCTS.slice(3).map((p,i)=>card(p,i+3)).join('')
@@ -429,7 +443,7 @@ function showView(){
   $('stageImg').src=v.img; $('stageImg').alt=v.alt; $('medT').setAttribute('transform',v.t);
 }
 function setProduct(k){
-  cur=CFG[k]; MED=cur.med; PX_PER_MM=cur.pxPerMm; color=Object.keys(cur.colors)[0];
+  cur=CFG[k]; cur.key=k; MED=cur.med; PX_PER_MM=cur.pxPerMm; color=Object.keys(cur.colors)[0];
   $('pdTitle').textContent=cur.title; $('pdPrice').textContent=cur.price;
   $('medal').innerHTML=cur.clip;
   $('l1').maxLength=cur.maxLen; $('l1').value=cur.value;
@@ -443,6 +457,8 @@ function setProduct(k){
   $('colors').innerHTML=Object.entries(cur.colors).map(([c,o])=>`<button data-c="${c}"${c===color?' class="on"':''} style="background:${o.bg}" aria-label="${o.name}"></button>`).join('')
     +`<span id="colorName">${cur.colors[color].name}</span>`;
   showView();
+  const ok=sellable(cur.key); $('pdBuy').setAttribute('aria-disabled',ok?'false':'true');
+  $('pdBuy').textContent=ok?'Weiter zur Bestellung':'Bald bestellbar';
 }
 const minPx=()=>Math.ceil(.9*PX_PER_MM/.7);   // unter ca. 0,9 mm Schrifthoehe nicht mehr sauber lesbar
 const mctx=document.createElement('canvas').getContext('2d');
@@ -490,14 +506,52 @@ const openPd=k=>{setProduct(k);$('pd').classList.add('open');
 const closePd=()=>{$('pd').classList.remove('open');document.body.style.overflow='';};
 $('grid').addEventListener('click',e=>{const b=e.target.closest('[data-cfg]');if(!b)return;e.preventDefault();openPd(b.dataset.cfg);});
 const ED_V=Date.now().toString(36);   // Editor nie aus dem Browser-Cache (GitHub Pages: max-age 600)
-const openEd=shape=>{const f=$('edFrame'),u='privat-editor.html?shape='+encodeURIComponent(shape)+'&v='+ED_V;
+const openEd=shape=>{const f=$('edFrame'),buy=sellable(shape)?'&buy=1&price='+SHOP[shape].price.toFixed(2):'',
+  u=(shape==='tafel'?'privat-tafel-editor.html?x=1':'privat-editor.html?shape='+encodeURIComponent(shape))+buy+'&v='+ED_V;
   if(f.dataset.shape!==shape){f.src=u;f.dataset.shape=shape;}
   $('ed').classList.add('open');document.body.style.overflow='hidden';};
 const closeEd=()=>{$('ed').classList.remove('open');document.body.style.overflow='';};
 $('grid').addEventListener('click',e=>{const b=e.target.closest('[data-ed]');if(!b)return;e.preventDefault();openEd(b.dataset.ed);});
 $('edClose').addEventListener('click',closeEd);
 $('ed').addEventListener('click',e=>{if(e.target===$('ed'))closeEd();});
-window.addEventListener('message',e=>{if(e.origin===location.origin&&e.data&&e.data.wlEditor==='close')closeEd();});
+window.addEventListener('message',e=>{if(e.origin!==location.origin||!e.data)return;
+  if(e.data.wlEditor==='close')closeEd();
+  if(e.data.wlEditor==='order'&&e.data.order)orderFromEditor(e.data.order);});
+
+/* ---- Bestellung: Editor (iframe) und Konfigurator (Armreif) uebergeben an privat-checkout.js ---- */
+function checkout(o){
+  if(!window.WLCheckout){alert('Die Kasse lädt noch – bitte einen Moment und erneut versuchen.');return;}
+  window.WLCheckout.open(o);
+}
+function orderFromEditor(d){
+  const k=$('edFrame').dataset.shape, cfg=SHOP[k];
+  if(!sellable(k)) return;                                  // Preis/Material kommen nur aus dem Shop
+  const prod=PRODUCTS.find(p=>p.ed===k)||{};
+  checkout({key:k, produkt:prod.name||d.title, form:d.title, variante:k==='tafel'?'130 × 180 mm':'', material:cfg.mat, schmuck:cfg.schmuck,
+    unit:cfg.price, img:prod.img||'', gravurText:d.gravurText, details:d.details||{}, kettenlaenge:(d.details||{})['Kettenlänge']||'–',
+    designDaten:d.designDaten, svg:d.svg, png:d.png, foto:d.foto||'', mitFoto:!!d.mitFoto, mitKarte:!!d.mitKarte, karteOrt:d.karteOrt||''});
+}
+/* Gravurdatei fuer den Konfigurator: nur die Gravur in echten mm, Medaillon-Kontur rot als Referenz. */
+function pdSVG(){
+  const k=PX_PER_MM, w=MED.rx*2/k+6, h=MED.ry*2/k+6;
+  const outline=cur.clip.replace('<ellipse','<ellipse fill="none" stroke="#ff0000" stroke-width="'+(0.2*k).toFixed(2)+'"').replace('<rect','<rect fill="none" stroke="#ff0000" stroke-width="'+(0.2*k).toFixed(2)+'"');
+  const txt=$('engTxt').innerHTML.replace(/<text /g,'<text fill="#000000" ');
+  return '<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="'+w.toFixed(2)+'mm" height="'+h.toFixed(2)+'mm" viewBox="'+(-w*k/2).toFixed(2)+' '+(-h*k/2+MED.cy).toFixed(2)+' '+(w*k).toFixed(2)+' '+(h*k).toFixed(2)+'">'
+    +'<desc>Wolf Lasermark · '+cur.title+' · Massstab 1:1 (mm). Rot = Kontur (nur Referenz), Schwarz = Gravur.</desc>'
+    +'<g id="Kontur">'+outline+'</g><g id="Gravur">'+txt+'</g></svg>';
+}
+function pdPNG(svg){return new Promise(res=>{const i=new Image();i.onload=()=>{try{const c=document.createElement('canvas');c.width=900;c.height=Math.round(900*i.height/i.width)||600;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(i,0,0,c.width,c.height);res(c.toDataURL('image/png'));}catch(e){res('');}};i.onerror=()=>res('');i.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);});}
+$('pdBuy').addEventListener('click',()=>{
+  const k=cur.key; if(!sellable(k)) return;
+  const lines=['l1','l2','l3','l4'].filter(id=>!$(id).hidden).map(id=>$(id).value.trim()).filter(Boolean);
+  if(!lines.length||!$('engTxt').innerHTML){renderEngr();$('l1').focus();return;}
+  const cfg=SHOP[k], mat=typeof cfg.mat==='object'?cfg.mat[color]:cfg.mat, svg=pdSVG();
+  const fontName=document.querySelector('#fonts button.on').textContent.trim();
+  checkout({key:k, produkt:cur.title, form:cur.title, variante:cur.colors[color].name, material:mat, schmuck:cfg.schmuck,
+    unit:cfg.price, img:cur.colors[color].views.full.img, gravurText:lines.join(' / '),
+    details:{Farbe:cur.colors[color].name, Schrift:fontName}, designDaten:{produkt:k,farbe:color,schrift:font,zeilen:lines},
+    svg, png:()=>pdPNG(svg)});
+});
 $('pdClose').addEventListener('click',closePd);
 $('pd').addEventListener('click',e=>{if(e.target===$('pd'))closePd();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closePd();closeEd();}});
@@ -507,5 +561,6 @@ Promise.all(Object.values(FONTS).map(f=>document.fonts.load(`${f.w} 40px ${f.fam
  if(w){const b=document.querySelector('#whoPick [data-who="'+CSS.escape(w)+'"]');if(b)b.click();}
  if(p){const i=PRODUCTS.findIndex(x=>x.k===p),a=i<0?null:document.querySelector('.card[data-i="'+i+'"] .btn');if(a)a.click();}}
 </script>
+<script type="module" src="privat-checkout.js"></script>
 </body>
 </html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Erinnerungstafel gestalten | Wolf Lasermark</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&family=Instrument+Sans:wght@400;500;600&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="privat-tafel-editor.css">
+</head>
+<body>
+<!-- Erinnerungstafel-Editor (uebernommen aus privat-gravur.html, 2026-11-16). Laeuft im Shop
+     (privat-shop-ducett.html) im Editor-Fenster; Bestellung geht per postMessage an die Shop-Kasse. -->
+<main class="tafel-app">
+  <h1>Erinnerungstafel gestalten</h1>
+  <p class="lead">Wähle eine Vorlage, trag eure Worte ein und sieh sofort, wie es auf dem Stahl steht. Der Maßstab zeigt die echte Größe in Millimetern.</p>
+    <div class="config" id="paneTafel">
+      <div class="config-preview">
+        <span class="preview-tag">Vorschau · Maßstab in mm</span>
+        <svg id="tafSvg" viewBox="28 -2 292 304" aria-label="Live-Vorschau der gravierten Erinnerungstafel">
+          <defs>
+            <linearGradient id="tafSteel" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#fafbfc"/><stop offset=".22" stop-color="#e2e5ea"/>
+              <stop offset=".46" stop-color="#c6cbd3"/><stop offset=".62" stop-color="#d8dce2"/>
+              <stop offset=".84" stop-color="#b9bfc8"/><stop offset="1" stop-color="#d9dde3"/>
+            </linearGradient>
+            <linearGradient id="tafBase" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#3a3a40"/><stop offset=".5" stop-color="#232328"/><stop offset="1" stop-color="#141417"/>
+            </linearGradient>
+            <clipPath id="tafPlateClip"><path id="tafPlateClipPath" d=""/></clipPath>
+            <clipPath id="tafPortraitClip"><rect id="tafPortraitRect" x="0" y="0" width="0" height="0" rx="2"/></clipPath>
+          </defs>
+          <g id="tafRuler"></g>
+          <g id="tafPlate">
+            <path id="tafPlateBody" d="" fill="url(#tafSteel)"/>
+            <g clip-path="url(#tafPlateClip)">
+              <g id="tafBrush" opacity=".5"></g>
+              <image id="tafPortrait" x="0" y="0" width="0" height="0" clip-path="url(#tafPortraitClip)"
+                     preserveAspectRatio="xMidYMid slice" style="display:none"/>
+              <g id="tafPortraitArt" clip-path="url(#tafPortraitClip)"></g>
+              <g id="tafEng"></g>
+              <rect id="tafDragArea" x="0" y="0" width="0" height="0" fill="transparent"
+                    style="display:none;touch-action:none;cursor:grab"></rect>
+            </g>
+            <path id="tafPlateEdge" d="" fill="none" stroke="#ffffff" stroke-opacity=".55" stroke-width=".9"/>
+          </g>
+          <g id="tafStand"></g>
+        </svg>
+        <span class="dim-caption" id="tafDimCaption"></span>
+        <span class="drag-hint">Foto direkt in der Vorschau verschieben</span>
+      </div>
+
+      <div class="config-controls">
+        <div class="field">
+          <label>Vorschläge</label>
+          <div class="taf-presets" id="tafPresets"></div>
+          <p class="mini-help">Ein Startpunkt — jede Zeile bleibt frei änderbar.</p>
+        </div>
+
+        <div class="field" data-fld="title">
+          <label for="tafTitle">Überschrift</label>
+          <input class="txt" id="tafTitle" maxlength="26" value="Unsere Geschichte" placeholder="Unsere Geschichte">
+          <p class="mini-help">Wird in gesperrten Großbuchstaben graviert.</p>
+        </div>
+
+        <div class="field" data-fld="photo">
+          <label>Porträt aus eurem Foto</label>
+          <label class="upload" id="tafUploadLabel" for="tafPhotoInput">
+            <svg viewBox="0 0 24 24"><path d="M12 16V4m0 0L8 8m4-4 4 4"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+            <span id="tafUploadText">Foto auswählen</span>
+            <input type="file" id="tafPhotoInput" accept="image/jpeg,image/png,image/webp">
+          </label>
+          <div class="photo-msg" id="tafPhotoMsg"></div>
+          <div class="photo-actions" id="tafPhotoActions" style="display:none">
+            <button type="button" class="linkbtn" id="tafPhotoRemove">Foto entfernen</button>
+            <button type="button" class="linkbtn" id="tafSketchDl">Zeichnung herunterladen (PNG)</button>
+          </div>
+          <div id="tafPhotoTools" style="display:none">
+            <span class="tool-lab">Detailgrad</span>
+            <div class="range-line">
+              <input type="range" id="tafLineRange" min="30" max="90" step="1" value="64">
+              <output id="tafLineValue">64</output>
+            </div>
+            <p class="mini-help">Wie viele Details sichtbar werden — links nur die markanten Züge, rechts auch feine Strukturen wie Haare und Stoffmuster. Graviert wird alles gleich tief.</p>
+            <span class="tool-lab">Größe</span>
+            <div class="range-line">
+              <input type="range" id="tafZoomRange" min="30" max="300" step="1" value="100">
+              <output id="tafZoomValue">100%</output>
+            </div>
+            <p class="mini-help">Nach rechts, wenn die Gesichter klein im Bild sind — nach links,
+            wenn zu viel abgeschnitten wird und die Person ganz zu sehen sein soll.</p>
+            <span class="tool-lab">Bildausschnitt</span>
+            <div class="range-line">
+              <input type="range" id="tafCropRange" min="0" max="100" step="1" value="32">
+              <output id="tafCropValue">32</output>
+            </div>
+            <p class="mini-help"><b>Zieh das Foto direkt in der Vorschau zurecht</b> — oder nutze
+            den Regler für die Höhe. Beim Hochladen setzen wir den Ausschnitt automatisch so,
+            dass die Personen den Rahmen füllen.</p>
+            <button type="button" class="linkbtn" id="tafAutoFit">Automatisch einpassen</button>
+          </div>
+          <p class="hint">Am besten ein scharfes, nahes Foto: Gesichter groß im Bild, gleichmäßiges Licht. <b>Tipp:</b> Foto vorher freistellen (iPhone: Motiv gedrückt halten → „Kopieren“, oder z.&nbsp;B. remove.bg) — dann zeichnet der Stift nur die Person, ohne störenden Hintergrund. Die Vorschau zeigt dir sofort, ob das Foto trägt.</p>
+        </div>
+
+        <div class="taf-pair" data-fld="bigNum">
+          <div class="field">
+            <label for="tafBigNum">Zahl in der Mitte</label>
+            <input class="txt" id="tafBigNum" maxlength="3" placeholder="25">
+          </div>
+          <div class="field" data-fld="bigLabel">
+            <label for="tafBigLabel">Wort darunter</label>
+            <input class="txt" id="tafBigLabel" maxlength="12" placeholder="Jahre">
+          </div>
+        </div>
+
+        <div class="taf-pair" data-fld="dateA">
+          <div class="field">
+            <label for="tafDateA">Von</label>
+            <input class="txt" id="tafDateA" maxlength="16" placeholder="2001">
+          </div>
+          <div class="field" data-fld="dateB">
+            <label for="tafDateB">Bis</label>
+            <input class="txt" id="tafDateB" maxlength="16" placeholder="2026">
+          </div>
+        </div>
+
+        <div class="field" data-fld="sub">
+          <label for="tafSub">Für wen</label>
+          <input class="txt" id="tafSub" maxlength="34" placeholder="Für Frau Keller">
+        </div>
+
+        <div class="field" data-fld="msg">
+          <label for="tafMsg">Widmung</label>
+          <textarea class="txt" id="tafMsg" rows="4" maxlength="180" placeholder="Eine Zeile pro Gedanke."></textarea>
+          <p class="mini-help">Höchstens vier Zeilen — jede Zeilenschaltung wird graviert.</p>
+        </div>
+
+        <div class="field" data-fld="ms">
+          <label id="tafMsLabel">Eure Stationen</label>
+          <div id="tafMilestones"></div>
+          <button type="button" class="linkbtn" id="tafAddMs">+ Station hinzufügen</button>
+        </div>
+
+        <div class="field" data-fld="quote">
+          <label for="tafQuote">Satz in der Mitte</label>
+          <input class="txt" id="tafQuote" maxlength="52" value="Ich würde dich immer wieder wählen." placeholder="Euer Satz">
+        </div>
+
+        <div class="field" data-fld="names">
+          <label for="tafNames">Namen</label>
+          <input class="txt" id="tafNames" maxlength="30" value="Anna &amp; Lukas" placeholder="Anna &amp; Lukas">
+        </div>
+
+        <div class="price-row">
+          <span class="lbl">Edelstahl 1.4301 · Gravur inklusive</span>
+          <span class="val" id="tafPrice">Preis folgt</span>
+        </div>
+        <a class="btn btn-fill btn-off" id="tafBestellBtn" aria-disabled="true">Bald bestellbar</a>
+        <ul class="assure">
+          <li>Was du in der Vorschau siehst, wird genau so graviert</li>
+          <li>Gravur direkt im Edelstahl, kratzfest und lichtecht</li>
+          <li>Versandkostenfrei innerhalb Deutschlands</li>
+        </ul>
+      </div>
+    </div>
+</main>
+<script src="privat-tafel-editor.js"></script>
+</body>
+</html>
