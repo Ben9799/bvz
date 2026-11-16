@@ -326,7 +326,7 @@ const ICONS={
 };
 const PRODUCTS=[
   {k:'dogtag',name:'Dog Tag mit Gravur',sub:'Ø 24 mm Aluminium – auch fürs Haustier',badge:'Neu',price:'ab 19,99 €',ed:'dogtag',who:['partner','mama','papa','freunde','kind','kollege','ich','haustier']},
-  {k:'tafel',img:'images/shop/erinnerungstafel-edelstahl.jpg',name:'Erinnerungstafel',sub:'Edelstahl, 130 × 180 mm, mit Vorlagen und Porträt',badge:'Neu',ed:'tafel',who:['partner','mama','papa','freunde','kollege']},
+  {k:'tafel',img:'images/shop/erinnerungstafel-edelstahl.jpg',name:'Erinnerungstafel',sub:'Edelstahl, 130 × 180 mm, mit Vorlagen und Porträt',badge:'Neu',price:'89,00 €',ed:'tafel',who:['partner','mama','papa','freunde','kollege']},
   {k:'armreif',img:'images/shop/armreif-oval-edelstahl.jpg',img2:'images/shop/armreif-oval-handgelenk.jpg',name:'Armreif mit Gravur',sub:'Ovales Medaillon, Silber oder Gold',badge:'Neu',price:'35,00 € · Versandkostenfrei',cfg:'armreif',who:['partner','mama','freunde','kind','ich']},
   {k:'herz',img:'images/shop/herz-armband-beige.jpg',img2:'images/shop/herz-armband-handgelenk-beige.jpg',name:'Herz-Armband mit Gravur',sub:'Schlangenkette mit Herz, 17 + 5 cm',badge:'Neu',price:'24,99 € · Versandkostenfrei',ed:'herzarmband',who:['partner','mama','freunde','kind','ich']},
   {k:'kette',img:'images/shop/kette-medaillon-rund.jpg',name:'Kette mit rundem Medaillon',sub:'Ø 25 mm, drehbare Scheibe – beidseitig gravierbar',badge:'Neu',price:'ab 19,99 €',ed:'medaillon',who:['partner','mama','freunde','kind','ich']},
@@ -357,7 +357,7 @@ const SHOP={
   herzarmband:  {price:24.99, mat:'Edelstahl', schmuck:true},
   dogtag:       {price:19.99, mat:'Aluminium', schmuck:true},
   medaillon:    {price:19.99, mat:null, schmuck:true},          // Material noch offen
-  tafel:        {price:null,  mat:'Edelstahl 1.4301 (V2A)', schmuck:false},   // Preis noch offen
+  tafel:        {price:89.00, mat:'Edelstahl 1.4301 (V2A)', schmuck:false},
 };
 const sellable=k=>{const o=SHOP[k];return !!(o&&o.price>0&&o.mat);};
 const eur=n=>n.toFixed(2).replace('.',',')+' €';
@@ -420,7 +420,7 @@ const CFG={
         hand:{img:'images/shop/herz-armband-handgelenk.jpg',alt:'Herz-Armband mit Gravur am Handgelenk',t:'translate(521 532) rotate(48) scale(1 .82)'}}}}},
   /* Kontur = Kunden-DXF: 130 x 180 mm, oben R20, unten R6. Gravurfeld 106 x 150 mm (12 mm Rand, oben 18 mm).
      Produktbild: WL_projekt/scripts/shop-render/tafel-render.py (gleicher Massstab 5,2 px/mm, Mitte 600/600). */
-  tafel:{title:'Erinnerungstafel',price:'Preis folgt',value:'Anna & Ben',maxLen:28,lines:4,box:true,fontK:3.2,
+  tafel:{title:'Erinnerungstafel',price:'89,00 €',value:'Anna & Ben',maxLen:28,lines:4,box:true,fontK:3.2,
     crumb:'Geschenke / Erinnerung',area:'Gravurfeld',noun:'die Tafel',
     vals:['seit dem','14. Juni 2019',''],
     facts:['130 × 180 mm, 2 mm stark','Kaltgewalzt, Oberfläche 2G, einseitig geschliffen (Korn 240)','Läuft nicht an, für drinnen und draußen'],
