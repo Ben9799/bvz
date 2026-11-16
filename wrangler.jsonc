@@ -1,0 +1,16 @@
+// Cloudflare Workers static assets — wolf-lasermark.de
+// html_handling "none": keep .html URLs exactly as in sitemap/canonical (no 308 to pretty URLs)
+// not_found_handling "404-page": real 404 status with 404.html (no soft-404 to index)
+// _worker.js only runs for "/" and maps them to index.html.
+{
+  "name": "wolf-lasermark",
+  "main": "_worker.js",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": ".",
+    "binding": "ASSETS",
+    "html_handling": "none",
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/"]
+  }
+}

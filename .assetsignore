@@ -1,0 +1,10 @@
+.git
+.github
+.gitignore
+.assetsignore
+wrangler.jsonc
+node_modules
+.wrangler
+*.md
+CNAME
+_worker.js
