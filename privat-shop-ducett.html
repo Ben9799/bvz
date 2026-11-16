@@ -85,6 +85,8 @@
   .price{display:block;margin-top:6px;font-size:.92rem}
   .card .btn{margin-top:14px;width:100%;text-align:center;padding:12px 10px;font-size:.66rem}
   .card .btn:hover{background:var(--ink);color:#fff}
+  .card .btn.soldout{opacity:.45;cursor:not-allowed;pointer-events:none}
+  .card .price.soldout{color:#8a4b3c}
   @media(max-width:700px){.pinfo h3{font-size:.9rem}.card .btn{font-size:.6rem;letter-spacing:.12em}}
 
   /* USP-BLOCK IM RASTER (wie bei Ducett) */
@@ -360,6 +362,17 @@ const SHOP={
   tafel:        {price:89.00, mat:'Edelstahl', schmuck:false},
 };
 const sellable=k=>{const o=SHOP[k];return !!(o&&o.price>0&&o.mat);};
+/* ---- Lager: oeffentlich nur die Liste ausverkaufter Varianten (stats/lager, keine Stueckzahlen).
+   Gepflegt im WL-Dashboard (Raktár), abgebucht von lager-sync. Fehler beim Laden = alles bestellbar. ---- */
+let AUS=new Set();
+const LAGER_URL='https://firestore.googleapis.com/v1/projects/auftrage-edc6d/databases/(default)/documents/stats/lager?key=AIzaSyBLSp0en7wDD_71PF1n3qYXPF0YNTEWmIc';
+async function loadStock(){
+  try{const r=await fetch(LAGER_URL,{cache:'no-store'}); if(!r.ok) return;
+    const j=await r.json(), v=(((j.fields||{}).ausverkauft||{}).arrayValue||{}).values||[];
+    AUS=new Set(v.map(x=>x.stringValue));}catch(e){}
+}
+const skuOut=(k,c)=>AUS.has(c?k+':'+c:k);
+const allOut=k=>{const m=SHOP[k]&&SHOP[k].mat;return typeof m==='object'&&m?Object.keys(m).every(c=>skuOut(k,c)):skuOut(k);};
 const eur=n=>n.toFixed(2).replace('.',',')+' €';
 const USP=`<div class="usp" id="usp">
   <div><svg viewBox="0 0 32 32"><path d="M6 26l14-14M18 6l8 8-4 4-8-8z"/></svg>Gravur inklusive</div>
@@ -393,6 +406,16 @@ $('whoPick').addEventListener('click',e=>{const b=e.target.closest('[data-who]')
   document.querySelectorAll('#whoPick button').forEach(x=>x.classList.toggle('on',x.dataset.who===who)); apply();});
 $('reset').addEventListener('click',()=>{who=null;document.querySelectorAll('#whoPick .on').forEach(b=>b.classList.remove('on'));apply();});
 apply();
+function markStock(){
+  document.querySelectorAll('.card').forEach(el=>{const p=PRODUCTS[el.dataset.i],k=p.ed||p.cfg;
+    if(!sellable(k)) return;
+    const out=allOut(k), pr=el.querySelector('.price'), b=el.querySelector('.btn');
+    pr.textContent=out?'Vorübergehend ausverkauft':eur(SHOP[k].price)+' · Versandkostenfrei';
+    pr.classList.toggle('soldout',out); b.classList.toggle('soldout',out);
+    b.textContent=out?'Ausverkauft':'Personalisieren'; b.setAttribute('aria-disabled',out?'true':'false');});
+  if($('pd').classList.contains('open')) buyState();
+}
+loadStock().then(markStock);
 
 /* ---- Konfigurator: Text wird so gesetzt, dass jede Zeile innerhalb der Gravur-Ellipse
    des Medaillons bleibt (Sicherheitsabstand zum Rand); der clipPath ist nur die Notbremse.
@@ -457,8 +480,12 @@ function setProduct(k){
   $('colors').innerHTML=Object.entries(cur.colors).map(([c,o])=>`<button data-c="${c}"${c===color?' class="on"':''} style="background:${o.bg}" aria-label="${o.name}"></button>`).join('')
     +`<span id="colorName">${cur.colors[color].name}</span>`;
   showView();
-  const ok=sellable(cur.key); $('pdBuy').setAttribute('aria-disabled',ok?'false':'true');
-  $('pdBuy').textContent=ok?'Weiter zur Bestellung':'Bald bestellbar';
+  buyState();
+}
+function buyState(){
+  const ok=sellable(cur.key), out=ok&&skuOut(cur.key,Object.keys(cur.colors).length>1?color:'');
+  $('pdBuy').setAttribute('aria-disabled',ok&&!out?'false':'true');
+  $('pdBuy').textContent=out?'Vorübergehend ausverkauft':ok?'Weiter zur Bestellung':'Bald bestellbar';
 }
 const minPx=()=>Math.ceil(.9*PX_PER_MM/.7);   // unter ca. 0,9 mm Schrifthoehe nicht mehr sauber lesbar
 const mctx=document.createElement('canvas').getContext('2d');
@@ -499,19 +526,19 @@ document.querySelector('.viewsw').addEventListener('click',e=>{const b=e.target.
   document.querySelectorAll('.viewsw button').forEach(x=>x.classList.toggle('on',x===b));});
 $('colors').addEventListener('click',e=>{const b=e.target.closest('[data-c]');if(!b)return;color=b.dataset.c;
   $('colorName').textContent=cur.colors[color].name; $('pdMat').textContent=cur.colors[color].mat;
-  document.querySelectorAll('#colors button').forEach(x=>x.classList.toggle('on',x===b));showView();});
+  document.querySelectorAll('#colors button').forEach(x=>x.classList.toggle('on',x===b));showView();buyState();});
 const openPd=k=>{setProduct(k);$('pd').classList.add('open');
   Object.values(cur.colors).forEach(c=>Object.values(c.views).forEach(v=>{new Image().src=v.img;}));   // Farbwechsel ohne Nachladen
   document.body.style.overflow='hidden';renderEngr();$('l1').focus({preventScroll:true});};
 const closePd=()=>{$('pd').classList.remove('open');document.body.style.overflow='';};
-$('grid').addEventListener('click',e=>{const b=e.target.closest('[data-cfg]');if(!b)return;e.preventDefault();openPd(b.dataset.cfg);});
+$('grid').addEventListener('click',e=>{const b=e.target.closest('[data-cfg]');if(!b)return;e.preventDefault();if(b.classList.contains('soldout'))return;openPd(b.dataset.cfg);});
 const ED_V=Date.now().toString(36);   // Editor nie aus dem Browser-Cache (GitHub Pages: max-age 600)
 const openEd=shape=>{const f=$('edFrame'),buy=sellable(shape)?'&buy=1&price='+SHOP[shape].price.toFixed(2):'',
   u=(shape==='tafel'?'privat-tafel-editor.html?x=1':'privat-editor.html?shape='+encodeURIComponent(shape))+buy+'&v='+ED_V;
   if(f.dataset.shape!==shape){f.src=u;f.dataset.shape=shape;}
   $('ed').classList.add('open');document.body.style.overflow='hidden';};
 const closeEd=()=>{$('ed').classList.remove('open');document.body.style.overflow='';};
-$('grid').addEventListener('click',e=>{const b=e.target.closest('[data-ed]');if(!b)return;e.preventDefault();openEd(b.dataset.ed);});
+$('grid').addEventListener('click',e=>{const b=e.target.closest('[data-ed]');if(!b)return;e.preventDefault();if(b.classList.contains('soldout'))return;openEd(b.dataset.ed);});
 $('edClose').addEventListener('click',closeEd);
 $('ed').addEventListener('click',e=>{if(e.target===$('ed'))closeEd();});
 window.addEventListener('message',e=>{if(e.origin!==location.origin||!e.data)return;
@@ -519,8 +546,11 @@ window.addEventListener('message',e=>{if(e.origin!==location.origin||!e.data)ret
   if(e.data.wlEditor==='order'&&e.data.order)orderFromEditor(e.data.order);});
 
 /* ---- Bestellung: Editor (iframe) und Konfigurator (Armreif) uebergeben an privat-checkout.js ---- */
-function checkout(o){
+async function checkout(o){
   if(!window.WLCheckout){alert('Die Kasse lädt noch – bitte einen Moment und erneut versuchen.');return;}
+  await loadStock();                                         // frischer Stand direkt vor der Kasse
+  const c=(o.designDaten||{}).farbe||'';
+  if(skuOut(o.key,c)){markStock();alert('Dieses Produkt ist leider gerade ausverkauft. Bitte schau bald wieder vorbei.');return;}
   window.WLCheckout.open(o);
 }
 function orderFromEditor(d){
@@ -542,7 +572,7 @@ function pdSVG(){
 }
 function pdPNG(svg){return new Promise(res=>{const i=new Image();i.onload=()=>{try{const c=document.createElement('canvas');c.width=900;c.height=Math.round(900*i.height/i.width)||600;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(i,0,0,c.width,c.height);res(c.toDataURL('image/png'));}catch(e){res('');}};i.onerror=()=>res('');i.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);});}
 $('pdBuy').addEventListener('click',()=>{
-  const k=cur.key; if(!sellable(k)) return;
+  const k=cur.key; if(!sellable(k)||$('pdBuy').getAttribute('aria-disabled')==='true') return;
   const lines=['l1','l2','l3','l4'].filter(id=>!$(id).hidden).map(id=>$(id).value.trim()).filter(Boolean);
   if(!lines.length||!$('engTxt').innerHTML){renderEngr();$('l1').focus();return;}
   const cfg=SHOP[k], mat=typeof cfg.mat==='object'?cfg.mat[color]:cfg.mat, svg=pdSVG();
