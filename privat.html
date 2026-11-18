@@ -10,7 +10,7 @@
 <link rel="icon" href="images/favicon-32.png" sizes="32x32">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Great+Vibes&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link media="print" onload="this.media='all'" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Great+Vibes&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="images/privat-mosaik/armreif-oval-handgelenk.webp" fetchpriority="high">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -242,7 +242,7 @@ footer{background:var(--bg);border-top:1px solid var(--line);padding:36px 0 40px
 .sticky .btn{min-height:44px;padding:0 1.2rem}
 
 /* REVEAL */
-.rv{opacity:0;transform:translateY(18px);transition:opacity .8s var(--ease),transform .8s var(--ease);transition-delay:calc(var(--i,0)*70ms)}
+.rv{opacity:0;transform:translateY(18px);transition:opacity .5s var(--ease),transform .5s var(--ease);transition-delay:calc(var(--i,0)*70ms)}
 .rv.in{opacity:1;transform:none}
 
 @media(max-width:759px){
@@ -323,17 +323,17 @@ footer{background:var(--bg);border-top:1px solid var(--line);padding:36px 0 40px
     <div class="sec-head rv"><div class="kicker">Lieblingsstücke</div><h2>Unsere Lieblingsstücke</h2><p>Jedes Stück wird einzeln für dich graviert.</p></div>
     <div class="prods">
       <a class="prod rv" style="--i:0" href="privat-shop-ducett.html?p=armreif">
-        <div class="pimg"><span class="pbadge">Neu</span><img src="images/shop/armreif-oval-edelstahl.jpg" alt="Armreif mit ovalem Medaillon" loading="lazy" decoding="async" width="1000" height="1000"><img class="alt" src="images/shop/armreif-oval-handgelenk.jpg" alt="" loading="lazy" decoding="async"></div>
+        <div class="pimg"><span class="pbadge">Neu</span><img src="images/shop/armreif-oval-edelstahl.webp" alt="Armreif mit ovalem Medaillon" loading="lazy" decoding="async" width="1000" height="1000"><img class="alt" src="images/shop/armreif-oval-handgelenk.webp" alt="" loading="lazy" decoding="async"></div>
         <div class="pinfo"><h3>Armreif mit Gravur</h3><p>Ovales Medaillon, Silber oder Gold</p><span class="pprice"><b>35,00 €</b> <small>· versandkostenfrei</small></span></div>
         <span class="btn btn-fill">Personalisieren</span>
       </a>
       <a class="prod rv" style="--i:1" href="privat-shop-ducett.html?p=herz">
-        <div class="pimg"><span class="pbadge">Neu</span><img src="images/shop/herz-armband-beige.jpg" alt="Herz-Armband mit Schlangenkette" loading="lazy" decoding="async" width="1000" height="1000"><img class="alt" src="images/shop/herz-armband-handgelenk-beige.jpg" alt="" loading="lazy" decoding="async"></div>
+        <div class="pimg"><span class="pbadge">Neu</span><img src="images/shop/herz-armband-beige.webp" alt="Herz-Armband mit Schlangenkette" loading="lazy" decoding="async" width="1000" height="1000"><img class="alt" src="images/shop/herz-armband-handgelenk-beige.webp" alt="" loading="lazy" decoding="async"></div>
         <div class="pinfo"><h3>Herz-Armband mit Gravur</h3><p>Schlangenkette mit Herz</p><span class="pprice"><b>24,99 €</b> <small>· versandkostenfrei</small></span></div>
         <span class="btn btn-fill">Personalisieren</span>
       </a>
       <a class="prod rv" style="--i:2" href="privat-shop-ducett.html?p=kette">
-        <div class="pimg"><img src="images/shop/kette-medaillon-rund.jpg" alt="Kette mit rundem Medaillon" loading="lazy" decoding="async" width="1000" height="1000"></div>
+        <div class="pimg"><img src="images/shop/kette-medaillon-rund.webp" alt="Kette mit rundem Medaillon" loading="lazy" decoding="async" width="1000" height="1000"></div>
         <div class="pinfo"><h3>Kette mit rundem Medaillon</h3><p>Drehbare Scheibe, beidseitig gravierbar</p><span class="pprice"><b>ab 19,99 €</b></span></div>
         <span class="btn btn-fill">Personalisieren</span>
       </a>
@@ -382,7 +382,7 @@ footer{background:var(--bg);border-top:1px solid var(--line);padding:36px 0 40px
     </div>
     <div class="demo rv" style="--i:1" aria-hidden="true" id="demo">
       <div class="demo-card">
-        <img src="images/shop/kette-medaillon-rund.jpg" alt="" loading="lazy" decoding="async" width="1000" height="1000">
+        <img src="images/shop/kette-medaillon-rund.webp" alt="" loading="lazy" decoding="async" width="1000" height="1000">
         <span class="engr notranslate" id="engr" translate="no">Anna</span>
         <span class="demo-tag">Live</span>
       </div>
@@ -551,7 +551,7 @@ function initWerke(list){
 }
 
 /* Reveal */
-const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.15});
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.05,rootMargin:'0px 0px 15% 0px'});
 document.querySelectorAll('.rv').forEach(el=>io.observe(el));
 
 /* Header + Sticky CTA */

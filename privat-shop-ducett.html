@@ -383,7 +383,7 @@ const USP=`<div class="usp" id="usp">
 const $=id=>document.getElementById(id);
 const card=(p,i)=>`
   <article class="card" data-i="${i}" style="order:${i*2}">
-    <div class="pimg">${p.badge?`<span class="badge gold">${p.badge}</span>`:''}${p.img?`<img src="${p.img}" alt="${p.name}" loading="lazy">`+(p.img2?`<img class="alt" src="${p.img2}" alt="" loading="lazy">`:''):ICONS[p.k]}</div>
+    <div class="pimg">${p.badge?`<span class="badge gold">${p.badge}</span>`:''}${p.img?`<img src="${p.img.replace(/\.jpg$/,'.webp')}" alt="${p.name}" loading="lazy">`+(p.img2?`<img class="alt" src="${p.img2.replace(/\.jpg$/,'.webp')}" alt="" loading="lazy">`:''):ICONS[p.k]}</div>
     <div class="pinfo"><h3>${p.name}</h3><p>${p.sub}</p><span class="price">${sellable(p.ed||p.cfg)?eur(SHOP[p.ed||p.cfg].price)+' · Versandkostenfrei':'Bald erhältlich'}</span></div>
     <a href="#" class="btn"${p.cfg?` data-cfg="${p.cfg}"`:''}${p.ed?` data-ed="${p.ed}"`:''}>Personalisieren</a>
   </article>`;
