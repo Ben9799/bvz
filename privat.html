@@ -157,6 +157,13 @@ header.solid{background:rgba(255,255,255,.92);backdrop-filter:blur(14px);-webkit
 .why svg{width:34px;height:34px;stroke:var(--caramel);fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
 .why h3{font-size:1.5rem;margin:12px 0 6px}
 .why p{color:var(--soft);font-size:.94rem}
+.about{display:grid;gap:28px;align-items:center;max-width:920px;margin:0 auto}
+.about-img{width:min(260px,70vw);aspect-ratio:2/3;object-fit:cover;margin:0 auto;border-radius:var(--r);box-shadow:var(--shadow)}
+.about-txt{text-align:center}
+.about-txt h2{font-size:clamp(2.1rem,6vw,3.2rem);margin:12px 0 14px}
+.about-txt p{color:var(--soft);max-width:52ch;margin:0 auto}
+.about-sig{font-family:var(--script);font-size:2rem;color:var(--caramel);margin-top:14px}
+@media(min-width:760px){.about{grid-template-columns:auto 1fr;gap:56px}.about-txt{text-align:left}.about-txt p{margin:0}}
 
 /* WERKE */
 .werke{columns:2;column-gap:10px}
@@ -392,6 +399,18 @@ footer{background:var(--bg);border-top:1px solid var(--line);padding:36px 0 40px
       <div class="rv" style="--i:1"><svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="11"/><path d="M16 9v7l5 3"/></svg><h3>Bleibt für immer</h3><p>Wischfest und beständig. Die Gravur verblasst nicht.</p></div>
       <div class="rv" style="--i:2"><svg viewBox="0 0 32 32"><path d="M16 4c4 5 9 7 9 14a9 9 0 0 1-18 0c0-7 5-9 9-14z"/><path d="M12 19a4 4 0 0 0 4 4"/></svg><h3>Einzeln gefertigt</h3><p>Jedes Stück entsteht einzeln in unserer Werkstatt in Bayern.</p></div>
       <div class="rv" style="--i:3"><svg viewBox="0 0 32 32"><rect x="5" y="12" width="22" height="15"/><path d="M3 8h26v4H3zM16 8v19M16 8c-3-5-8-4-7 0M16 8c3-5 8-4 7 0"/></svg><h3>Fertig zum Verschenken</h3><p>Gravur inklusive, geschenkfertig verpackt.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="ueberuns">
+  <div class="wrap about">
+    <picture class="rv"><source srcset="bence-veda.webp" type="image/webp"><img class="about-img" src="bence-veda.jpg" alt="Bence und Veda von Wolf Lasermark" width="400" height="600" loading="lazy"></picture>
+    <div class="about-txt rv" style="--i:1">
+      <div class="kicker">Über uns</div>
+      <h2>Hinter jeder Gravur steckt <em>ein Mensch</em></h2>
+      <p>Wolf Lasermark sind wir zwei – meine Frau und ich. Die Ideen, das Design, die Gravuren: alles gemeinsam, in unserer kleinen Werkstatt in Bayern. Jedes Stück geht durch unsere Hände, bevor es zu dir kommt.</p>
+      <div class="about-sig">Bence &amp; Veda</div>
     </div>
   </div>
 </section>
