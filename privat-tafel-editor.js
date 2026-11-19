@@ -212,13 +212,16 @@
      Dienstzeugnis, nicht wie der geschwungene Lebensweg. */
   function stationListMarkup(y0,step){
     const list=st.ms.slice(0,4);
-    const xYear=44, xText=52, xDot=48;
+    /* Statt Punkt: das gewaehlte Motiv im kleinen Kreis — sonst waere die
+       Motivauswahl im Formular bei dieser Tafel wirkungslos. */
+    const xYear=40.5, xText=53.5, xDot=47, r=3.4;
     let out='';
     list.forEach((m,i)=>{
-      const y=y0+i*step;
+      const y=y0+i*step, cy=y-1.5;
       if(m.year) out+=txt(m.year,y,{x:xYear,anchor:'end',serif:true,size:5.4,weight:600});
-      out+=`<circle cx="${X(xDot)}" cy="${Y(y-1.5)}" r="${P(.9)}" fill="${ENG}"/>`;
-      if(i<list.length-1) out+=`<path d="M${X(xDot)} ${Y(y+.4)}V${Y(y+step-3.4)}" stroke="${ENG}" `
+      out+=`<circle cx="${X(xDot)}" cy="${Y(cy)}" r="${P(r)}" fill="none" stroke="${ENG}" stroke-width=".6"/>`;
+      out+=iconMarkup(m.icon,xDot,cy,4.4);
+      if(i<list.length-1) out+=`<path d="M${X(xDot)} ${Y(cy+r)}V${Y(cy+step-r)}" stroke="${ENG}" `
         + `stroke-width=".6" opacity=".5" stroke-linecap="round"/>`;
       const label=[m.l1,m.l2].filter(Boolean).join(' ');
       if(label) out+=txt(label,y,{x:xText,anchor:'start',size:3.4,maxw:PLATE.w-xText-8});
