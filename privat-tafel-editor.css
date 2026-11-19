@@ -362,4 +362,8 @@ body{background:#fff}
 #tafBestellBtn.ready{opacity:1;cursor:pointer}
 #tafBestellBtn.ready:hover{background:#fff;color:#1c1c1c}
 .assure li::before{background:#f4f1ee}
-@media(max-width:820px){.tafel-app{padding:16px 12px 26px}.config-preview{position:relative}}
+@media(max-width:820px){.tafel-app{padding:16px 12px 26px}
+  /* 2026-11-19: Vorschau bleibt beim Scrollen durch die Felder oben sichtbar */
+  .config-preview{position:sticky;top:0;z-index:5;height:44vh;min-height:0;padding:22px 8px 8px;box-shadow:0 6px 14px -10px rgba(0,0,0,.35)}
+  .config-preview svg{height:100%;width:auto;max-width:100%}
+  .config-preview .preview-tag{top:6px}}

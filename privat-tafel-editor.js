@@ -509,6 +509,36 @@
     return n?s/n:0;
   }
 
+  /* 2026-11-19 (Bence): kein Bleistift mehr — das Portrait erscheint als
+     Graustufen-Foto, so wie es spaeter im Stahl aussieht (dunkel = graviert,
+     hell = blanker Stahl). Der Kunde kann NUR verschieben und zoomen. */
+  let photoCanv=null;
+  function makePhoto(img){
+    const NW=img.naturalWidth||img.width, NH=img.naturalHeight||img.height;
+    const MAX=1400, sc=Math.min(1,MAX/Math.max(NW,NH));
+    const w=Math.max(1,Math.round(NW*sc)), h=Math.max(1,Math.round(NH*sc));
+    const c=document.createElement('canvas'); c.width=w; c.height=h;
+    const cx=c.getContext('2d',{willReadFrequently:true});
+    cx.drawImage(img,0,0,w,h);
+    let cut=false;
+    { const d=cx.getImageData(0,0,w,h).data;
+      for(let i=3;i<d.length;i+=4*499){ if(d[i]<250){ cut=true; break; } } }
+    cx.clearRect(0,0,w,h); cx.fillStyle='#fff'; cx.fillRect(0,0,w,h); cx.drawImage(img,0,0,w,h);
+    const id=cx.getImageData(0,0,w,h), g0=toGray(id.data);
+    const sharp=sharpness(g0,w,h), g=stretchContrast(g0);
+    const er=parseInt(ENG.slice(1,3),16), eg=parseInt(ENG.slice(3,5),16), eb=parseInt(ENG.slice(5,7),16);
+    let bx0=w, by0=h, bx1=-1, by1=-1;
+    for(let i=0;i<g.length;i++){
+      const a=Math.max(0,Math.min(255,Math.round(Math.pow((255-g[i])/255,0.9)*255)));
+      if(a>40){ const qx=i%w, qy=(i/w)|0;
+        if(qx<bx0)bx0=qx; if(qx>bx1)bx1=qx; if(qy<by0)by0=qy; if(qy>by1)by1=qy; }
+      const o=i*4; id.data[o]=er; id.data[o+1]=eg; id.data[o+2]=eb; id.data[o+3]=a;
+    }
+    cx.putImageData(id,0,0);
+    const box=(bx1>=bx0&&by1>=by0)?{x:bx0/w,y:by0/h,w:(bx1-bx0+1)/w,h:(by1-by0+1)/h}:null;
+    return {url:c.toDataURL('image/png'),canvas:c,sharp,cut,box,w:NW,h:NH};
+  }
+
   function makeSketch(img,strength,opts){
     /* opts.max: Aufloesung; opts.gray: deckendes Schwarz-auf-Weiss statt der
        getoenten, transparenten Vorschau — das ist die Datei fuer den Laser;
@@ -930,18 +960,18 @@
 
   function applyPhoto(isNew){
     if(!photoImg) return;
-    /* Es gibt nur noch einen Stil: die weiche Bleistift-Zeichnung. */
-    const r=makeSketch(photoImg,st.line);
+    const r=makePhoto(photoImg);
+    photoCanv=r.canvas;
     st.sketch=r.url; st.art=null;
     st.sketchW=r.w; st.sketchH=r.h; st.sketchBox=r.box;
     if(isNew) autoFitPhoto();
     const small=Math.min(r.w,r.h)<900;
     const blurry=r.sharp<7;
     if(small&&blurry) msg('warn','Das Foto ist klein und wirkt unscharf — bitte ein größeres, schärferes Bild wählen.');
-    else if(small) msg('warn',`Das Foto ist recht klein (${r.w}×${r.h} px). Für feine Linien sind mindestens 900 px auf der kurzen Seite besser.`);
-    else if(blurry) msg('warn','Das Foto wirkt unscharf. Ein schärferes Bild gibt deutlich feinere Linien.');
-    else if(r.cut) msg('ok','Freigestelltes Foto erkannt — gezeichnet wird nur die Person, der Hintergrund bleibt leer.');
-    else msg('ok','Sieht gut aus — so wird euer Porträt graviert. Noch schöner: Foto vorher freistellen, dann bleibt nur die Person.');
+    else if(small) msg('warn',`Das Foto ist recht klein (${r.w}×${r.h} px). Für eine scharfe Gravur sind mindestens 900 px auf der kurzen Seite besser.`);
+    else if(blurry) msg('warn','Das Foto wirkt unscharf. Ein schärferes Bild wird deutlich detailreicher graviert.');
+    else if(r.cut) msg('ok','Freigestelltes Foto erkannt — graviert wird nur die Person, der Hintergrund bleibt blanker Stahl.');
+    else msg('ok','Sieht gut aus. Verschiebe und vergrößere das Foto direkt in der Vorschau, bis der Ausschnitt passt.');
     render();
   }
 
@@ -1079,6 +1109,33 @@
     maskField(cx,outW,outH,p);
     if(!(opts&&opts.smooth)) ditherForLaser(cx,outW,outH);
     return out;
+  }
+
+  /* Fuer Bence: der vom Kunden gewaehlte Ausschnitt aus dem ORIGINALFOTO,
+     unbearbeitet und in voller Aufloesung (max. 6000 px) — daraus wird in
+     LightBurn selbst aufbereitet. Ausserhalb eines runden Feldes: weiss. */
+  function originalCrop(){
+    const p=port(); if(!photoImg||!p) return null;
+    const NW=photoImg.naturalWidth, g0=portraitPlacement(1000); if(!g0) return null;
+    const f=Math.min(NW/g0.w, 6000/1000, 6000*p.w/(1000*p.h));
+    const outW=Math.max(1,Math.round(1000*f)), outH=Math.max(1,Math.round(outW*p.h/p.w));
+    const g=portraitPlacement(outW);
+    const c=document.createElement('canvas'); c.width=outW; c.height=outH;
+    const cx=c.getContext('2d',{willReadFrequently:true});
+    cx.fillStyle='#fff'; cx.fillRect(0,0,outW,outH);
+    cx.imageSmoothingEnabled=true; cx.imageSmoothingQuality='high';
+    cx.drawImage(photoImg,g.x,g.y,g.w,g.h);
+    const r=Math.min(outW,outH)/2*Math.min(1,(p.rx||0)/(Math.min(p.w,p.h)/2));
+    if(r>=0.5){ cx.globalCompositeOperation='destination-in'; cx.beginPath();
+      cx.roundRect?cx.roundRect(0,0,outW,outH,r):cx.rect(0,0,outW,outH); cx.fill();
+      cx.globalCompositeOperation='destination-over'; cx.fillStyle='#fff'; cx.fillRect(0,0,outW,outH);
+      cx.globalCompositeOperation='source-over'; }
+    const NH=photoImg.naturalHeight, s=NW/g.w;
+    return {canvas:c, info:{feldMm:[+(p.w*K).toFixed(2),+(p.h*K).toFixed(2)],
+      feldPosMm:[+(OX+p.x*K).toFixed(2),+(OY+p.y*K).toFixed(2)],
+      originalPx:[NW,NH], ausschnittPx:{x:Math.round(-g.x*s),y:Math.round(-g.y*s),
+        w:Math.round(outW*s),h:Math.round(outH*s)},
+      zoom:+(st.pz||1).toFixed(2), posX:Math.round(st.px==null?50:st.px), posY:Math.round(st.crop==null?32:st.crop)}};
   }
 
   /* Der Kunde laedt die weiche Fassung herunter: die gerasterte saehe am
@@ -1539,9 +1596,6 @@
       const inp=$(FLD_INPUT[f]); if(!inp) return;
       inp.addEventListener('input',e=>{ st[f]=e.target.value; render(); });
     });
-    $('tafLineRange').addEventListener('input',e=>{
-      st.line=+e.target.value; $('tafLineValue').value=e.target.value; reprocess();
-    });
     /* Huzas az elonezetben. Termeszetesebb, mint csuszkazni: a vasarlo azt
        mozgatja, amit lat. A csuszkak megmaradnak -- egerrel/finom allitasra
        jobbak --, es a ketto ugyanazt az allapotot irja. */
@@ -1594,7 +1648,6 @@
     });
     $('tafPhotoInput').addEventListener('change',e=>loadPhoto(e.target.files&&e.target.files[0]));
     $('tafPhotoRemove').addEventListener('click',clearPhoto);
-    $('tafSketchDl').addEventListener('click',downloadSketchPNG);
     $('tafMilestones').addEventListener('input',e=>{
       const row=e.target.closest('.ms-row'); if(!row) return;
       const i=+row.dataset.i, f=e.target.dataset.f; if(!f||!st.ms[i]) return;
@@ -1688,9 +1741,19 @@
     let portOut='';
     const p=port();
     if(p && photoImg){
-      const c=engraveCanvas(preview?{smooth:true}:null);
+      /* preview: genau der Look, den der Kunde sah (getoentes Foto auf Stahl);
+         sonst: unbearbeiteter Originalausschnitt an seiner mm-Position. */
+      let c=null;
+      if(preview){
+        const W=Math.round(p.w/ENG_MM_PER_PX/2), H=Math.round(p.h/ENG_MM_PER_PX/2), g=portraitPlacement(W);
+        c=document.createElement('canvas'); c.width=W; c.height=H;
+        const x=c.getContext('2d'); x.imageSmoothingQuality='high';
+        if(p.rx){ x.beginPath(); const rr=Math.min(W,H)/2*Math.min(1,p.rx/(Math.min(p.w,p.h)/2));
+          x.roundRect?x.roundRect(0,0,W,H,rr):x.rect(0,0,W,H); x.clip(); }
+        if(photoCanv) x.drawImage(photoCanv,g.x,g.y,g.w,g.h);
+      } else { const oc=originalCrop(); c=oc&&oc.canvas; }
       if(c){
-        const u=c.toDataURL('image/png');
+        const u=c.toDataURL(preview?'image/png':'image/jpeg',.95);
         portOut=`<image x="${p.x}" y="${p.y}" width="${p.w}" height="${p.h}" `
           + `preserveAspectRatio="none" href="${u}" xlink:href="${u}"/>`;
       }
@@ -1712,12 +1775,12 @@
     const cut=preview?LASER_BLACK:LASER_REF;
     const hint=`Wolf Lasermark · Erinnerungstafel ${w}×${h} mm. `
       + `Ebene "Kontur" (rot) = nur Referenz, nicht gravieren. `
-      + `Portrait: 1 Bit, ${ENG_DPI} dpi — in LightBurn Bildmodus "Threshold" `
-      + `(nicht erneut dithern), Zeilenabstand ${String(+(ENG_MM_PER_PX*K).toFixed(3)).replace('.',',')} mm.`;
+      + `Portrait: unbearbeiteter Originalausschnitt (Farbe, volle Aufloesung) exakt an Position und Groesse `
+      + `des Kunden — in LightBurn selbst aufbereiten (Graustufen/Dithering).`;
     return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" `
       + `width="${w}mm" height="${h}mm" viewBox="0 0 ${w} ${h}">`
       + `<title>Erinnerungstafel ${w}×${h} mm</title><desc>${hint}</desc>`
-      + `<g id="Kontur"><path d="${realPlatePath()}" fill="none" stroke="${cut}" stroke-width=".2"/></g>`
+      + `<g id="Kontur"><path d="${realPlatePath()}" fill="${preview?'#d3d7dd':'none'}" stroke="${cut}" stroke-width=".2"/></g>`
       + `<g transform="translate(${OX} ${OY}) scale(${K})"><g id="Portrait">${portOut}</g>`
       + `<g id="Gravur">${g}</g></g></svg>`;
   }
@@ -1744,7 +1807,8 @@
     sketch:()=>st.sketch,
     state:()=>JSON.parse(JSON.stringify({preset:st.preset,layout:st.layout,title:st.title,
       quote:st.quote,names:st.names,sub:st.sub,msg:st.msg,bigNum:st.bigNum,bigLabel:st.bigLabel,
-      dateA:st.dateA,dateB:st.dateB,ms:st.ms,line:st.line,detail:st.detail,smooth:st.smooth,lw:st.lw})),
+      dateA:st.dateA,dateB:st.dateB,ms:st.ms,
+      portrait:(photoImg&&port())?originalCrop().info:null})),
     svg:()=>exportSVG(false),
     svgPreview:()=>exportSVG(true),
     validate:()=>{
