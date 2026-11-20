@@ -223,8 +223,13 @@
       out+=iconMarkup(m.icon,xDot,cy,4.4);
       if(i<list.length-1) out+=`<path d="M${X(xDot)} ${Y(cy+r)}V${Y(cy+step-r)}" stroke="${ENG}" `
         + `stroke-width=".6" opacity=".5" stroke-linecap="round"/>`;
-      const label=[m.l1,m.l2].filter(Boolean).join(' ');
-      if(label) out+=txt(label,y,{x:xText,anchor:'start',size:3.4,maxw:PLATE.w-xText-8});
+      /* Zeile 2 steht direkt unter Zeile 1 — eng gesetzt und um die
+         Kreismitte zentriert, damit beide als eine Station lesbar bleiben. */
+      const maxw=PLATE.w-xText-8, lines=[m.l1,m.l2].filter(Boolean);
+      if(lines.length===2){
+        out+=txt(lines[0],cy-0.2,{x:xText,anchor:'start',size:3.4,maxw});
+        out+=txt(lines[1],cy+3.4,{x:xText,anchor:'start',size:3.0,op:'.85',maxw});
+      } else if(lines.length) out+=txt(lines[0],y,{x:xText,anchor:'start',size:3.4,maxw});
     });
     return out;
   }
