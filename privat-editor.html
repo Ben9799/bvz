@@ -1415,9 +1415,21 @@ function keepLineInside(line){
   if(line.textMode==='arc') return false;
   if(line.key && !(line.text||'').trim()) return false;
   let changed=false;
+  const shrinkable=state.shape==='dogtag' || isKey(state.shape) || isCoin(state.shape);
+  /* Passt die Zeile in voller Groesse nirgends (auch nicht am Anker), zeigt die Vorschau sie verkleinert —
+     und mit dieser Groesse hat der Kunde sie platziert. Erst verkleinern, dann pruefen; sonst wuerde jedes
+     Neuzeichnen (z. B. "+ Weitere Zeile") sie auf den Anker zuruecksetzen. */
+  if(shrinkable){
+    const a=textAnchor(state.shape,CFG_CX,CFG_CY,CFG_MM);
+    if(!isStraightLineInside(line, a.x, a.y) && shrinkToFit(line)) changed=true;
+  }
   const clamped=clampLineOffsetToShape(line, line.offX*CFG_MM, line.offY*CFG_MM, 0, 0);
+  /* Ist auch der Ausweichpunkt ungueltig (Pfote/Doktorhut: der Anker liegt in einer Sperrzone), nicht verschieben —
+     sonst springt die Zeile beim Neuzeichnen auf den Anker. Dann bleibt sie, wo der Kunde sie hingelegt hat. */
+  const a0=textAnchor(state.shape,CFG_CX,CFG_CY,CFG_MM);
+  if(clamped.changed && !isStraightLineInside(line, a0.x+clamped.x, a0.y+clamped.y)) clamped.changed=false;
   if(clamped.changed){ line.offX=clamped.x/CFG_MM; line.offY=clamped.y/CFG_MM; updateSingleGroup(line.id); changed=true; }
-  if((state.shape==='dogtag' || isKey(state.shape) || isCoin(state.shape)) && shrinkToFit(line)) changed=true;
+  if(shrinkable && shrinkToFit(line)) changed=true;
   return changed;
 }
 function keepAllLinesInside(){
