@@ -177,8 +177,9 @@
   #dogFields{display:none} body.dog #dogFields{display:block}
   #sideField{display:none} body.two #sideField{display:block}
   /* Rueckseite (Aufpreis) + Seiten-Umschalter in der Vorschau + Feinjustier-Pfeile (2026-11-23) */
-  .stage-sides{position:absolute;top:58px;left:0;right:0;display:none;justify-content:center;z-index:2;pointer-events:none}
+  .stage-sides{position:absolute;top:14px;left:0;right:0;display:none;justify-content:center;z-index:2;pointer-events:none}
   body.two .stage-sides{display:flex}
+  .preview.compact .stage-sides{display:none}
   .field > label.back-toggle{display:flex;align-items:center;gap:12px;font:400 .88rem var(--body);letter-spacing:0;text-transform:none;margin:0;color:var(--ink)}
   .back-toggle{display:flex;align-items:center;gap:12px;border:1px solid var(--line2);background:#fff;padding:13px 14px;border-radius:2px;cursor:pointer;transition:border-color .15s,background .15s}
   .back-toggle:hover{border-color:var(--ink)}
@@ -932,7 +933,8 @@ function viewTarget(){
   if(b && view.mode!=='detail') return coverRect(b, W/H, b.maxW ? b.maxW*Math.max(1,W/H) : 0);
   const compact=H<290, mobile=isMobile(), seg=!!photoBgKey();
   stageEl.classList.toggle('compact',compact);
-  const padT=compact?4:(mobile?12:30), padB=compact?4:(mobile?(seg?46:10):(seg?104:72));
+  /* Vorder-/Rueckseite-Umschalter oben: Platz freihalten, damit er nie ueber der Gravur liegt */
+  const padT=compact?4:(mobile?12:30)+(sides.on?44:0), padB=compact?4:(mobile?(seg?46:10):(seg?104:72));
   const s=SHAPES[state.shape], hw=s.w/2*CFG_MM, hh=s.h/2*CFG_MM;
   const vr=!state.bracelet;                                     // senkrechtes Lineal links
   let x0=CFG_CX-hw-(compact?10:(vr?48:20)), x1=CFG_CX+hw+(compact?10:20);
@@ -1268,7 +1270,7 @@ function renderPreviewOnly(){
   fitEngravings(document);
   keepAllLinesInside();
   $('clipNote').hidden=!linesOverflow();
-  const fk=state.shape+'|'+sceneKey();
+  const fk=state.shape+'|'+sceneKey()+'|'+sides.on;
   if(view.fitKey!==fk){ view.fitKey=fk; fitView(false); }
   drawSelection();
   syncSideBadges();
