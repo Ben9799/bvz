@@ -176,6 +176,23 @@
   body.dog #modeField,body.dog #lineField{display:none !important}
   #dogFields{display:none} body.dog #dogFields{display:block}
   #sideField{display:none} body.two #sideField{display:block}
+  /* Rueckseite (Aufpreis) + Seiten-Umschalter in der Vorschau + Feinjustier-Pfeile (2026-11-23) */
+  .stage-sides{position:absolute;top:58px;left:0;right:0;display:none;justify-content:center;z-index:2;pointer-events:none}
+  body.two .stage-sides{display:flex}
+  .field > label.back-toggle{display:flex;align-items:center;gap:12px;font:400 .88rem var(--body);letter-spacing:0;text-transform:none;margin:0;color:var(--ink)}
+  .back-toggle{display:flex;align-items:center;gap:12px;border:1px solid var(--line2);background:#fff;padding:13px 14px;border-radius:2px;cursor:pointer;transition:border-color .15s,background .15s}
+  .back-toggle:hover{border-color:var(--ink)}
+  .back-toggle input{width:18px;height:18px;accent-color:var(--ink);flex:none;margin:0}
+  .back-toggle span{flex:1;display:flex;flex-direction:column;gap:2px}
+  .back-toggle strong{font-weight:500;font-size:.88rem}
+  .back-toggle small{font-size:.74rem;color:var(--mut)}
+  .back-toggle em{font-style:normal;font-size:.82rem;color:var(--caramel);white-space:nowrap}
+  .back-toggle.on{border-color:var(--ink);background:var(--blush)}
+  .nudge{display:flex;gap:6px;flex-wrap:wrap}
+  .nudge button{width:44px;height:38px;border:1px solid var(--line2);background:#fff;border-radius:2px;font-size:1rem;color:var(--ink);transition:border-color .15s}
+  .nudge button:hover{border-color:var(--ink)}
+  .nudge button:disabled{opacity:.35;cursor:default}
+  .price-note{display:block;font-size:.72rem;color:var(--caramel);margin-top:3px}
   body.fixshape #shapeField{display:none !important}
   body.bracelet #modeField,body.bracelet #lenField{display:none !important}
   body.keyring #lenField,body.coin #lenField{display:none !important}
@@ -268,6 +285,10 @@
         <button type="button" class="tool" id="redoBtn" title="Wiederholen (Strg/⌘ + Umschalt + Z)" aria-label="Wiederholen" disabled><svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg></button>
       </div>
     </div>
+    <div class="stage-sides"><div class="seg" id="stageSides" role="tablist" aria-label="Seite">
+      <button type="button" class="on" data-side="front">Vorderseite</button>
+      <button type="button" data-side="back">Rückseite</button>
+    </div></div>
     <div class="stage-foot">
       <div class="seg" id="viewSeg" hidden role="tablist" aria-label="Ansicht">
         <button type="button" class="on" data-view="detail">Detail</button>
@@ -284,13 +305,17 @@
     <h1 id="edTitle">Anhänger gestalten</h1>
     <p class="lead">Die Vorschau zeigt deine Gravur maßstabsgetreu – so wird sie gelasert.</p>
 
+    <div class="field" id="backField" hidden>
+      <label class="back-toggle" id="backToggleCard"><input type="checkbox" id="backToggle"><span><strong>Rückseite gravieren</strong><small>Text, Foto oder Karte auch auf der Rückseite</small></span><em>+&nbsp;3,90&nbsp;€</em></label>
+    </div>
+
     <div class="field" id="sideField">
-      <label>Seite der Gravurscheibe</label>
+      <label id="sideLabel">Seite der Gravurscheibe</label>
       <div class="chips tabs" id="sideChips">
         <button type="button" class="chip on" data-side="front">Vorderseite<small></small></button>
         <button type="button" class="chip" data-side="back">Rückseite<small></small></button>
       </div>
-      <p class="mini-help">Die Scheibe (Ø 21 mm) dreht sich in der Fassung. Beide Seiten sind optional – was leer bleibt, bleibt blank.</p>
+      <p class="mini-help" id="sideHelp">Die Scheibe (Ø 21 mm) dreht sich in der Fassung. Beide Seiten sind optional – was leer bleibt, bleibt blank.</p>
     </div>
 
     <div class="field" id="modeField">
@@ -396,6 +421,15 @@
           <label for="verticalRange"><span id="verticalLabel">Höhe</span> <output id="verticalValue">0 mm</output></label>
           <input type="range" id="verticalRange" min="-6" max="6" step="0.1" value="0">
         </div>
+        <div class="row" id="nudgeRow">
+          <label>Feinjustieren <output>0,2&nbsp;mm pro Tipp</output></label>
+          <div class="nudge" id="nudgeBtns">
+            <button type="button" data-dx="-1" data-dy="0" aria-label="Nach links">←</button>
+            <button type="button" data-dx="0" data-dy="-1" aria-label="Nach oben">↑</button>
+            <button type="button" data-dx="0" data-dy="1" aria-label="Nach unten">↓</button>
+            <button type="button" data-dx="1" data-dy="0" aria-label="Nach rechts">→</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -447,7 +481,7 @@
     </div>
 
     <div class="price-row">
-      <span class="lbl">inkl. Gravur &amp; Verpackung</span>
+      <span class="lbl">inkl. Gravur &amp; Verpackung<span class="price-note" id="priceNote" hidden></span></span>
       <span class="val" id="price">ab 19,99&nbsp;€</span>
     </div>
     <a class="btn-off" aria-disabled="true">Bald bestellbar</a>
@@ -1221,8 +1255,10 @@ function renderPreviewOnly(){
   $('cfgPendant').innerHTML = pendant(state.shape, state.lines, CFG_CX, CFG_CY, CFG_MM, state.photo);
   const side = state.shape==='dogtag' ? dogTag.side : (sides.on ? sides.cur : '');
   $('dimCaption').textContent = (state.bracelet ? 'Herz-Armband · Edelstahl · Herz ca. 19,5 mm breit · Schlangenkette 17 + 5 cm' : SHAPES[state.shape].cap) + (side ? (side==='back' ? ' · Rückseite' : ' · Vorderseite') : '');
-  if(SHOP_PRICE>0) $('price').innerHTML = SHOP_PRICE.toFixed(2).replace('.',',')+'&nbsp;€'; else
+  const extra=backPaid() ? BACK_PRICE : 0;
+  if(SHOP_PRICE>0) $('price').innerHTML = (SHOP_PRICE+extra).toFixed(2).replace('.',',')+'&nbsp;€'; else
   $('price').innerHTML = state.bracelet ? '24,99&nbsp;€' : (SHAPES[state.shape].price ? 'ab '+SHAPES[state.shape].price+'&nbsp;€' : 'Preis folgt');
+  $('priceNote').hidden=!extra; if(extra) $('priceNote').textContent='inkl. Rückseitengravur + '+BACK_PRICE.toFixed(2).replace('.',',')+' €';
   fitEngravings(document);
   keepAllLinesInside();
   const fk=state.shape+'|'+sceneKey();
@@ -1533,6 +1569,13 @@ document.querySelectorAll('#modeCards .mode-card').forEach(c=>c.addEventListener
 /* ---- Medaillon: Vorder- und Rueckseite, beide optional (je eigene Zeilen / Foto / Karte) ---- */
 const SIDE_KEYS=['lines','contentMode','photo','photoWidth','photoHeight','photoScale','photoOffX','photoOffY','mapPaths','mapLabel','mapCenter','selectedLineId'];
 const sides={on:false, cur:'front', front:null, back:null};
+/* Rueckseite gegen Aufpreis (2026-11-23, Bence): alle Ketten + Schluesselanhaenger. Medaillon (beidseitig im Preis)
+   und Dog Tag (feste Kontakt-Rueckseite) behalten ihre eigene Logik. */
+const BACK_PRICE=3.90;
+const BACK_SHAPES=['kettenanhaenger','stabkette','herzstabkette','dogtagkette','muenzkette','ovalkette','herzkette','pfotenkette','doktorhutkette','lederanhaenger','katze'];
+const backOptional=()=>BACK_SHAPES.includes(state.shape) && !state.bracelet;
+const backPaid=()=>backOptional() && sides.on;
+const SIDE_BTNS='#sideChips .chip, #stageSides button';
 const snapSide=()=>{ const o={}; SIDE_KEYS.forEach(k=>o[k]=state[k]); return o; };
 function emptySide(){ const l=createLine(''); return {lines:[l],contentMode:'text',photo:null,photoWidth:0,photoHeight:0,photoScale:1,photoOffX:0,photoOffY:0,mapPaths:null,mapLabel:'',mapCenter:null,selectedLineId:l.id}; }
 function sideStatus(s){
@@ -1548,7 +1591,8 @@ function syncSideBadges(){
   });
 }
 function syncSideUi(){
-  document.querySelectorAll('#sideChips .chip').forEach(x=>x.classList.toggle('on', x.dataset.side===sides.cur));
+  document.querySelectorAll(SIDE_BTNS).forEach(x=>{ x.classList.toggle('on', x.dataset.side===sides.cur); x.setAttribute('aria-pressed', x.dataset.side===sides.cur); });
+  $('backToggle').checked=sides.on; $('backToggleCard').classList.toggle('on', sides.on);
   syncSideBadges();
   $('photoInput').value='';
   uploadLabel.textContent = state.photo ? 'Foto gewählt – ersetzen …' : 'Foto auswählen …';
@@ -1573,7 +1617,33 @@ function leaveSides(){
   sides.on=false; sides.cur='front';
   document.body.classList.remove('two'); syncSideUi();
 }
-document.querySelectorAll('#sideChips .chip').forEach(c=>c.addEventListener('click',()=>setSide(c.dataset.side)));
+document.querySelectorAll(SIDE_BTNS).forEach(c=>c.addEventListener('click',()=>setSide(c.dataset.side)));
+$('backToggle').addEventListener('change',e=>{
+  if(!backOptional()) return;
+  mark();
+  if(e.target.checked){ enterSides(); setSide('back'); }
+  else { leaveSides(); selVisible=true; render(); }
+});
+/* Feinjustieren: Pfeile (und Pfeiltasten) verschieben die gewaehlte Zeile um 0,2 mm (Umschalt: 1 mm), nie aus der Form */
+function nudgeLine(dx,dy,step){
+  const line=getSelectedLine(); if(!line) return;
+  mark('n'+line.id);
+  if(line.textMode==='arc'){
+    if(dx){ const ar=$('angleRange'); ar.value=clampNumber(normAngle(line.angle)+dx*2*(step>0.5?3:1), +ar.min, +ar.max); ar.dispatchEvent(new Event('input')); }
+    if(dy){ const vr=$('verticalRange'); vr.value=clampNumber(Number(line.offY||0)-dy*step, +vr.min, +vr.max); vr.dispatchEvent(new Event('input')); }
+    return;
+  }
+  const c=clampLineOffsetToShape(line, (line.offX+dx*step)*CFG_MM, (line.offY+dy*step)*CFG_MM, line.offX*CFG_MM, line.offY*CFG_MM);
+  line.offX=c.x/CFG_MM; line.offY=c.y/CFG_MM; selVisible=true;
+  updateSingleGroup(line.id); drawSelection(); syncSelectedControls();
+}
+document.querySelectorAll('#nudgeBtns button').forEach(b=>b.addEventListener('click',()=>nudgeLine(+b.dataset.dx,+b.dataset.dy,0.2)));
+document.addEventListener('keydown',e=>{
+  const k={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];
+  if(!k || e.metaKey || e.ctrlKey || e.altKey) return;
+  const t=e.target; if(t && t.matches && t.matches('input,textarea,select,[contenteditable]')) return;
+  e.preventDefault(); nudgeLine(k[0],k[1],e.shiftKey?1:0.2);
+});
 
 /* ---- Dog Tag: feste Felder, zwei Seiten ---- */
 function syncDogUi(){
@@ -2031,16 +2101,31 @@ function orderTexts(){
   else if(state.contentMode==='text') push('',state.lines);
   return out.join(' | ');
 }
-function orderSVG(){
+function orderSVG(){ return '<?xml version="1.0" encoding="UTF-8"?>\n'+new XMLSerializer().serializeToString(orderSVGEl()); }
+/* Beide Seiten in EINER Datei: links Vorderseite, rechts Rueckseite (IDs der Rueckseite mit b_ praefixiert) */
+function orderSVGBoth(){
+  const cur=sides.cur, parts={};
+  ['front','back'].forEach(sd=>{ setSide(sd); const el=orderSVGEl(); el.querySelectorAll('desc').forEach(d=>d.remove()); parts[sd]=el; });
+  setSide(cur);
+  const W=300, ser=new XMLSerializer();
+  const nest=(el,x,id)=>{ el.setAttribute('x',x); el.setAttribute('y',0); el.setAttribute('width',W); el.setAttribute('height',W); el.setAttribute('id',id); return ser.serializeToString(el); };
+  const back=nest(parts.back,W,'Rueckseite').replace(/\bid="(?!Rueckseite")([^"]+)"/g,'id="b_$1"').replace(/url\(#/g,'url(#b_').replace(/href="#/g,'href="#b_');
+  return '<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 '+(2*W)+' '+W+'" width="'+(2*W/CFG_MM)+'mm" height="'+(W/CFG_MM)+'mm">'
+    +'<desc>Wolf Lasermark · '+($('edTitle').textContent||state.shape)+' · Massstab 1:1 (mm). Links = Vorderseite, rechts = Rückseite (so wie der Kunde sie von hinten sieht). Rot = Kontur (nur Referenz), Schwarz = Gravur.</desc>'
+    +nest(parts.front,0,'Vorderseite')+back+'</svg>';
+}
+function orderSVGEl(){
   /* Bildschirm-SVG ohne alles, was nur zur Anzeige da ist: Foto-Hintergrund, Massstab, Auswahl,
      Hilfslinien, Klickflaechen, Filter. Kontur = rot (nur Referenz), Gravur = schwarz. */
   const c=$('cfgSvg').cloneNode(true);
   ['cfgBg','cfgRuler','cfgSel','cfgGuides'].forEach(id=>{ const n=c.querySelector('#'+id); if(n) n.remove(); });
-  c.querySelectorAll('.hit,.hit-outline,.photo-hit,.area-outline,[fill^="url(#sheen"]').forEach(n=>n.remove());
+  c.querySelectorAll('.hit,.hit-outline,.photo-hit,.area-outline,.keepout,[fill^="url(#sheen"]').forEach(n=>n.remove());
   c.querySelectorAll('[filter]').forEach(n=>n.removeAttribute('filter'));
   c.querySelectorAll('.engPath').forEach(n=>{ n.setAttribute('fill','none'); n.setAttribute('stroke','none'); });
   c.querySelectorAll('[fill^="url(#metal"],[stroke^="url(#metal"],[stroke^="url(#rim"]').forEach(n=>{
     n.setAttribute('fill','none'); n.setAttribute('stroke','#ff0000'); n.setAttribute('stroke-width','1.6'); n.removeAttribute('stroke-opacity'); n.removeAttribute('vector-effect'); });
+  /* Foto-Formen (Ketten/Anhaenger): Kontur ist nur per CSS gestylt -> in der Datei sonst schwarz gefuellt und verdeckt die Gravur */
+  c.querySelectorAll('.shape-outline').forEach(n=>{ n.setAttribute('fill','none'); n.setAttribute('stroke','#ff0000'); n.setAttribute('stroke-width','1.6'); n.removeAttribute('class'); });
   c.querySelectorAll('text').forEach(n=>{ n.setAttribute('fill','#000000'); n.removeAttribute('opacity'); });
   c.querySelectorAll('.engLayer').forEach(n=>n.removeAttribute('opacity'));
   c.removeAttribute('id'); c.removeAttribute('style'); c.removeAttribute('aria-label');
@@ -2050,27 +2135,28 @@ function orderSVG(){
   const t=document.createElementNS('http://www.w3.org/2000/svg','desc');
   t.textContent='Wolf Lasermark · '+($('edTitle').textContent||state.shape)+' · Massstab 1:1 (mm). Rot = Kontur (nur Referenz), Schwarz = Gravur.';
   c.insertBefore(t,c.firstChild);
-  return '<?xml version="1.0" encoding="UTF-8"?>\n'+new XMLSerializer().serializeToString(c);
+  return c;
 }
-function orderPNG(svg){
+function orderPNG(svg,w=900,h=900){
   return new Promise(res=>{
     const img=new Image();
-    img.onload=()=>{ try{ const cv=document.createElement('canvas'); cv.width=cv.height=900; const x=cv.getContext('2d');
-      x.fillStyle='#ffffff'; x.fillRect(0,0,900,900); x.drawImage(img,0,0,900,900); res(cv.toDataURL('image/png')); }catch(e){ res(''); } };
+    img.onload=()=>{ try{ const cv=document.createElement('canvas'); cv.width=w; cv.height=h; const x=cv.getContext('2d');
+      x.fillStyle='#ffffff'; x.fillRect(0,0,w,h); x.drawImage(img,0,0,w,h); res(cv.toDataURL('image/png')); }catch(e){ res(''); } };
     img.onerror=()=>res('');
     img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
   });
 }
 async function collectOrder(){
-  const svg=orderSVG(), png=await orderPNG(svg);
+  const both=sides.on, svg=both ? orderSVGBoth() : orderSVG(), png=await orderPNG(svg, both?1800:900, 900);
   const shapeParam=new URLSearchParams(location.search).get('shape')||state.shape;
   const details={};
   if(SHAPES[state.shape] && !state.bracelet && !isKey(state.shape) && !isCoin(state.shape) && state.shape!=='dogtag') details['Kettenlänge']=state.len+' cm';
   if(state.mapPaths) details['Karte']=state.mapLabel||'ja';
   if(state.photo) details['Foto-Gravur']='ja';
+  if(backPaid()) details['Rückseitengravur']='ja (+ '+BACK_PRICE.toFixed(2).replace('.',',')+' €)';
   return { shape:shapeParam, title:$('edTitle').textContent.replace(/\s*gestalten$/,''),
     gravurText:orderTexts(), details, designDaten:snapshot(), svg, png,
-    foto:state.photo||'', mitFoto:!!state.photo, mitKarte:!!state.mapPaths, karteOrt:state.mapLabel||'' };
+    foto:state.photo||'', mitFoto:!!state.photo, mitKarte:!!state.mapPaths, karteOrt:state.mapLabel||'', rueckseite:backPaid() };
 }
 (function(){
   const q=new URLSearchParams(location.search), off=document.querySelector('.btn-off');
@@ -2078,6 +2164,10 @@ async function collectOrder(){
   const b=document.createElement('button'); b.type='button'; b.className='btn-buy'; b.id='buyBtn'; b.textContent='Weiter zur Bestellung';
   off.replaceWith(b);
   b.addEventListener('click',async()=>{
+    if(backPaid()){
+      const other=sides.cur==='back' ? state : sides.back;
+      if(sideStatus(other)==='leer'){ setSide('back'); alert('Die Rückseite ist noch leer. Gib dort einen Text ein (oder ein Foto / eine Karte) – oder wähle „Rückseite gravieren“ wieder ab.'); return; }
+    }
     b.disabled=true;
     try{ const order=await collectOrder(); window.parent.postMessage({wlEditor:'order', order}, location.origin); }
     catch(e){ console.error(e); }
@@ -2106,6 +2196,10 @@ async function collectOrder(){
   }else{
     $('dogChip').hidden=false;
     $('edTitle').textContent='Anhänger gestalten';
+  }
+  if(backOptional()){
+    $('backField').hidden=false; $('sideLabel').textContent='Seite';
+    $('sideHelp').textContent='Wechsle zwischen Vorder- und Rückseite – auch oben in der Vorschau. Jede Seite hat eigene Zeilen, Schrift und Position.';
   }
   syncShapeChips();
   syncContentMode();

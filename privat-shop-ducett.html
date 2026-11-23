@@ -361,6 +361,8 @@ const SHOP={
   medaillon:    {price:19.99, mat:null, schmuck:true},          // Material noch offen
   tafel:        {price:89.00, mat:'Edelstahl', schmuck:false},
 };
+const BACK_SURCHARGE=3.90;   // Rueckseitengravur (2026-11-23), gleiche Liste wie BACK_SHAPES in privat-editor.html
+const BACK_SURCHARGE_SHAPES=['kettenanhaenger','stabkette','herzstabkette','dogtagkette','muenzkette','ovalkette','herzkette','pfotenkette','doktorhutkette','lederanhaenger','katze'];
 const sellable=k=>{const o=SHOP[k];return !!(o&&o.price>0&&o.mat);};
 /* ---- Lager: oeffentlich nur die Liste ausverkaufter Varianten (stats/lager, keine Stueckzahlen).
    Gepflegt im WL-Dashboard (Raktár), abgebucht von lager-sync. Fehler beim Laden = alles bestellbar. ---- */
@@ -557,8 +559,10 @@ function orderFromEditor(d){
   const k=$('edFrame').dataset.shape, cfg=SHOP[k];
   if(!sellable(k)) return;                                  // Preis/Material kommen nur aus dem Shop
   const prod=PRODUCTS.find(p=>p.ed===k)||{};
-  checkout({key:k, produkt:prod.name||d.title, form:d.title, variante:k==='tafel'?'130 × 180 mm':'', material:cfg.mat, schmuck:cfg.schmuck,
-    unit:cfg.price, img:prod.img||'', gravurText:d.gravurText, details:d.details||{}, kettenlaenge:(d.details||{})['Kettenlänge']||'–',
+  /* Rueckseite: Aufpreis kommt aus dem Shop (nicht aus dem Editor), nur fuer freigegebene Formen */
+  const back=!!d.rueckseite && BACK_SURCHARGE_SHAPES.includes(k), unit=+(cfg.price+(back?BACK_SURCHARGE:0)).toFixed(2);
+  checkout({key:k, produkt:prod.name||d.title, form:d.title, variante:k==='tafel'?'130 × 180 mm':(back?'mit Rückseitengravur':''), material:cfg.mat, schmuck:cfg.schmuck,
+    unit, img:prod.img||'', gravurText:d.gravurText, details:d.details||{}, kettenlaenge:(d.details||{})['Kettenlänge']||'–',
     designDaten:d.designDaten, svg:d.svg, png:d.png, foto:d.foto||'', mitFoto:!!d.mitFoto, mitKarte:!!d.mitKarte, karteOrt:d.karteOrt||''});
 }
 /* Gravurdatei fuer den Konfigurator: nur die Gravur in echten mm, Medaillon-Kontur rot als Referenz. */
