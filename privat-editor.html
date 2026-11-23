@@ -296,6 +296,7 @@
         <button type="button" data-view="wrist" id="wristBtn" hidden>Am Handgelenk</button>
       </div>
       <span class="dim-caption" id="dimCaption"></span>
+      <span class="dim-caption clip-note" id="clipNote" hidden>Was über den Rand ragt, wird nicht graviert</span>
       <span class="drag-hint" id="dragHint">Gravur antippen, ziehen und an den Ecken skalieren</span>
     </div>
   </div>
@@ -1063,6 +1064,11 @@ function pendant(shape, lines, cx, cy, MM, photo){
   const hideText = state.contentMode==='photo' || state.contentMode==='map' || (shape!=='heart' && (photo || state.mapPaths));
   const text = hideText ? '' : lines.filter(l=>!(l.key && !(l.text||'').trim())).map(line=>lineMarkup(line, shape, cx, cy, MM)).join('');
   /* Gravur-Ebene: halbtransparent (Licht und Verlauf des Metalls scheinen durch) + Gravur-Filter (matt, Kanten) */
+  /* Ueberstehendes verschwindet hinter dem Rand (wie beim Foto): Gravur auf die Gravurflaeche beschneiden (2026-11-23) */
+  if(text && overflowOK()){
+    const id='ec'+(clipSeq++);
+    return body + overlays + engClipMarkup(id,shape,cx,cy,MM) + `<g class="engClip" clip-path="url(#${id})"><g class="engLayer" filter="url(#engrave)" opacity=".8">${text}</g></g>`;
+  }
   return body + overlays + (text ? `<g class="engLayer" filter="url(#engrave)" opacity=".8">${text}</g>` : '');
 }
 
@@ -1261,6 +1267,7 @@ function renderPreviewOnly(){
   $('priceNote').hidden=!extra; if(extra) $('priceNote').textContent='inkl. Rückseitengravur + '+BACK_PRICE.toFixed(2).replace('.',',')+' €';
   fitEngravings(document);
   keepAllLinesInside();
+  $('clipNote').hidden=!linesOverflow();
   const fk=state.shape+'|'+sceneKey();
   if(view.fitKey!==fk){ view.fitKey=fk; fitView(false); }
   drawSelection();
@@ -1379,6 +1386,32 @@ function boxGridPoints(ext, cx, cy, angleDeg){
   }
   return pts;
 }
+/* Gravur darf ueber den Rand gezogen werden (Rest wird beschnitten) — ausser Dog Tag: Kontaktdaten muessen ganz bleiben */
+const overflowOK=()=>state.shape!=='dogtag';
+function engClipMarkup(id,shape,cx,cy,MM){
+  if(isKey(shape)) return keyClip(id,shape,cx,cy,MM);
+  if(isRound(shape)){
+    const c=frameCenter(roundKey(shape),cx,cy,MM), R=frameOf(roundKey(shape)).outerR*MM, hs=holesPx(shape,cx,cy,MM);
+    return `<clipPath id="${id}"><path clip-rule="evenodd" d="${ringPath(c.x,c.y,R)}${hs.map(h=>' '+ringPath(h.x,h.y,h.keep)).join('')}"/></clipPath>`;
+  }
+  const f=frameOf('heart'), c=frameCenter('heart',cx,cy,MM), pts=heartPolygon(c.x,c.y,MM,f.outerScaleX,f.outerScaleY);
+  return `<clipPath id="${id}"><path d="M ${pts.map(p=>p.x.toFixed(2)+' '+p.y.toFixed(2)).join(' L ')} Z"/></clipPath>`;
+}
+/* Lockere Regel beim Ziehen: nur die Mitte der Zeile muss auf der Gravurflaeche liegen (bleibt greifbar) */
+function isLineCenterInside(cx,cy){
+  const p={x:cx,y:cy};
+  if(isKey(state.shape)) return pointInPolygon(p, keyPolygon(state.shape)) && !inKeep(state.shape,cx,cy);
+  if(isRound(state.shape)){ const c=frameCenter(roundKey(state.shape),CFG_CX,CFG_CY,CFG_MM), R=rf().outerR*CFG_MM; return (cx-c.x)**2+(cy-c.y)**2<=R*R; }
+  const f=frameOf('heart'), c=frameCenter('heart',CFG_CX,CFG_CY,CFG_MM);
+  return pointInPolygon(p, heartPolygon(c.x,c.y,CFG_MM,f.outerScaleX,f.outerScaleY));
+}
+const linePlaceOK=(line,cx,cy)=>overflowOK() ? isLineCenterInside(cx,cy) : isStraightLineInside(line,cx,cy);
+/* ragt eine gerade Zeile ueber den Rand? (Hinweis + Vermerk in der Bestellung) */
+function linesOverflow(){
+  if(!overflowOK()) return false;
+  const a=textAnchor(state.shape,CFG_CX,CFG_CY,CFG_MM);
+  return state.lines.some(l=>l.textMode!=='arc' && (l.text||'').trim() && getPreviewText(l.id) && !isStraightLineInside(l, a.x+l.offX*CFG_MM, a.y+l.offY*CFG_MM));
+}
 function isStraightLineInside(line, cx, cy){
   const ext=rectExtentsFromText(line.id);
   const corners=rotatedCorners(ext, cx, cy, line.angle);
@@ -1406,16 +1439,16 @@ function clampLineOffsetToShape(line, desiredOx, desiredOy, fallbackOx, fallback
   if(line.textMode!=='arc'){
     const anchor=textAnchor(state.shape,CFG_CX,CFG_CY,CFG_MM);
     const targetCx = anchor.x + desiredOx, targetCy = anchor.y + desiredOy;
-    if(isStraightLineInside(line, targetCx, targetCy)) return {x:desiredOx,y:desiredOy,changed:false};
+    if(linePlaceOK(line, targetCx, targetCy)) return {x:desiredOx,y:desiredOy,changed:false};
     let insideX = anchor.x + fallbackOx, insideY = anchor.y + fallbackOy;
-    if(!isStraightLineInside(line, insideX, insideY)){
+    if(!linePlaceOK(line, insideX, insideY)){
       insideX = anchor.x + line.offX*CFG_MM; insideY = anchor.y + line.offY*CFG_MM;
-      if(!isStraightLineInside(line, insideX, insideY)){ insideX = anchor.x; insideY = anchor.y; }
+      if(!linePlaceOK(line, insideX, insideY)){ insideX = anchor.x; insideY = anchor.y; }
     }
     let ax=insideX, ay=insideY, bx=targetCx, by=targetCy;
     for(let i=0;i<18;i++){
       const mx=(ax+bx)/2, my=(ay+by)/2;
-      if(isStraightLineInside(line, mx, my)){ ax=mx; ay=my; } else { bx=mx; by=my; }
+      if(linePlaceOK(line, mx, my)){ ax=mx; ay=my; } else { bx=mx; by=my; }
     }
     return {x:ax-anchor.x, y:ay-anchor.y, changed:true};
   }
@@ -1425,7 +1458,8 @@ function clampLineOffsetToShape(line, desiredOx, desiredOy, fallbackOx, fallback
 function shrinkToFit(line){
   const t=getPreviewText(line.id); if(!t) return false;
   const a=textAnchor(state.shape,CFG_CX,CFG_CY,CFG_MM);
-  const cx=a.x+line.offX*CFG_MM, cy=a.y+line.offY*CFG_MM;
+  /* bei erlaubtem Ueberstand: Groesse nur am Anker pruefen — ueber den Rand Gezogenes wird beschnitten, nicht verkleinert */
+  const cx=a.x+(overflowOK()?0:line.offX*CFG_MM), cy=a.y+(overflowOK()?0:line.offY*CFG_MM);
   let sc=line.fontScale, n=0;
   while(!isStraightLineInside(line,cx,cy) && n<18 && sc>.15){
     sc*=.9; t.dataset.fontScale=sc;
@@ -1463,7 +1497,7 @@ function keepLineInside(line){
   /* Ist auch der Ausweichpunkt ungueltig (Pfote/Doktorhut: der Anker liegt in einer Sperrzone), nicht verschieben —
      sonst springt die Zeile beim Neuzeichnen auf den Anker. Dann bleibt sie, wo der Kunde sie hingelegt hat. */
   const a0=textAnchor(state.shape,CFG_CX,CFG_CY,CFG_MM);
-  if(clamped.changed && !isStraightLineInside(line, a0.x+clamped.x, a0.y+clamped.y)) clamped.changed=false;
+  if(clamped.changed && !linePlaceOK(line, a0.x+clamped.x, a0.y+clamped.y)) clamped.changed=false;
   if(clamped.changed){ line.offX=clamped.x/CFG_MM; line.offY=clamped.y/CFG_MM; updateSingleGroup(line.id); changed=true; }
   if(shrinkable && shrinkToFit(line)) changed=true;
   return changed;
@@ -1635,7 +1669,7 @@ function nudgeLine(dx,dy,step){
   }
   const c=clampLineOffsetToShape(line, (line.offX+dx*step)*CFG_MM, (line.offY+dy*step)*CFG_MM, line.offX*CFG_MM, line.offY*CFG_MM);
   line.offX=c.x/CFG_MM; line.offY=c.y/CFG_MM; selVisible=true;
-  updateSingleGroup(line.id); drawSelection(); syncSelectedControls();
+  updateSingleGroup(line.id); drawSelection(); syncSelectedControls(); $('clipNote').hidden=!linesOverflow();
 }
 document.querySelectorAll('#nudgeBtns button').forEach(b=>b.addEventListener('click',()=>nudgeLine(+b.dataset.dx,+b.dataset.dy,0.2)));
 document.addEventListener('keydown',e=>{
@@ -1789,7 +1823,7 @@ cfgSvgEl.addEventListener('pointermove',e=>{
 function endDrag(){
   if(!drag) return;
   try{ cfgSvgEl.releasePointerCapture(drag.id); }catch(_){ }
-  drag=null; cfgSvgEl.style.cursor=''; stageEl.classList.remove('dragging','cropping');
+  drag=null; cfgSvgEl.style.cursor=''; $('clipNote').hidden=!linesOverflow(); stageEl.classList.remove('dragging','cropping');
   drawGuides(false,false); syncSelectedControls();
 }
 cfgSvgEl.addEventListener('pointerup',endDrag);
@@ -2103,9 +2137,11 @@ function orderTexts(){
 }
 function orderSVG(){ return '<?xml version="1.0" encoding="UTF-8"?>\n'+new XMLSerializer().serializeToString(orderSVGEl()); }
 /* Beide Seiten in EINER Datei: links Vorderseite, rechts Rueckseite (IDs der Rueckseite mit b_ praefixiert) */
+let overflowSeen=false;
 function orderSVGBoth(){
   const cur=sides.cur, parts={};
-  ['front','back'].forEach(sd=>{ setSide(sd); const el=orderSVGEl(); el.querySelectorAll('desc').forEach(d=>d.remove()); parts[sd]=el; });
+  overflowSeen=false;
+  ['front','back'].forEach(sd=>{ setSide(sd); if(linesOverflow()) overflowSeen=true; const el=orderSVGEl(); el.querySelectorAll('desc').forEach(d=>d.remove()); parts[sd]=el; });
   setSide(cur);
   const W=300, ser=new XMLSerializer();
   const nest=(el,x,id)=>{ el.setAttribute('x',x); el.setAttribute('y',0); el.setAttribute('width',W); el.setAttribute('height',W); el.setAttribute('id',id); return ser.serializeToString(el); };
@@ -2147,12 +2183,13 @@ function orderPNG(svg,w=900,h=900){
   });
 }
 async function collectOrder(){
-  const both=sides.on, svg=both ? orderSVGBoth() : orderSVG(), png=await orderPNG(svg, both?1800:900, 900);
+  const both=sides.on; overflowSeen=false; const svg=both ? orderSVGBoth() : orderSVG(), png=await orderPNG(svg, both?1800:900, 900);
   const shapeParam=new URLSearchParams(location.search).get('shape')||state.shape;
   const details={};
   if(SHAPES[state.shape] && !state.bracelet && !isKey(state.shape) && !isCoin(state.shape) && state.shape!=='dogtag') details['Kettenlänge']=state.len+' cm';
   if(state.mapPaths) details['Karte']=state.mapLabel||'ja';
   if(state.photo) details['Foto-Gravur']='ja';
+  if(linesOverflow() || overflowSeen) details['Beschnitt']='Text ragt bewusst über den Rand – nur der Teil auf der Fläche wird graviert (clipPath in der SVG)';
   if(backPaid()) details['Rückseitengravur']='ja (+ '+BACK_PRICE.toFixed(2).replace('.',',')+' €)';
   return { shape:shapeParam, title:$('edTitle').textContent.replace(/\s*gestalten$/,''),
     gravurText:orderTexts(), details, designDaten:snapshot(), svg, png,
