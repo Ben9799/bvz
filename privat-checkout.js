@@ -1,7 +1,7 @@
 /* Wolf Lasermark — Kasse fuer den Privat-Shop (privat-shop-ducett.html).
    Uebernommen aus dem bewaehrten Checkout von privat-gravur.html:
    Firestore "privat-bestellungen" (Auto-Rechnung liest das), Storage-Upload der Gravurdatei,
-   Gutscheine, Formspree-Benachrichtigung, PayPal + Karte (LIVE-App "WL Gravur Shop Live").
+   Gutscheine, Bestell-Mail an uns aus info@ (Rechner-Job), PayPal + Karte (LIVE-App "WL Gravur Shop Live").
 
    Aufruf:  WLCheckout.open(order)
      order = { key, produkt, form, variante, material, schmuck:bool, unit:Number,
@@ -20,7 +20,6 @@ import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gsta
 /* LIVE-Client-ID (geprueft 2026-08-30 gegen developer.paypal.com/dashboard/applications/live,
    App "WL Gravur Shop Live"). Die alte Sandbox-ID AVoTaZt4… NIE wieder einsetzen. */
 const PAYPAL_CLIENT_ID = "BAAhZHJG81nSPL2TIZk4WBfahJJW7YsXSrYtYm2Iv0etpBHE2UGvZNfvro66TlHpCH_WQ8j2Xzp4M0XUXs";
-const FORMSPREE = "https://formspree.io/f/xpqjjobb";
 const AGB_URL = "https://itrk.legal/Ipk.2Y.Cj6.html";
 const WIDERRUF_URL = "https://itrk.legal/Ipk.2J.Cj6.html";
 
@@ -48,6 +47,18 @@ function upload(blob, path, contentType){
 async function saveOrder(id, data){
   await authReady;
   return setDoc(doc(db,"privat-bestellungen",id), Object.assign({}, data, { status:"neu", createdAt: serverTimestamp() }));
+}
+/* Seit 2026-11-24 gibt es keine Formspree-Mail mehr: die Bestell-Mail an uns verschickt
+   der Rechner aus info@ (auto-invoice-run.py), sobald die Bestellung in Firestore liegt.
+   Darum muss das Speichern sitzen — bis zu 4 Versuche, sonst ehrlicher Hinweis an den Kunden. */
+async function saveOrderRetry(id, data){
+  let last;
+  for(let i=0;i<4;i++){
+    try{ await saveOrder(id,data); return true; }
+    catch(e){ last=e; console.error('Firestore-Bestellung-Fehler (Versuch '+(i+1)+')',e); await new Promise(r=>setTimeout(r,1500*(i+1))); }
+  }
+  try{ localStorage.setItem('wl-order-'+id, JSON.stringify(data)); }catch(e){}
+  return false;
 }
 function couponUses(c){
   let maxUses=Number(c.max_uses); if(!Number.isFinite(maxUses)||maxUses<1) maxUses=1;
@@ -184,6 +195,7 @@ const HTML=`
     <h2>Vielen Dank<span id="coThx"></span>!</h2>
     <p>Deine Bestellung ist eingegangen und bezahlt. Du erhältst in Kürze eine Bestätigung per E-Mail.</p>
     <p style="font-size:.78rem;color:#7a7a7a">Bestellnummer: <span id="coNo"></span></p>
+    <p id="coSaveWarn" hidden style="font-size:.85rem;color:#7a4a00;background:#fff6e5;border-radius:8px;padding:10px 12px;margin-top:12px">Deine Zahlung ist angekommen, aber die Gravurdaten konnten wir gerade nicht speichern. Bitte schreib uns kurz an <a href="mailto:info@wolf-lasermark.de">info@wolf-lasermark.de</a> mit der Nummer <b></b> – wir melden uns sofort.</p>
     <button type="button" class="co-order" id="coDone" style="max-width:220px;margin:18px auto 0">Schließen</button>
   </div>
 </div>`;
@@ -312,27 +324,11 @@ async function finalize(orderID, details, opts){
     quelle: 'privat-shop'
   };
   if(opts.dry){ return { id, data, svgLen:svg.length, pngLen:png.length }; }
-  try{ await saveOrder(id,data); }catch(e){ console.error('Firestore-Bestellung-Fehler',e); }
+  const saved=await saveOrderRetry(id,data);
   if(coupon){ try{ await redeemCoupon(coupon.code,id); }catch(e){ console.error(e); } }
-  try{
-    const fd=new FormData();
-    fd.append('Produkt',data.produkt); fd.append('Details',data.details||'–');
-    fd.append('Gravur',data.gravurText||(data.mitFoto?'(nur Foto)':'–'));
-    if(data.designDaten) fd.append('Design_Daten',data.designDaten.slice(0,4000));
-    fd.append('Material',data.material||'–');
-    fd.append('Menge',String(data.menge)); fd.append('Einzelpreis',data.einzelpreis);
-    if(coupon) fd.append('Gutschein',coupon.code+' (−'+coupon.percent+'% = −'+eur(D)+')');
-    fd.append('Gesamtpreis',data.gesamtpreis);
-    fd.append('Name',data.name); fd.append('Email',data.email); fd.append('Telefon',data.telefon||'–');
-    fd.append('Adresse',data.adresse); fd.append('Anmerkung',data.anmerkung||'–');
-    fd.append('Design_SVG',svgUrl||'(Upload fehlgeschlagen)'); fd.append('Vorschau_PNG',pngUrl||'(kein PNG)');
-    if(fotoUrl) fd.append('Original_Foto',fotoUrl);
-    fd.append('PayPal_OrderID',data.paypalOrderId); fd.append('PayPal_Status',data.paypalStatus); fd.append('PayPal_Payer',data.paypalPayer);
-    fd.append('Bestellnummer',id);
-    fd.append('_replyto',data.email);
-    fd.append('_subject','🛒 Neue PRIVAT-Shop Bestellung: '+data.produkt+' ×'+data.menge+' – '+data.name);
-    await fetch(FORMSPREE,{method:'POST',headers:{'Accept':'application/json'},body:fd});
-  }catch(e){ console.error('Formspree-Fehler',e); }
+  // Bestell-Mail an uns: kommt aus info@ (auto-invoice-run.py), sobald die Bestellung in Firestore liegt.
+  const warn=$('coSaveWarn');
+  if(warn){ warn.hidden=saved; if(!saved) warn.querySelector('b').textContent=id+(data.paypalOrderId?' / PayPal '+data.paypalOrderId:''); }
   $('coThx').textContent=data.name?', '+data.name.split(' ')[0]:'';
   $('coNo').textContent=id;
   $('coForm').hidden=true; $('coOk').hidden=false;
